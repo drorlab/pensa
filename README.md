@@ -23,6 +23,7 @@ Python 3 with:
 
 - upload examples
 - add CNN difference learning
+- implement Wasserstein distance
 - add generic preprocessing script
 - add job submission scripts like in DrorMD 
   (alternative: merge methods in there)
