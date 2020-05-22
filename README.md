@@ -1,4 +1,4 @@
-# pensa - Protein Ensemble Analysis
+# PENSA - Protein Ensemble Analysis
 
 A collection of python methods to cluster and compare ensembles of protein structures.
 
