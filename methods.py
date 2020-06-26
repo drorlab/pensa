@@ -319,7 +319,8 @@ def obtain_clusters(data,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=
     return cl_idx
 
 
-def obtain_combined_clusters(data_g,data_a,start_frame,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=100,saveas=None):
+def obtain_combined_clusters(data_g, data_a, start_frame, label_g, label_a,
+                             algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=100,plot=True,saveas=None):
     '''Performs a PyEMMA clustering on a combination of two data sets.
     
     Parameters
@@ -330,6 +331,10 @@ def obtain_combined_clusters(data_g,data_a,start_frame,algorithm='kmeans',num_cl
         Trajectory data [frames,frame_data]
     start_frame: int.
         Frame from which the clustering data starts.
+    label_g: str.
+        Label for the plot.
+    label_a: str.
+        Label for the plot.
     algorithm: string
         The algorithm to use for the clustering. 
         Options: kmeans, rspace. Default: kmeans
@@ -362,22 +367,36 @@ def obtain_combined_clusters(data_g,data_a,start_frame,algorithm='kmeans',num_cl
     # Extract cluster indices
     cidx = clusters.get_output()[0][:,0]
 
-    # Count and plot
-    fig,ax = plt.subplots(1,1,figsize=[4,3],sharex=True,dpi=100)
-    c, nc   = np.unique(cidx,return_counts=True)
-    cg, ncg = np.unique(cidx[cond==1],return_counts=True)
-    ca, nca = np.unique(cidx[cond==0],return_counts=True)
-    ax.bar(cg-0.15,ncg,0.3,label='G-bound')
-    ax.bar(ca+0.15,nca,0.3,label='arr-bound')
-    ax.legend()
-    ax.set_xticks(c)
-    ax.set_xlabel('clusters')
-    ax.set_ylabel('population')
-    fig.tight_layout()
-    if saveas is not None:
-        fig.savefig(saveas,dpi=300)
+    # Calculate centroids and total within-cluster sum of square
+    centroids = []
+    total_wss = 0
+    for i in np.unique(cidx):
+        # get the data for this cluster
+        cluster_data = data[np.where(cidx==i)]
+        # calcualte the centroid
+        cluster_centroid = np.mean(cluster_data,0)
+        centroids.append(cluster_centroid)
+        # calculate the within-cluster sum of square
+        cluster_wss = np.sum( (cluster_data - centroid)**2 )
+        total_wss += cluster_wss
     
-    return cidx, cond, oidx
+    # Count and plot
+    if plot:
+        fig,ax = plt.subplots(1,1,figsize=[4,3],sharex=True,dpi=100)
+        c, nc   = np.unique(cidx,return_counts=True)
+        cg, ncg = np.unique(cidx[cond==1],return_counts=True)
+        ca, nca = np.unique(cidx[cond==0],return_counts=True)
+        ax.bar(cg-0.15,ncg,0.3,label=label_g)
+        ax.bar(ca+0.15,nca,0.3,label=label_a)
+        ax.legend()
+        ax.set_xticks(c)
+        ax.set_xlabel('clusters')
+        ax.set_ylabel('population')
+        fig.tight_layout()
+        if saveas is not None:
+            fig.savefig(saveas,dpi=300)
+    
+    return cidx, cond, oidx, total_wss, centroids
 
 
 def write_cluster_traj(cluster_idx,base_name,name,sim,start_frame):
