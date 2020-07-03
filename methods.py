@@ -217,7 +217,7 @@ def project_on_pc(data,ev_idx,pca=None):
     return projection
     
 
-def sort_trajs_along_common_pc(data_g,data_a,start_frame,name_g,name_a,sim):
+def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g, name_a, out_name):
     '''Sort two trajectories along the 12 highest principal components.
     
     Parameters
@@ -228,14 +228,18 @@ def sort_trajs_along_common_pc(data_g,data_a,start_frame,name_g,name_a,sim):
         Trajectory data [frames,frame_data]
     start_frame: int
         offset of the data with respect to the trajectories (defined below)
+    ref_g: string.
+        reference topology for the first trajectory (g-bound). 
+    ref_a: string.
+        reference topology for the second trajectory (arr-bound). 
     name_g: string.
         first of the trajetories from which the frames are picked (g-bound). 
         Should be the same as data_g was from.
     name_a: string.
-        first of the trajetories from which the frames are picked (arr-bound). 
+        second of the trajetories from which the frames are picked (arr-bound). 
         Should be the same as data_g was from.
-    sim: string.
-        simulation type (tremd or mremd)
+    out_name: string.
+        core part of the name of the output files
     '''
     
     # Combine the data
@@ -252,8 +256,8 @@ def sort_trajs_along_common_pc(data_g,data_a,start_frame,name_g,name_a,sim):
     pca = pyemma.coordinates.pca(data,dim=3)
 
     # Define the MDAnalysis trajectories from where the frames come
-    ug = mda.Universe("traj/"+name_g+".gro","traj/"+name_g+"_"+sim+".xtc")
-    ua = mda.Universe("traj/"+name_a+".gro","traj/"+name_a+"_"+sim+".xtc")
+    ug = mda.Universe("traj/"+ref_g+".gro","traj/"+name_g+".xtc")
+    ua = mda.Universe("traj/"+ref_a+".gro","traj/"+name_a+".xtc")
 
     ag = ug.select_atoms('all')
     aa = ua.select_atoms('all')
@@ -269,7 +273,7 @@ def sort_trajs_along_common_pc(data_g,data_a,start_frame,name_g,name_a,sim):
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
 
-        with mda.Writer("pca/"+name_g.split('_')[0]+"_"+name_g.split('_')[-1]+"_"+sim+"_pc"+str(evi)+".xtc", ag.n_atoms) as W:
+        with mda.Writer("pca/"+out_name+"_pc"+str(evi)+".xtc", ag.n_atoms) as W:
             for i in range(data.shape[0]):
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ug.trajectory[oidx_sort[i]]
