@@ -9,44 +9,6 @@ import matplotlib.pyplot as plt
 
 
 
-def get_features(pdb,xtc,start_frame):
-    
-    labels = []
-    features = []
-    data = []
-    
-    torsions_feat  = pyemma.coordinates.featurizer(pdb)
-    torsions_feat.add_backbone_torsions(cossin=True, periodic=False)
-    torsions_data = pyemma.coordinates.load(xtc, features=torsions_feat)[start_frame:]
-    labels   = ['backbone\ntorsions']
-    features = [torsions_feat]
-    data     = [torsions_data]
-    
-    positions_feat = pyemma.coordinates.featurizer(pdb)
-    positions_feat.add_selection(positions_feat.select_Backbone())
-    positions_data = pyemma.coordinates.load(xtc, features=positions_feat)[start_frame:]
-    labels   += ['backbone atom\npositions']
-    features += [positions_feat]
-    data     += [positions_data]
-    
-    distances_feat = pyemma.coordinates.featurizer(pdb)
-    distances_feat.add_distances(distances_feat.pairs(distances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
-    distances_data = pyemma.coordinates.load(xtc, features=distances_feat)[start_frame:]
-    labels   += ['backbone atom\ndistances']
-    features += [distances_feat]
-    data     += [distances_data]
-    
-    sidechains_feat  = pyemma.coordinates.featurizer(pdb)
-    sidechains_feat.add_sidechain_torsions(cossin=True, periodic=False)
-    sidechains_data = pyemma.coordinates.load(xtc, features=sidechains_feat)[start_frame:]
-    labels   += ['sidechains\ntorsions']
-    features += [sidechains_feat]
-    data     += [sidechains_data]
-    
-    return labels, features, data
-
-
-
 # --- METHODS FOR FEATURE DIFFERENCE ANALYSIS ---
 
 
@@ -381,7 +343,7 @@ def obtain_combined_clusters(data_g, data_a, start_frame, label_g, label_a,
         cluster_centroid = np.mean(cluster_data,0)
         centroids.append(cluster_centroid)
         # calculate the within-cluster sum of square
-        cluster_wss = np.sum( (cluster_data - centroid)**2 )
+        cluster_wss = np.sum( (cluster_data - cluster_centroid)**2 )
         total_wss += cluster_wss
     
     # Count and plot
@@ -403,17 +365,16 @@ def obtain_combined_clusters(data_g, data_a, start_frame, label_g, label_a,
     return cidx, cond, oidx, total_wss, centroids
 
 
-def write_cluster_traj(cluster_idx,base_name,name,sim,start_frame):
+def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame):
     '''Writes a trajectory into a separate file for each cluster.'''
     
-    print("traj/"+name+".gro","traj/"+name+"_"+sim+".xtc")
-    u = mda.Universe("traj/"+name+".gro","traj/"+name+"_"+sim+".xtc")
+    u = mda.Universe(top_file, trj_file)
     protein = u.select_atoms('all')
     
     num_clusters = np.max(cluster_idx)+1
     
     for nr in range(num_clusters):
-        with mda.Writer("clusters/"+base_name+"_"+name+"_"+sim+"_c"+str(nr)+".xtc", protein.n_atoms) as W:
+        with mda.Writer(out_name+"_c"+str(nr)+".xtc", protein.n_atoms) as W:
             for ts in u.trajectory:
                 if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr: 
                     W.write(protein)
