@@ -1,5 +1,6 @@
-import numpy as np
 import MDAnalysis as mda
+import pyemma
+import numpy as np
 
 
 
@@ -83,7 +84,7 @@ def extract_coordinates(ref, pdb, trj, out_name, sel_string):
     return
 
 
-def extract_coordinates_combined(ref, trj, sel_string, out_name, write_initial=False):
+def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0):
     """Extract selected coordinates from several trajectory files"""
         
     # Determine number of atoms from first trajectory
@@ -98,7 +99,7 @@ def extract_coordinates_combined(ref, trj, sel_string, out_name, write_initial=F
             print(s)
             u = mda.Universe(r, t)
             selection = u.select_atoms(s)
-            for ts in u.trajectory:
+            for ts in u.trajectory[start_frame:]:
                 W.write(selection)
             
     return

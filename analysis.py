@@ -179,6 +179,51 @@ def project_on_pc(data,ev_idx,pca=None):
     return projection
     
 
+def sort_traj_along_pc(data, pca, start_frame, ref, name, out_name, num_pc=3):
+    '''Sort a trajectory along given principal components.
+    
+    Parameters
+    ----------
+    data: float array.
+        Trajectory data [frames,frame_data]
+    pca: PCA object.
+        principal compoenents information
+    num_pc: int
+        sort along the first num_pc principal components
+    start_frame: int
+        offset of the data with respect to the trajectories (defined below)
+    ref: string.
+        reference topology for the first trajectory (g-bound). 
+    name: string.
+        first of the trajetories from which the frames are picked (g-bound). 
+        Should be the same as data_g was from.
+    out_name: string.
+        core part of the name of the output files
+    '''
+    
+    # Remember the index in the simulation (taking into account cutoff)
+    oidx = np.arange(len(data))+start_frame
+
+    # Define the MDAnalysis trajectories from where the frames come
+    u = mda.Universe("traj/"+ref+".gro","traj/"+name+".xtc")
+    a = u.select_atoms('all')
+
+    for evi in range(num_pc):
+
+        # Project the combined data on the principal component
+        proj = project_on_pc(data,evi,pca=pca)
+
+        # Sort everything along the projection on th resp. PC
+        sort_idx  = np.argsort(proj)
+        proj_sort = proj[sort_idx] 
+        oidx_sort = oidx[sort_idx]
+
+        with mda.Writer("pca/"+out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
+            for i in range(data.shape[0]):
+                ts = u.trajectory[oidx_sort[i]]
+                W.write(a)
+                
+                
 def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g, name_a, out_name):
     '''Sort two trajectories along the 12 highest principal components.
     
