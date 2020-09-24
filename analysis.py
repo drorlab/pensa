@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 def relative_entropy_analysis(features_a, features_g, all_data_a, all_data_g, bin_width=0.001, verbose=True):
-    """Calculates Jensen-Shannon distance, Kullback-Leibler divergences, and Kolmogorov-Smirnov statistic for the two distributions."""
+    """Calculates Jensen-Shannon distance, Kullback-Leibler divergences, and Kolmogorov-Smirnov statistic for two distributions."""
     
     # Assert that features are the same and data sets have same number of features
     assert features_a.describe() == features_g.describe()
