@@ -7,11 +7,6 @@ from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 
-# -- Import all analysis methods --
-
-from pensa.pca import *
-from pensa.clusters import *
-from pensa.featurediff import *
 
 
 # -- Loading the Features --
@@ -44,3 +39,4 @@ def get_features(pdb,xtc,start_frame):
     features_data['bb-distances'] = bbdistances_data.T
     
     return feature_names, features_data
+

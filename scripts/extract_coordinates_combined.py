@@ -1,5 +1,5 @@
 import argparse
-from preprocessing import *
+from pensa import load_selection, extract_coordinates_combined
 
 
 # -------------#
