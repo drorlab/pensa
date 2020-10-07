@@ -11,7 +11,7 @@ A collection of python methods to cluster and compare ensembles of protein struc
 
 ## Requirements
 
-Python 3 with:
+Python 3.7 with:
 - numpy
 - scipy
 - mdshare
@@ -21,13 +21,11 @@ Python 3 with:
 
 ## Installation
 
-     pip install -e . 
+    pip install -e . 
 
 ## To do:
 
 - upload examples
 - add CNN difference learning
 - implement Wasserstein distance
-- add generic preprocessing script
-- add job submission scripts like in DrorMD 
-  (alternative: merge methods in there)
+- add job submission scripts (?)
