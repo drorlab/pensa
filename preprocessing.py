@@ -10,32 +10,28 @@ import numpy as np
 def get_features(pdb,xtc,start_frame):
     """http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html"""
     
-    labels = []
-    features = []
-    data = []
+    feature_names = {}
+    features_data = {}
+
+    bbtorsions_feat = pyemma.coordinates.featurizer(pdb)
+    bbtorsions_feat.add_backbone_torsions(cossin=True, periodic=False)
+    bbtorsions_data = pyemma.coordinates.load(xtc, features=bbtorsions_feat)[start_frame:]
+    feature_names['bb-torsions'] = bbtorsions_feat
+    features_data['bb-torsions'] = bbtorsions_data.T
     
-    torsions_feat  = pyemma.coordinates.featurizer(pdb)
-    torsions_feat.add_backbone_torsions(cossin=True, periodic=False)
-    torsions_data = pyemma.coordinates.load(xtc, features=torsions_feat)[start_frame:]
-    labels   = ['backbone\ntorsions']
-    features = [torsions_feat]
-    data     = [torsions_data]
+    sctorsions_feat = pyemma.coordinates.featurizer(pdb)
+    sctorsions_feat.add_sidechain_torsions(cossin=True, periodic=False)
+    sctorsions_data = pyemma.coordinates.load(xtc, features=sctorsions_feat)[start_frame:]
+    feature_names['sc-torsions'] = sctorsions_feat
+    features_data['sc-torsions'] = sctorsions_data.T
+
+    bbdistances_feat = pyemma.coordinates.featurizer(pdb)
+    bbdistances_feat.add_distances(bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
+    bbdistances_data = pyemma.coordinates.load(xtc, features=bbdistances_feat)[start_frame:]
+    feature_names['bb-distances'] = bbdistances_feat
+    features_data['bb-distances'] = bbdistances_data.T
     
-    distances_feat = pyemma.coordinates.featurizer(pdb)
-    distances_feat.add_distances(distances_feat.pairs(distances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
-    distances_data = pyemma.coordinates.load(xtc, features=distances_feat)[start_frame:]
-    labels   += ['backbone atom\ndistances']
-    features += [distances_feat]
-    data     += [distances_data]
-    
-    sidechains_feat  = pyemma.coordinates.featurizer(pdb)
-    sidechains_feat.add_sidechain_torsions(cossin=True, periodic=False)
-    sidechains_data = pyemma.coordinates.load(xtc, features=sidechains_feat)[start_frame:]
-    labels   += ['sidechains\ntorsions']
-    features += [sidechains_feat]
-    data     += [sidechains_data]
-    
-    return labels, features, data
+    return feature_names, features_data
 
 
 
