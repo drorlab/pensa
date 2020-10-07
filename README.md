@@ -19,6 +19,10 @@ Python 3 with:
 - MDAnalysis
 - matplotlib
 
+## Installation
+
+     pip install -e . 
+
 ## To do:
 
 - upload examples
