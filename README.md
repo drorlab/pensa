@@ -21,7 +21,21 @@ Python 3.7 with:
 
 ## Installation
 
+Create and activate a conda environment:
+
+    conda create --name pensa python=3.7 numpy scipy matplotlib pyemma mdshare MDAnalysis -c conda-forge
+    conda activate pensa
+
+If you want to use PENSA with Jupyter notebooks:
+
+    conda install jupyter
+    
+Download and install PENSA:
+
+    git clone https://github.com/drorlab/pensa.git
+    cd pensa
     pip install -e . 
+
 
 ## To do:
 
