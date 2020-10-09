@@ -122,7 +122,73 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)
                 
-                                   
+
+def sort_trajs_along_common_pc(data_g, data_a, start_frame, top_g, top_a, trj_g, trj_a, out_name):
+    '''Sort two trajectories along the 12 highest principal components.
+    
+    Parameters
+    ----------
+    data_g: float array.
+        Trajectory data [frames,frame_data]
+    data_a: float array.
+        Trajectory data [frames,frame_data]
+    start_frame: int
+        offset of the data with respect to the trajectories (defined below)
+    top_g: string.
+        reference topology for the first trajectory (g-bound). 
+    top_a: string.
+        reference topology for the second trajectory (arr-bound). 
+    trj_g: string.
+        first of the trajetories from which the frames are picked (g-bound). 
+        Should be the same as data_g was from.
+    trj_a: string.
+        second of the trajetories from which the frames are picked (arr-bound). 
+        Should be the same as data_g was from.
+    out_name: string.
+        core part of the name of the output files
+    '''
+
+    # Combine the data
+    data = np.concatenate([data_g,data_a],0)
+
+    # Remember which simulation the data came frome
+    cond = np.concatenate([np.ones(len(data_g)), np.zeros(len(data_a))])
+
+    # Remember the index in the respective simulation (taking into account cutoff)
+    oidx = np.concatenate([np.arange(len(data_g))+start_frame, 
+                           np.arange(len(data_a))+start_frame])
+
+    # Calculate the principal components
+    pca = pyemma.coordinates.pca(data,dim=3)
+
+    # Define the MDAnalysis trajectories from where the frames come
+    ug = mda.Universe(top_g,trj_g)
+    ua = mda.Universe(top_a,trj_a)
+
+    ag = ug.select_atoms('all')
+    aa = ua.select_atoms('all')
+
+    for evi in range(12):
+
+        # Project the combined data on the principal component
+        proj = project_on_pc(data,evi,pca=pca)
+
+        # Sort everything along the projection on th resp. PC
+        sort_idx  = np.argsort(proj)
+        proj_sort = proj[sort_idx] 
+        cond_sort = cond[sort_idx]
+        oidx_sort = oidx[sort_idx]
+
+        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", ag.n_atoms) as W:
+            for i in range(data.shape[0]):
+                if cond_sort[i] == 1: # G-protein bound
+                    ts = ug.trajectory[oidx_sort[i]]
+                    W.write(ag)
+                elif cond_sort[i] == 0: # arrestin bound
+                    ts = ua.trajectory[oidx_sort[i]]
+                    W.write(aa)
+
+
 def compare_projections(data_g, data_a, pca, num=3, saveas=None):
     '''Compare two datasets along a given principal component.
     
