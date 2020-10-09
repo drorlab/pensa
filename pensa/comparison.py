@@ -17,6 +17,8 @@ def relative_entropy_analysis(features_a, features_g, all_data_a, all_data_g, bi
     Calculates Jensen-Shannon distance and Kullback-Leibler divergences for two distributions.
     """
     
+    all_data_a, all_data_g = all_data_a.T, all_data_g.T
+    
     # Assert that features are the same and data sets have same number of features
     assert features_a.describe() == features_g.describe()
     assert all_data_a.shape[0] == all_data_g.shape[0] 
@@ -71,6 +73,8 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
     Calculates Kolmogorov-Smirnov statistic for two distributions.
     """
     
+    all_data_a, all_data_g = all_data_a.T, all_data_g.T
+    
     # Assert that features are the same and data sets have same number of features
     assert features_a.describe() == features_g.describe()
     assert all_data_a.shape[0] == all_data_g.shape[0] 
@@ -109,6 +113,8 @@ def mean_difference_analysis(features_a, features_g, all_data_a, all_data_g, ver
     """
     Compares the arithmetic means of two distance distributions.
     """
+    
+    all_data_a, all_data_g = all_data_a.T, all_data_g.T
     
     # Assert that features are the same and data sets have same number of features
     assert features_a.describe() == features_g.describe()
