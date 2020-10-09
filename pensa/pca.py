@@ -21,7 +21,7 @@ def calculate_pca(data):
         Trajectory data [frames,frame_data]
     '''
     
-    pca = pyemma.coordinates.pca(data.T)
+    pca = pyemma.coordinates.pca(data)
     
     # Plot the eigenvalues
     fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=100)
@@ -68,8 +68,6 @@ def project_on_pc(data, ev_idx, pca=None):
         Pre-calculated PCA. Must be calculated for the same features (but not necessarily the same trajectory)
     '''
     
-    data = data.T
-    
     if pca is None:
         pca = pyemma.coordinates.pca(data) #,dim=3)
 
@@ -103,7 +101,7 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     '''
     
     # Remember the index in the simulation (taking into account cutoff)
-    oidx = np.arange(len(data.T))+start_frame
+    oidx = np.arange(len(data))+start_frame
 
     # Define the MDAnalysis trajectories from where the frames come
     u = mda.Universe(top,trj)
@@ -120,7 +118,7 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
         oidx_sort = oidx[sort_idx]
 
         with mda.Writer(out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
-            for i in range(data.shape[1]):
+            for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)
                 
