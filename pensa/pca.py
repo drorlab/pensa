@@ -187,4 +187,39 @@ def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g
                 elif cond_sort[i] == 0: # arrestin bound
                     ts = ua.trajectory[oidx_sort[i]]
                     W.write(aa)
+
                     
+def compare_projections(data_g, data_a, pca, num=3, saveas=None):
+    '''Compare two datasets along a given principal component.
+    
+    Parameters
+    ----------
+    data_g: float array.
+        Trajectory data [frames,frame_data]
+    data_a: float array.
+        Trajectory data [frames,frame_data]
+    pca: PCA object.
+        Principal components information.
+    num: int.
+        Number of princibal components to plot. 
+    saveas: string.
+        Name of the output file.
+    '''
+    
+    fig,ax = plt.subplots(num,2,figsize=[8,3*num],dpi=100)
+
+    for evi in range(num):
+        
+        proj_a = project_on_pc(data_a,evi,pca=pca)
+        proj_g = project_on_pc(data_g,evi,pca=pca)
+
+        ax[evi,0].plot(proj_a,alpha=0.5)
+        ax[evi,0].plot(proj_g,alpha=0.5)
+
+        ax[evi,1].hist(proj_a,bins=30,alpha=0.5,density=True)
+        ax[evi,1].hist(proj_g,bins=30,alpha=0.5,density=True)
+    
+    if saveas is not None:
+        fig.savefig(saveas,dpi=300)
+        
+        
