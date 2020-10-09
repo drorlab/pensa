@@ -78,7 +78,7 @@ def project_on_pc(data,ev_idx,pca=None):
     return projection
     
 
-def sort_traj_along_pc(data, pca, start_frame, ref, name, out_name, num_pc=3):
+def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     '''Sort a trajectory along given principal components.
     
     Parameters
@@ -91,11 +91,11 @@ def sort_traj_along_pc(data, pca, start_frame, ref, name, out_name, num_pc=3):
         sort along the first num_pc principal components
     start_frame: int
         offset of the data with respect to the trajectories (defined below)
-    ref: string.
-        reference topology for the first trajectory (g-bound). 
-    name: string.
-        first of the trajetories from which the frames are picked (g-bound). 
-        Should be the same as data_g was from.
+    top: string.
+        reference topology for the trajectory. 
+    trj: string.
+        first of the trajetories from which the frames are picked. 
+        Should be the same as data was from.
     out_name: string.
         core part of the name of the output files
     '''
@@ -104,7 +104,7 @@ def sort_traj_along_pc(data, pca, start_frame, ref, name, out_name, num_pc=3):
     oidx = np.arange(len(data))+start_frame
 
     # Define the MDAnalysis trajectories from where the frames come
-    u = mda.Universe("traj/"+ref+".gro","traj/"+name+".xtc")
+    u = mda.Universe(top,trj)
     a = u.select_atoms('all')
 
     for evi in range(num_pc):
@@ -117,13 +117,13 @@ def sort_traj_along_pc(data, pca, start_frame, ref, name, out_name, num_pc=3):
         proj_sort = proj[sort_idx] 
         oidx_sort = oidx[sort_idx]
 
-        with mda.Writer("pca/"+out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
+        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
             for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)
                 
                 
-def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g, name_a, out_name):
+def sort_trajs_along_common_pc(data_g, data_a, start_frame, top_g, top_a, trj_g, trj_a, out_name):
     '''Sort two trajectories along the 12 highest principal components.
     
     Parameters
@@ -134,14 +134,14 @@ def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g
         Trajectory data [frames,frame_data]
     start_frame: int
         offset of the data with respect to the trajectories (defined below)
-    ref_g: string.
+    top_g: string.
         reference topology for the first trajectory (g-bound). 
-    ref_a: string.
+    top_a: string.
         reference topology for the second trajectory (arr-bound). 
-    name_g: string.
+    trj_g: string.
         first of the trajetories from which the frames are picked (g-bound). 
         Should be the same as data_g was from.
-    name_a: string.
+    trj_a: string.
         second of the trajetories from which the frames are picked (arr-bound). 
         Should be the same as data_g was from.
     out_name: string.
@@ -162,8 +162,8 @@ def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g
     pca = pyemma.coordinates.pca(data,dim=3)
 
     # Define the MDAnalysis trajectories from where the frames come
-    ug = mda.Universe("traj/"+ref_g+".gro","traj/"+name_g+".xtc")
-    ua = mda.Universe("traj/"+ref_a+".gro","traj/"+name_a+".xtc")
+    ug = mda.Universe(top_g,trj_g)
+    ua = mda.Universe(top_a,trj_a)
 
     ag = ug.select_atoms('all')
     aa = ua.select_atoms('all')
@@ -179,7 +179,7 @@ def sort_trajs_along_common_pc(data_g, data_a, start_frame, ref_g, ref_a, name_g
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
 
-        with mda.Writer("pca/"+out_name+"_pc"+str(evi)+".xtc", ag.n_atoms) as W:
+        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", ag.n_atoms) as W:
             for i in range(data.shape[0]):
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ug.trajectory[oidx_sort[i]]
