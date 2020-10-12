@@ -117,9 +117,7 @@ if __name__ == "__main__":
     for f in sf[:args.print_num]: print(f[0], f[1])
 
     # Visualize the deviations in a matrix plot
-    matrix = distances_visualization(names, jsd, 
-                                     args.out_plots+"_bbdist-means_diff.pdf",
-                                     vmin = 0.0, vmax = 1.0)
+    matrix = distances_visualization(names, diff, args.out_plots+"_bbdist-means_diff.pdf")
 
 
 
