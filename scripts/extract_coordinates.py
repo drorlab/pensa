@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sel_base", type=str, default='protein and ')
-    parser.add_argument("--sel_file", type=str, default='selection.txt')
+    parser.add_argument("--sel_file", type=str, default='')
     parser.add_argument("--ref_file", type=str, default='system.psf')
     parser.add_argument("--pdb_file", type=str, default='system.pdb')
     parser.add_argument("--trj_file", type=str, default='stitched_310.nc')
@@ -18,7 +18,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load the selection and generate the string
-    sel_string = load_selection(args.sel_file, args.sel_base)
+    if len(args.sel_file) > 0: 
+        sel_string = load_selection(args.sel_file, args.sel_base)
+    else:
+        sel_string = args.sel_base
     print(sel_string)
 
     # Extract the coordinates from the trajectory
