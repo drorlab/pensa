@@ -23,7 +23,7 @@ Python 3.7 with:
 
 Create and activate a conda environment:
 
-    conda create --name pensa python=3.7 numpy scipy matplotlib pyemma mdshare MDAnalysis -c conda-forge
+    conda create --name pensa python=3.7 numpy scipy>=1.2 matplotlib pyemma mdshare MDAnalysis -c conda-forge
     conda activate pensa
 
 If you want to use PENSA with Jupyter notebooks:
