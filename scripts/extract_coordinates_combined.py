@@ -21,8 +21,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load the selection and generate the strings
-    sel_string_a = load_selection(args.sel_file, args.sel_base_a)
-    sel_string_b = load_selection(args.sel_file, args.sel_base_b)
+    if len(args.sel_file) > 0:
+        sel_string_a = load_selection(args.sel_file, args.sel_base_a)
+        sel_string_b = load_selection(args.sel_file, args.sel_base_b)
+    else:
+        sel_string_a = args.sel_base_a
+        sel_string_b = args.sel_base_b
 
     print(args.trj_file_a)
     print(args.trj_file_b)
