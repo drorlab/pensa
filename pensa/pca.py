@@ -23,15 +23,23 @@ def calculate_pca(data):
     
     pca = pyemma.coordinates.pca(data)
     
-    # Plot the eigenvalues
-    fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=100)
-    ax.plot(pca.eigenvalues[:12],'o')
-    plt.show()   
-    
     return pca
 
 
-def pca_features(pca, features, num, threshold):
+def pca_eigenvalues_plot(pca, num=12, plot_file=None):
+
+    fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
+    ax.plot(np.arange(num)+1, pca.eigenvalues[:num], 'o')
+    ax.set_xlabel('component number')
+    ax.set_ylabel('eigenvalue')
+    fig.tight_layout()
+
+    if plot_file: fig.savefig(plot_file)
+
+    return 
+
+
+def pca_features(pca, features, num, threshold, plot_file=None):
     '''Prints relevant features and plots feature correlations.
     
     Parameters
@@ -47,12 +55,18 @@ def pca_features(pca, features, num, threshold):
     '''
     
     # Plot the highest PC correlations and print relevant features
-    fig,ax = plt.subplots(num,1,figsize=[4,num*3],dpi=100,sharex=True)
+    fig,ax = plt.subplots(num,1,figsize=[4,num*3],dpi=300,sharex=True)
     for i in range(num):
-        relevant = pca.feature_PC_correlation[:,i]**2 > threshold
-        print(np.array(features)[relevant])
+        relevant = pca.feature_PC_correlation[:,i]**2 > threshold**2
+        print("Features with abs. corr. above a threshold of %3.1f for PC %i:"%(threshold, i+1))
+        for j, ft in enumerate(features):
+            if relevant[j]: print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
         ax[i].plot(pca.feature_PC_correlation[:,i])
-    plt.show()
+    fig.tight_layout()
+
+    if plot_file: fig.savefig(plot_file)
+
+    return 
     
     
 def project_on_pc(data, ev_idx, pca=None):
@@ -123,7 +137,7 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
                 W.write(a)
                 
 
-def sort_trajs_along_common_pc(data_g, data_a, start_frame, top_g, top_a, trj_g, trj_a, out_name):
+def sort_trajs_along_common_pc(data_g, data_a, start_frame, top_g, top_a, trj_g, trj_a, out_name, num_pc=3):
     '''Sort two trajectories along the 12 highest principal components.
     
     Parameters
@@ -168,7 +182,7 @@ def sort_trajs_along_common_pc(data_g, data_a, start_frame, top_g, top_a, trj_g,
     ag = ug.select_atoms('all')
     aa = ua.select_atoms('all')
 
-    for evi in range(12):
+    for evi in range(num_pc):
 
         # Project the combined data on the principal component
         proj = project_on_pc(data,evi,pca=pca)
