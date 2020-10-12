@@ -316,12 +316,14 @@ def distances_visualization(dist_names, dist_diff, out_filename,
     fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
     img = ax.imshow(diff, vmin=vmin, vmax=vmax)
     ax.xaxis.set_ticks_position('top')
-    ax.set_xticks(np.arange(50-firstres,450,50))
-    ax.set_yticks(np.arange(50-firstres,450,50))
-    ax.set_xticklabels(np.arange(50,451,50))
-    ax.set_yticklabels(np.arange(50,451,50))
+    ax.set_xticks(np.arange(50-firstres,lastres-firstres+1,50))
+    ax.set_yticks(np.arange(50-firstres,lastres-firstres+1,50))
+    ax.set_xticklabels(np.arange(50,lastres+1,50))
+    ax.set_yticklabels(np.arange(50,lastres+1,50))
     fig.colorbar(img,ax=ax)
     fig.tight_layout()
     fig.savefig(out_filename,dpi=300)  
     
     return diff
+
+
