@@ -1,6 +1,8 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
+import scipy.spatial
+import scipy.spatial.distance
 import mdshare
 import pyemma
 from pyemma.util.contexts import settings
@@ -296,12 +298,14 @@ def sort_distances(dist_names, dist_avg, dist_relen, dist_id):
         
 
 def distances_visualization(dist_names, dist_diff, out_filename, 
-                            vmin=None, vmax=None):
+                            vmin=None, vmax=None, verbose=False):
         
     # Distance Matrix
     firstres = int(dist_names[0].split(' ')[2])
     lastres  = int(dist_names[-1].split(' ')[2])
-    print('first:',firstres,', last:',lastres)
+    if verbose:
+        print('Plotting distance matrix')
+        print('first res:', firstres, ', last res:', lastres)
     size = lastres-firstres+2
     diff = np.zeros([size,size])
     for n,name in enumerate(dist_names):
