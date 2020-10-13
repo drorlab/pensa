@@ -34,7 +34,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
 
-    if plot_file: fig.savefig(plot_file)
+    if plot_file: fig.savefig(plot_file,dpi=300)
 
     return 
 
@@ -64,7 +64,7 @@ def pca_features(pca, features, num, threshold, plot_file=None):
         ax[i].plot(pca.feature_PC_correlation[:,i])
     fig.tight_layout()
 
-    if plot_file: fig.savefig(plot_file)
+    if plot_file: fig.savefig(plot_file,dpi=300)
 
     return 
     

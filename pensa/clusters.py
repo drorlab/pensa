@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 # --- METHODS FOR CLUSTERING ---
     
     
-def obtain_clusters(data,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=100):
+def obtain_clusters(data,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=100,
+                    plot=True,saveas=None):
     '''Performs a PyEMMA clustering on the provided data
     
     Parameters
@@ -41,9 +42,12 @@ def obtain_clusters(data,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=
     cl_idx = clusters.get_output()[0][:,0]
     
     # Count and plot
-    fig,ax = plt.subplots(1,1,figsize=[4,3])
-    c, nc = np.unique(cl_idx,return_counts=True)
-    ax.bar(c,nc)
+    if plot:
+        fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=300)
+        c, nc = np.unique(cl_idx,return_counts=True)
+        ax.bar(c,nc)
+        if saveas is not None:
+            fig.savefig(saveas,dpi=300)
     
     return cl_idx
 
@@ -111,7 +115,7 @@ def obtain_combined_clusters(data_g, data_a, start_frame, label_g, label_a,
     
     # Count and plot
     if plot:
-        fig,ax = plt.subplots(1,1,figsize=[4,3],sharex=True,dpi=100)
+        fig,ax = plt.subplots(1,1,figsize=[4,3],sharex=True,dpi=300)
         c, nc   = np.unique(cidx,return_counts=True)
         cg, ncg = np.unique(cidx[cond==1],return_counts=True)
         ca, nca = np.unique(cidx[cond==0],return_counts=True)
