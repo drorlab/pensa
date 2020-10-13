@@ -13,7 +13,7 @@ A collection of python methods to cluster and compare ensembles of protein struc
 
 Python 3.7 with:
 - numpy
-- scipy
+- scipy >= 1.2
 - mdshare
 - pyemma
 - MDAnalysis
@@ -39,7 +39,6 @@ Download and install PENSA:
 
 ## To do:
 
-- upload examples
 - add CNN difference learning
 - implement Wasserstein distance
 - add job submission scripts (?)
