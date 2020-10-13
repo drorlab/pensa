@@ -142,3 +142,37 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame):
                 if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr: 
                     W.write(protein)
                     
+                    
+def wss_over_number_of_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B', start_frame = 0, 
+                                algorithm='kmeans', max_iter=100, num_repeats = 5, max_num_clusters = 12, 
+                                plot_file = None):
+    '''Calculates the Within-Sum-of-Squares for different numbers of clusters,
+       averaged over several iterations.'''
+    
+    all_wss = []
+    std_wss = []
+    for nc in range(1,max_num_clusters):
+        rep_wss = []
+        for repeat in range(num_repeats):
+            cc = obtain_combined_clusters(data_a, data_b, start_frame, 
+                                          label_a, label_b,  
+                                          algorithm=algorithm, max_iter=max_iter, 
+                                          num_clusters=nc, plot=False)
+            cidx, cond, oidx, wss, centroids = cc
+            rep_wss.append(wss)
+
+        all_wss.append(np.mean(rep_wss))
+        std_wss.append(np.std(rep_wss))
+        
+    fig, ax = plt.subplots(1,1, figsize=[4,3], dpi=300)
+    ax.errorbar(np.arange(len(all_wss))+2,np.array(all_wss),yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    ax.set_xlabel('number of clusters')
+    ax.set_ylabel('total WSS')
+    fig.tight_layout()
+    if plot_file: fig.savefig(plot_file)
+    
+    return all_wss, std_wss
+    
+    
+
+                    
