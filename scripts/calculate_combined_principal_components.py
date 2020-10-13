@@ -29,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("--out_plots",   type=str, default='plots/rhodopsin_receptor' )
     parser.add_argument("--out_pc",      type=str, default='pca/rhodopsin_receptor' )
     parser.add_argument("--start_frame", type=int, default=0 )
+    parser.add_argument("--feature_type", type=str, default='bb-torsions' )
     parser.add_argument("--num_eigenvalues", type=int, default=12 )
     parser.add_argument("--num_components",  type=int, default=3 )
     parser.add_argument("--feat_threshold",  type=float, default=0.4 )
@@ -49,24 +50,27 @@ if __name__ == "__main__":
         print(k, data_b[k].shape)
 
 
-    # -- BACKBONE TORSIONS --
+    # -- JOINT PCA --
+
+    ftype = args.feature_type
 
     # Calculate the principal components of the combined data
-    combined_data_tors = np.concatenate([data_a['bb-torsions'], data_b['bb-torsions']], 0)
-    pca = calculate_pca(combined_data_tors)
+    combined_data = np.concatenate([data_a[ftype], data_b[ftype]], 0)
+    pca = calculate_pca(combined_data)
     # Plot the corresponding eigenvalues
     pca_eigenvalues_plot(pca, num=args.num_eigenvalues, 
-                         plot_file=args.out_plots+"_eigenvalues_combined.pdf")
+                         plot_file=args.out_plots+"_"+ftype+"_eigenvalues_combined.pdf")
     # Plot feature correlation with top components and print relevant features
-    pca_features(pca, feat_a['bb-torsions'].describe(), 
+    pca_features(pca, feat_a[ftype].describe(), 
                  args.num_components, args.feat_threshold,
-                 plot_file=args.out_plots+"_feature_correlation.pdf")
+                 plot_file=args.out_plots+"_"+ftype+"_feature_correlation.pdf")
     # Sort each of the trajectories along the top components of combined data
-    sort_trajs_along_common_pc(data_a['bb-torsions'], data_b['bb-torsions'], args.start_frame,
+    sort_trajs_along_common_pc(data_a[ftype], data_b[ftype], args.start_frame,
                                args.ref_file_a, args.ref_file_b, args.trj_file_a, args.trj_file_b,
                                args.out_pc, num_pc=args.num_components)
     # Plot histograms of both simulations along the common PCs
-    compare_projections(data_a['bb-torsions'], data_b['bb-torsions'], pca,
-                        num=args.num_components, saveas=args.out_plots+"_pc-comparison.pdf")
+    compare_projections(data_a[ftype], data_b[ftype], pca,
+                        num=args.num_components, saveas=args.out_plots+"_"+ftype+"_pc-comparison.pdf")
+
 
 
