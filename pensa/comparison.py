@@ -255,7 +255,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     ax.set_ylabel(y_label)
     fig.tight_layout()
     # Save the figure
-    fig.savefig(pdf_filename)
+    fig.savefig(pdf_filename,dpi=300)
     
     # -- PDB FILE --
     
