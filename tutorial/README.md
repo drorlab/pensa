@@ -1,6 +1,6 @@
 # PENSA Tutorial 
 
-This repository provides a python library and several ready-to-use python scripts. We start with the latter, explaining the basic functionalities, and then explain how to access the library directly to write your own scripts or to use its methods interactively in a Jupyter Notebook.
+This repository provides a python library and several ready-to-use python scripts. We start with the python scripts, explaining the basic functionalities, and then explain how to access the library directly to write your own scripts or to use its methods interactively in a Jupyter Notebook.
 
 The following assumes that you have cloned the PENSA repository to your home directory (```~/```) and that you work on the Sherlock cluster at Stanford. If this is not the case, you should adapt the file paths accordingly.
 
@@ -9,9 +9,9 @@ A note for Sherlock users: It might be useful to copy the tutorial folder to ```
 ## Usage-ready scripts
 
 This tutorial shows the usage of the scripts for the basic applications provided with this repository. 
-For each of the following four steps, a bash script runs the python script for an example system: rhodopsin, once bound to arrestin-1 and once bound to Gi. Below, we go through the steps as invoked by these scripts.
+For each of the following four steps, a bash script runs the python script for an example system: rhodopsin, once bound to arrestin-1 and once bound to Gi. Below, we go through the steps as invoked by these bash scripts to demonstrate how to use the python code.
 
-Preprocessing is necessary for all of the following steps which are independent from one another.
+Preprocessing is necessary for all of the subsequent steps, which then are independent from one another.
 
 ### Preprocessing
 
@@ -74,8 +74,8 @@ In the following, we iterate over the two different selections and invoke the py
       python ~/pensa/scripts/extract_coordinates_combined.py \
         --ref_file_a "$REF_FILE_A" --ref_file_b "$REF_FILE_B" \
         --trj_file_a "$TRJ_FILE_A" --trj_file_b "$TRJ_FILE_B" \
-                    --sel_base_a "$SEL_BASE_A" --sel_base_b "$SEL_BASE_B" \
-                    --sel_file "$SEL_FILE" --out_name "${OUT_NAME_COMBINED}_${PART}"
+        --sel_base_a "$SEL_BASE_A" --sel_base_b "$SEL_BASE_B" \
+        --sel_file "$SEL_FILE" --out_name "${OUT_NAME_COMBINED}_${PART}"
     done
 
 It is preferable to run this on Sherlock directly than on a local machine with the mounted file system because a lot of trajectory reading and writing is going on.
