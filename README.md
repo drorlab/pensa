@@ -41,7 +41,10 @@ Download and install PENSA:
 
 ## To do:
 
-- write tutorial description
+- write tutorial descriptions for the example scripts
+- add example Jupyter Notebook(s) for the python package
+- option to read one condition from multiple simulation runs
 - add CNN difference learning
 - implement Wasserstein distance
 - add job submission scripts (?)
+
