@@ -82,6 +82,31 @@ It is preferable to run this on Sherlock directly than on a local machine with t
 
 ### Comparison of two structural ensembles
 
+PENSA allows you to detect deviations between two simulations feature by feature. It analyzes the backbone torsions, side-chain torsions, and distances of C-alpha atoms (which we call "features" of the respective system).
+In order to compare two structural ensembles, we need to provide the topology files (.gro) and trajectory files (.xtc) that we have extracted in the preprocessing step. With the option ```--out_plots```, we define the base for the filenames of the output plots and with ```--out_vispdb```, we define the same for the PDB files in which the deviation measure between the features will be saved in the field that usually contains the B factor. Additionally, you can provide the number of the simulation frame to start with via ```--start_frame``` and the number of residues with the strongest deviation to be printed via ```--print_num```.
+
+    mkdir -p plots
+    mkdir -p vispdb
+
+    python ~/pensa/scripts/compare_feature_distributions.py \
+        --ref_file_a traj/rhodopsin_arrbound_receptor.gro \
+        --trj_file_a traj/rhodopsin_arrbound_receptor.xtc \
+        --ref_file_b traj/rhodopsin_gibound_receptor.gro \
+        --trj_file_b traj/rhodopsin_gibound_receptor.xtc \
+        --out_plots  plots/rhodopsin_receptor \
+        --out_vispdb vispdb/rhodopsin_receptor \
+        --start_frame 0 \
+        --print_num 12
+
+In the python script used in this tutorial, the deviation is measured using the [Jensen-Shannon distance](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence), a symmetric measure. The same function in the PENSA module also allows to calculate the (asymmetric) Kullback-Leibler divergence with respect to either of the simulations. Other functions can perform a Kolmogorov-Smirnov test or simply compare the mean values and standard deviations of each feature.
+
+The plots are saved as PDF files. The PDB files with the maximum deviation of any torsion related to a certain residue can be visualized using [VMD](https://www.ks.uiuc.edu/Research/vmd/) and we provide a tcl script that does the basic first steps:
+
+    vmd vispdb/rhodopsin_receptor_bbtors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
+    vmd vispdb/rhodopsin_receptor_sctors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
+
+As you can see here, sidechain and backbone torsions are treated separately.
+
 ### Principal component analysis
 
 ### Clustering
