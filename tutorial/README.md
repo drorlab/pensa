@@ -100,16 +100,69 @@ In order to compare two structural ensembles, we need to provide the topology fi
 
 In the python script used in this tutorial, the deviation is measured using the [Jensen-Shannon distance](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence), a symmetric measure. The same function in the PENSA module also allows to calculate the (asymmetric) Kullback-Leibler divergence with respect to either of the simulations. Other functions can perform a Kolmogorov-Smirnov test or simply compare the mean values and standard deviations of each feature.
 
-The plots are saved as PDF files. The PDB files with the maximum deviation of any torsion related to a certain residue can be visualized using [VMD](https://www.ks.uiuc.edu/Research/vmd/) and we provide a tcl script that does the basic first steps:
+The plots are saved as PDF files. For torsions, the plot is one-dimensional (with the residue number at the x-axis). For distances, the plot is a 2D heatmap.
+
+The PDB files with the maximum deviation of any torsion related to a certain residue can be visualized using [VMD](https://www.ks.uiuc.edu/Research/vmd/) and we provide a tcl script that does the basic first steps:
 
     vmd vispdb/rhodopsin_receptor_bbtors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
     vmd vispdb/rhodopsin_receptor_sctors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
 
-As you can see here, sidechain and backbone torsions are treated separately.
+As we can see here, sidechain and backbone torsions are treated separately.
 
 ### Principal component analysis
 
+To characterize collective variations within a structural ensemble, PENSA allows you to calculate the principal components of a simulation but also of a combined ensemble from two simulations - which this section is about. The script below works either in the space of backbone torsions, side-chain torsions, or distances of C-alpha atoms (defined by the option ```--feature_type```).
+
+    mkdir -p pca
+
+    python ~/pensa/scripts/calculate_combined_principal_components.py \
+        --ref_file_a 'traj/rhodopsin_arrbound_receptor.gro' \
+        --trj_file_a 'traj/rhodopsin_arrbound_receptor.xtc' \
+        --ref_file_b 'traj/rhodopsin_gibound_receptor.gro' \
+        --trj_file_b 'traj/rhodopsin_gibound_receptor.xtc' \
+        --out_plots 'plots/rhodopsin_receptor' \
+        --out_pc 'pca/rhodopsin_receptor' \
+        --start_frame 2000 \
+        --feature_type 'bb-torsions' \
+        --num_eigenvalues 12 \
+        --num_components 3 \
+        --feat_threshold 0.4 
+        
+The PCA script, as invoked above, performs the following tasks:
+ - It plots the eigenvalues of the dominant principal components (the number of which is determined via ```--num_eigenvalues```). 
+ - It plots the distribution of simulation frames from each condition along the common PCs (the number of which is determined via ```--num_components```). 
+ - It performs a feature correlation analysis and prints the features that are most correlated with each PC (the threshold for the correlation is provided via ```--feat_threshold```).
+ - It sorts simulation frames along each PC which is crucial for visualizing the major directions of vriablity within the examined protein ensemble. Again, you can visualize them using VMD.
+The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```pca```.
+    
 ### Clustering
+
+To detect major states of a structural ensemble, PENSA can calculate clusters of simulation frames. In the python script provided here, we use the combined ensemble form two simulations to determine these clusters. 
+
+    mkdir -p clusters
+
+    python ~/pensa/scripts/calculate_combined_clusters.py --no-write --wss \
+        --ref_file_a 'traj/rhodopsin_arrbound_receptor.gro' \
+        --trj_file_a 'traj/rhodopsin_arrbound_receptor.xtc' \
+        --ref_file_b 'traj/rhodopsin_gibound_receptor.gro' \
+        --trj_file_b 'traj/rhodopsin_gibound_receptor.xtc' \
+        --label_a 'Rho-Arr' \ # Label for the plot
+        --label_b 'Rho-Gi' \  # Label for the plot
+        --out_plots 'plots/rhodopsin_receptor' \
+        --out_frames_a 'clusters/rhodopsin_arrbound_receptor' \
+        --out_frames_b 'clusters/rhodopsin_gibound_receptor' \
+        --start_frame 2000 \
+        --feature_type 'bb-torsions' \
+        --algorithm 'kmeans' \
+        --max_num_clusters 12 \
+        --write_num_clusters 2
+
+The clusteering script, as invoked above, performs the following tasks:
+ - It plots the number of frames from each simulation in each cluster. The number of clusters in which to divide the ensemble is determined via ```--write_num_clusters```). 
+ - It sorts the frames from each simulation into their corresponding cluster. The bases of the corresponding filenames are given via ```out_frames_a```, and ```out_frames_b```, respectively.
+ - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
+The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```clusters```.
+
 
 ## Accessing the library directly
 
