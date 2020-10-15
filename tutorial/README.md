@@ -133,6 +133,7 @@ The PCA script, as invoked above, performs the following tasks:
  - It plots the distribution of simulation frames from each condition along the common PCs (the number of which is determined via ```--num_components```). 
  - It performs a feature correlation analysis and prints the features that are most correlated with each PC (the threshold for the correlation is provided via ```--feat_threshold```).
  - It sorts simulation frames along each PC which is crucial for visualizing the major directions of vriablity within the examined protein ensemble. Again, you can visualize them using VMD.
+ 
 The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```pca```.
     
 ### Clustering
@@ -161,6 +162,7 @@ The clusteering script, as invoked above, performs the following tasks:
  - It plots the number of frames from each simulation in each cluster. The number of clusters in which to divide the ensemble is determined via ```--write_num_clusters```). 
  - It sorts the frames from each simulation into their corresponding cluster. The bases of the corresponding filenames are given via ```out_frames_a```, and ```out_frames_b```, respectively.
  - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
+ 
 The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```clusters```.
 
 
