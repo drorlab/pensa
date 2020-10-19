@@ -1,0 +1,6 @@
+# mark tutorial for language statistics
+tutorial/* linguist-documentation
+
+# mark documentation for language statistics
+docs/* linguist-documentation
+
