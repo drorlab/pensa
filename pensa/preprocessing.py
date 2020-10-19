@@ -34,7 +34,6 @@ def extract_coordinates(ref, pdb, trj, out_name, sel_string):
     
     u = mda.Universe(ref,pdb)
     selection = u.select_atoms(sel_string)
-    print(selection.ids)
 
     selection.write(out_name+'.pdb')
     selection.write(out_name+'.gro')
