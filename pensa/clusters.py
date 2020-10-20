@@ -39,17 +39,30 @@ def obtain_clusters(data,algorithm='kmeans',num_clusters=2,min_dist=12,max_iter=
         clusters = pyemma.coordinates.cluster_regspace(data,min_dist)
     
     # Extract cluster indices
-    cl_idx = clusters.get_output()[0][:,0]
+    cidx = clusters.get_output()[0][:,0]
     
+    # Calculate centroids and total within-cluster sum of square
+    centroids = []
+    total_wss = 0
+    for i in np.unique(cidx):
+        # get the data for this cluster
+        cluster_data = data[np.where(cidx==i)]
+        # calcualte the centroid
+        cluster_centroid = np.mean(cluster_data,0)
+        centroids.append(cluster_centroid)
+        # calculate the within-cluster sum of square
+        cluster_wss = np.sum( (cluster_data - cluster_centroid)**2 )
+        total_wss += cluster_wss
+        
     # Count and plot
     if plot:
         fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=300)
-        c, nc = np.unique(cl_idx,return_counts=True)
+        c, nc = np.unique(cidx,return_counts=True)
         ax.bar(c,nc)
         if saveas is not None:
             fig.savefig(saveas,dpi=300)
     
-    return cl_idx
+    return cidx, total_wss, centroids
 
 
 def obtain_combined_clusters(data_g, data_a, start_frame, label_g, label_a,
@@ -146,10 +159,39 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame):
                 if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr: 
                     W.write(protein)
                     
-                    
-def wss_over_number_of_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B', start_frame = 0, 
-                                algorithm='kmeans', max_iter=100, num_repeats = 5, max_num_clusters = 12, 
+
+def wss_over_number_of_clusters(data, algorithm='kmeans', 
+                                max_iter=100, num_repeats = 5, max_num_clusters = 12, 
                                 plot_file = None):
+    '''Calculates the Within-Sum-of-Squares for different numbers of clusters,
+       averaged over several iterations.'''
+    
+    all_wss = []
+    std_wss = []
+    for nc in range(1,max_num_clusters):
+        rep_wss = []
+        for repeat in range(num_repeats):
+            cc = obtain_clusters(data, algorithm=algorithm, max_iter=max_iter, 
+                                 num_clusters=nc, plot=False)
+            cidx, wss, centroids = cc
+            rep_wss.append(wss)
+
+        all_wss.append(np.mean(rep_wss))
+        std_wss.append(np.std(rep_wss))
+        
+    fig, ax = plt.subplots(1,1, figsize=[4,3], dpi=300)
+    ax.errorbar(np.arange(len(all_wss))+2,np.array(all_wss),yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    ax.set_xlabel('number of clusters')
+    ax.set_ylabel('total WSS')
+    fig.tight_layout()
+    if plot_file: fig.savefig(plot_file)
+    
+    return all_wss, std_wss
+
+                    
+def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B', start_frame = 0, 
+                                         algorithm='kmeans', max_iter=100, num_repeats = 5, max_num_clusters = 12, 
+                                         plot_file = None):
     '''Calculates the Within-Sum-of-Squares for different numbers of clusters,
        averaged over several iterations.'''
     
