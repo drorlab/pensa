@@ -220,7 +220,7 @@ def compare_projections(data_g, data_a, pca, num=3, saveas=None):
         Name of the output file.
     '''
     
-    fig,ax = plt.subplots(num,2,figsize=[8,3*num],dpi=100)
+    fig,ax = plt.subplots(num,2,figsize=[8,3*num],dpi=300)
 
     for evi in range(num):
         
