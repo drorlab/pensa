@@ -31,7 +31,7 @@ def load_selection(sel_file, sel_base=''):
     return sel_string
 
 
-def extract_coordinates(ref, pdb, trj, out_name, sel_string):
+def extract_coordinates(ref, pdb, trj, out_name, sel_string, start_frame=0):
     """Extract selected coordinates from a trajectory file"""
     
     u = mda.Universe(ref,pdb)
@@ -44,7 +44,7 @@ def extract_coordinates(ref, pdb, trj, out_name, sel_string):
     selection = u.select_atoms(sel_string)
 
     with mda.Writer(out_name+'.xtc', selection.n_atoms) as W:
-        for ts in u.trajectory:
+        for ts in u.trajectory[start_frame:]:
             W.write(selection)
             
     return

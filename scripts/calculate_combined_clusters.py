@@ -77,12 +77,10 @@ if __name__ == "__main__":
     # -- Within-Sum-of-Squares (WSS) analysis --
     if args.wss:
         print('WSS analysis not yet implemented.')
-        wss_avg, wss_std = wss_over_number_of_clusters(data_a[ftype], data_b[ftype],
-                                                       label_a=args.label_a, label_b=args.label_b, 
-                                                       start_frame=args.start_frame,
-                                                       algorithm=args.algorithm, 
-                                                       max_iter = 100, num_repeats = 5, 
-                                                       max_num_clusters = args.max_num_clusters, 
-                                                       plot_file = args.out_plots+'_wss_'+ftype+'.pdf')
-
-
+        wss_avg, wss_std = wss_over_number_of_combined_clusters(data_a[ftype], data_b[ftype],
+                                                                label_a=args.label_a, label_b=args.label_b, 
+                                                                start_frame=args.start_frame,
+                                                                algorithm=args.algorithm, 
+                                                                max_iter = 100, num_repeats = 5, 
+                                                                max_num_clusters = args.max_num_clusters, 
+                                                                plot_file = args.out_plots+'_wss_'+ftype+'.pdf')
