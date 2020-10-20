@@ -43,5 +43,4 @@ Download and install PENSA:
 
 - add CNN difference learning
 - implement Wasserstein distance
-- add job submission scripts (?)
 
