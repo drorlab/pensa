@@ -1,10 +1,20 @@
 # PENSA Tutorial 
 
-This repository provides a python library and several ready-to-use python scripts. We start with the python scripts, explaining the basic functionalities, and then explain how to access the library directly to write your own scripts or to use its methods interactively in a Jupyter Notebook.
+This repository provides a python library and several ready-to-use [python scripts](https://github.com/drorlab/pensa/tree/master/scripts). We explain the library in a [Jupyter Notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial.ipynb) and the scripts in the section below. All of this requires that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
 
 The following assumes that you have cloned the PENSA repository to your home directory (```~/```) and that you work on the Sherlock cluster at Stanford. If this is not the case, you should adapt the file paths accordingly.
 
 A note for Sherlock users: It might be useful to copy the tutorial folder to ```$OAK``` and run the scripts from there. Storage in the home directories is quite limited.
+
+
+## Accessing the library directly
+
+In your custom python script or Jupyter Notebook, import the PENSA methods via
+
+    from pensa import *
+    
+Have a look at the [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial.ipynb) that demonstrates the functionality of the library.
+
 
 ## Usage-ready scripts
 
@@ -163,13 +173,4 @@ The clusteering script, as invoked above, performs the following tasks:
  - It sorts the frames from each simulation into their corresponding cluster. The bases of the corresponding filenames are given via ```out_frames_a```, and ```out_frames_b```, respectively.
  - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
  
-The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```clusters```.
-
-
-## Accessing the library directly
-
-In your custom python script or Jupyter Notebook, import the PENSA methods via
-
-    from pensa import *
-    
-An example notebook that demonstrates the functionality will soon be provided.    
+The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```clusters```.    
