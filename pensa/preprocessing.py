@@ -22,6 +22,7 @@ def range_to_string(a, b):
 def load_selection(sel_file, sel_base=''):
     """Load a selection from a selection string"""
     
+    sel_string = sel_base
     with open(sel_file,'r') as sf:
         for line in sf.readlines():
             r = np.array(line.strip().split(' '), dtype=int)
