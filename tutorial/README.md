@@ -2,10 +2,6 @@
 
 This repository provides a python library and several ready-to-use [python scripts](https://github.com/drorlab/pensa/tree/master/scripts). We explain the library in a [Jupyter Notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial.ipynb) and the scripts in the section below. All of this requires that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
 
-The following assumes that you have cloned the PENSA repository to your home directory (```~/```) and that you work on the Sherlock cluster at Stanford. If this is not the case, you should adapt the file paths accordingly.
-
-A note for Sherlock users: It might be useful to copy the tutorial folder to ```$OAK``` and run the scripts from there. Storage in the home directories is quite limited.
-
 
 ## Accessing the library directly
 
@@ -20,6 +16,10 @@ Have a look at the [example notebook](https://github.com/drorlab/pensa/blob/mast
 
 This tutorial shows the usage of the scripts for the basic applications provided with this repository. 
 For each of the following four steps, a bash script runs the python script for an example system: rhodopsin, once bound to arrestin-1 and once bound to Gi. Below, we go through the steps as invoked by these bash scripts to demonstrate how to use the python code.
+
+The following assumes that you have cloned the PENSA repository to your home directory (```~/```) and that you work on the Sherlock cluster at Stanford. If this is not the case, you should adapt the file paths accordingly.
+
+A note for Sherlock users: It might be useful to copy the tutorial folder to ```$OAK``` and run the scripts from there. Storage in the home directories is quite limited.
 
 Preprocessing is necessary for all of the subsequent steps, which then are independent from one another.
 
