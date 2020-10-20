@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ROOT="/oak/stanford/groups/rondror/projects/MD_simulations/amber/INCITE_REMD_trajectories"
 
 REF_FILE_A="$ROOT/remd-rhodopsin-arr/system_reference.psf"
