@@ -4,7 +4,6 @@ import matplotlib as mpl
 import numpy as np
 import scipy as sp
 import scipy.stats
-import mdshare
 import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda

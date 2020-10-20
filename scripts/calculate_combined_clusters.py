@@ -4,7 +4,6 @@ import matplotlib as mpl
 import numpy as np
 import scipy as sp
 import scipy.stats
-import mdshare
 import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
@@ -40,7 +39,7 @@ if __name__ == "__main__":
     parser.add_argument('--no-write', dest='write', action='store_false')
     parser.add_argument('--wss',      dest='wss',   action='store_true')
     parser.add_argument('--no-wss',   dest='wss',   action='store_false')
-    parser.set_defaults(write=True, wss=False)
+    parser.set_defaults(write=True, wss=True)
     args = parser.parse_args()
 
 
