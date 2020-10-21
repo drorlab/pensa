@@ -38,9 +38,3 @@ Download and install PENSA:
     cd pensa
     pip install -e . 
 
-
-## To do:
-
-- add CNN difference learning
-- implement Wasserstein distance
-
