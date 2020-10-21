@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ftype = args.feature_type
 
     # Calculate clusters from the combined data
-    cc = obtain_combined_clusters(data_a[ftype], data_b[ftype], args.start_frame, args.label_a, args.label_b, 
+    cc = obtain_combined_clusters(data_a[ftype], data_b[ftype], args.label_a, args.label_b, args.start_frame, 
                                   args.algorithm, max_iter=100, num_clusters=args.write_num_clusters, min_dist=12,
                                   saveas=args.out_plots+'_combined-clusters_'+ftype+'.pdf')
     cidx, cond, oidx, wss, centroids = cc

@@ -2,7 +2,7 @@
 
 mkdir -p clusters
 
-python ~/pensa/scripts/calculate_combined_clusters.py --no-write --wss \
+python ~/pensa/scripts/calculate_combined_clusters.py --write --wss \
 	--ref_file_a 'traj/rhodopsin_arrbound_receptor.gro' \
 	--trj_file_a 'traj/rhodopsin_arrbound_receptor.xtc' \
 	--ref_file_b 'traj/rhodopsin_gibound_receptor.gro' \
