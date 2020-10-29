@@ -29,6 +29,10 @@ def obtain_clusters(data, algorithm='kmeans',
             Default: 12.
         max_iter (int, optional): Maximum number of iterations. 
             Default: 100.
+        plot (bool, optional): Create a plot. 
+            Default: True
+        saveas (str, optional): Name of the file in which to save the plot.
+            (only needed if "plot" is True)
         
     Returns:
         cidx (int array): Cluster indices for each frame.
@@ -95,7 +99,10 @@ def obtain_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B
             Default: 12.
         max_iter (int, optional): Maximum number of iterations. 
             Default: 100.
-        saveas (str, optional): Name of the file to save the plot.
+        plot (bool, optional): Create a plot. 
+            Default: True
+        saveas (str, optional): Name of the file in which to save the plot.
+            (only needed if "plot" is True)
         
     Returns:
         cidx (int array): Cluster indices for each frame.
