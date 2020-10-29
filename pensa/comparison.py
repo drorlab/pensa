@@ -241,20 +241,17 @@ def sort_features(names, sortby):
         sort (array of tuples [str,float]): Array of sorted tuples with feature and value.
     
     """
-
+    # Get the indices of the sorted order
     sort_id = np.argsort(sortby)[::-1]  
-    
-    sorted_names = []
+    # Bring the names and values in the right order
+    sorted_names  = []
     sorted_values = []
-    
     for i in sort_id:
         sorted_names.append(np.array(names)[i])
         sorted_values.append(sortby[i])
-        
     sn, sv = np.array(sorted_names), np.array(sorted_values)
-    
+    # Format for output
     sort = np.array([sn,sv]).T
-    
     return sort
 
 
@@ -324,15 +321,15 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     return vis_resids, vis_values        
         
 
-def distances_visualization(dist_names, dist_diff, out_filename, 
+def distances_visualization(dist_names, dist_diff, plot_filename, 
                             vmin=None, vmax=None, verbose=True):
     """
     Visualizes features per residue as plot and in PDB files, assuming values from 0 to 1. 
     
     Args:
-        dist_names (str array): Names of the features in PyEMMA nomenclaturre (contain residue ID).
-        dist_diff (float array): Data to project onto the structure.
-        out_filename (str): Name of the file for the reference structure.
+        dist_names (str array): Names of the features in PyEMMA nomenclaturre (contain residue IDs).
+        dist_diff (float array): Data for each distance feature.
+        plot_filename (str): Name of the file for the plot.
         vmin (float): Minimum value for the heat map.
         vmax (float): Maximum value for the heat map.
         verbose (bool): Print numbers of first and last residue. Defaults to True.
@@ -368,7 +365,7 @@ def distances_visualization(dist_names, dist_diff, out_filename,
     ax.set_yticklabels(np.arange(50,lastres+1,50))
     fig.colorbar(img,ax=ax)
     fig.tight_layout()
-    fig.savefig(out_filename,dpi=300)  
+    fig.savefig(plot_filename,dpi=300)  
     
     return diff
 

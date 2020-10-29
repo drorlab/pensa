@@ -196,6 +196,8 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
         pca (PCA object): Principal components information.
         num (int): Number of principal components to plot. 
         saveas (str, optional): Name of the output file.
+        label_a (str, optional): Label for the first dataset.
+        label_b (str, optional): Label for the second dataset.
         
     """
     # Start the figure    
