@@ -267,8 +267,10 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
         ref_filename (str): Name of the file for the reference structure.
         pdf_filename (str): Name of the PDF file to save the plot.
         pdb_filename (str): Name of the PDB file to save the structure with the values to visualize.
-        selection (str): How to select the value to visualize for each residue from all its features ['max', 'min'].
-        y_label (str): Label of the y axis of the plot.
+        selection (str, optional): How to select the value to visualize for each residue from all its features 
+            Options: 'max', 'min'. Default: 'max'
+        y_label (str, optional): Label of the y axis of the plot.
+            Default: 'max. JS dist. of BB torsions'
         
     Returns:
         vis_resids (int array): Residue numbers.
@@ -330,9 +332,9 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
         dist_names (str array): Names of the features in PyEMMA nomenclaturre (contain residue IDs).
         dist_diff (float array): Data for each distance feature.
         plot_filename (str): Name of the file for the plot.
-        vmin (float): Minimum value for the heat map.
-        vmax (float): Maximum value for the heat map.
-        verbose (bool): Print numbers of first and last residue. Defaults to True.
+        vmin (float, optional): Minimum value for the heat map.
+        vmax (float, optional): Maximum value for the heat map.
+        verbose (bool, optional): Print numbers of first and last residue. Defaults to True.
         
     Returns:
         diff (float array): Distance matrix.
