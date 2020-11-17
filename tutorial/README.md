@@ -90,6 +90,11 @@ In the following, we iterate over the two different selections and invoke the py
 
 It is preferable to run this on Sherlock directly than on a local machine with the mounted file system because a lot of trajectory reading and writing is going on.
 
+If you store your trajectories distributed across several files, the extract_coordinates.py script can take multiple arguments, e.g. 
+
+    --trj_file "$TRJ_FILE_A1 $TRJ_FILE_A2 $TRJ_FILE_A3"
+
+
 ### Comparison of two structural ensembles
 
 PENSA allows you to detect deviations between two simulations feature by feature. It analyzes the backbone torsions, side-chain torsions, and distances of C-alpha atoms (which we call "features" of the respective system).
