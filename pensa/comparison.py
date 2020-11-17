@@ -32,7 +32,7 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
         data_names (list of str): Feature names.
         data_jsdist (float array): Jensen-Shannon distance for each feature.
         data_kld_ab (float array): Kullback-Leibler divergences of data_a wrt to data_b.
-        data_kld_ba (float array): Kullback-Leibler divergences of data_b wrt to data_b.
+        data_kld_ba (float array): Kullback-Leibler divergences of data_b wrt to data_a.
         
     """
     
