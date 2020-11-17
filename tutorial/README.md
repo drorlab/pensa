@@ -113,7 +113,7 @@ In order to compare two structural ensembles, we need to provide the topology fi
         --start_frame 0 \
         --print_num 12
 
-In the python script used in this tutorial, the deviation is measured using the [Jensen-Shannon distance](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence), a symmetric measure. The same function in the PENSA module also allows to calculate the (asymmetric) Kullback-Leibler divergence with respect to either of the simulations. Other functions can perform a Kolmogorov-Smirnov test or simply compare the mean values and standard deviations of each feature.
+In the python script used in this tutorial, the deviation is measured using the Jensen-Shannon distance, a symmetric measure that is the square root of the [Jensen-Shannon divergence](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence). The same function in the PENSA module also allows to calculate the (asymmetric) [Kullback-Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) with respect to either of the simulations. Other functions can perform a [Kolmogorov-Smirnov test](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test) or simply compare the mean values and standard deviations of each feature.
 
 The plots are saved as PDF files. For torsions, the plot is one-dimensional (with the residue number at the x-axis). For distances, the plot is a 2D heatmap.
 
@@ -179,3 +179,4 @@ The clusteering script, as invoked above, performs the following tasks:
  - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
  
 The plots are saved as PDF files in the folder ```plots``` and the sorted frames are saved as trajectories in the folder ```clusters```.    
+
