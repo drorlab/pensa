@@ -303,7 +303,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     
     fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=300)
     # Plot values against residue number
-    ax.plot(vis_resids, vis_values, '.')
+    ax.bar(vis_resids, vis_values, width=1)
     ax.set_ylim(0,1)
     # Labels
     ax.set_xlabel('residue number')
