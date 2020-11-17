@@ -47,7 +47,7 @@ def load_selection(sel_file, sel_base=''):
     return sel_string
 
 
-def extract_coordinates(ref, pdb, trj, out_name, sel_string, start_frame=0):
+def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0):
     """
     Extracts selected coordinates from a trajectory file.
     
@@ -55,7 +55,7 @@ def extract_coordinates(ref, pdb, trj, out_name, sel_string, start_frame=0):
         ref (str): File name for reference topology. 
             Can read all MDAnalysis-compatible topology formats.
         pdb (str): File name for the reference PDB file.
-        trj (str): File name for the input trajectory.
+        trj_list (list of str): File names for the input trajectory.
             Can read all MDAnalysis-compatible trajectory formats.
         out_name (str): Core of the file names for the output files.
         start_frame (int, optional): First frame to read from the trajectory.
@@ -66,12 +66,13 @@ def extract_coordinates(ref, pdb, trj, out_name, sel_string, start_frame=0):
     selection = u.select_atoms(sel_string)
     selection.write(out_name+'.pdb')
     selection.write(out_name+'.gro')
-    # Read the trajectory and extract selected parts.
-    u = mda.Universe(ref,trj)
-    selection = u.select_atoms(sel_string)
+    # Read the trajectories and extract selected parts.
     with mda.Writer(out_name+'.xtc', selection.n_atoms) as W:
-        for ts in u.trajectory[start_frame:]:
-            W.write(selection)
+        for trj in trj_list:
+            u = mda.Universe(ref,trj)
+            selection = u.select_atoms(sel_string)
+            for ts in u.trajectory[start_frame:]:
+                W.write(selection)
     return
 
 
