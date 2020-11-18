@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#SBATCH --time=24:00:00
+#SBATCH --mem=20G
+#SBATCH --partition=rondror
+#SBATCH --constraint=GPU_MEM:12GB
+#SBATCH --qos=high_p
+
 ROOT="/oak/stanford/groups/rondror/projects/MD_simulations/amber/INCITE_REMD_trajectories"
 
 REF_FILE_A="$ROOT/remd-rhodopsin-arr/system_reference.psf"
