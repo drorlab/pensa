@@ -36,13 +36,15 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     """
     # Plot eigenvalues over component numbers
     fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
-    ax.plot(np.arange(num)+1, pca.eigenvalues[:num], 'o')
+    componentnr = np.arange(num)+1 
+    eigenvalues = pca.eigenvalues[:num]
+    ax.plot(componentnr, eigenvalues, 'o')
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
     # Save the figure to a file
     if plot_file: fig.savefig(plot_file, dpi=300)
-    return 
+    return componentnr, eigenvalues
 
 
 def pca_features(pca, features, num, threshold, plot_file=None):

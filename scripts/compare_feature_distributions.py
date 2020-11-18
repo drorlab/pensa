@@ -21,14 +21,15 @@ from pensa import *
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ref_file_a", type=str, default='traj/rhodopsin_arrbound_receptor.gro')
-    parser.add_argument("--trj_file_a", type=str, default='traj/rhodopsin_arrbound_receptor.xtc')
-    parser.add_argument("--ref_file_b", type=str, default='traj/rhodopsin_gibound_receptor.gro')
-    parser.add_argument("--trj_file_b", type=str, default='traj/rhodopsin_gibound_receptor.xtc')
-    parser.add_argument("--out_plots",  type=str, default='plots/rhodopsin_receptor' )
-    parser.add_argument("--out_vispdb", type=str, default='vispdb/rhodopsin_receptor' )
-    parser.add_argument("--start_frame", type=int, default=0 )
-    parser.add_argument("--print_num", type=int, default=12 )
+    parser.add_argument( "--ref_file_a",  type=str, default='traj/rhodopsin_arrbound_receptor.gro')
+    parser.add_argument( "--trj_file_a",  type=str, default='traj/rhodopsin_arrbound_receptor.xtc')
+    parser.add_argument( "--ref_file_b",  type=str, default='traj/rhodopsin_gibound_receptor.gro')
+    parser.add_argument( "--trj_file_b",  type=str, default='traj/rhodopsin_gibound_receptor.xtc')
+    parser.add_argument( "--out_plots",   type=str, default='plots/rhodopsin_receptor' )
+    parser.add_argument( "--out_vispdb",  type=str, default='vispdb/rhodopsin_receptor' )
+    parser.add_argument( "--out_results", type=str, default='results/rhodopsin_receptor' )
+    parser.add_argument( "--start_frame", type=int, default=0 )
+    parser.add_argument( "--print_num",   type=int, default=12 )
     args = parser.parse_args()
 
 
@@ -52,13 +53,21 @@ if __name__ == "__main__":
     relen = relative_entropy_analysis(feat_a['bb-torsions'], feat_b['bb-torsions'], 
                                       data_a['bb-torsions'], data_b['bb-torsions'],
                                       bin_width=0.001, verbose=False)
-    names, jsd, kld_ab, kld_ba = relen 
+    names, jsd, kld_ab, kld_ba = relen
 
+    # Save all results (per feature) in a CSV file 
+    np.savetxt(args.out_results+'_bb-torsions_relative-entropy.csv', np.array(relen).T, 
+               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+    
     # Save the Jensen-Shannon distance as "B factor" in a PDB file
     vis = residue_visualization(names, jsd, args.ref_file_a, 
-                                args.out_plots+"_bbtors-distributions_jsd.pdf", 
-                                args.out_vispdb+"_bbtors-distributions_jsd.pdb",
+                                args.out_plots+"_bb-torsions_jsd.pdf", 
+                                args.out_vispdb+"_bb-torsions_jsd.pdb",
                                 y_label='max. JS dist. of BB torsions')
+
+    # Save the per-residue data in a CSV file
+    np.savetxt(args.out_results+'_bb-torsions_max-jsd-per-residue.csv', np.array(vis).T, 
+               fmt='%s', delimiter=',', header='Residue, max. JSD(A,B)')
 
     # Print the features with the highest values
     print("Backbone torsions with the strongest deviations:")
@@ -72,13 +81,21 @@ if __name__ == "__main__":
     relen = relative_entropy_analysis(feat_a['sc-torsions'], feat_b['sc-torsions'],
                                       data_a['sc-torsions'], data_b['sc-torsions'],
                                       bin_width=0.001, verbose=False)
-    names, jsd, kld_ab, kld_ba = relen 
+    names, jsd, kld_ab, kld_ba = relen
+
+    # Save all results (per feature) in a CSV file 
+    np.savetxt(args.out_results+'_sc-torsions_relative-entropy.csv', np.array(relen).T,
+               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)') 
 
     # Save the Jensen-Shannon distance as "B factor" in a PDB file
     vis = residue_visualization(names, jsd, args.ref_file_a, 
-                                args.out_plots+"_sctors-distributions_jsd.pdf",
-                                args.out_vispdb+"_sctors-distributions_jsd.pdb",
+                                args.out_plots+"_sc-torsions_jsd.pdf",
+                                args.out_vispdb+"_sc-torsions_jsd.pdb",
                                 y_label='max. JS dist. of BB torsions')
+
+    # Save the per-residue data in a CSV file
+    np.savetxt(args.out_results+'_sc-torsions_max-jsd-per-residue.csv', np.array(vis).T,
+               fmt='%s', delimiter=',', header='Residue, max. JSD(A,B)')
 
     # Print the features with the highest values
     print("Sidechain torsions with the strongest deviations:")
@@ -94,6 +111,10 @@ if __name__ == "__main__":
                                       bin_width=0.001, verbose=False)
     names, jsd, kld_ab, kld_ba = relen 
 
+    # Save all results (per feature) in a CSV file 
+    np.savetxt(args.out_results+'_bb-distances_relative-entropy.csv', np.array(relen).T,
+               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+
     # Print the features with the highest values
     print("Backbone C-alpha distances with the strongest deviations:")
     sf = sort_features(names, jsd)
@@ -101,7 +122,7 @@ if __name__ == "__main__":
     
     # Visualize the deviations in a matrix plot
     matrix = distances_visualization(names, jsd, 
-                                     args.out_plots+"_bbdist-distributions_jsd.pdf",
+                                     args.out_plots+"_bb-distances-distributions_jsd.pdf",
                                      vmin = 0.0, vmax = 1.0)
 
     # Difference-of-the-mean analysis for C-alpha distances
@@ -110,13 +131,17 @@ if __name__ == "__main__":
                                       verbose=False)
     names, avg, diff = meanda
 
+    # Save all results (per feature) in a CSV file 
+    np.savetxt(args.out_results+'_bb-distances_difference-of-mean.csv', np.array(meanda).T,
+               fmt='%s', delimiter=',', header='Name, average, difference')
+
     # Sort the distances by their differences
     print("Backbone C-alpha distances with the strongest differences of their mean value:")
     sf = sort_features(names, diff)
     for f in sf[:args.print_num]: print(f[0], f[1])
 
     # Visualize the deviations in a matrix plot
-    matrix = distances_visualization(names, diff, args.out_plots+"_bbdist-means_diff.pdf")
+    matrix = distances_visualization(names, diff, args.out_plots+"_bb-diststances_difference-of-mean.pdf")
 
 
 

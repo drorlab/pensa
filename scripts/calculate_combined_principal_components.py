@@ -27,6 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("--trj_file_b",  type=str, default='traj/rhodopsin_gibound_receptor.xtc')
     parser.add_argument("--out_plots",   type=str, default='plots/rhodopsin_receptor' )
     parser.add_argument("--out_pc",      type=str, default='pca/rhodopsin_receptor' )
+    parser.add_argument("--out_results", type=str, default='results/rhodopsin_receptor' )
     parser.add_argument("--start_frame", type=int, default=0 )
     parser.add_argument("--feature_type", type=str, default='bb-torsions' )
     parser.add_argument("--num_eigenvalues", type=int, default=12 )
@@ -57,8 +58,11 @@ if __name__ == "__main__":
     combined_data = np.concatenate([data_a[ftype], data_b[ftype]], 0)
     pca = calculate_pca(combined_data)
     # Plot the corresponding eigenvalues
-    pca_eigenvalues_plot(pca, num=args.num_eigenvalues, 
-                         plot_file=args.out_plots+"_"+ftype+"_eigenvalues_combined.pdf")
+    cn, ev = pca_eigenvalues_plot(pca, num=args.num_eigenvalues, 
+                                  plot_file=args.out_plots+"_"+ftype+"_eigenvalues_combined.pdf")
+    # Save them to a CSV file
+    np.savetxt(args.out_results+"_"+ftype+"_eigenvalues_combined.csv", np.array([cn,ev]).T, 
+               delimiter=',', header='Component, Eigenvalue')
     # Plot feature correlation with top components and print relevant features
     pca_features(pca, feat_a[ftype].describe(), 
                  args.num_components, args.feat_threshold,

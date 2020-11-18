@@ -28,6 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("--label_a",      type=str, default='Sim A')
     parser.add_argument("--label_b",      type=str, default='Sim B')
     parser.add_argument("--out_plots",    type=str, default='plots/rhodopsin_receptor' )
+    parser.add_argument("--out_results",  type=str, default='results/rhodopsin_receptor' )
     parser.add_argument("--out_frames_a", type=str, default='clusters/rhodopsin_arrbound_receptor' )
     parser.add_argument("--out_frames_b", type=str, default='clusters/rhodopsin_gibound_receptor' )
     parser.add_argument("--start_frame",  type=int, default=0 )
@@ -66,6 +67,13 @@ if __name__ == "__main__":
                                   args.algorithm, max_iter=100, num_clusters=args.write_num_clusters, min_dist=12,
                                   saveas=args.out_plots+'_combined-clusters_'+ftype+'.pdf')
     cidx, cond, oidx, wss, centroids = cc
+
+    # Write indices to results file
+    np.savetxt(args.out_results+'_combined-cluster-indices.csv', 
+               np.array([cidx, cond, oidx], dtype=int).T,
+               delimiter=',', fmt='%i',
+               header='Cluster, Condition, Index within condition')
+
     # Write out frames for each cluster for each simulation
     if args.write:
         write_cluster_traj(cidx[cond==0], args.ref_file_a, args.trj_file_a, 

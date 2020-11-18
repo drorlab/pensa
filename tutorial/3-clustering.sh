@@ -1,5 +1,15 @@
 #!/bin/bash
 
+#SBATCH --time=24:00:00
+#SBATCH --mem=20G
+#SBATCH --partition=rondror
+#SBATCH --gres gpu:1
+#SBATCH --constraint=GPU_MEM:12GB
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=mvoegele@stanford.edu
+#SBATCH --qos=high_p
+
+mkdir -p plots
 mkdir -p clusters
 
 python ~/pensa/scripts/calculate_combined_clusters.py --write --wss \
