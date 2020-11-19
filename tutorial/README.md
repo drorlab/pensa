@@ -110,6 +110,7 @@ In order to compare two structural ensembles, we need to provide the topology fi
         --trj_file_b traj/rhodopsin_gibound_receptor.xtc \
         --out_plots  plots/rhodopsin_receptor \
         --out_vispdb vispdb/rhodopsin_receptor \
+        --out_results results/rhodopsin_receptor \
         --start_frame 0 \
         --print_num 12
 
@@ -119,8 +120,8 @@ The plots are saved as PDF files. For torsions, the plot is one-dimensional (wit
 
 The PDB files with the maximum deviation of any torsion related to a certain residue can be visualized using [VMD](https://www.ks.uiuc.edu/Research/vmd/) and we provide a tcl script that does the basic first steps:
 
-    vmd vispdb/rhodopsin_receptor_bbtors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
-    vmd vispdb/rhodopsin_receptor_sctors-distributions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
+    vmd vispdb/rhodopsin_receptor_bb-torsions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
+    vmd vispdb/rhodopsin_receptor_sc-torsions_jsd.pdb -e ~/pensa/scripts/residue_visualization.tcl
 
 As we can see here, sidechain and backbone torsions are treated separately.
 
@@ -135,6 +136,7 @@ To characterize collective variations within a structural ensemble, PENSA allows
         --trj_file_a 'traj/rhodopsin_arrbound_receptor.xtc' \
         --ref_file_b 'traj/rhodopsin_gibound_receptor.gro' \
         --trj_file_b 'traj/rhodopsin_gibound_receptor.xtc' \
+        --out_results results/rhodopsin_receptor \
         --out_plots 'plots/rhodopsin_receptor' \
         --out_pc 'pca/rhodopsin_receptor' \
         --start_frame 2000 \
@@ -165,6 +167,7 @@ To detect major states of a structural ensemble, PENSA can calculate clusters of
         --label_a 'Rho-Arr' \ # Label for the plot
         --label_b 'Rho-Gi' \  # Label for the plot
         --out_plots 'plots/rhodopsin_receptor' \
+        --out_results results/rhodopsin_receptor \
         --out_frames_a 'clusters/rhodopsin_arrbound_receptor' \
         --out_frames_b 'clusters/rhodopsin_gibound_receptor' \
         --start_frame 2000 \
@@ -173,7 +176,7 @@ To detect major states of a structural ensemble, PENSA can calculate clusters of
         --max_num_clusters 12 \
         --write_num_clusters 2
 
-The clusteering script, as invoked above, performs the following tasks:
+The clustering script, as invoked above, performs the following tasks:
  - It plots the number of frames from each simulation in each cluster. The number of clusters in which to divide the ensemble is determined via ```--write_num_clusters```). 
  - It sorts the frames from each simulation into their corresponding cluster. The bases of the corresponding filenames are given via ```out_frames_a```, and ```out_frames_b```, respectively.
  - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
