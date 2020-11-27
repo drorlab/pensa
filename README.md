@@ -27,7 +27,7 @@ If you want to use PENSA with Jupyter notebooks:
 
 ### Library installation
 
-#### Variant 1: Install PENSA library from PyPI
+#### Option 1: Install PENSA library from PyPI
 
 Within the environment created above, execute:
 
@@ -35,7 +35,7 @@ Within the environment created above, execute:
 
 To use the example scripts or tutorial folder, you'll have to download them separately.
 
-#### Variant 2: Download PENSA and create editable installation
+#### Option 2: Download PENSA and create editable installation
 
 Within the environment created above, execute:
 
