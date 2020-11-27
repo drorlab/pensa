@@ -11,30 +11,48 @@ Proteins are featurized via PyEMMA using backbone torsions, sidechain torsions, 
 
 All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
 
-## Requirements
-
-Python 3.7 with:
-- numpy
-- scipy >= 1.2
-- mdshare
-- pyemma
-- MDAnalysis
-- matplotlib
 
 ## Installation
 
+### Conda environment
+
 Create and activate a conda environment:
 
-    conda create --name pensa python=3.7 numpy scipy>=1.2 matplotlib pyemma mdshare MDAnalysis -c conda-forge
+    conda create --name pensa python=3.7 numpy scipy matplotlib pyemma mdshare MDAnalysis cython -c conda-forge
     conda activate pensa
 
 If you want to use PENSA with Jupyter notebooks:
 
     conda install jupyter
-    
-Download and install PENSA:
+
+### Library installation
+
+#### Variant 1: Install PENSA library from PyPI
+
+Within the environment created above, execute:
+
+    pip install pensa
+
+To use the example scripts or tutorial folder, you'll have to download them separately.
+
+#### Variant 2: Download PENSA and create editable installation
+
+Within the environment created above, execute:
 
     git clone https://github.com/drorlab/pensa.git
     cd pensa
     pip install -e . 
+
+
+## Contributions
+
+#### Development
+Martin Vögele
+
+#### Beta-Tests
+Martin Vögele, Alex Powers, Sang Truong
+
+#### Funding & Support 
+This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).
+
 
