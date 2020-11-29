@@ -78,7 +78,7 @@ if __name__ == "__main__":
     if args.write:
         write_cluster_traj(cidx[cond==0], args.ref_file_a, args.trj_file_a, 
                            args.out_frames_a, args.start_frame )
-        write_cluster_traj(cidx[cond==0], args.ref_file_b, args.trj_file_b, 
+        write_cluster_traj(cidx[cond==1], args.ref_file_b, args.trj_file_b, 
                            args.out_frames_b, args.start_frame )
 
     # -- Within-Sum-of-Squares (WSS) analysis --
