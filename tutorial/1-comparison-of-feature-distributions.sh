@@ -17,6 +17,7 @@ python ~/pensa/scripts/compare_feature_distributions.py \
 	--trj_file_b traj/rhodopsin_gibound_receptor.xtc \
 	--out_plots  plots/rhodopsin_receptor \
 	--out_vispdb vispdb/rhodopsin_receptor \
+	--out_results results/rhodopsin_receptor \
 	--start_frame 0 \
 	--print_num 12
 
