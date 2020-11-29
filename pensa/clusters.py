@@ -117,7 +117,7 @@ def obtain_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B
     data = np.concatenate([data_a,data_b],0)
 
     # Remember which simulation the data came frome
-    cond = np.concatenate([np.ones(len(data_a)), np.zeros(len(data_b))])
+    cond = np.concatenate([np.zeros(len(data_a)), np.ones(len(data_b))])
 
     # Remember the index in the respective simulation (taking into account cutoff)
     oidx = np.concatenate([np.arange(len(data_a))+start_frame, np.arange(len(data_b))+start_frame])
@@ -180,6 +180,8 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     # Load and select the protein
     u = mda.Universe(top_file, trj_file)
     protein = u.select_atoms('all')
+    print('Number of frames in trajectory:',len(u.trajectory))
+    print('Number of cluster indices:',len(cluster_idx))
     
     # Loop over clusters
     num_clusters = np.max(cluster_idx)+1
