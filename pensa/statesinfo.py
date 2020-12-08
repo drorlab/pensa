@@ -267,7 +267,7 @@ def get_intersects(gaussians,distribution,xline, show_plots=True):
 
 ##this function requires a list of the distribution you want to cluster/discretize into states
 ##this can be applied to a list of all filenames in a directory where every filename is a list of the distributions
-def extract_state_limits(distr, show_plots=None):    
+def determine_state_limits(distr, show_plots=None):    
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
@@ -322,7 +322,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None):
         distr_a=[periodic_correction(i) for i in set_distr_a]
     distr_a_states=[]
     for i in distr_a:
-        distr_a_states.append(extract_state_limits(i))
+        distr_a_states.append(determine_state_limits(i))
         print(distr_a_states)
         
     H_a=calculate_entropy(distr_a_states,distr_a) 
@@ -341,7 +341,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None):
             distr_b=[periodic_correction(i) for i in set_distr_b]
         distr_b_states=[]
         for i in distr_b:
-            distr_b_states.append(extract_state_limits(i))
+            distr_b_states.append(determine_state_limits(i))
         H_b=calculate_entropy(distr_b_states,distr_b)
 
     ab_joint_states= distr_a_states + distr_b_states
@@ -364,7 +364,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
         distr_a=[periodic_correction(i) for i in set_distr_a]
     distr_a_states=[]
     for i in distr_a:
-        distr_a_states.append(extract_state_limits(i))
+        distr_a_states.append(determine_state_limits(i))
     H_a=calculate_entropy(distr_a_states,distr_a)
         
     ##----------------
@@ -375,7 +375,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
         distr_b=[periodic_correction(i) for i in set_distr_b]
     distr_b_states=[]
     for i in distr_b:
-        distr_b_states.append(extract_state_limits(i))
+        distr_b_states.append(determine_state_limits(i))
     H_b=calculate_entropy(distr_b_states,distr_b) 
     
     ##----------------
@@ -392,7 +392,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
             distr_c=[periodic_correction(i) for i in set_distr_c]
         distr_c_states=[]
         for i in distr_c:
-            distr_c_states.append(extract_state_limits(i))
+            distr_c_states.append(determine_state_limits(i))
         H_c=calculate_entropy(distr_c_states,distr_c)
 
     ##----------------
