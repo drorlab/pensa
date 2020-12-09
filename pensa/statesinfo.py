@@ -265,8 +265,10 @@ def get_intersects(gaussians,distribution,xline, show_plots=True):
     return all_intersects
     
 
-##this function requires a list of the distribution you want to cluster/discretize into states
-##this can be applied to a list of all filenames in a directory where every filename is a list of the distributions
+##this function requires a distribution to cluster/discretize into states
+##The function handles both residue angle distributions and water orientation/occupancy
+##distributions. For waters, the assignment of an additional non-angular state is performed if
+## changes in pocket occupancy occur.
 def determine_state_limits(distr, show_plots=None):    
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
