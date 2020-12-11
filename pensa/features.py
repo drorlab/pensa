@@ -6,7 +6,7 @@ from pyemma.util.contexts import settings
 # -- Loading the Features --
 
 
-def get_features(pdb, xtc, start_frame=0):
+def get_features(pdb, xtc, start_frame=0, cos_sin=None):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
     http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
@@ -26,13 +26,13 @@ def get_features(pdb, xtc, start_frame=0):
     features_data = {}
     # Add backbone torsions.
     bbtorsions_feat = pyemma.coordinates.featurizer(pdb)
-    bbtorsions_feat.add_backbone_torsions(cossin=True, periodic=False)
+    bbtorsions_feat.add_backbone_torsions(cossin=cos_sin, periodic=False)
     bbtorsions_data = pyemma.coordinates.load(xtc, features=bbtorsions_feat)[start_frame:]
     feature_names['bb-torsions'] = bbtorsions_feat
     features_data['bb-torsions'] = bbtorsions_data
     # Add sidechain torsions.
     sctorsions_feat = pyemma.coordinates.featurizer(pdb)
-    sctorsions_feat.add_sidechain_torsions(cossin=True, periodic=False)
+    sctorsions_feat.add_sidechain_torsions(cossin=cos_sin, periodic=False)
     sctorsions_data = pyemma.coordinates.load(xtc, features=sctorsions_feat)[start_frame:]
     feature_names['sc-torsions'] = sctorsions_feat
     features_data['sc-torsions'] = sctorsions_data
@@ -43,5 +43,5 @@ def get_features(pdb, xtc, start_frame=0):
     feature_names['bb-distances'] = bbdistances_feat
     features_data['bb-distances'] = bbdistances_data
     # Return the dictionaries.
-    return feature_names, features_data
+   return feature_names, features_data
 
