@@ -230,7 +230,8 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
 def multivar_res_timeseries_data(feat, data, feature_type):
     """
     Returns the multivariate timeseries for all angles in a residues particular feature.
-    
+    Output is in sequential order for the protein sequence.
+
     Args:
         feat (features obj): Object with all feature names.
         data (float array): Trajectory data from the simulation.
