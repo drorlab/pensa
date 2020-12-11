@@ -227,6 +227,40 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
     timeseries = data[feature_type][:,index]
     return timeseries
 
+def multivar_res_timeseries_data(feat, data, feature_type):
+    """
+    Returns the multivariate timeseries for all angles in a residues particular feature.
+    
+    Args:
+        feat (features obj): Object with all feature names.
+        data (float array): Trajectory data from the simulation.
+        feature_type: Type of the selected feature 
+            ('bb-torsions', 'bb-distances', 'sc-torsions').
+    Returns:
+        timeseries (float nested list): Value of each feature for each frame for a specific residue.
+    
+    """
+    # Obtain the feature names
+    feature_names = feat[feature_type].describe()
+    # Obtain the residue numbers 
+    res_numbers = [int(i.split()[-1]) for i in feature_names]
+
+    # Group indices in which the feature refers to same residue
+    index_same_res = [list(np.where(np.array(res_numbers)==i)[0])
+                      for i in range(min(res_numbers), max(res_numbers)+1)]   
+    
+    # Obtain timeseries data for each residue
+    multivar_res_timeseries_data=[]
+    for i in range(len(index_same_res)):
+        feat_timeseries=[]
+        
+        for j in index_same_res[i]:
+            feat_timeseries.append(list(get_feature_timeseries(feat,data,feature_type,feature_names[j])))
+        
+        multivar_res_timeseries_data.append(feat_timeseries)
+        
+    return multivar_res_timeseries_data
+
 
 
 def sort_features(names, sortby):
