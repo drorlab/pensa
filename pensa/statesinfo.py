@@ -42,23 +42,22 @@ def periodic_correction(angle1):
     ##the periodicity on gmx_chi goes [-180,180]
     ##this shifts the periodicity for distributions that sample the [180,0] region
     ##so that the same periodic correction can be used on waters [0,360] and residues [-180,180]    
-    if min(angle1)>0:
-        shift_dist=continuous_angles
+    if min(continuous_angles)<0:
+        shift_dist=[(i - min(continuous_angles)) for i in continuous_angles]
     else:
-        shift_dist=[i+180 for i in continuous_angles]
+        shift_dist=continuous_angles
     ##generating a histogram of the chi angles
     heights=np.histogram(shift_dist, bins=90, density=True)
     ##if the first bar height is not the minimum bar height
     ##then find the minimum bar and shift everything before that bar by 360
     if heights[0][0] > min(heights[0]):   
-        ##set the periodic boundary to the first minimum in the distribution
-        ##find the minimum angle by multiplying the minimum bin number by the size of the bins
-        ##define the new periodic boundary for the shifted values
-        j=np.where(heights[0] == min(heights[0]))[0][0]*(360.0/len(heights[0]))
+        ##define the new periodic boundary for the shifted values as the first minima
+        j=heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
         for k in range(len(shift_dist)):
-            ##if the angle is before the periodic boundary, shift by 360
-            if shift_dist[k] <= j:
-                shift_dist[k]+=360
+            ##if the angle is before the periodic boundary, shift by 2*pi
+            ## the boundaries in pyEMMA are in radians. [-pi, pi]
+            if shift_dist[k] < j:
+                shift_dist[k]+=2*np.pi
     for i in range(len(index_cont_angles)):
         new_dist[index_cont_angles[i]] = shift_dist[i]
     return new_dist
@@ -180,7 +179,7 @@ def printKclosest(arr,n,x,k):
 
 
 ## obatining the gaussians that fit the distribution
-def get_gaussian_fit(distribution, binnumber=55, window_len=10, show_plots=None):    
+def get_gaussian_fit(distribution, binnumber=60, window_len=10, show_plots=None):    
     histo=np.histogram(distribution, bins=binnumber, density=True)
     distributionx=smooth(histo[1][0:-1],window_len)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
@@ -227,7 +226,7 @@ def get_gaussian_fit(distribution, binnumber=55, window_len=10, show_plots=None)
         expected.append(mean_pop[i])
         expected.append(sigma_pop[i])
         expected.append(corrected_extrema[i])    
-    params,cov=curve_fit(mode,distributionx,distributiony,expected)   
+    params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=100000)   
     if show_plots is not None:
         plt.figure()
         sns.distplot(distribution,bins=binnumber) 
@@ -243,7 +242,7 @@ def get_gaussian_fit(distribution, binnumber=55, window_len=10, show_plots=None)
 
 
 # OBTAINING THE GAUSSIAN INTERSECTS
-def get_intersects(gaussians,distribution,xline, show_plots=True):
+def get_intersects(gaussians,distribution,xline, show_plots=None):
     ##discretising each state by gaussian intersects    
     ##adding the minimum angle value as the first boundary
     all_intersects=[min(distribution)]
@@ -325,7 +324,6 @@ def calculate_ssi(set_distr_a, set_distr_b=None):
     distr_a_states=[]
     for i in distr_a:
         distr_a_states.append(determine_state_limits(i))
-        print(distr_a_states)
         
     H_a=calculate_entropy(distr_a_states,distr_a) 
             
