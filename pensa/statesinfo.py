@@ -39,27 +39,20 @@ def periodic_correction(angle1):
     continuous_angles = [i for i in new_dist if i != 10000.0]
     ##indexing all the continuous distribution angles
     index_cont_angles = [i for i, x in enumerate(new_dist) if x != 10000.0]      
-    ##the periodicity on gmx_chi goes [-180,180]
-    ##this shifts the periodicity for distributions that sample the [180,0] region
-    ##so that the same periodic correction can be used on waters [0,360] and residues [-180,180]    
-    if min(continuous_angles)<0:
-        shift_dist=[(i - min(continuous_angles)) for i in continuous_angles]
-    else:
-        shift_dist=continuous_angles
     ##generating a histogram of the chi angles
-    heights=np.histogram(shift_dist, bins=90, density=True)
+    heights=np.histogram(continuous_angles, bins=90, density=True)
     ##if the first bar height is not the minimum bar height
     ##then find the minimum bar and shift everything before that bar by 360
     if heights[0][0] > min(heights[0]):   
         ##define the new periodic boundary for the shifted values as the first minima
         j=heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
-        for k in range(len(shift_dist)):
+        for k in range(len(continuous_angles)):
             ##if the angle is before the periodic boundary, shift by 2*pi
             ## the boundaries in pyEMMA are in radians. [-pi, pi]
-            if shift_dist[k] < j:
-                shift_dist[k]+=2*np.pi
+            if continuous_angles[k] < j:
+                continuous_angles[k]+=2*np.pi
     for i in range(len(index_cont_angles)):
-        new_dist[index_cont_angles[i]] = shift_dist[i]
+        new_dist[index_cont_angles[i]] = continuous_angles[i]
     return new_dist
 
 
