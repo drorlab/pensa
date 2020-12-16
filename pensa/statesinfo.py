@@ -57,13 +57,8 @@ def periodic_correction(angle1):
 
 
 def import_distribution(simulation_folder, file_name):
-    dist1 = [item[0] for item in list(np.genfromtxt(simulation_folder + file_name))]
-    my_file = Path(simulation_folder + file_name)
-    if my_file.is_file():
-        dist2 = [item[1] for item in list(np.genfromtxt(simulation_folder + file_name))]
-        return dist1, dist2
-    else:
-        return dist1
+    dists = np.genfromtxt(simulation_folder + file_name, dtype=float, delimiter=",")
+    return dists
     
     
 # this function makes sure that the two simulations are the same length
@@ -77,17 +72,8 @@ def match_sim_lengths(sim1,sim2):
         
 
 def get_filenames(folder):  
-    files = [f.split(folder)[1] for f in glob.glob(folder+ "**/*.xvg", recursive=True)]
-    files_ordered=[]
-    ##parsing the data by separating the residue number and re-ordering the lists numerically
-    for r in files:
-        j=re.split('(\d+)',r)
-        files_ordered.append(j)
-    files_ordered.sort(key = lambda x: int(x[1]))
-    ##adding together the strings to create one string
-    for i in range(len(files_ordered)):
-        files_ordered[i]=files_ordered[i][0]+files_ordered[i][1]+files_ordered[i][2]
-    return files_ordered
+    files = [f.split(folder)[1] for f in glob.glob(folder + "*", recursive=True)]
+    return files
     
 
 #smoothing the kde data so that the extrema can be found without any of the small noise appearing as extrema
