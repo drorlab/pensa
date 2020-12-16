@@ -158,7 +158,7 @@ def printKclosest(arr,n,x,k):
 
 
 ## obatining the gaussians that fit the distribution
-def get_gaussian_fit(distribution, binnumber=60, window_len=10, show_plots=None):    
+def get_gaussian_fit(distribution, binnumber=360, window_len=15):    
     histo=np.histogram(distribution, bins=binnumber, density=True)
     distributionx=smooth(histo[1][0:-1],window_len)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
@@ -196,7 +196,7 @@ def get_gaussian_fit(distribution, binnumber=60, window_len=10, show_plots=None)
         mean_pop.append(mean_vals[i])
         sigma_pop.append(sig_vals[i])
     ##x is the space of angles
-    xline=np.linspace(min(distribution),min(distribution)+360,10000)                
+    xline=np.linspace(min(distribution),min(distribution)+2*np.pi,10000)                
     ##choosing the fitting mode
     peak_number=[gauss,bimodal,trimodal,quadmodal,quinmodal,sexmodal,septmodal]
     mode=peak_number[len(sig_vals)-1]    
@@ -205,18 +205,11 @@ def get_gaussian_fit(distribution, binnumber=60, window_len=10, show_plots=None)
         expected.append(mean_pop[i])
         expected.append(sigma_pop[i])
         expected.append(corrected_extrema[i])    
-    params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=100000)   
-    if show_plots is not None:
-        plt.figure()
-        sns.distplot(distribution,bins=binnumber) 
+    params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
     gaussians=[]
-    colours=['m','g','c','r','b','y','k']
     gaussnumber=np.linspace(0,(len(params))-3,int(len(params)/3))    
     for j in gaussnumber:
         gaussians.append(gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]))
-        if show_plots is not None:
-            plt.plot(xline,gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]),
-                      color=colours[np.where(gaussnumber==j)[0][0]], linewidth=2)
     return gaussians, xline
 
 
@@ -236,7 +229,9 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     
     if show_plots is not None:
         plt.figure()
-        sns.distplot(distribution,bins=90) 
+        sns.distplot(distribution,bins=360) 
+        for j in range(len(gaussians)):
+            plt.plot(xline, gaussians[j], linewidth=2)        
         for i in range(len(all_intersects)):
             plt.axvline(all_intersects[i],color='k',lw=1,ls='--')   
                 
