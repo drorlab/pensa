@@ -227,30 +227,18 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
     timeseries = data[feature_type][:,index]
     return timeseries
 
-def multivar_res_timeseries_data(feat, data, feature_type):
-    """
-    Returns the multivariate timeseries for all angles in a residues particular feature.
-    Output is in sequential order for the protein sequence.
-
-    Args:
-        feat (features obj): Object with all feature names.
-        data (float array): Trajectory data from the simulation.
-        feature_type: Type of the selected feature 
-            ('bb-torsions', 'bb-distances', 'sc-torsions').
-    Returns:
-        timeseries (float nested list): Value of each feature for each frame for a specific residue.
+def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
     
-    """
-    # Obtain the feature names
+    #obtaining the feature names
     feature_names = feat[feature_type].describe()
-    # Obtain the residue numbers 
+    #obtaining the residue numbers 
     res_numbers = [int(i.split()[-1]) for i in feature_names]
 
-    # Group indices in which the feature refers to same residue
+    #grouping indices where feature refers to same residue
     index_same_res = [list(np.where(np.array(res_numbers)==i)[0])
                       for i in range(min(res_numbers), max(res_numbers)+1)]   
     
-    # Obtain timeseries data for each residue
+    #obtaining timeseries data for each residue
     multivar_res_timeseries_data=[]
     for i in range(len(index_same_res)):
         feat_timeseries=[]
@@ -260,8 +248,16 @@ def multivar_res_timeseries_data(feat, data, feature_type):
         
         multivar_res_timeseries_data.append(feat_timeseries)
         
+        if write is True:
+            for subdir in [feature_type+'/']:
+                if not os.path.exists(subdir):
+                    os.makedirs(subdir)
+            filename= feature_type+'/' + out_name + feature_names[j].split()[-2] + feature_names[j].split()[-1] + ".txt"
+            with open(filename, 'w') as output:
+                for row in feat_timeseries:
+                    output.write(str(row)[1:-1] + '\n')
+            
     return multivar_res_timeseries_data
-
 
 
 def sort_features(names, sortby):
