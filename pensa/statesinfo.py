@@ -218,11 +218,19 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     ##discretising each state by gaussian intersects    
     ##adding the minimum angle value as the first boundary
     all_intersects=[min(distribution)]
-    for i in range(len(gaussians)-1):        
+    
+    mean_gauss_xval=[]
+    for i in range(len(gaussians)):
+        mean_gauss_xval.append(xline[list(gaussians[i]).index(max(gaussians[i]))])
+    
+    reorder_indices=[mean_gauss_xval.index(i) for i in sorted(mean_gauss_xval)]    
+    reorder_gaussians=[gaussians[i] for i in reorder_indices]
+        
+    for i in range(len(reorder_gaussians)-1):    
         ##First calculate f - g and the corresponding signs using np.sign. 
         ##Applying np.diff reveals all the positions where the sign changes (e.g. the lines cross). 
         ##Using np.argwhere gives us the exact indices of the state intersects
-        idx = np.argwhere(np.diff(np.sign(gaussians[i] - gaussians[i+1]))).flatten()
+        idx = np.argwhere(np.diff(np.sign(reorder_gaussians[i] - reorder_gaussians[i+1]))).flatten()
         for intersect in idx:
             all_intersects.append(xline[intersect])            
     all_intersects.append(max(distribution))  
@@ -230,8 +238,8 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     if show_plots is not None:
         plt.figure()
         sns.distplot(distribution,bins=360) 
-        for j in range(len(gaussians)):
-            plt.plot(xline, gaussians[j], linewidth=2)        
+        for j in range(len(reorder_gaussians)):
+            plt.plot(xline, reorder_gaussians[j], linewidth=2)        
         for i in range(len(all_intersects)):
             plt.axvline(all_intersects[i],color='k',lw=1,ls='--')   
                 
