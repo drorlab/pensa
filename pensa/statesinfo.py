@@ -158,7 +158,7 @@ def printKclosest(arr,n,x,k):
 
 
 ## obatining the gaussians that fit the distribution
-def get_gaussian_fit(distribution, binnumber=360, window_len=15):    
+def get_gaussian_fit(distribution, binnumber=180, window_len=12):    
     histo=np.histogram(distribution, bins=binnumber, density=True)
     distributionx=smooth(histo[1][0:-1],window_len)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
@@ -196,7 +196,7 @@ def get_gaussian_fit(distribution, binnumber=360, window_len=15):
         mean_pop.append(mean_vals[i])
         sigma_pop.append(sig_vals[i])
     ##x is the space of angles
-    xline=np.linspace(min(distribution),min(distribution)+2*np.pi,10000)                
+    xline=np.linspace(min(distribution),max(distribution),10000)                
     ##choosing the fitting mode
     peak_number=[gauss,bimodal,trimodal,quadmodal,quinmodal,sexmodal,septmodal]
     mode=peak_number[len(sig_vals)-1]    
@@ -236,8 +236,8 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     all_intersects.append(max(distribution))  
     
     if show_plots is not None:
-        plt.figure()
-        sns.distplot(distribution,bins=360) 
+        plt.figure()      
+        sns.distplot(distribution,bins=180) 
         for j in range(len(reorder_gaussians)):
             plt.plot(xline, reorder_gaussians[j], linewidth=2)        
         for i in range(len(all_intersects)):
