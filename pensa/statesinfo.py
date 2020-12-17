@@ -158,7 +158,7 @@ def printKclosest(arr,n,x,k):
 
 
 ## obatining the gaussians that fit the distribution
-def get_gaussian_fit(distribution, binnumber=180, window_len=12):    
+def get_gaussian_fit(distribution, binnumber=90, window_len=6):    
     histo=np.histogram(distribution, bins=binnumber, density=True)
     distributionx=smooth(histo[1][0:-1],window_len)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
@@ -237,7 +237,7 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     
     if show_plots is not None:
         plt.figure()      
-        sns.distplot(distribution,bins=180) 
+        sns.distplot(distribution,bins=90) 
         for j in range(len(reorder_gaussians)):
             plt.plot(xline, reorder_gaussians[j], linewidth=2)        
         for i in range(len(all_intersects)):
