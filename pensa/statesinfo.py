@@ -158,7 +158,9 @@ def printKclosest(arr,n,x,k):
 
 
 ## obatining the gaussians that fit the distribution
-def get_gaussian_fit(distribution, binnumber=90, window_len=6):    
+## bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
+## smoothing is chosen based on 95% significance level (i.e. 0.05*binnumber) 
+def get_gaussian_fit(distribution, binnumber=120, window_len=6):    
     histo=np.histogram(distribution, bins=binnumber, density=True)
     distributionx=smooth(histo[1][0:-1],window_len)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
@@ -168,7 +170,7 @@ def get_gaussian_fit(distribution, binnumber=90, window_len=6):
     ##the maxima may be an artifact of undersampling
     ##this grabs only the maxima that correspond to a density greater than the cutoff
     ##cutoff= 0.75% at a 99.25% significance level
-    ##which ignores only the states limits in which states are sampled less that 0.75% of the time
+    ##which ignores only the states limits in which states are sampled less that 1% of the time
     corrected_extrema=[item for item in maxima if item > max(distributiony)*0.0075]
     ##finding the guess parameters for the plots
     ##empty lists for the guess params to be added to
@@ -176,19 +178,21 @@ def get_gaussian_fit(distribution, binnumber=90, window_len=6):
     sigma_pop=[]
     ##number of closest neighbours
     ##setting for the sigma finding function
-    noc=6    
-    ##for all the extrema, find the 'noc' closest x coordinates that lie on the distribution
-    ##closest to a value of half of the maximum
+    noc=28
+    ##for all the extrema, find the 'noc' yval 
+    ##closest to half max yval
     ##this is to find the edges of the gaussians for calculating sigma
     sig_vals=[]
     for extrema in corrected_extrema:
-        ##finding the 6 y values closest to the half max value of each extrema
-        closest=printKclosest(distributiony, len(distributiony), extrema/2.0, noc)
-        ##finding the x coordinate corresponding to these values
+        
+        mean_xval=distributionx[np.where(distributiony==extrema)[0][0]]
+        ##finding the "noc" closest y values to the 1/2 max value of each extrema
+        closest=printKclosest(distributiony, len(distributiony), extrema*0.5, noc)
+        ##finding the x closest to the mean
         xlist=[np.where(distributiony==float(closesty))[0][0] for closesty in closest]
-        xsig=find_nearest(distributionx[xlist],distributionx[np.where(distributiony==extrema)[0][0]])
+        xsig=find_nearest(distributionx[xlist],mean_xval)
         ##obtaining the width of the distribution
-        sig=np.absolute(xsig-distributionx[np.where(distributiony==extrema)[0][0]])
+        sig=np.absolute(xsig-mean_xval)
         sig_vals.append(sig)        
     ##the mean x of the gaussian is the value of x at the peak of y
     mean_vals=[distributionx[np.where(distributiony==extrema)[0][0]] for extrema in corrected_extrema]
@@ -222,27 +226,50 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     mean_gauss_xval=[]
     for i in range(len(gaussians)):
         mean_gauss_xval.append(xline[list(gaussians[i]).index(max(gaussians[i]))])
-    
+        
+    gauss_mean_ordered=sorted(mean_gauss_xval)
     reorder_indices=[mean_gauss_xval.index(i) for i in sorted(mean_gauss_xval)]    
-    reorder_gaussians=[gaussians[i] for i in reorder_indices]
+    ##sort gaussians in order of their mean xval for neighbouring intersects
+    ##Only accept gaussians if their maxima is above 0.03 (normalised histogram)
+    reorder_gaussians=[gaussians[i] for i in reorder_indices if max(gaussians[i])>0.03]
         
     for i in range(len(reorder_gaussians)-1):    
         ##First calculate f - g and the corresponding signs using np.sign. 
         ##Applying np.diff reveals all the positions where the sign changes (e.g. the lines cross). 
         ##Using np.argwhere gives us the exact indices of the state intersects
-        idx = np.argwhere(np.diff(np.sign(reorder_gaussians[i] - reorder_gaussians[i+1]))).flatten()
-        for intersect in idx:
-            all_intersects.append(xline[intersect])            
+        
+        idx = np.argwhere(np.diff(np.sign(reorder_gaussians[i] - reorder_gaussians[i+1]))).flatten()      
+        
+        if len(idx)==1:
+            all_intersects.append(xline[idx][0])
+            
+        elif len(idx)!=0:
+            ##intersects can occur at multiple places
+            ##this selects the intersect with the maximum probability
+            ##which stops intersects occuring when
+            ##the gaussians trail to zero further right on the plot
+            intersect_ymax=max([reorder_gaussians[i][intersect] for intersect in idx])
+            intersect_ymax_index=[item for item in idx if reorder_gaussians[i][item]==intersect_ymax]
+            
+            all_intersects.append(xline[intersect_ymax_index])
+
+            
     all_intersects.append(max(distribution))  
     
     if show_plots is not None:
         plt.figure()      
-        sns.distplot(distribution,bins=90) 
+        # histo=np.histogram(distribution, bins=120, density=True)
+        # distributionx=smooth(histo[1][0:-1],12)
+        # distributiony=smooth(histo[0]-min(histo[0]),12)
+        # plt.plot(distributionx,distributiony,ls='--',lw=3)
+        sns.distplot(distribution,bins=120) 
         for j in range(len(reorder_gaussians)):
             plt.plot(xline, reorder_gaussians[j], linewidth=2)        
         for i in range(len(all_intersects)):
             plt.axvline(all_intersects[i],color='k',lw=1,ls='--')   
-                
+        plt.xlabel('Radians')
+        plt.ylabel('Count')
+            
     return all_intersects
     
 
