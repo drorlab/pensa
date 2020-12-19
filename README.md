@@ -55,13 +55,10 @@ Martin Vögele. PENSA. http://doi.org/10.5281/zenodo.4362136
 
 This version:
 ```
-Martin Vögele. (2020, December 19). PENSA 0.1.1 (Version v0.1.1). http://doi.org/10.5281/zenodo.4362137
+Martin Vögele. (2020, December 19). PENSA (Version 0.1.1). http://doi.org/10.5281/zenodo.4362137
 ```
 
-## Contributions
-
-#### Development
-Martin Vögele
+## Acknowledgments
 
 #### Beta-Tests
 Alex Powers, Sang Truong
