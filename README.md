@@ -1,5 +1,7 @@
 # PENSA - Protein Ensemble Analysis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362137.svg)](https://doi.org/10.5281/zenodo.4362137)
+
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
 With PENSA, you can (currently):
@@ -44,13 +46,18 @@ Within the environment created above, execute:
     pip install -e . 
 
 
+## Citation
+
+Martin Vögele. (2020, December 19). drorlab/pensa: PENSA 0.1.1 (Version v0.1.1). Zenodo. http://doi.org/10.5281/zenodo.4362137
+
+
 ## Contributions
 
 #### Development
 Martin Vögele
 
 #### Beta-Tests
-Martin Vögele, Alex Powers, Sang Truong
+Alex Powers, Sang Truong
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).
