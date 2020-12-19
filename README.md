@@ -48,8 +48,15 @@ Within the environment created above, execute:
 
 ## Citation
 
-Martin Vögele. (2020, December 19). drorlab/pensa: PENSA 0.1.1 (Version v0.1.1). Zenodo. http://doi.org/10.5281/zenodo.4362137
+General:
+```
+Martin Vögele. PENSA. http://doi.org/10.5281/zenodo.4362136
+```
 
+This version:
+```
+Martin Vögele. (2020, December 19). PENSA 0.1.1 (Version v0.1.1). http://doi.org/10.5281/zenodo.4362137
+```
 
 ## Contributions
 
