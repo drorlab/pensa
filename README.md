@@ -61,7 +61,7 @@ Martin Vögele. (2020, December 19). PENSA (Version 0.1.1). http://doi.org/10.52
 ## Acknowledgments
 
 #### Beta-Tests
-Alex Powers, Sang Truong
+Alex Powers, Sang Truong, Lukas Stelzl
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).

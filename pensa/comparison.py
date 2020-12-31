@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # --- METHODS FOR FEATURE DIFFERENCE ANALYSIS ---
 
 
-def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=0.001, verbose=True):
+def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True):
     """
     Calculates the Jensen-Shannon distance and the Kullback-Leibler divergences for each feature from two ensembles.
     
@@ -25,7 +25,8 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
             Must be the same as features_a. Provided as a sanity check. 
         all_data_a (float array): Trajectory data from the first ensemble [frames,frame_data].
         all_data_b (float array): Trajectory data from the second ensemble [frames,frame_data].
-        bin_width (float): Bin width for the axis to compare the distributions on. Defaults to 0.001.
+        bin_width (float): Bin width for the axis to compare the distributions on. If bin_width=None, bin_num (see below) bins are used and the width is determined from the common histogram. Defaults to None.
+        bin_num (int): Number of bins for the axis to compare the distributions on (only if bin_width=None). Defaults to 10.
         verbose (bool): Print intermediate results. Defaults to True.
     
     Returns:
@@ -62,12 +63,15 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
         data_avg[i] = np.mean(data_both)
         
         # Get bin values for all histograms from the combined data set
-        bins_min = np.min( data_both )
-        bins_max = np.max( data_both )
-        bins = np.arange(bins_min,bins_max,bin_width)
+        if bin_width is None:
+            bins = bin_num
+        else:
+            bins_min = np.min( data_both )
+            bins_max = np.max( data_both )
+            bins = np.arange(bins_min,bins_max,bin_width)
 
         # Calculate histograms for combined and single data sets
-        histo_both = np.histogram(data_both, density = True)
+        histo_both = np.histogram(data_both, bins = bins, density = True)
         histo_a = np.histogram(data_a, density = True, bins = histo_both[1])
         distr_a = histo_a[0] / np.sum(histo_a[0])
         histo_b = np.histogram(data_b, density = True, bins = histo_both[1])
@@ -88,7 +92,7 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
 
 
 
-def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, bin_width=0.001, verbose=True):
+def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, verbose=True):
     """
     Calculates Kolmogorov-Smirnov statistic for two distributions.
     
@@ -100,7 +104,6 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
             Must be the same as features_a. Provided as a sanity check. 
         all_data_a (float array): Trajectory data from the first ensemble [frames,frame_data].
         all_data_b (float array): Trajectory data from the second ensemble [frames,frame_data].
-        bin_width (float): Bin width for the axis to compare the distributions on. Defaults to 0.001.
         verbose (bool): Print intermediate results. Defaults to True.
 
     Returns:
