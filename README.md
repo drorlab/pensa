@@ -1,5 +1,6 @@
 # PENSA - Protein Ensemble Analysis
 
+![Package](https://github.com/drorlab/pensa/workflows/package/badge.svg)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362137.svg)](https://doi.org/10.5281/zenodo.4362137)
 
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
