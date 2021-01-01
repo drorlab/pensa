@@ -86,7 +86,7 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
         
         if verbose:
             print(i,'/',len(all_data_a),':', data_names[i]," %1.2f"%data_avg[i],
-                  " %1.2f %1.2f %1.2f"%(js_dist,rel_ent_ab,rel_ent_ba))
+                  " %1.2f %1.2f %1.2f"%(data_jsdist[i],data_kld_ab[i],data_kld_ba[i]))
         
     return data_names, data_jsdist, data_kld_ab, data_kld_ba
 
