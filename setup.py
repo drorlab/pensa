@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pensa',
-      version='0.1.1',
+      version='0.1.2',
       description='PENSA - protein ensemble analysis',
       url='http://github.com/drorlab/pensa',
       author='Martin Voegele',
