@@ -212,13 +212,18 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
         # Plot the time series in the left panel
         ax[evi,0].plot(proj_a, alpha=0.5, label=label_a)
         ax[evi,0].plot(proj_b, alpha=0.5, label=label_b)
+        ax[evi,0].set_xlabel('frame number')
+        ax[evi,0].set_ylabel('PC %i'%(evi+1))
         # Plot the histograms in the right panel
         ax[evi,1].hist(proj_a, bins=30, alpha=0.5, density=True, label=label_a)
         ax[evi,1].hist(proj_b, bins=30, alpha=0.5, density=True, label=label_b)
+        ax[evi,1].set_xlabel('PC %i'%(evi+1))
+        ax[evi,1].set_ylabel('frequency')
         # Legend
         if label_a and label_b:
             ax[evi,0].legend()
             ax[evi,1].legend()
+    fig.tight_layout()
     # Save the figure
     if saveas is not None:
         fig.savefig(saveas, dpi=300)

@@ -49,6 +49,8 @@ if __name__ == "__main__":
 
     # -- BACKBONE TORSIONS --
 
+    print('BACKBONE TORSIONS')
+
     # Relative Entropy analysis with BB torsions
     relen = relative_entropy_analysis(feat_a['bb-torsions'], feat_b['bb-torsions'], 
                                       data_a['bb-torsions'], data_b['bb-torsions'],
@@ -77,6 +79,8 @@ if __name__ == "__main__":
 
     # -- SIDECHAIN TORSIONS --
 
+    print('SIDECHAIN TORSIONS')
+
     # Relative Entropy analysis with sidechain torsions
     relen = relative_entropy_analysis(feat_a['sc-torsions'], feat_b['sc-torsions'],
                                       data_a['sc-torsions'], data_b['sc-torsions'],
@@ -104,6 +108,8 @@ if __name__ == "__main__":
 
 
     # -- BACKBONE C-ALPHA DISTANCES --
+
+    print('BACKBONE C-ALPHA DISTANCES')
 
     # Relative entropy analysis for C-alpha distances
     relen = relative_entropy_analysis(feat_a['bb-distances'], feat_b['bb-distances'], 

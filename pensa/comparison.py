@@ -7,6 +7,7 @@ import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
+from pensa.features import *
 
 
 
@@ -40,11 +41,11 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
     
     # Assert that the features are the same and data sets have same number of features
-    assert features_a.describe() == features_b.describe()
+    assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     
     # Extract the names of the features
-    data_names = features_a.active_features[0].describe()
+    data_names = features_a
     
     # Initialize relative entropy and average value
     data_jsdist = np.zeros(len(data_names))
@@ -116,11 +117,11 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
     all_data_a, all_data_g = all_data_a.T, all_data_g.T
     
     # Assert that features are the same and data sets have same number of features
-    assert features_a.describe() == features_g.describe()
+    assert features_a == features_b
     assert all_data_a.shape[0] == all_data_g.shape[0] 
     
     # Extract names of features
-    data_names = features_a.active_features[0].describe()
+    data_names = features_a
 
     # Initialize relative entropy and average value
     data_avg = np.zeros(len(data_names))
@@ -174,11 +175,11 @@ def mean_difference_analysis(features_a, features_g, all_data_a, all_data_g, ver
     all_data_a, all_data_g = all_data_a.T, all_data_g.T
     
     # Assert that features are the same and data sets have same number of features
-    assert features_a.describe() == features_g.describe()
+    assert features_a == features_b
     assert all_data_a.shape[0] == all_data_g.shape[0] 
     
     # Extract names of features
-    data_names = features_a.active_features[0].describe()
+    data_names = features_a
 
     # Initialize relative entropy and average value
     data_diff = np.zeros(len(data_names))
@@ -225,7 +226,7 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
     
     """
     # Select the feature and get its index.
-    index = np.where( np.array( feat[feature_type].describe() ) == feature_name )[0][0]
+    index = np.where( np.array( feat[feature_type] ) == feature_name )[0][0]
     # Extract the timeseries.
     timeseries = data[feature_type][:,index]
     return timeseries
@@ -354,7 +355,7 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
     diff = np.zeros([size,size])
     for n,name in enumerate(dist_names):
         splitname = name.split(' ')
-        resi,resj = int(splitname[2]),int(splitname[7])
+        resi,resj = int(splitname[2]),int(splitname[6])
         i = resi - firstres
         j = resj - firstres
         diff[i,j] = dist_diff[n]
