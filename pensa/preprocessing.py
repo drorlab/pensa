@@ -78,7 +78,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0)
     return
 
 
-def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0):
+def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0, verbose=False):
     """
     Extracts selected coordinates from several trajectory files.
     
@@ -99,7 +99,7 @@ def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0):
     with mda.Writer(out_name+'.xtc', num_at) as W:
         for r, t, s in zip(ref, trj, sel_string):
             print(r, t)
-            print(s)
+            if verbose: print(s)
             u = mda.Universe(r, t)
             selection = u.select_atoms(s)
             for ts in u.trajectory[start_frame:]:
