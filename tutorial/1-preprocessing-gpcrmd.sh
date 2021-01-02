@@ -12,13 +12,13 @@ ROOT="./mor-data"
 REF_FILE_A="$ROOT/11427_dyn_151.psf"
 PDB_FILE_A="$ROOT/11426_dyn_151.pdb"
 TRJ_FILE_A="$ROOT/11423_trj_151.xtc $ROOT/11424_trj_151.xtc $ROOT/11425_trj_151.xtc"
-SEL_BASE_A="protein and "
+SEL_BASE_A="(not name H*) and protein and "
 OUT_NAME_A="traj/condition-a"
 
 REF_FILE_B="$ROOT/11580_dyn_169.psf"
 PDB_FILE_B="$ROOT/11579_dyn_169.pdb"
 TRJ_FILE_B="$ROOT/11576_trj_169.xtc $ROOT/11577_trj_169.xtc $ROOT/11578_trj_169.xtc"
-SEL_BASE_B="protein and "
+SEL_BASE_B="(not name H*) and protein and "
 OUT_NAME_B="traj/condition-b"
 
 OUT_NAME_COMBINED="traj/combined"
@@ -48,7 +48,7 @@ for PART in receptor tm; do
 		--ref_file_b  $REF_FILE_B $REF_FILE_B $REF_FILE_B \
 		--trj_file_a  $TRJ_FILE_A  --trj_file_b  $TRJ_FILE_B  \
                 --sel_base_a "$SEL_BASE_A" --sel_base_b "$SEL_BASE_B" \
-                --sel_file "selections/mor_${PART}_without_asp114.txt" \
+                --sel_file "selections/mor_${PART}.txt" \
 		--out_name "${OUT_NAME_COMBINED}_${PART}"
 
 done

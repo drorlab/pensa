@@ -65,8 +65,10 @@ In each simulation, we need to select the protein or the part of it that we want
 It is crucial for comparing two simulations that the residues selected from both simulations are the same! 
 We provide a basic string (selection in [MDAnalysis format](https://docs.mdanalysis.org/1.0.0/documentation_pages/selections.html)) to which the corresponding residue numbers will be added later:
 
-    SEL_BASE_A="protein and "
-    SEL_BASE_B="protein and "
+    SEL_BASE_A="(not name H*) and protein and "
+    SEL_BASE_B="(not name H*) and protein and "
+
+In this example, we also exclude hydrogen atoms because the residue Asp114 is protonated in the BU72 simulation but not in the apo simulation. This would prevent us from stitching the trajectories together. Comparisons would still work, as long as all derived features are the same in both conditions.
 
 We also define the names of the processed trajectories, here: one for each simulation condition and a combined one:
 
@@ -112,7 +114,7 @@ In the following, we iterate over the two different selections and invoke the py
         --ref_file_b  $REF_FILE_B $REF_FILE_B $REF_FILE_B \
         --trj_file_a  $TRJ_FILE_A  --trj_file_b  $TRJ_FILE_B  \
         --sel_base_a "$SEL_BASE_A" --sel_base_b "$SEL_BASE_B" \
-        --sel_file "selections/mor_${PART}_without_asp114.txt" \
+        --sel_file "selections/mor_${PART}.txt" \
         --out_name "${OUT_NAME_COMBINED}_${PART}"
 
     done
