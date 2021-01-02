@@ -68,6 +68,8 @@ def pca_features(pca, features, num, threshold, plot_file=None):
         for j, ft in enumerate(features):
             if relevant[j]: print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
         ax[i].plot(pca.feature_PC_correlation[:,i])
+        ax[i].set_xlabel('feature index')
+        ax[i].set_ylabel('correlation with PC%i'%(i+1))
     fig.tight_layout()
     # Save the figure to a file
     if plot_file: fig.savefig(plot_file,dpi=300)

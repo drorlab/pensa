@@ -64,7 +64,7 @@ if __name__ == "__main__":
     np.savetxt(args.out_results+"_"+ftype+"_eigenvalues_combined.csv", np.array([cn,ev]).T, 
                delimiter=',', header='Component, Eigenvalue')
     # Plot feature correlation with top components and print relevant features
-    pca_features(pca, feat_a[ftype].describe(), 
+    pca_features(pca, feat_a[ftype], 
                  args.num_components, args.feat_threshold,
                  plot_file=args.out_plots+"_"+ftype+"_feature_correlation.pdf")
     # Sort each of the trajectories along the top components of combined data

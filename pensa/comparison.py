@@ -93,7 +93,7 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
 
 
 
-def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, verbose=True):
+def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
     """
     Calculates Kolmogorov-Smirnov statistic for two distributions.
     
@@ -114,11 +114,11 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
         
     """
 
-    all_data_a, all_data_g = all_data_a.T, all_data_g.T
+    all_data_a, all_data_b = all_data_a.T, all_data_b.T
     
     # Assert that features are the same and data sets have same number of features
     assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_g.shape[0] 
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
     
     # Extract names of features
     data_names = features_a
@@ -131,15 +131,15 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
     for i in range(len(all_data_a)):
 
         data_a = all_data_a[i]
-        data_g = all_data_g[i]
+        data_b = all_data_b[i]
         
         # Perform Kolmogorov-Smirnov test
-        ks = sp.stats.ks_2samp(data_a,data_g)
+        ks = sp.stats.ks_2samp(data_a,data_b)
         data_kss[i] = ks.statistic
         data_ksp[i] = ks.pvalue
         
         # Combine both data sets
-        data_both = np.concatenate((data_a,data_g))
+        data_both = np.concatenate((data_a,data_b))
         data_avg[i] = np.mean(data_both)
         
         if verbose:
@@ -150,7 +150,7 @@ def kolmogorov_smirnov_analysis(features_a, features_g, all_data_a, all_data_g, 
 
 
 
-def mean_difference_analysis(features_a, features_g, all_data_a, all_data_g, verbose=True):
+def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
     """
     Compares the arithmetic means of two distance distributions.
     
@@ -172,11 +172,11 @@ def mean_difference_analysis(features_a, features_g, all_data_a, all_data_g, ver
         
     """
     
-    all_data_a, all_data_g = all_data_a.T, all_data_g.T
+    all_data_a, all_data_b = all_data_a.T, all_data_b.T
     
     # Assert that features are the same and data sets have same number of features
     assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_g.shape[0] 
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
     
     # Extract names of features
     data_names = features_a
@@ -188,19 +188,19 @@ def mean_difference_analysis(features_a, features_g, all_data_a, all_data_g, ver
     for i in range(len(all_data_a)):
 
         data_a = all_data_a[i]
-        data_g = all_data_g[i]
+        data_b = all_data_b[i]
 
         # Calculate means of the data sets
         mean_a = np.mean(data_a)
-        mean_g = np.mean(data_g)
+        mean_b = np.mean(data_b)
 
         # Calculate difference of means between the two data sets
-        diff_ag = mean_a-mean_g
-        mean_ag = 0.5*(mean_a+mean_g)
+        diff_ab = mean_a-mean_b
+        mean_ab = 0.5*(mean_a+mean_b)
 
         # Update the output arrays
-        data_avg[i]  = mean_ag
-        data_diff[i] = diff_ag
+        data_avg[i]  = mean_ab
+        data_diff[i] = diff_ab
         
         if verbose:
             print(i,'/',len(all_data_a),':', data_names[i]," %1.2f"%data_avg[i],
