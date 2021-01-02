@@ -1,7 +1,7 @@
 # PENSA - Protein Ensemble Analysis
 
 ![Package](https://github.com/drorlab/pensa/workflows/package/badge.svg)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362137.svg)](https://doi.org/10.5281/zenodo.4362137)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362136.svg)](https://doi.org/10.5281/zenodo.4362136)
 
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
@@ -54,10 +54,8 @@ General:
 Martin Vögele. PENSA. http://doi.org/10.5281/zenodo.4362136
 ```
 
-This version:
-```
-Martin Vögele. (2020, December 19). PENSA (Version 0.1.1). http://doi.org/10.5281/zenodo.4362137
-```
+To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136):
+
 
 ## Acknowledgments
 
