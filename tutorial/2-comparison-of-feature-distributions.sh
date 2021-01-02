@@ -10,7 +10,7 @@ mkdir -p plots
 mkdir -p vispdb
 mkdir -p results
 
-python ~/pensa/scripts/compare_feature_distributions.py \
+python ../scripts/compare_feature_distributions.py \
 	--ref_file_a traj/condition-a_receptor.gro \
 	--trj_file_a traj/condition-a_receptor.xtc \
 	--ref_file_b traj/condition-b_receptor.gro \

@@ -30,20 +30,20 @@ for PART in receptor tm; do
 	SEL_FILE="selections/mor_${PART}.txt"
 	
 	echo CONDITION A, $PART
-        python ~/pensa/scripts/extract_coordinates.py \
+        python ../scripts/extract_coordinates.py \
 		--sel_base "$SEL_BASE_A" --sel_file "$SEL_FILE" \
 		--ref_file "$REF_FILE_A" --pdb_file "$PDB_FILE_A" \
 		--trj_file  $TRJ_FILE_A  --out_name "${OUT_NAME_A}_${PART}"
 
 	echo CONDITION B, $PART
-	python ~/pensa/scripts/extract_coordinates.py \
+	python ../scripts/extract_coordinates.py \
 		--sel_base "$SEL_BASE_B" --sel_file "$SEL_FILE" \
 		--ref_file "$REF_FILE_B" --pdb_file "$PDB_FILE_B" \
 		--trj_file  $TRJ_FILE_B  --out_name "${OUT_NAME_B}_${PART}"
 
 	echo COMBINED, $PART 
 	# needs one reference file for each trajectory file
-        python ~/pensa/scripts/extract_coordinates_combined.py \
+        python ../scripts/extract_coordinates_combined.py \
 		--ref_file_a  $REF_FILE_A $REF_FILE_A $REF_FILE_A \
 		--ref_file_b  $REF_FILE_B $REF_FILE_B $REF_FILE_B \
 		--trj_file_a  $TRJ_FILE_A  --trj_file_b  $TRJ_FILE_B  \

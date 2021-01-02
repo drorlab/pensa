@@ -12,7 +12,7 @@
 mkdir -p plots
 mkdir -p clusters
 
-python ~/pensa/scripts/calculate_combined_clusters.py --write --wss \
+python ../scripts/calculate_combined_clusters.py --write --wss \
 	--ref_file_a 'traj/condition-a_receptor.gro' \
 	--trj_file_a 'traj/condition-a_receptor.xtc' \
 	--ref_file_b 'traj/condition-b_receptor.gro' \

@@ -13,7 +13,7 @@ mkdir -p pca
 mkdir -p plots
 mkdir -p results
 
-python ~/pensa/scripts/calculate_combined_principal_components.py \
+python ../scripts/calculate_combined_principal_components.py \
 	--ref_file_a 'traj/condition-a_receptor.gro' \
 	--trj_file_a 'traj/condition-a_receptor.xtc' \
 	--ref_file_b 'traj/condition-b_receptor.gro' \

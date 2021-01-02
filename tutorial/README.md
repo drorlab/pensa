@@ -25,7 +25,7 @@ This tutorial shows the usage of the scripts for the basic applications provided
 For each of the following four steps, a bash script runs the python script for an example system: the mu-opioid receptor, once in its apo form and once bound to the ligand BU72. We download the trajectories from GPCRmd.
 For users of the Sherlock cluster at Stanford, an alternative system is available (no download necessary): rhodopsin, once bound to arrestin-1 and once bound to Gi. Below, we go through the steps as invoked by these bash scripts to demonstrate how to use the python code.
 
-The following assumes that you have cloned the PENSA repository to your home directory (```~/```). If this is not the case, you should adapt the file paths accordingly.
+The following assumes that you invoke the tutorial scripts from the folder ```tutorial``` in the PENSA repository. If this is not the case, you should adapt the file paths accordingly.
 
 Two notes for Sherlock users: 
 - It might be useful to copy the tutorial folder to ```$OAK``` and run the scripts from there. Storage in the home directories is quite limited.

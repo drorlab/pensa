@@ -6,5 +6,5 @@
 #SBATCH --constraint=GPU_MEM:12GB
 #SBATCH --qos=high_p
 
-python ~/pensa/scripts/get_tutorial_datasets.py -d "./mor-data"
+python ../scripts/get_tutorial_datasets.py -d "./mor-data"
 
