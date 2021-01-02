@@ -5,6 +5,7 @@ tutorial/plots/
 tutorial/vispdb/
 tutorial/pca/
 tutorial/clusters/
+tutorial/mor-data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
