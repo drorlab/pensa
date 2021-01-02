@@ -2,9 +2,12 @@
 
 This repository provides a python library and several ready-to-use [python scripts](https://github.com/drorlab/pensa/tree/master/scripts). 
 We explain the library in example notebooks:
-- [mu-opioid receptor](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) (using simulation data from GPCRmd)
-- [rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb) (for users on Sherlock at Stanford only)
-and the scripts in the section below. All of this requires that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
+- [mu-opioid receptor](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) (using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/))
+- [rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb) (for users on [Sherlock](https://www.sherlock.stanford.edu/) at Stanford only)
+
+and the scripts in the section below. 
+
+All of this requires that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
 
 
 ## Accessing the library directly
