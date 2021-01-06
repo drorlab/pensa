@@ -18,7 +18,6 @@ import numpy as np
 from scipy import ndimage as ndi
 from gridData import Grid
 import MDAnalysis.analysis.hbonds
-from collections import OrderedDict
 import matplotlib.pyplot as plt
 import math
 import re
@@ -97,8 +96,8 @@ def get_water_features(grid_input, structure_input, xtc_input, atom=None, thresh
     """
     Example use:
         get_water_features(grid_input = "OW_density.dx", 
-                           structure_input = "na4dkldens.gro", 
-                           xtc_input = "trajforh2ona4dkl.xtc",
+                           structure_input = "protein.gro", 
+                           xtc_input = "protein.xtc",
                            threshold_density = 0.1)
         
     Output:
@@ -111,15 +110,12 @@ def get_water_features(grid_input, structure_input, xtc_input, atom=None, thresh
     
     """
     
+    wat_no=0
+    
+    
     if atom is None:
         atomgroup = "OW"
     ## by default make this average_probability_density
-    
-    
-    grid_input = "OW_density.dx"
-    structure_input = "na4dkldens.gro"
-    xtc_input = "trajforh2ona4dkl.xtc"
-    threshold_density = 0.1
     
     u = mda.Universe(structure_input, xtc_input)
     # ## The density will be obtained from the universe which depends on the .xtc and .gro
@@ -163,7 +159,7 @@ def get_water_features(grid_input, structure_input, xtc_input, atom=None, thresh
         u.trajectory[i]
         ##this is where the water pocket is defined as sphere of radius 5 
         ##centred on centre of geometry of following CA atoms
-        waters_resid=u.select_atoms('resname SOL and point ' + maxdens_coord_str[0]+' 5').resids
+        waters_resid=u.select_atoms('resname SOL and point ' + maxdens_coord_str[wat_no]+' 5').resids
                          
         ##making a list of water residue IDs for every frame where all three atoms of the water appear in the pocket
         multi_waters_id=[]

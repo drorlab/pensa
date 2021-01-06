@@ -27,7 +27,6 @@ sel_base_b = "protein"
 # Names of the output files
 out_name_a = "traj/testa"
 out_name_b = "traj/testb"
-# out_name_combined="traj/NK_E_protonate"
 
 for subdir in ['traj','plots','vispdb','pca','clusters','results']:
     if not os.path.exists(subdir):
