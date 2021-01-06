@@ -43,7 +43,7 @@ def get_features(pdb, xtc, start_frame=0, cos_sin=None):
     feature_names['bb-distances'] = describe_dist_without_atom_numbers(bbdistances_feat)
     features_data['bb-distances'] = bbdistances_data
     # Return the dictionaries.
-   return feature_names, features_data
+    return feature_names, features_data
 
 
 # -- Utilities to process the features
