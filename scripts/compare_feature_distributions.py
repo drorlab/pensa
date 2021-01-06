@@ -49,10 +49,12 @@ if __name__ == "__main__":
 
     # -- BACKBONE TORSIONS --
 
+    print('BACKBONE TORSIONS')
+
     # Relative Entropy analysis with BB torsions
     relen = relative_entropy_analysis(feat_a['bb-torsions'], feat_b['bb-torsions'], 
                                       data_a['bb-torsions'], data_b['bb-torsions'],
-                                      bin_width=0.001, verbose=False)
+                                      bin_width=None, bin_num=10, verbose=False)
     names, jsd, kld_ab, kld_ba = relen
 
     # Save all results (per feature) in a CSV file 
@@ -77,10 +79,12 @@ if __name__ == "__main__":
 
     # -- SIDECHAIN TORSIONS --
 
+    print('SIDECHAIN TORSIONS')
+
     # Relative Entropy analysis with sidechain torsions
     relen = relative_entropy_analysis(feat_a['sc-torsions'], feat_b['sc-torsions'],
                                       data_a['sc-torsions'], data_b['sc-torsions'],
-                                      bin_width=0.001, verbose=False)
+                                      bin_width=None, bin_num=10, verbose=False)
     names, jsd, kld_ab, kld_ba = relen
 
     # Save all results (per feature) in a CSV file 
@@ -105,10 +109,12 @@ if __name__ == "__main__":
 
     # -- BACKBONE C-ALPHA DISTANCES --
 
+    print('BACKBONE C-ALPHA DISTANCES')
+
     # Relative entropy analysis for C-alpha distances
     relen = relative_entropy_analysis(feat_a['bb-distances'], feat_b['bb-distances'], 
                                       data_a['bb-distances'], data_b['bb-distances'],
-                                      bin_width=0.001, verbose=False)
+                                      bin_width=0.01, verbose=False)
     names, jsd, kld_ab, kld_ba = relen 
 
     # Save all results (per feature) in a CSV file 

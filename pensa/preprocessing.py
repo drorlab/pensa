@@ -1,6 +1,8 @@
 import MDAnalysis as mda
 import pyemma
 import numpy as np
+import os
+import requests
 
 
 # -- Functions to preprocess trajectories --
@@ -76,7 +78,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0)
     return
 
 
-def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0):
+def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0, verbose=False):
     """
     Extracts selected coordinates from several trajectory files.
     
@@ -97,10 +99,32 @@ def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0):
     with mda.Writer(out_name+'.xtc', num_at) as W:
         for r, t, s in zip(ref, trj, sel_string):
             print(r, t)
-            print(s)
+            if verbose: print(s)
             u = mda.Universe(r, t)
             selection = u.select_atoms(s)
             for ts in u.trajectory[start_frame:]:
                 W.write(selection)
     return
 
+
+# -- Functions to download from online repositories
+
+
+def download_from_gpcrmd(filename, folder):
+    """
+    Downloads a file from GPCRmd.
+    
+    Args:
+        filename (str): Name of the file to download. 
+            Must be a file that is in GPCRmd.
+        folder (str): Target directory.
+            The directory is created if it does not exist.
+    """  
+    print('Retrieving file',filename,'from GPCRmd.')
+    url = 'https://submission.gpcrmd.org/dynadb/files/Dynamics/'
+    url += filename
+    req = requests.get(url, allow_redirects=True)
+    out = os.path.join(folder,filename)
+    os.makedirs(folder, exist_ok=True)
+    open(out, 'wb').write(req.content)
+    return

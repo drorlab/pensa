@@ -1,5 +1,8 @@
 # PENSA - Protein Ensemble Analysis
 
+![Package](https://github.com/drorlab/pensa/workflows/package/badge.svg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362136.svg)](https://doi.org/10.5281/zenodo.4362136)
+
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
 With PENSA, you can (currently):
@@ -7,7 +10,7 @@ With PENSA, you can (currently):
 - project ensembles on their combined principal components (PCs) and sort the structures along a PC.
 - cluster structures via k-means and via regular-space clustering and write out the resulting clusters as trajectories.
 
-Proteins are featurized via PyEMMA using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. Trajectories are processed and written using MDAnalysis. Plots are generated using Matplotlib. 
+Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/). 
 
 All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
 
@@ -44,13 +47,20 @@ Within the environment created above, execute:
     pip install -e . 
 
 
-## Contributions
+## Citation
 
-#### Development
-Martin Vögele
+General:
+```
+Martin Vögele. PENSA. http://doi.org/10.5281/zenodo.4362136
+```
+
+To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136):
+
+
+## Acknowledgments
 
 #### Beta-Tests
-Martin Vögele, Alex Powers, Sang Truong
+Alex Powers, Sang Truong, Lukas Stelzl
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).

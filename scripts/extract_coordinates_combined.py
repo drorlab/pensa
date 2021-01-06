@@ -32,6 +32,8 @@ if __name__ == "__main__":
     print(args.trj_file_b)
     
     # Combine the lists of input files and selections
+    assert len(args.ref_file_a) == len(args.trj_file_a)
+    assert len(args.ref_file_b) == len(args.trj_file_b)
     ref_file_list = args.ref_file_a + args.ref_file_b
     trj_file_list = args.trj_file_a + args.trj_file_b
     sel_string_list = [sel_string_a]*len(args.ref_file_a) + [sel_string_b]*len(args.ref_file_b)
