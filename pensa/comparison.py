@@ -234,7 +234,7 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
 def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
     
     #obtaining the feature names
-    feature_names = feat[feature_type].describe()
+    feature_names = feat[feature_type]
     #obtaining the residue numbers 
     res_numbers = [int(i.split()[-1]) for i in feature_names]
 
