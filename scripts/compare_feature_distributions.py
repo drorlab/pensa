@@ -95,7 +95,7 @@ if __name__ == "__main__":
     vis = residue_visualization(names, jsd, args.ref_file_a, 
                                 args.out_plots+"_sc-torsions_jsd.pdf",
                                 args.out_vispdb+"_sc-torsions_jsd.pdb",
-                                y_label='max. JS dist. of BB torsions')
+                                y_label='max. JS dist. of SC torsions')
 
     # Save the per-residue data in a CSV file
     np.savetxt(args.out_results+'_sc-torsions_max-jsd-per-residue.csv', np.array(vis).T,
