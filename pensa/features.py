@@ -6,7 +6,8 @@ from pyemma.util.contexts import settings
 # -- Loading the Features --
 
 
-def get_features(pdb, xtc, start_frame=0):
+def get_features(pdb, xtc, start_frame=0, step_width=1, 
+                 features=['bb-torsions', 'sc-torsions', 'bb-distances']):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
     http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
@@ -14,7 +15,8 @@ def get_features(pdb, xtc, start_frame=0):
     Args:
         pdb (str): File name for the reference file (PDB or GRO format).
         xtc (str): File name for the trajectory (xtc format).
-        start_frame (int, optional): First frame to read the features. Defaults to 0.
+        start_frame (int, optional): First frame to return of the features. Already takes subsampling by stride>=1 into account. Defaults to 0.
+        step_width (int, optional): Subsampling step width when reading the frames. Defaults to 1.
     
     Returns:
         feature_names (list of str): Names of all features
@@ -25,23 +27,26 @@ def get_features(pdb, xtc, start_frame=0):
     feature_names = {}
     features_data = {}
     # Add backbone torsions.
-    bbtorsions_feat = pyemma.coordinates.featurizer(pdb)
-    bbtorsions_feat.add_backbone_torsions(cossin=True, periodic=False)
-    bbtorsions_data = pyemma.coordinates.load(xtc, features=bbtorsions_feat)[start_frame:]
-    feature_names['bb-torsions'] = bbtorsions_feat.describe()
-    features_data['bb-torsions'] = bbtorsions_data
+    if 'bb-torsions' in features:
+        bbtorsions_feat = pyemma.coordinates.featurizer(pdb)
+        bbtorsions_feat.add_backbone_torsions(cossin=True, periodic=False)
+        bbtorsions_data = pyemma.coordinates.load(xtc, features=bbtorsions_feat, stride=step_width)[start_frame:]
+        feature_names['bb-torsions'] = bbtorsions_feat.describe()
+        features_data['bb-torsions'] = bbtorsions_data
     # Add sidechain torsions.
-    sctorsions_feat = pyemma.coordinates.featurizer(pdb)
-    sctorsions_feat.add_sidechain_torsions(cossin=True, periodic=False)
-    sctorsions_data = pyemma.coordinates.load(xtc, features=sctorsions_feat)[start_frame:]
-    feature_names['sc-torsions'] = sctorsions_feat.describe()
-    features_data['sc-torsions'] = sctorsions_data
+    if 'sc-torsions' in features:
+        sctorsions_feat = pyemma.coordinates.featurizer(pdb)
+        sctorsions_feat.add_sidechain_torsions(cossin=True, periodic=False)
+        sctorsions_data = pyemma.coordinates.load(xtc, features=sctorsions_feat, stride=step_width)[start_frame:]
+        feature_names['sc-torsions'] = sctorsions_feat.describe()
+        features_data['sc-torsions'] = sctorsions_data
     # Add backbone C-alpha distances.
-    bbdistances_feat = pyemma.coordinates.featurizer(pdb)
-    bbdistances_feat.add_distances(bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
-    bbdistances_data = pyemma.coordinates.load(xtc, features=bbdistances_feat)[start_frame:]
-    feature_names['bb-distances'] = describe_dist_without_atom_numbers(bbdistances_feat)
-    features_data['bb-distances'] = bbdistances_data
+    if 'bb-distances' in features:
+        bbdistances_feat = pyemma.coordinates.featurizer(pdb)
+        bbdistances_feat.add_distances(bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
+        bbdistances_data = pyemma.coordinates.load(xtc, features=bbdistances_feat, stride=step_width)[start_frame:]
+        feature_names['bb-distances'] = describe_dist_without_atom_numbers(bbdistances_feat)
+        features_data['bb-distances'] = bbdistances_data
     # Return the dictionaries.
     return feature_names, features_data
 
