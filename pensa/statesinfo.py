@@ -89,7 +89,7 @@ def smooth(x,window_len,window=None):
     if not window_type in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
         raise ValueError
     s=np.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
-    if window_type  is  'flat': #moving average
+    if window_type  ==  'flat': #moving average
         w=np.ones(window_len,'d')
     else:
         w=eval('np.'+window_type+'(window_len)')
@@ -325,7 +325,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None):
 
     ##calculating the entropy for set_distr_a
     ## if set_distr_a only contains one distributions
-    if any(isinstance(i, list) for i in set_distr_a) is 0:
+    if any(isinstance(i, list) for i in set_distr_a)==0:
         distr_a=[periodic_correction(set_distr_a)]
     ## else set_distr_a is a nested list of multiple distributions (bivariate)
     else:
@@ -344,7 +344,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None):
         distr_b_states= [[0,1,2]]  
         
     else:
-        if any(isinstance(i, list) for i in set_distr_b) is 0:
+        if any(isinstance(i, list) for i in set_distr_b)==0:
             distr_b=[periodic_correction(set_distr_b)]
         else:
             distr_b=[periodic_correction(i) for i in set_distr_b]
@@ -367,7 +367,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None):
 def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
     
     ##calculating the entropy for set_distr_a
-    if any(isinstance(i, list) for i in set_distr_a) is 0:
+    if any(isinstance(i, list) for i in set_distr_a)==0:
         distr_a=[periodic_correction(set_distr_a)]
     else:
         distr_a=[periodic_correction(i) for i in set_distr_a]
@@ -378,7 +378,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
         
     ##----------------
     ##calculating the entropy for set_distr_b
-    if any(isinstance(i, list) for i in set_distr_b) is 0:
+    if any(isinstance(i, list) for i in set_distr_b)==0:
         distr_b=[periodic_correction(set_distr_b)]
     else:
         distr_b=[periodic_correction(i) for i in set_distr_b]
@@ -395,7 +395,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None):
         distr_c=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
         distr_c_states= [[0,1,2]]  
     else:
-        if any(isinstance(i, list) for i in set_distr_c) is 0:
+        if any(isinstance(i, list) for i in set_distr_c)==0:
             distr_c=[periodic_correction(set_distr_c)]
         else:
             distr_c=[periodic_correction(i) for i in set_distr_c]
