@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import math
 import re
 from tqdm import tqdm
-
+import os
        
 """    
 FUNCTIONS
@@ -55,9 +55,12 @@ def get_dipole(water_atom_positions):
         psi+=360
     if phi < 0:
         phi+=360
-    
-    # radianphi=phi*math.pi/180
-    # radianpsi=psi*math.pi/180
+        
+        
+    ## radians
+    # psi=np.arctan2(y_axis,x_axis)
+    # phi=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))
+
     
     return(psi,phi)
     
@@ -91,8 +94,8 @@ def local_maxima_3D(data, order=3):
     return coords, values
 
 
-def get_water_features(grid_input, structure_input, xtc_input, atom=None, threshold_density=None):
-    
+def get_water_features(structure_input, xtc_input, grid_input=None, atomgroup=None, threshold_density=None, write=None):
+
     """
     Example use:
         get_water_features(grid_input = "OW_density.dx", 
@@ -102,18 +105,15 @@ def get_water_features(grid_input, structure_input, xtc_input, atom=None, thresh
         
     Output:
         
-        Polarisation angles are output in spherical coordinates in degrees 
+        Polarisation angles are output in spherical coordinates 
         
         List (phi values), 
         List (psi values), 
         List (water pocket center coordinate and frequency of pocket occupation)  
     
-    """
+    """      
     
-    wat_no=0
-    
-    
-    if atom is None:
+    if atomgroup is None:
         atomgroup = "OW"
     ## by default make this average_probability_density
     
@@ -151,82 +151,92 @@ def get_water_features(grid_input, structure_input, xtc_input, atom=None, thresh
     psilist=[]
     
     counting=[]
-    
-    ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-    #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
-    for i in tqdm(range(len(u.trajectory))):       
-    
-        u.trajectory[i]
-        ##this is where the water pocket is defined as sphere of radius 5 
-        ##centred on centre of geometry of following CA atoms
-        waters_resid=u.select_atoms('resname SOL and point ' + maxdens_coord_str[wat_no]+' 5').resids
-                         
-        ##making a list of water residue IDs for every frame where all three atoms of the water appear in the pocket
-        multi_waters_id=[]
-        for elem in list(set(waters_resid)):
-            if list(waters_resid).count(elem)==3:
-                multi_waters_id.append(elem)
-        counting.append(multi_waters_id)
-    
-    ##making a list of the water IDs that appear in the simulation in that pocket (no dups)
-    flat_list = [item for sublist in counting for item in sublist]
-    no_dups=list(set(flat_list))
-    
-    ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-    #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
-    for i in tqdm(range(len(u.trajectory))):       
-        u.trajectory[i]
-        waters_resid=counting[i]
-        ##extracting the water coordinates based on the water that appears in that frame
-        ##if there is only one water in the pocket then...
-        if len(waters_resid)==1:        
-            ##(x,y,z) positions for the water atom (residue) at frame i
-            water_indices=u.select_atoms('resid ' + str(waters_resid[0])).indices
-            water_atom_positions=u.trajectory[i].positions[water_indices]
-            #print(water_atom_positions)
-            psi, phi = get_dipole(water_atom_positions)
-            psilist.append(psi)
-            philist.append(phi)
-            
-        ##if there are multiple waters in the pocket then find the 
-        ##water that appears in the pocket with the largest frequency and use that 
-        ##ID number to get the coordinate for that frame
-        elif len(waters_resid)>1:
-            
-            freq_count=[]
-            for ID in waters_resid:
-                freq_count.append([flat_list.count(ID),ID])
-            freq_count.sort(key = lambda x: x[0])
-            
-            ##(x,y,z) positions for the water atom (residue) at frame i
-            water_indices=u.select_atoms('resid ' + str(freq_count[-1][1])).indices
-            water_atom_positions=u.trajectory[i].positions[water_indices]
-            #print(water_atom_positions)
-            psi, phi = get_dipole(water_atom_positions)
-            psilist.append(psi)
-            philist.append(phi)
-    
-    
-        ##if there are no waters bound then append these coordinates to identify 
-        ##a separate state
-        elif len(waters_resid)<1:
-            psilist.append(10000.0)
-            philist.append(10000.0)
-            
-    # plt.figure()
-    # plt.plot(np.histogram([elem for elem in philist if elem !=10000.0],bins=60)[1][0:-1],np.histogram([elem for elem in philist if elem !=10000.0],bins=60)[0],label='D2.50 + Na')
-    # plt.xlabel('$\phi$')
-    # plt.figure()
-    # plt.plot(np.histogram([elem for elem in psilist if elem !=10000.0],bins=60)[1][0:-1],np.histogram([elem for elem in psilist if elem !=10000.0],bins=60)[0],label='D2.50 + Na')
-    # plt.xlabel('$\psi$')
-            
-    
-    # filepsi='waterdistributions/'+str(simulation_names)+str(water_names[water_pocket_number])+'_water_distspsi.txt'
-    # filephi='waterdistributions/'+str(simulation_names)+str(water_names[water_pocket_number])+'_water_distsphi.txt'
-    
-    # np.savetxt(filepsi,np.array(psilist))
-    # np.savetxt(filephi,np.array(philist))
-    
-    pymol_output = [maxdens_coord_str[wat_no] + str(psilist.count(10000.0)/len(psilist))]
         
-    return psilist, philist, pymol_output
+    for wat_no in range(len(coords)):
+        
+        ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
+        #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
+        for i in tqdm(range(len(u.trajectory))):       
+        
+            u.trajectory[i]
+            
+            ##list all water resids within sphere of radius 3.5 centered on water prob density maxima
+            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[0]+' 3.5').residues.resids)
+            
+            ##select only those resids that have all three atoms within the water pocket
+            multi_waters_id=[]            
+            for i in atomgroup_IDS:
+                if len(u.select_atoms('resid ' + str(i) + ' and point '+ maxdens_coord_str[0]+' 3.5'))==3:
+                    multi_waters_id.append(i)
+            counting.append(multi_waters_id)
+        
+        ##making a list of the water IDs that appear in the simulation in that pocket (no dups)
+        flat_list = [item for sublist in counting for item in sublist]
+        no_dups=list(set(flat_list))
+        
+        ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
+        #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
+        for i in tqdm(range(len(u.trajectory))):       
+            u.trajectory[i]
+            waters_resid=counting[i]
+            ##extracting the water coordinates based on the water that appears in that frame
+            ##if there is only one water in the pocket then...
+            if len(waters_resid)==1:        
+                ##(x,y,z) positions for the water atom (residue) at frame i
+                water_indices=u.select_atoms('resid ' + str(waters_resid[0])).indices
+                water_atom_positions=u.trajectory[i].positions[water_indices]
+                #print(water_atom_positions)
+                psi, phi = get_dipole(water_atom_positions)
+                psilist.append(psi)
+                philist.append(phi)
+                
+            ##if there are multiple waters in the pocket then find the 
+            ##water that appears in the pocket with the largest frequency and use that 
+            ##ID number to get the coordinate for that frame
+            elif len(waters_resid)>1:
+                
+                freq_count=[]
+                for ID in waters_resid:
+                    freq_count.append([flat_list.count(ID),ID])
+                freq_count.sort(key = lambda x: x[0])
+                
+                ##(x,y,z) positions for the water atom (residue) at frame i
+                water_indices=u.select_atoms('resid ' + str(freq_count[-1][1])).indices
+                water_atom_positions=u.trajectory[i].positions[water_indices]
+                #print(water_atom_positions)
+                psi, phi = get_dipole(water_atom_positions)
+                psilist.append(psi)
+                philist.append(phi)
+        
+        
+            ##if there are no waters bound then append these coordinates to identify 
+            ##a separate state
+            elif len(waters_resid)<1:
+                psilist.append(10000.0)
+                philist.append(10000.0)
+                
+        plt.figure()
+        plt.plot(np.histogram([elem for elem in philist if elem !=10000.0])[1][0:-1],np.histogram([elem for elem in philist if elem !=10000.0])[0],label='Water'+str(wat_no))
+        plt.xlabel('$\phi$')
+        plt.figure()
+        plt.plot(np.histogram([elem for elem in psilist if elem !=10000.0])[1][0:-1],np.histogram([elem for elem in psilist if elem !=10000.0])[0],label='Water'+str(wat_no))
+        plt.xlabel('$\psi$')
+                
+    
+        ##this provides a unique ID, coordinate, and frequency of occupation for each water site
+        water_ID = 'WaterNum_' + str(wat_no)
+        water_pocket_occupation_frequency = str(1 - psilist.count(10000.0)/len(psilist))
+        xyz_location_string = str(coords[wat_no][0]) + 'x' + str(coords[wat_no][1]) + 'y' + str(coords[wat_no][2]) + 'z'
+        
+        water_out = [psilist, philist]        
+        
+        if write is not None:
+            if not os.path.exists('water_features/'):
+                os.makedirs('water_features/')
+            filename= 'water_features/' + water_ID + '.txt'
+            with open(filename, 'w') as output:
+                for row in water_out:
+                    output.write(str(row) + '\n')
+    
+        return water_out
+
