@@ -54,7 +54,7 @@ def get_features(pdb, xtc, start_frame=0, step_width=1,
 # -- Utilities to process the features
 
 
-def sort_sincos_torsions_by_resnum(tors):
+def sort_sincos_torsions_by_resnum(tors, data):
     """
     Sort sin/cos of torsion features by the residue number..
 
@@ -71,8 +71,10 @@ def sort_sincos_torsions_by_resnum(tors):
         ft = t.split(' ')[0].replace('(',' ')
         sincos, angle = ft.split(' ')
         renamed.append('%09i %s %s'%(int(rn),angle,sincos))
-    new_tors = np.array(tors)[np.argsort(renamed)].tolist()
-    return new_tors
+    new_order = np.argsort(renamed)
+    new_tors = np.array(tors)[new_order].tolist()
+    new_data = data[:,new_order]
+    return new_tors, new_data
 
 
 def remove_atom_numbers_from_distance(feat_str):
