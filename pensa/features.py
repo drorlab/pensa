@@ -54,9 +54,30 @@ def get_features(pdb, xtc, start_frame=0, step_width=1,
 # -- Utilities to process the features
 
 
-def remove_atom_numbers(feat_str):
+def sort_sincos_torsions_by_resnum(tors):
     """
-    Remove atom numbers from a feature string.
+    Sort sin/cos of torsion features by the residue number..
+
+    Args:
+        tors (str[]): The list of torsion features.
+
+    Returns:
+        new_tors (str[]): The sorted list of torsion features.
+
+    """
+    renamed = []
+    for t in tors:
+        rn = t.split(' ')[3].replace(')','')
+        ft = t.split(' ')[0].replace('(',' ')
+        sincos, angle = ft.split(' ')
+        renamed.append('%09i %s %s'%(int(rn),angle,sincos))
+    new_tors = np.array(tors)[np.argsort(renamed)].tolist()
+    return new_tors
+
+
+def remove_atom_numbers_from_distance(feat_str):
+    """
+    Remove atom numbers from a distance feature string.
     
     Args:
         feat_str (str): The string describing a single feature.
@@ -86,5 +107,5 @@ def describe_dist_without_atom_numbers(feature_names):
     
     """
     desc = feature_names.describe()
-    desc = [ remove_atom_numbers(d) for d in desc ]
+    desc = [ remove_atom_numbers_from_distance(d) for d in desc ]
     return desc
