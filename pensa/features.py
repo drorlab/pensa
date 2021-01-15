@@ -1,4 +1,4 @@
-#import mdshare
+import numpy as np
 import pyemma
 from pyemma.util.contexts import settings
 
