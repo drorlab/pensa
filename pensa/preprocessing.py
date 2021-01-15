@@ -49,7 +49,8 @@ def load_selection(sel_file, sel_base=''):
     return sel_string
 
 
-def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0):
+def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
+                        rename_segments=None ):
     """
     Extracts selected coordinates from a trajectory file.
     
@@ -66,6 +67,9 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0)
     # Read the reference+PDB files and extract selected parts.
     u = mda.Universe(ref,pdb)
     selection = u.select_atoms(sel_string)
+    if rename_segments is not None:
+        for s in selection.segments: 
+            s.segid = rename_segments
     selection.write(out_name+'.pdb')
     selection.write(out_name+'.gro')
     # Read the trajectories and extract selected parts.

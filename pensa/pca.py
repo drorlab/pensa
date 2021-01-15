@@ -190,6 +190,54 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
     return
 
 
+def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_pc=3):
+    """
+    Sort multiple trajectories along their most important common principal components.
+
+    Args:
+        data (list of float arrays): List of trajectory data arrays, each [frames,frame_data].
+        start_frame (int): Offset of the data with respect to the trajectories (defined below).
+        top (list of str): Reference topology files.
+        trj (list of str): Trajetories from which the frames are picked.
+            trj[i] should be the same as data[i] was from.
+        out_name (str): Core part of the name of the output files.
+
+    """
+    num_frames = [len(d) for d in data]
+    num_traj = len(data)
+    # Combine the input data
+    data = np.concatenate(data,0)
+    # Remember which simulation the data came frome
+    cond = np.concatenate([i*np.ones(num_frames[i]) for i in range(num_traj)])
+    # Remember the index in the respective simulation (taking into account cutoff)
+    oidx = np.concatenate([np.arange(num_frames[i])+start_frame for i in range(num_traj)])
+    # Calculate the principal components
+    pca = pyemma.coordinates.pca(data,dim=3)
+    # Define the MDAnalysis trajectories from where the frames come
+    univs = []
+    atoms = []
+    for j in range(num_traj):
+        u = mda.Universe(top[j],trj[j])
+        univs.append(u)
+        atoms.append(u.select_atoms('all'))
+    # Loop over principal components.
+    for evi in range(num_pc):
+        # Project the combined data on the principal component
+        proj = project_on_pc(data,evi,pca=pca)
+        # Sort everything along the projection on th resp. PC
+        sort_idx  = np.argsort(proj)
+        proj_sort = proj[sort_idx]
+        cond_sort = cond[sort_idx]
+        oidx_sort = oidx[sort_idx]
+        # Write the trajectory, ordered along the PC
+        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", atoms[0].n_atoms) as W:
+            for i in range(data.shape[0]):
+                j = cond_sort[i] 
+                ts = univs[j].trajectory[oidx_sort[i]]
+                W.write(atoms[j])
+    return
+
+
 def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, label_b=None):
     """
     Compare two datasets along a given principal component.
