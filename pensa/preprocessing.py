@@ -111,6 +111,48 @@ def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0, 
     return
 
 
+def merge_coordinates(ref_files, trj_files, out_name, segid=None):
+    """
+    Merges the trajectories of several different systems or system parts.
+    All trajectories must be (at least) as long as the first one.
+    
+    Args:
+        ref_files (str[]): list of input topology files
+        trj_files (str[]): list of input trajectory files
+        out_name (str): name of the output files (without ending)
+        segid (str, optional): Value to overwrite the segment ID. Defaults to None.
+    
+    Returns:
+        univ (obj): MDAnalysis universe of the merged system 
+    """
+    num_parts = len(ref_files)
+    assert num_parts == len(trj_files)
+    # Create an array of universes
+    u = [ mda.Universe(ref_files[i],trj_files[i]) for i in range(num_parts) ]
+    num_frames = len(u[0].trajectory)
+    new_num_at = sum([len(ui.atoms) for ui in u]) 
+    # Create the merged starting structure
+    univ = mda.core.universe.Merge(*[ui.atoms for ui in u])
+    # Give all segments the same name 
+    if segid is not None: 
+        univ.segments.segids = segid
+    # Write the merged starting structure
+    univ.atoms.write(out_name+'.gro')
+    univ.atoms.write(out_name+'.pdb')
+    # Merge and write trajectory frame by frame
+    with mda.Writer(out_name+'.xtc', new_num_at) as W:
+        for f in range(num_frames):
+            # Set all universes to the current timesteps
+            ts = [ ui.trajectory[f] for ui in u ]
+            # Make sure the trajectories add up to the correct number of atoms
+            assert sum([tsi.n_atoms for tsi in ts]) == new_num_at
+            # Create a universe with coordinates from this timestep
+            c = mda.core.universe.Merge(*[ui.atoms for ui in u])
+            # Write this frame
+            W.write(c.atoms)
+    return univ
+
+
 # -- Functions to download from online repositories
 
 
