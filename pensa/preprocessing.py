@@ -132,3 +132,5 @@ def download_from_gpcrmd(filename, folder):
     os.makedirs(folder, exist_ok=True)
     open(out, 'wb').write(req.content)
     return
+
+
