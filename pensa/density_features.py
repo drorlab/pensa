@@ -18,15 +18,10 @@ import numpy as np
 from scipy import ndimage as ndi
 from gridData import Grid
 import MDAnalysis.analysis.hbonds
-import matplotlib.pyplot as plt
-import math
-import re
 from tqdm import tqdm
 import os
 import biotite.structure as struc
 import biotite.structure.io as strucio
-import biotite.structure.io.pdb as pdb
-from tempfile import gettempdir, NamedTemporaryFile
        
 """    
 FUNCTIONS
