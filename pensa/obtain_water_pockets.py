@@ -52,14 +52,12 @@ def get_dipole(water_atom_positions):
     Ot0 = water_atom_positions[::3]
     H1t0 = water_atom_positions[1::3]
     H2t0 = water_atom_positions[2::3]
-#    print(Ot0,H1t0,H2t0)
     ##finding the dipole vector
     dipVector0 = (H1t0 + H2t0) * 0.5 - Ot0
     
     ##getting the dot product of the dipole vector about each axis
     unitdipVector0 = dipVector0 / \
         np.linalg.norm(dipVector0, axis=1)[:, None]
-#    print(unitdipVector0)
     x_axis=unitdipVector0[0][0]
     y_axis=unitdipVector0[0][1]
     z_axis=unitdipVector0[0][2]
@@ -68,12 +66,6 @@ def get_dipole(water_atom_positions):
     # psi=math.degrees(np.arctan2(y_axis,x_axis))
     # phi=math.degrees(np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2))))   
 
-    # if psi < 0:
-    #     psi+=360
-    # if phi < 0:
-    #     phi+=360
-        
-        
     ## radians
     psi=np.arctan2(y_axis,x_axis)
     phi=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))
@@ -111,7 +103,7 @@ def local_maxima_3D(data, order=3):
     return coords, values
     
 
-def get_water_features(structure_input, xtc_input, atomgroup=None,
+def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as=None,
                        grid_input=None, top_waters=None, write=None, pdb_vis=True):
     """
     
@@ -153,11 +145,6 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
         pdb_outname = structure_input[0:-4]+"_WaterSites.pdb"
         protein.write(pdb_outname)
     
-
-
-        
-    ## by default make this average_probability_density
-    
     u = mda.Universe(structure_input, xtc_input)
     # ## The density will be obtained from the universe which depends on the .xtc and .gro
     if atomgroup is None:
@@ -167,22 +154,22 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
         density_atomgroup = u.select_atoms("name " + atomgroup)
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
-        D.density.convert_density("TIP3P")
-        D.density.export(atomgroup + "_density.dx", type="double")
-        grid_input = atomgroup + "_density.dx"
-
-    g = Grid(grid_input)
-    # ##converting the density to a probability
+        if write_grid_as is not None:
+            D.density.convert_density(write_grid_as)
+            D.density.export(atomgroup + "_density.dx", type="double")
+            grid_input = atomgroup + "_density.dx"
+        g = D.density
+    else:
+        g = Grid(grid_input)  
+        
+    ##converting the density to a probability
     sol_number = len(u.select_atoms('name ' + atomgroup))
     grid_data = np.array(g.grid)*sol_number/np.sum(np.array(g.grid))
-    
+
     ##mask all probabilities below the average prob in the whole box
     # average_probability_density_box = sol_number/np.product(grid_data.shape)
     ##mask all probabilities below the average water probability
     average_probability_density = sol_number/sum(1 for i in grid_data.flat if i)
-    print(average_probability_density)
-
-    
     # print(average_probability_density)
     ##mask all grid centers with density less than threshold density
     grid_data[grid_data <= average_probability_density] = 0.0
@@ -193,7 +180,6 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
     val_sort = np.argsort(-1*val.copy())
     values = [val[i] for i in val_sort]    
     coords = [xyz[i] for i in val_sort]    
-    print(values[0:100])    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     
     water_frequencies=[]
@@ -215,8 +201,8 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
         counting=[]
-        for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
             u.trajectory[i]
             ##list all water resids within sphere of radius 2 centered on water prob density maxima
             atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] +' 3.5').residues.resids)
@@ -231,8 +217,8 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        # for i in tqdm(range(100)):       
-        for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
             u.trajectory[i]
             waters_resid=counting[i]
             ##extracting the water coordinates for inside the pocket
@@ -263,7 +249,7 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
                 philist.append(10000.0)
 
         water_out = [psilist, philist]        
-        water_ID = atomgroup + chr(ord('`')+wat_no+1)
+        water_ID = "O" + string(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
         atom_location = coords[wat_no] + g.origin
         # print(water_ID, water_pocket_occupation_frequency)
@@ -318,12 +304,131 @@ def get_water_features(structure_input, xtc_input, atomgroup=None,
             
     return water_frequencies
 
+def get_atom_features(structure_input, xtc_input, atomgroup, element,
+                     grid_input=None, top_atoms=None, write=None, pdb_vis=True):
+    
+    if pdb_vis is True:
+        u_pdb = mda.Universe(structure_input)
+        protein = u_pdb.select_atoms("protein")
+        pdb_outname = structure_input[0:-4]+"_IonSites.pdb"
+        protein.write(pdb_outname)
+    
+    u = mda.Universe(structure_input, xtc_input)
+    # ## The density will be obtained from the universe which depends on the .xtc and .gro
 
-   
+    if grid_input is None:
+        density_atomgroup = u.select_atoms("name " + atomgroup)
+        D = DensityAnalysis(density_atomgroup, delta=1.0)
+        D.run()
+        g = D.density
+    else:
+        g = Grid(grid_input)  
+        
+    ##converting the density to a probability
+    atom_number = len(u.select_atoms('name ' + atomgroup))
+    grid_data = np.array(g.grid)*atom_number/np.sum(np.array(g.grid))
+
+    ##mask all probabilities below the average prob in the whole box
+    # average_probability_density_box = sol_number/np.product(grid_data.shape)
+    ##mask all probabilities below the average water probability
+    average_probability_density = atom_number/sum(1 for i in grid_data.flat if i)
+    # print(average_probability_density)
+    ##mask all grid centers with density less than threshold density
+    grid_data[grid_data <= average_probability_density] = 0.0
+    
+    
+    xyz, val = local_maxima_3D(grid_data)
+    ##negate the array to get descending order from most prob to least prob
+    val_sort = np.argsort(-1*val.copy())
+    values = [val[i] for i in val_sort]    
+    coords = [xyz[i] for i in val_sort]    
+    maxdens_coord_str = [str(item)[1:-1] for item in coords]
+    
+    atom_frequencies=[]
+        
+    if top_atoms is None:
+        top_atoms = len(coords)  
+    elif top_atoms > len(coords):
+        top_atoms = len(coords)  
+
+        
+    print('Featurizing ',top_atoms,' Atoms')
+    for atom_no in range(top_atoms):
+        print('\n')
+        print('Atom no: ',atom_no)
+        print('\n')
+
+        ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
+        #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
+        counting=[]
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
+            u.trajectory[i]
+            ##list all water resids within sphere of radius 2 centered on water prob density maxima
+            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +' 2').indices)
+            ##select only those resids that have all three atoms within the water pocket
+            if len(atomgroup_IDS)==0:
+                atomgroup_IDS=[-1]
+            counting.append(atomgroup_IDS)
+
+        atom_ID = element + str(atom_no+1)
+        pocket_occupation_frequency = 1 - counting.count(-1)/len(counting)    
+        atom_location = coords[atom_no] + g.origin
+
+        atom_frequencies.append([atom_ID,atom_location,pocket_occupation_frequency])
+
+        ##PDB_VISUALISATION     
+        ##rescursively add waters to the pdb file one by one as they are processed           
+        if pdb_vis is True:
+            # # Read the file into Biotite's structure object (atom array)
+            atom_array = strucio.load_structure(pdb_outname)
+            # Shifting the coordinates by the grid origin
+            atom_location = coords[atom_no] + g.origin
+            # Add an HETATM
+            atom = struc.Atom(
+                coord = atom_location,
+                chain_id = "W",
+                # The residue ID is the last ID in the file +1
+                res_id = atom_array.res_id[-1] + 1,
+                res_name = atom_ID,
+                hetero = True,
+                atom_name = atomgroup,
+                element = element
+                )
+            atom_array += struc.array([atom])
+            # Save edited structure
+            strucio.save_structure(pdb_outname, atom_array)
+        
+    if pdb_vis is True:
+        u_pdb = mda.Universe(pdb_outname)
+        
+        u_pdb.add_TopologyAttr('tempfactors')
+        # Write values as beta-factors ("tempfactors") to a PDB file
+        for res in range(len(atom_frequencies)):
+            u_pdb.residues[-1*res].atoms.tempfactors = atom_frequencies[-1*res][-1]
+        u_pdb.atoms.write(pdb_outname)
+
+    if write is True:
+        if not os.path.exists('atom_features/'):
+            os.makedirs('atom_features/')
+        filename= 'atom_features/PocketFrequencies.txt'
+        with open(filename, 'w') as output:
+            for row in ion_frequencies:
+                output.write(str(row) + '\n')
+            
+    return atom_frequencies
 
 # water_frequencies=get_water_features(structure_input = "na4dkldens.gro", 
 #                                     xtc_input = "trajforh2ona4dkl.xtc",
 #                                     grid_input = "OW_density.dx",
-#                                     # top_waters = 10,
+#                                     top_waters = 10,
 #                                     write=True)
 
+
+ion_frequencies=get_atom_features(structure_input = "na4dkldens.gro", 
+                                xtc_input = "trajforh2ona4dkl.xtc",
+                                atomgroup = "OW",
+                                element = "O",
+                                grid_input = "OW_density.dx",
+                                top_atoms = 10,
+                                write=None)
