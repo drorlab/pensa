@@ -8,7 +8,7 @@ from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from pensa.features import *
-
+import os
 
 
 # --- METHODS FOR FEATURE DIFFERENCE ANALYSIS ---
