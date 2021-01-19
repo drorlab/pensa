@@ -340,7 +340,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     xyz, val = local_maxima_3D(grid_data)
     ##negate the array to get descending order from most prob to least prob
     val_sort = np.argsort(-1*val.copy())
-    values = [val[i] for i in val_sort]    
+    # values = [val[i] for i in val_sort]    
     coords = [xyz[i] for i in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     
@@ -413,7 +413,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             os.makedirs('atom_features/')
         filename= 'atom_features/PocketFrequencies.txt'
         with open(filename, 'w') as output:
-            for row in ion_frequencies:
+            for row in atom_frequencies:
                 output.write(str(row) + '\n')
             
     return atom_frequencies
@@ -425,7 +425,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
 #                                     write=True)
 
 
-ion_frequencies=get_atom_features(structure_input = "na4dkldens.gro", 
+atom_frequencies=get_atom_features(structure_input = "na4dkldens.gro", 
                                 xtc_input = "trajforh2ona4dkl.xtc",
                                 atomgroup = "OW",
                                 element = "O",
