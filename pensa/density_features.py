@@ -353,17 +353,3 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             
     return atom_frequencies
 
-# water_frequencies=get_water_features(structure_input = "na4dkldens.gro", 
-#                                     xtc_input = "trajforh2ona4dkl.xtc",
-#                                     grid_input = "OW_density.dx",
-#                                     top_waters = 10,
-#                                     write=True)
-
-
-# atom_frequencies=get_atom_features(structure_input = "na4dkldens.gro", 
-                                # xtc_input = "trajforh2ona4dkl.xtc",
-                                # atomgroup = "OW",
-                                # element = "O",
-                                # grid_input = "OW_density.dx",
-                                # top_atoms = 10,
-                                # write=None)
