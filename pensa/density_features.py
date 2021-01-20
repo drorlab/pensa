@@ -102,7 +102,7 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
         D.run()
         if write_grid_as is not None:
             D.density.convert_density(write_grid_as)
-            D.density.export(atomgroup + "_density.dx", type="double")
+            D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
             grid_input = atomgroup + "_density.dx"
         g = D.density
     else:
@@ -143,31 +143,32 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         #print('extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound')
         counting=[]
-        for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
             u.trajectory[i]
             ##list all water resids within sphere of radius 2 centered on water prob density maxima
-            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] +' 3.5').residues.resids)
+            atomgroup_IDS = list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] +' 3.5').indices)
+            atom_resids = [u.select_atoms('index ' + str(i)).resids[0] for i in atomgroup_IDS]
             ##select only those resids that have all three atoms within the water pocket
             multi_waters_id=[]            
-            for i in atomgroup_IDS:
-                if len(u.select_atoms('resid ' + str(i) + ' and point '+ maxdens_coord_str[wat_no]+' 3.5'))==3:
-                    multi_waters_id.append(i)
+            for i in range(len(atom_resids)):
+                if len(u.select_atoms('byres index ' + str(atom_resids[i]) + ' and point '+ maxdens_coord_str[wat_no]+' 3.5'))==3:
+                    multi_waters_id.append(atomgroup_IDS[i])
             counting.append(multi_waters_id)
         
         # ##making a list of the water IDs that appear in the simulation in that pocket (no dups)
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        # for i in tqdm(range(100)):       
-        for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
             u.trajectory[i]
             waters_resid=counting[i]
             ##extracting the water coordinates for inside the pocket
             if len(waters_resid)==1:        
                 ##(x,y,z) positions for the water atom (residue) at frame i
-                water_indices=u.select_atoms('resid ' + str(waters_resid[0])).indices
-                water_atom_positions=u.trajectory[i].positions[water_indices]
+                # water_indices=u.select_atoms('resid ' + str(waters_resid[0])).indices
+                water_atom_positions=u.trajectory[i].positions[waters_resid]
                 #print(water_atom_positions)
                 psi, phi = get_dipole(water_atom_positions)
                 psilist.append(psi)
@@ -179,8 +180,8 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
                     freq_count.append([flat_list.count(ID),ID])
                 freq_count.sort(key = lambda x: x[0])
                 ##(x,y,z) positions for the water atom (residue) at frame i
-                water_indices=u.select_atoms('resid ' + str(freq_count[-1][1])).indices
-                water_atom_positions=u.trajectory[i].positions[water_indices]
+                # water_indices=u.select_atoms('resid ' + str(freq_count[-1][1])).indices
+                water_atom_positions=u.trajectory[i].positions[freq_count[-1][1]]
                 psi, phi = get_dipole(water_atom_positions)
                 psilist.append(psi)
                 philist.append(phi)
@@ -296,8 +297,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         print('\n')
 
         counting=[]
-        for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
             u.trajectory[i]
             ##list all water resids within sphere of radius 2 centered on water prob density maxima
             atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +' 2').indices)
