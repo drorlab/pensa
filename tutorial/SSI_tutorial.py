@@ -54,6 +54,7 @@ for subdir in ['traj','plots','vispdb','pca','clusters','results']:
 extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
 extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", sel_base_b)
      
+# # # Extract the features from the beginning (start_frame) of the trajectory
 start_frame=0  
 a_rec = get_features(out_name_a+"_receptor.gro",
                       out_name_a+"_receptor.xtc", 
@@ -67,24 +68,22 @@ b_rec = get_features(out_name_b+"_receptor.gro",
 
 b_rec_feat, b_rec_data = b_rec
 
-for k in a_rec_data.keys(): 
-    print(k, a_rec_data[k].shape)
-
-
-for k in b_rec_data.keys(): 
-    print(k, b_rec_data[k].shape)
 
 out_name_a = "condition-a"
 out_name_b = "condition-b"
-# # # # Extract the multivariate torsion coordinates of each residue as a timeseries from the trajectory
-# multivar_res_timeseries_data_a=multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
-# multivar_res_timeseries_data_b=multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
+# # # Extract the multivariate torsion coordinates of each residue as a 
+# # # timeseries from the trajectory and write into subdirectory
+multivar_res_timeseries_data_a=multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
+multivar_res_timeseries_data_b=multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
 
 
 # # # Parse data for SSI 
 folder='sc-torsions/'
+# # # Get names of all the torsion files
 names=get_filenames(folder)
-residues = list(set([item[len('condition-a'):] for item in names]))
+# # # Remove unique identifier for the different ensembles
+residues = list(set([item[len(out_name_a):] for item in names]))
+# # # Arrange the filenames in numberical order according to the protein sequence
 res_sequence_order=[]
 for r in residues: 
     j=re.split('(\d+)',r)
@@ -92,30 +91,37 @@ for r in residues:
 res_sequence_order.sort(key = lambda x: int(x[1]))
 filename_sequence_ordered=[i[0]+i[1]+i[2] for i in res_sequence_order]
 
+
+# # # Initialize list for SSI values
 ssi=[]
 
 count_empty=[]
-for i in ['ARG273.txt']:
-    
+# # # Calculate SSI one residue at a time on a read in basis
+for i in filename_sequence_ordered:
+    # # # Notify that the residue has no distributions for this feature
     if len(list(import_distribution(folder,out_name_a+i))) == 0: 
         count_empty.append(1)
         print('empty distribution')
+        
+    # # # Generate nested list of distributions for multivariate phase space of that residue 
     elif len(list(import_distribution(folder,out_name_a+i))) > 10: 
         dist_a=[list(import_distribution(folder,out_name_a+i))]
         dist_b=[list(import_distribution(folder,out_name_b+i))]    
+    # # # Generate nested list of distributions for multivariate phase space of that residue 
     else:    
         dist_a=[list(i) for i in import_distribution(folder,out_name_a+i)]
         dist_b=[list(i) for i in import_distribution(folder,out_name_b+i)]
-        
+    
+    # # # Combine non-empty distributions from both ensembles (a and b) into one distribution
     if len(list(import_distribution(folder,out_name_a+i))) != 0: 
         
         combined_dist=[]
         for j in range(len(dist_a)):
+            # # # Make sure the ensembles have the same length of trajectory
             sim1,sim2=match_sim_lengths(dist_a[j],dist_b[j])
             combined_dist.append(sim1+sim2)
-            determine_state_limits(periodic_correction(combined_dist[-1]),show_plots=True)
-        
-        ##add write option for plot
+
+        # # # Calculate the SSI between a single multivariate component and the binary switch between ensembles        
         ssi.append(calculate_ssi(combined_dist,show_plots=True))
     
         print(i,ssi[-1])
