@@ -81,8 +81,8 @@ def local_maxima_3D(data, order=3):
 
     return coords, values
     
-
-def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as=None,
+##make atomgroup mandatory
+def get_water_features(structure_input, xtc_input, atomgroup=None, water_model=None,
                        grid_input=None, top_waters=None, write=None, pdb_vis=True):
     
     if pdb_vis is True:
@@ -100,8 +100,8 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
         density_atomgroup = u.select_atoms("name " + atomgroup)
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
-        if write_grid_as is not None:
-            D.density.convert_density(write_grid_as)
+        if water_model is not None:
+            D.density.convert_density(water_model)
             D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
             grid_input = atomgroup + "_density.dx"
         g = D.density
@@ -167,7 +167,6 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
             ##extracting the water coordinates for inside the pocket
             if len(waters_resid)==1:        
                 ##(x,y,z) positions for the water atom (residue) at frame i
-                # water_indices=u.select_atoms('resid ' + str(waters_resid[0])).indices
                 water_atom_positions=u.trajectory[i].positions[waters_resid]
                 #print(water_atom_positions)
                 psi, phi = get_dipole(water_atom_positions)
@@ -180,7 +179,6 @@ def get_water_features(structure_input, xtc_input, atomgroup=None, write_grid_as
                     freq_count.append([flat_list.count(ID),ID])
                 freq_count.sort(key = lambda x: x[0])
                 ##(x,y,z) positions for the water atom (residue) at frame i
-                # water_indices=u.select_atoms('resid ' + str(freq_count[-1][1])).indices
                 water_atom_positions=u.trajectory[i].positions[freq_count[-1][1]]
                 psi, phi = get_dipole(water_atom_positions)
                 psilist.append(psi)
