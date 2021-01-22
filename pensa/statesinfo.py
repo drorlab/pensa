@@ -248,8 +248,8 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
         mean_gauss_xval.append(xline[list(gaussians[i]).index(max(gaussians[i]))])
         
     reorder_indices=[mean_gauss_xval.index(i) for i in sorted(mean_gauss_xval)]    
-    ##sort gaussians in order of their mean xval 
-    reorder_gaussians=[gaussians[i] for i in reorder_indices]
+    ##sort gaussians in order of their mean xval and ignore gaussians with maxima below 0.0001
+    reorder_gaussians=[gaussians[i] for i in reorder_indices if max(gaussians[i])>0.0001]
         
     for i in range(len(reorder_gaussians)-1):    
         ##Find indices between neighbouring gaussians
