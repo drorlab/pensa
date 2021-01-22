@@ -71,15 +71,16 @@ b_rec_feat, b_rec_data = b_rec
 
 out_name_a = "condition-a"
 out_name_b = "condition-b"
-# # # Extract the multivariate torsion coordinates of each residue as a 
-# # # timeseries from the trajectory and write into subdirectory
+# # # # Extract the multivariate torsion coordinates of each residue as a 
+# # # # timeseries from the trajectory and write into subdirectory   
+# # # # output = [[torsion 1 timeseries],[torsion 2 timeseries],...,[torsion n timeseries]]
 multivar_res_timeseries_data_a=multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
 multivar_res_timeseries_data_b=multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
 
 
-# # # Parse data for SSI 
+# # # Parsing data for SSI 
 folder='sc-torsions/'
-# # # Get names of all the torsion files
+# # # Get names of all the torsion files within the folder
 names=get_filenames(folder)
 # # # Remove unique identifier for the different ensembles
 residues = list(set([item[len(out_name_a):] for item in names]))
@@ -93,11 +94,14 @@ filename_sequence_ordered=[i[0]+i[1]+i[2] for i in res_sequence_order]
 
 
 # # # Initialize list for SSI values
-ssi=[]
+SSI_full_receptor=[]
 
 count_empty=[]
 # # # Calculate SSI one residue at a time on a read in basis
 for i in filename_sequence_ordered:
+    
+    residue_name = i[:-4]
+    
     # # # Notify that the residue has no distributions for this feature
     if len(list(import_distribution(folder,out_name_a+i))) == 0: 
         count_empty.append(1)
@@ -119,12 +123,25 @@ for i in filename_sequence_ordered:
         for j in range(len(dist_a)):
             # # # Make sure the ensembles have the same length of trajectory
             sim1,sim2=match_sim_lengths(dist_a[j],dist_b[j])
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
             combined_dist.append(sim1+sim2)
-
-        # # # Calculate the SSI between a single multivariate component and the binary switch between ensembles        
-        ssi.append(calculate_ssi(combined_dist,show_plots=True))
-    
-        print(i,ssi[-1])
+            
+            
+        # # # Calculate the SSI between a component and the binary switch between ensembles a and b       
+        # # # Output = SSI (float)
+        # # # We enable show_plots=True to inspect the state clustering of the residue sc-torsion distributions
+        ssi = calculate_ssi(combined_dist,show_plots=True)   
         
+        # # # If we notice that one of the residues is not clustering properly
+        # # # we can adjust the clustering parameters - gauss_bins=120 (default), gauss_smooth=10 (default)
+        ssi = calculate_ssi(combined_dist,show_plots=True,gauss_bins=120,gauss_smooth=10)   
+        # # # The show_plots option maintains a constant binning on the distribution of 360 bins (1 degree resolution)
+        # # # So visualisation is not affected by the clustering parameters.
+        
+        # # # The clustered distribution plots can be written into the directory "ssi_plots/" in .png format
+        ssi = calculate_ssi(combined_dist,write_plots=True,write_name=residue_name)   
+    
+        # # # add ssi values to list to be written
+        SSI_full_receptor.append(ssi)    
         
 np.savetxt('sc_ssi.txt',np.array(ssi))
