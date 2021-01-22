@@ -18,6 +18,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
+import os
 
 """
 FUNCTIONS
@@ -240,7 +241,7 @@ def get_gaussian_fit(distribution, gauss_bin, gauss_smooth):
 
 
 # OBTAINING THE GAUSSIAN INTERSECTS
-def get_intersects(gaussians,distribution,xline, show_plots=None):
+def get_intersects(gaussians,distribution,xline, show_plots=None,write_plots=None,write_name=None):
     ##adding the minimum angle value as the first boundary
     all_intersects=[min(distribution)]
     mean_gauss_xval=[]
@@ -273,7 +274,7 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
     
     if show_plots is not None:
         plt.figure()      
-        histo=np.histogram(distribution, bins=120, density=True)
+        histo=np.histogram(distribution, bins=360, density=True)
         distributionx=smooth(histo[1][0:-1],12)
         distributiony=smooth(histo[0]-min(histo[0]),12)
         plt.plot(distributionx,distributiony)
@@ -283,7 +284,25 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
             plt.axvline(all_intersects[i],color='k',lw=1,ls='--')   
         plt.xlabel('Radians')
         plt.ylabel('Count')
-            
+    if write_plots is not None:
+        if not os.path.exists('ssi_plots/'):
+            os.makedirs('ssi_plots/')
+        plt.figure()      
+        plt.ion()
+        histo=np.histogram(distribution, bins=360, density=True)
+        distributionx=smooth(histo[1][0:-1],12)
+        distributiony=smooth(histo[0]-min(histo[0]),12)
+        plt.plot(distributionx,distributiony)
+        for j in range(len(reorder_gaussians)):
+            plt.plot(xline, reorder_gaussians[j])        
+        for i in range(len(all_intersects)):
+            plt.axvline(all_intersects[i],color='k',lw=1,ls='--')   
+        plt.xlabel('Radians')
+        plt.ylabel('Count')
+        plt.title(write_name)        
+        plt.ioff()
+        plt.savefig('ssi_plots/'+write_name+".png")
+    
     return all_intersects
     
 
@@ -291,13 +310,13 @@ def get_intersects(gaussians,distribution,xline, show_plots=None):
 ##The function handles both residue angle distributions and water orientation/occupancy
 ##distributions. For waters, the assignment of an additional non-angular state is performed if
 ## changes in pocket occupancy occur.
-def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, show_plots=None):    
+def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, show_plots=None, write_plots=None, write_name=None):    
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
     gaussians, xline = get_gaussian_fit(distribution,gauss_bins,gauss_smooth)            
     ##discretising each state by gaussian intersects       
-    intersection_of_states=get_intersects(gaussians,distr,xline,show_plots)   
+    intersection_of_states = get_intersects(gaussians, distr, xline, show_plots, write_plots, write_name)   
     if distr.count(10000.0)>=1:
         intersection_of_states.append(20000.0)  
     
@@ -335,8 +354,10 @@ def calculate_entropy(state_limits,distribution_list):
 
 ##this function requires a list of angles for SSI
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
-def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None, gauss_bins=120, gauss_smooth=10):
+def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None, 
+                  gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):
         
+    
     ##calculating the entropy for set_distr_a
     ## if set_distr_a only contains one distributions
     if any(isinstance(i, list) for i in set_distr_a)==0:
@@ -345,8 +366,10 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None, gauss_bins=120
     else:
         distr_a=[periodic_correction(i) for i in set_distr_a]
     distr_a_states=[]
-    for i in distr_a:
-        distr_a_states.append(determine_state_limits(i, gauss_bins, gauss_smooth, show_plots))
+    for i in range(len(distr_a)):
+        if write_name is not None:
+            plot_name = write_name + '_dist' + str(i)
+        distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, show_plots, write_plots, plot_name))
         
     H_a=calculate_entropy(distr_a_states,distr_a) 
             
@@ -363,8 +386,10 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None, gauss_bins=120
         else:
             distr_b=[periodic_correction(i) for i in set_distr_b]
         distr_b_states=[]
-        for i in distr_b:
-            distr_b_states.append(determine_state_limits(i, gauss_bins, gauss_smooth, show_plots))
+        for i in range(len(distr_b)):
+            if write_name is not None:
+                plot_name = write_name + '_dist' + str(i)
+            distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, show_plots, write_plots, plot_name))
         H_b=calculate_entropy(distr_b_states,distr_b)
 
     ab_joint_states= distr_a_states + distr_b_states
@@ -378,7 +403,8 @@ def calculate_ssi(set_distr_a, set_distr_b=None, show_plots=None, gauss_bins=120
 
 
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
-def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, show_plots=None, gauss_bins=120, gauss_smooth=10):
+def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, show_plots=None,
+                    gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
         
         
     ##calculating the entropy for set_distr_a
@@ -387,8 +413,10 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, show_plots=None,
     else:
         distr_a=[periodic_correction(i) for i in set_distr_a]
     distr_a_states=[]
-    for i in distr_a:
-        distr_a_states.append(determine_state_limits(i, gauss_bins, gauss_smooth, show_plots))
+    for i in range(len(distr_a)):
+        if write_name is not None:
+            plot_name = write_name + '_dist' + str(i)
+        distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, show_plots, write_plots, plot_name))
     H_a=calculate_entropy(distr_a_states,distr_a)
         
     ##----------------
@@ -398,8 +426,10 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, show_plots=None,
     else:
         distr_b=[periodic_correction(i) for i in set_distr_b]
     distr_b_states=[]
-    for i in distr_b:
-        distr_b_states.append(determine_state_limits(i, gauss_bins, gauss_smooth, show_plots))
+    for i in range(len(distr_b)):
+        if write_name is not None:
+            plot_name = write_name + '_dist' + str(i)
+        distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, show_plots, write_plots, plot_name))
     H_b=calculate_entropy(distr_b_states,distr_b) 
     
     ##----------------
@@ -415,8 +445,10 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, show_plots=None,
         else:
             distr_c=[periodic_correction(i) for i in set_distr_c]
         distr_c_states=[]
-        for i in distr_c:
-            distr_c_states.append(determine_state_limits(i, gauss_bins, gauss_smooth, show_plots))
+        for i in range(len(distr_c)):
+            if write_name is not None:
+                plot_name = write_name + '_dist' + str(i)
+            distr_c_states.append(determine_state_limits(distr_c[i], gauss_bins, gauss_smooth, show_plots, write_plots, plot_name))
         H_c=calculate_entropy(distr_c_states,distr_c)
 
     ##----------------
