@@ -129,17 +129,16 @@ for i in filename_sequence_ordered:
             
         # # # Calculate the SSI between a component and the binary switch between ensembles a and b       
         # # # Output = SSI (float)
-        # # # We enable show_plots=True to inspect the state clustering of the residue sc-torsion distributions
-        ssi = calculate_ssi(combined_dist,show_plots=True)   
+        # # # We enable write_plots=True to inspect the state clustering of the residue sc-torsion distributions
+        # # # Output plots are stored in .png format in "ssi_plots/WRITE_NAME_dist_number.png". 
+        # # # Specify the residue name for write_name.
+        ssi = calculate_ssi(combined_dist,write_plots=True,write_name=residue_name)   
         
         # # # If we notice that one of the residues is not clustering properly
         # # # we can adjust the clustering parameters - gauss_bins=120 (default), gauss_smooth=10 (default)
-        ssi = calculate_ssi(combined_dist,show_plots=True,gauss_bins=120,gauss_smooth=10)   
-        # # # The show_plots option maintains a constant binning on the distribution of 360 bins (1 degree resolution)
-        # # # So visualisation is not affected by the clustering parameters.
-        
-        # # # The clustered distribution plots can be written into the directory "ssi_plots/" in .png format
-        ssi = calculate_ssi(combined_dist,write_plots=True,write_name=residue_name)   
+        ssi = calculate_ssi(combined_dist,write_plots=True,write_name=residue_name,gauss_bins=120,gauss_smooth=10)   
+        # # # The write_plots option maintains a constant binning on the distribution of 360 bins (1 degree resolution)
+        # # # So the data is not affected by altering the clustering binning or smoothing parameters.
     
         # # # add ssi values to list to be written
         SSI_full_receptor.append(ssi)    
