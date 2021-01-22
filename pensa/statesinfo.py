@@ -275,8 +275,8 @@ def get_intersects(gaussians,distribution,xline, show_plots=None,write_plots=Non
     if show_plots is not None:
         plt.figure()      
         histo=np.histogram(distribution, bins=360, density=True)
-        distributionx=smooth(histo[1][0:-1],12)
-        distributiony=smooth(histo[0]-min(histo[0]),12)
+        distributionx=histo[1][0:-1]
+        distributiony=histo[0]
         plt.plot(distributionx,distributiony)
         for j in range(len(reorder_gaussians)):
             plt.plot(xline, reorder_gaussians[j])        
@@ -290,8 +290,8 @@ def get_intersects(gaussians,distribution,xline, show_plots=None,write_plots=Non
         plt.figure()      
         plt.ion()
         histo=np.histogram(distribution, bins=360, density=True)
-        distributionx=smooth(histo[1][0:-1],12)
-        distributiony=smooth(histo[0]-min(histo[0]),12)
+        distributionx=histo[1][0:-1]
+        distributiony=histo[0]
         plt.plot(distributionx,distributiony)
         for j in range(len(reorder_gaussians)):
             plt.plot(xline, reorder_gaussians[j])        
