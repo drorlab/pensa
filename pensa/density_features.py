@@ -80,16 +80,17 @@ def local_maxima_3D(data, order=3):
 def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=None,
                        grid_input=None, top_waters=None, write=None, pdb_vis=True):
     
-    if pdb_vis is True:
-        u_pdb = mda.Universe(structure_input)
-        protein = u_pdb.select_atoms("protein")
-        pdb_outname = structure_input[0:-4]+"_WaterSites.pdb"
-        protein.write(pdb_outname)
-    
     u = mda.Universe(structure_input, xtc_input)
+
+    if pdb_vis is True:
+        protein = u.select_atoms("protein")
+        pdb_outname = structure_input[0:-4]+"_WaterSites.pdb"
+        u.trajectory[0]
+        protein.write(pdb_outname)
 
     if grid_input is None:
         density_atomgroup = u.select_atoms("name " + atomgroup)
+        # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
         if grid_wat_model is not None:
@@ -138,7 +139,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         for frame_no in tqdm(range(100)):       
         # for frame_no in tqdm(range(len(u.trajectory))):   
-            # print(frame_no)
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             ##extracting the water coordinates for inside the pocket
@@ -200,14 +200,15 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
             atom_array += struc.array([atom])
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
-        
+                    
     if pdb_vis is True:
         u_pdb = mda.Universe(pdb_outname)
-        
         u_pdb.add_TopologyAttr('tempfactors')
         # Write values as beta-factors ("tempfactors") to a PDB file
         for res in range(len(water_frequencies)):
-            u_pdb.residues[-1*res].atoms.tempfactors = water_frequencies[-1*res][-1]
+            #scale the water resid by the starting resid
+            water_resid = len(u_pdb.residues) - top_waters + res
+            u_pdb.residues[water_resid].atoms.tempfactors = water_frequencies[res][2]
         u_pdb.atoms.write(pdb_outname)
 
     if write is True:
@@ -219,20 +220,25 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
     return water_frequencies
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element,
-                     grid_input=None, top_atoms=None, write=None, pdb_vis=True):
+                     grid_input=None, top_atoms=None, write=None, pdb_vis=True,grid_write=None):
+
+    u = mda.Universe(structure_input, xtc_input)
     
     if pdb_vis is True:
-        u_pdb = mda.Universe(structure_input)
-        protein = u_pdb.select_atoms("protein")
+        protein = u.select_atoms("protein")
         pdb_outname = structure_input[0:-4]+"_IonSites.pdb"
+        u.trajectory[0]
         protein.write(pdb_outname)
     
-    u = mda.Universe(structure_input, xtc_input)
     ## The density will be obtained from the universe which depends on the .xtc and .gro
     if grid_input is None:
         density_atomgroup = u.select_atoms("name " + atomgroup)
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
+        if grid_write is not None:
+            D.density.convert_density("Angstrom^{-3}")
+            D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
+            grid_input = atomgroup + "_density.dx"
         g = D.density
     else:
         g = Grid(grid_input)  
@@ -254,7 +260,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     
     atom_frequencies=[]
-        
+    
     if top_atoms is None:
         top_atoms = len(coords)  
     elif top_atoms > len(coords):
@@ -305,14 +311,15 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             atom_array += struc.array([atom])
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
-        
+            
     if pdb_vis is True:
         u_pdb = mda.Universe(pdb_outname)
         
         u_pdb.add_TopologyAttr('tempfactors')
         # Write values as beta-factors ("tempfactors") to a PDB file
         for res in range(len(atom_frequencies)):
-            u_pdb.residues[-1*res].atoms.tempfactors = atom_frequencies[-1*res][-1]
+            atom_resid = len(u_pdb.residues) - top_atoms + res
+            u_pdb.residues[atom_resid].atoms.tempfactors = atom_frequencies[res][2]
         u_pdb.atoms.write(pdb_outname)
 
     if write is True:
