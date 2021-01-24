@@ -1,4 +1,4 @@
-atom3d package
+pensa package
 ==============
 
 
