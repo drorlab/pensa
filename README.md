@@ -1,6 +1,8 @@
 # PENSA - Protein Ensemble Analysis
 
 ![Package](https://github.com/drorlab/pensa/workflows/package/badge.svg)
+[![Documentation
+Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pensa.readthedocs.io/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362136.svg)](https://doi.org/10.5281/zenodo.4362136)
 
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
@@ -13,6 +15,8 @@ With PENSA, you can (currently):
 Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/). 
 
 All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
+
+The [documentation](https://pensa.readthedocs.io/en/latest/) is still under construction. For now, please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
 
 
 ## Installation
