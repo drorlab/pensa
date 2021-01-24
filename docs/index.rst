@@ -5,14 +5,17 @@ Welcome to PENSA's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
    getting_started
    tutorials
-   api
 
-.. automodule:: pensa
-   :members:
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Documentation
+
+   source/pensa
 
 
 Indices and tables
