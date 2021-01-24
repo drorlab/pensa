@@ -58,6 +58,18 @@ html_static_path = ['_static']
 # Master Document
 master_doc = 'index'
 
+# Pretend these modules are imported
+autodoc_mock_imports = [
+    'numpy', 
+    'scipy',
+    'matplotlib',
+    'mdtraj',
+    'pyemma',
+    'mdshare',
+    'MDAnalysis',
+    'cython'
+]
+
 # Docstrings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
