@@ -1,0 +1,16 @@
+Installations needed:
+pip install sphinx
+pip install sphinx_rtd_theme
+
+To build the docs from the .rst files, run
+sphinx-build -b html . _build
+
+Auto-generate API docs:
+sphinx-apidoc -o ./source ../pensa
+
+This project uses the Google docstring format:
+https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+
+Good intro to documentation with Sphinx:
+https://brendanhasz.github.io/2019/01/05/sphinx.html
+
