@@ -73,5 +73,5 @@ autodoc_mock_imports = [
 
 # Docstrings
 napoleon_google_docstring = True
-napoleon_numpy_docstring = False
+napoleon_numpy_docstring = True 
 
