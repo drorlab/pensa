@@ -314,7 +314,7 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
         ax[evi,1].set_xlabel('PC %i'%(evi+1))
         ax[evi,1].set_ylabel('frequency')
         # Legend
-        if label_a and label_b:
+        if label:
             ax[evi,0].legend()
             ax[evi,1].legend()
     fig.tight_layout()
