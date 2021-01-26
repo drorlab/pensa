@@ -297,13 +297,15 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
     """
     if labels is not None:
         assert len(labels) == len(data)
+    else:
+        labels = [None for _ in range(len(data))]
     # Start the figure    
     fig,ax = plt.subplots(num, 2, figsize=[8,3*num], dpi=300)
     # Loop over PCs
     for evi in range(num):
         for j,d in enumerate(data):
             # Calculate values along PC for each frame
-            proj = project_on_pc(data, evi, pca=pca)
+            proj = project_on_pc(d, evi, pca=pca)
             # Plot the time series in the left panel
             ax[evi,0].plot(proj, alpha=0.5, label=labels[j])
             # Plot the histograms in the right panel
@@ -314,7 +316,7 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
         ax[evi,1].set_xlabel('PC %i'%(evi+1))
         ax[evi,1].set_ylabel('frequency')
         # Legend
-        if label:
+        if labels is not None:
             ax[evi,0].legend()
             ax[evi,1].legend()
     fig.tight_layout()
