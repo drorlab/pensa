@@ -208,7 +208,7 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
     # Combine the input data
     data = np.concatenate(data,0)
     # Remember which simulation the data came frome
-    cond = np.concatenate([i*np.ones(num_frames[i]) for i in range(num_traj)])
+    cond = np.concatenate([i*np.ones(num_frames[i],dtype=int) for i in range(num_traj)])
     # Remember the index in the respective simulation (taking into account cutoff)
     oidx = np.concatenate([np.arange(num_frames[i])+start_frame for i in range(num_traj)])
     # Calculate the principal components
@@ -218,6 +218,7 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
     atoms = []
     for j in range(num_traj):
         u = mda.Universe(top[j],trj[j])
+        print('Length of trajectory',len(u.trajectory))
         univs.append(u)
         atoms.append(u.select_atoms('all'))
     # Loop over principal components.
@@ -232,8 +233,10 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
         # Write the trajectory, ordered along the PC
         with mda.Writer(out_name+"_pc"+str(evi)+".xtc", atoms[0].n_atoms) as W:
             for i in range(data.shape[0]):
-                j = cond_sort[i] 
-                ts = univs[j].trajectory[oidx_sort[i]]
+                j = cond_sort[i]
+                o = oidx_sort[i]
+                uj = univs[j] 
+                ts = uj.trajectory[o]
                 W.write(atoms[j])
     return
 
