@@ -281,4 +281,45 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
     if saveas is not None:
         fig.savefig(saveas, dpi=300)
     return
+    
+    
+def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
+    """
+    Compare two datasets along a given principal component.
+    
+    Args:
+        data (list of float arrays): Data from multiple trajectories [frames,frame_data]
+        pca (PCA object): Principal components information.
+        num (int): Number of principal components to plot. 
+        saveas (str, optional): Name of the output file.
+        labels (list of str, optional): Labels for the datasets. If provided, it must have the same length as data.
+        
+    """
+    if labels is not None:
+        assert len(labels) == len(data)
+    # Start the figure    
+    fig,ax = plt.subplots(num, 2, figsize=[8,3*num], dpi=300)
+    # Loop over PCs
+    for evi in range(num):
+        for j,d in enumerate(data):
+            # Calculate values along PC for each frame
+            proj = project_on_pc(data, evi, pca=pca)
+            # Plot the time series in the left panel
+            ax[evi,0].plot(proj, alpha=0.5, label=labels[j])
+            # Plot the histograms in the right panel
+            ax[evi,1].hist(proj, bins=30, alpha=0.5, density=True, label=labels[j])
+        # Axis labels
+        ax[evi,0].set_xlabel('frame number')
+        ax[evi,0].set_ylabel('PC %i'%(evi+1))            
+        ax[evi,1].set_xlabel('PC %i'%(evi+1))
+        ax[evi,1].set_ylabel('frequency')
+        # Legend
+        if label_a and label_b:
+            ax[evi,0].legend()
+            ax[evi,1].legend()
+    fig.tight_layout()
+    # Save the figure
+    if saveas is not None:
+        fig.savefig(saveas, dpi=300)
+    return
 
