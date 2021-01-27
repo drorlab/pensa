@@ -13,11 +13,15 @@ def calculate_pca(data):
     """
     Performs a PyEMMA PCA on the provided data.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
         
-    Returns:
-        pca (PCA obj): Principal components information.
+    Returns
+    -------
+        pca : PCA obj
+            Principal components information.
         
     """
     pca = pyemma.coordinates.pca(data)
@@ -28,10 +32,14 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     """
     Plots the highest eigenvalues over the numberr of the principal components.
     
-    Args:
-        pca (PCA obj): Principal components information.
-        num (int, optional): Number of eigenvalues to plot. Defaults to 12.
-        plot_file(str, optional): Path and name of the file to save the plot.
+    Parameters
+    ----------
+        pca : PCA obj
+            Principal components information.
+        num : int, optional
+            Number of eigenvalues to plot. Defaults to 12.
+        plot_file : str, optional
+            Path and name of the file to save the plot.
         
     """
     # Plot eigenvalues over component numbers
@@ -51,13 +59,19 @@ def pca_features(pca, features, num, threshold, plot_file=None):
     """
     Prints relevant features and plots feature correlations.
     
-    Args:
-        pca (PCA obj): The PCA of which to plot the features.
-        features (list of str): Features for which the PCA was performed.
+    Parameters
+    ----------
+        pca : PCA obj
+            The PCA of which to plot the features.
+        features : list of str
+            Features for which the PCA was performed.
             (obtained from features object via .describe()).
-        num (float): Number of feature correlations to plot.
-        threshold (float): Features with a correlation above this will be printed.
-        plot_file(str, optional): Path and name of the file to save the plot.
+        num : float
+            Number of feature correlations to plot.
+        threshold : float
+            Features with a correlation above this will be printed.
+        plot_file : str, optional
+            Path and name of the file to save the plot.
         
     """
     # Plot the highest PC correlations and print relevant features
@@ -80,14 +94,20 @@ def project_on_pc(data, ev_idx, pca=None):
     """
     Projects a trajectory onto an eigenvector of its PCA.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
-        ev_idx (int): Index of the eigenvector to project on.
-        pca (PCA obj, optional): Information of pre-calculated PCA. Defaults to None.
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        ev_idx : int
+            Index of the eigenvector to project on.
+        pca : PCA obj, optional
+            Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
     
-    Returns:
-        projection (float array): value along the PC for each frame.
+    Returns
+    -------
+        projection : float array
+            Value along the PC for each frame.
         
     """
     # Perform PCA if none is provided
@@ -105,15 +125,23 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     """
     Sort a trajectory along given principal components.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
-        pca (PCA obj): Principal components information.
-        num_pc (int): Sort along the first num_pc principal components.
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top (str): File name of the reference topology for the trajectory. 
-        trj (str): File name of the trajetory from which the frames are picked. 
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        pca : PCA obj
+            Principal components information.
+        num_pc : int
+            Sort along the first num_pc principal components.
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top : str
+            File name of the reference topology for the trajectory. 
+        trj : str
+            File name of the trajetory from which the frames are picked. 
             Should be the same as data was from.
-        out_name (str): core part of the name of the output files
+        out_name : str
+            Core part of the name of the output files
     
     """    
     # Remember the index in the simulation (taking into account cutoff)
@@ -141,17 +169,26 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
     """
     Sort two trajectories along their most important common principal components.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data].
-        data_b (float array): Trajectory data [frames,frame_data].
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top_a (str): Reference topology for the first trajectory. 
-        top_b (str): Reference topology for the second trajectory. 
-        trj_a (str): First of the trajetories from which the frames are picked. 
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data].
+        data_b : float array
+            Trajectory data [frames,frame_data].
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top_a : str
+            Reference topology for the first trajectory. 
+        top_b : str
+            Reference topology for the second trajectory. 
+        trj_a : str
+            First of the trajetories from which the frames are picked. 
             Should be the same as data_a was from.
-        trj_b (str): Second of the trajetories from which the frames are picked. 
+        trj_b : str
+            Second of the trajetories from which the frames are picked. 
             Should be the same as data_b was from.
-        out_name (str): Core part of the name of the output files.
+        out_name : str
+            Core part of the name of the output files.
     
     """
     # Combine the input data
@@ -194,13 +231,19 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
     """
     Sort multiple trajectories along their most important common principal components.
 
-    Args:
-        data (list of float arrays): List of trajectory data arrays, each [frames,frame_data].
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top (list of str): Reference topology files.
-        trj (list of str): Trajetories from which the frames are picked.
+    Parameters
+    ----------
+        data : list of float arrays
+            List of trajectory data arrays, each [frames,frame_data].
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top : list of str
+            Reference topology files.
+        trj : list of str
+            Trajetories from which the frames are picked.
             trj[i] should be the same as data[i] was from.
-        out_name (str): Core part of the name of the output files.
+        out_name : str
+            Core part of the name of the output files.
 
     """
     num_frames = [len(d) for d in data]
@@ -245,14 +288,22 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
     """
     Compare two datasets along a given principal component.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data]
-        data_b (float array): Trajectory data [frames,frame_data]
-        pca (PCA object): Principal components information.
-        num (int): Number of principal components to plot. 
-        saveas (str, optional): Name of the output file.
-        label_a (str, optional): Label for the first dataset.
-        label_b (str, optional): Label for the second dataset.
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data]
+        data_b : float array
+            Trajectory data [frames,frame_data]
+        pca : PCA object
+            Principal components information.
+        num : int
+            Number of principal components to plot. 
+        saveas : str, optional
+            Name of the output file.
+        label_a : str, optional
+            Label for the first dataset.
+        label_b : str, optional
+            Label for the second dataset.
         
     """
     # Start the figure    
@@ -287,12 +338,18 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
     """
     Compare two datasets along a given principal component.
     
-    Args:
-        data (list of float arrays): Data from multiple trajectories [frames,frame_data]
-        pca (PCA object): Principal components information.
-        num (int): Number of principal components to plot. 
-        saveas (str, optional): Name of the output file.
-        labels (list of str, optional): Labels for the datasets. If provided, it must have the same length as data.
+    Parameters
+    ----------
+        data : list of float arrays
+            Data from multiple trajectories [frames,frame_data]
+        pca : PCA object
+            Principal components information.
+        num : int
+            Number of principal components to plot. 
+        saveas : str, optional
+            Name of the output file.
+        labels : list of str, optional
+            Labels for the datasets. If provided, it must have the same length as data.
         
     """
     if labels is not None:
@@ -300,7 +357,7 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
     else:
         labels = [None for _ in range(len(data))]
     # Start the figure    
-    fig,ax = plt.subplots(num, 2, figsize=[8,3*num], dpi=300)
+    fig,ax = plt.subplots(num, 2, figsize=[9,3*num], dpi=300)
     # Loop over PCs
     for evi in range(num):
         for j,d in enumerate(data):
@@ -316,7 +373,7 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
         ax[evi,1].set_xlabel('PC %i'%(evi+1))
         ax[evi,1].set_ylabel('frequency')
         # Legend
-        if labels is not None:
+        if labels[0] is not None:
             ax[evi,0].legend()
             ax[evi,1].legend()
     fig.tight_layout()
