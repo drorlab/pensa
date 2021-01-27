@@ -237,18 +237,18 @@ def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=
     feature_names = feat[feature_type]
     #obtaining the residue numbers 
     res_numbers = [int(i.split()[-1]) for i in feature_names]
-
     #grouping indices where feature refers to same residue
     index_same_res = [list(np.where(np.array(res_numbers)==i)[0])
-                      for i in range(min(res_numbers), max(res_numbers)+1)]   
-    
+                      for i in list(set(res_numbers))]   
     #obtaining timeseries data for each residue
     multivar_res_timeseries_data=[]
     for i in range(len(index_same_res)):
         feat_timeseries=[]
         
         for j in index_same_res[i]:
-            feat_timeseries.append(list(get_feature_timeseries(feat,data,feature_type,feature_names[j])))
+            single_feat_timeseries = get_feature_timeseries(feat,data,feature_type,feature_names[j])
+            
+            feat_timeseries.append(list(single_feat_timeseries))
         
         multivar_res_timeseries_data.append(feat_timeseries)
         
@@ -262,6 +262,7 @@ def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=
                     output.write(str(row)[1:-1] + '\n')
             
     return multivar_res_timeseries_data
+
 
 
 def sort_features(names, sortby):
