@@ -22,6 +22,14 @@ from tqdm import tqdm
 import os
 import biotite.structure as struc
 import biotite.structure.io as strucio
+from MDAnalysis.analysis.base import AnalysisFromFunction
+import numpy as np
+from MDAnalysis.coordinates.memory import MemoryReader
+from MDAnalysis.analysis import align
+
+
+def copy_coords(ag):
+    return ag.positions.copy()
 
 ## convert the cosine of the dipole moment into spherical coordinates 
 def get_dipole(water_atom_positions):
@@ -75,10 +83,27 @@ def local_maxima_3D(data, order=3):
     values = data[mask_local_maxima]
 
     return coords, values
+
+
+def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
+ 
+    u = mda.Universe(structure_input, xtc_input)
+    density_atomgroup = u.select_atoms("name " + atomgroup)
+    # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
+    D = DensityAnalysis(density_atomgroup, delta=1.0)
+    D.run()
+    D.density.convert_density(grid_wat_model)
+    if write is not None:
+        D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
+
+    g = D.density
     
+    return g
+
+
 ##make atomgroup mandatory
 def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=None,
-                       grid_input=None, top_waters=None, write=None, pdb_vis=True):
+                       grid_input=None, top_waters=30, write=None, pdb_vis=True):
     
     u = mda.Universe(structure_input, xtc_input)
 
@@ -108,10 +133,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
     coords = [xyz[i] for i in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     water_frequencies=[]
-        
-    if top_waters is None:
-        top_waters = len(coords)  
-    elif top_waters > len(coords):
+
+    if top_waters > len(coords):
         top_waters = len(coords)  
 
     print('\n')
@@ -129,7 +152,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
-            radius = ' 2'
+            radius = ' 3.5'
             atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] + radius).indices
             counting.append(atomgroup_IDS)
             
@@ -174,10 +197,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         if write is True:
             if not os.path.exists('water_features/'):
                 os.makedirs('water_features/')
-            filename= 'water_features/' + water_ID + '.txt'
+            filename= 'water_features/' + structure_input[0:-4] + water_ID + '.txt'
             with open(filename, 'w') as output:
                 for row in water_out:
-                    output.write(str(row) + '\n')
+                    output.write(str(row)[1:-1] + '\n')
 
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
@@ -212,10 +235,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         u_pdb.atoms.write(pdb_outname)
 
     if write is True:
-        filename= 'water_features/WaterPocketFrequencies.txt'
+        filename= 'water_features/' + structure_input[0:-4] + 'WaterPocketFrequencies.txt'
         with open(filename, 'w') as output:
             for row in water_frequencies:
-                output.write(str(row) + '\n')
+                output.write(str(row)[1:-1] + '\n')
             
     return water_frequencies
 
@@ -328,7 +351,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         filename= 'atom_features/PocketFrequencies.txt'
         with open(filename, 'w') as output:
             for row in atom_frequencies:
-                output.write(str(row) + '\n')
-            
+                output.write(str(row)[1:-1] + '\n')
+
     return atom_frequencies
 
