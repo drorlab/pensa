@@ -61,7 +61,7 @@ water_frequencies = get_water_features(structure_input = struc,
                                       atomgroup = "OH2",
                                       grid_input = grid,
                                       write = True,
-                                      top_waters = 5)
+                                      top_waters = 1)
 
 
 
