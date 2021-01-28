@@ -216,6 +216,11 @@ condition_b_aligned = mda.Universe(out_name_b+".gro", out_name_b+"aligned.dcd")
 # # # We then combine the ensembles into one universe
 Combined_conditions = mda.Merge(condition_a.atoms, condition_b_aligned.atoms)
 
+# # # save out the pdb file of the combined universe
+pdb_outname = "Combined_conditions.pdb"
+Combined_conditions.trajectory[0]
+Combined_conditions.write(pdb_outname)
+
 
 # # # Extract the coordinates from the trajectories to add to the new universe
 aligned_coords_b = AnalysisFromFunction(copy_coords,
@@ -234,6 +239,11 @@ merged_coords = np.hstack([sim1_coords,
 # # # We load in the merged coordinated into our new universe that contains
 # # # the receptor in both conditions
 Combined_conditions.load_new(merged_coords, format=MemoryReader)
+
+with mda.Writer('Combined_conditions.xyz', Combined_conditions.atoms.n_atoms) as w:
+    for ts in merged2.trajectory:
+        w.write(Combined_conditions.atoms)
+
 
 # # # We extract the density grid from the combined condition universe
 density_atomgroup = Combined_conditions.select_atoms("name OH2")
