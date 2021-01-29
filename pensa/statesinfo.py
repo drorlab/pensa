@@ -404,8 +404,8 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
     
         SSI = (H_a + H_b) - H_ab
     except:
-        SSI = 0
-        print('WARNING: SSI ERROR \nDefault output of SSI=0.')
+        SSI = -1
+        print('WARNING: SSI ERROR \nDefault output of SSI= -1.')
         
     return SSI
 
@@ -511,9 +511,9 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
         coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
         
     except:
-        SSI = 0
-        coSSI = 0
-        print('WARNING: SSI & coSSI ERROR \nDefault output of 0.')   
+        SSI = -1
+        coSSI = -1
+        print('WARNING: SSI & coSSI ERROR \nDefault output of -1.')   
         
     return SSI, coSSI
 
