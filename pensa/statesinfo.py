@@ -295,7 +295,7 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
 ##The function handles both residue angle distributions and water orientation/occupancy
 ##distributions. For waters, the assignment of an additional non-angular state is performed if
 ## changes in pocket occupancy occur.
-def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):    
+def determine_state_limits(distr, gauss_bins=180, gauss_smooth=10, write_plots=None, write_name=None):    
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
@@ -340,38 +340,104 @@ def calculate_entropy(state_limits,distribution_list):
 ##this function requires a list of angles for SSI
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
-                  gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):
+                  gauss_bins=180, gauss_smooth=10, write_plots=None, write_name=None):
         
-    
-    ##calculating the entropy for set_distr_a
-    ## if set_distr_a only contains one distributions
-    if any(isinstance(i, list) for i in set_distr_a)==0:
-        distr_a=[periodic_correction(set_distr_a)]
-    ## else set_distr_a is a nested list of multiple distributions (bivariate)
-    else:
-        distr_a=[periodic_correction(i) for i in set_distr_a]
-    
-    if a_states is None:    
-        distr_a_states=[]
-        for i in range(len(distr_a)):
-            if write_name is not None:
-                plot_name = write_name + '_dist' + str(i)
-            else:
-                plot_name = None
-            distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, write_plots, plot_name))
-    else:
-        distr_a_states = a_states
+    try:       
+        ##calculating the entropy for set_distr_a
+        ## if set_distr_a only contains one distributions
+        if any(isinstance(i, list) for i in set_distr_a)==0:
+            distr_a=[periodic_correction(set_distr_a)]
+        ## else set_distr_a is a nested list of multiple distributions (bivariate)
+        else:
+            distr_a=[periodic_correction(i) for i in set_distr_a]
         
-    H_a=calculate_entropy(distr_a_states,distr_a) 
+        if a_states is None:    
+            distr_a_states=[]
+            for i in range(len(distr_a)):
+                if write_name is not None:
+                    plot_name = write_name + '_dist' + str(i)
+                else:
+                    plot_name = None
+                try:
+                    distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                except:
+                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+        else:
+            distr_a_states = a_states
             
-    ##calculating the entropy for set_distr_b
-    ## if no dist (None) then apply the binary dist for two simulations
-    if set_distr_b is None:       
-        H_b=1
-        distr_b=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
-        distr_b_states= [[0,1,2]]  
+        H_a=calculate_entropy(distr_a_states,distr_a) 
+                
+        ##calculating the entropy for set_distr_b
+        ## if no dist (None) then apply the binary dist for two simulations
+        if set_distr_b is None:       
+            H_b=1
+            distr_b=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
+            distr_b_states= [[0,1,2]]  
+            
+        else:
+            if any(isinstance(i, list) for i in set_distr_b)==0:
+                distr_b=[periodic_correction(set_distr_b)]
+            else:
+                distr_b=[periodic_correction(i) for i in set_distr_b]
+            if b_states is None:    
+                distr_b_states=[]
+                for i in range(len(distr_b)):
+                    if write_name is not None:
+                        plot_name = write_name + '_dist' + str(i)
+                    else:
+                        plot_name = None
+                    try:
+                        distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                    except:    
+                        print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                
+            else:
+                distr_b_states = b_states
+                
+                    
+            H_b=calculate_entropy(distr_b_states,distr_b)
+    
+        ab_joint_states= distr_a_states + distr_b_states
+        ab_joint_distributions= distr_a + distr_b
         
-    else:
+        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+    
+        SSI = (H_a + H_b) - H_ab
+    except:
+        SSI = 0
+        print('WARNING: SSI ERROR \nDefault output of SSI=0.')
+        
+    return SSI
+
+
+#CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
+def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
+                    c_states=None, gauss_bins=180, gauss_smooth=10, write_plots=None,write_name=None):
+        
+    try:
+        ##calculating the entropy for set_distr_a
+        if any(isinstance(i, list) for i in set_distr_a)==0:
+            distr_a=[periodic_correction(set_distr_a)]
+        else:
+            distr_a=[periodic_correction(i) for i in set_distr_a]
+        if a_states is None:    
+            distr_a_states=[]
+            for i in range(len(distr_a)):
+                if write_name is not None:
+                    plot_name = write_name + '_dist' + str(i)
+                else:
+                    plot_name = None
+                try:    
+                    distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                except:    
+                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+
+        else:
+            distr_a_states = a_states    
+        H_a=calculate_entropy(distr_a_states,distr_a)
+            
+        ##----------------
+        ##calculating the entropy for set_distr_b
         if any(isinstance(i, list) for i in set_distr_b)==0:
             distr_b=[periodic_correction(set_distr_b)]
         else:
@@ -383,111 +449,71 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
                     plot_name = write_name + '_dist' + str(i)
                 else:
                     plot_name = None
-                distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                try:
+                    distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                except:    
+                    print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
         else:
             distr_b_states = b_states
+        H_b=calculate_entropy(distr_b_states,distr_b) 
+        
+        ##----------------
+        ##calculating the entropy for set_distr_c
+        ## if no dist (None) then apply the binary dist for two simulations
+        if set_distr_c is None:
+            H_c=1
+            distr_c=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
+            distr_c_states= [[0,1,2]]  
+        else:
+            if any(isinstance(i, list) for i in set_distr_c)==0:
+                distr_c=[periodic_correction(set_distr_c)]
+            else:
+                distr_c=[periodic_correction(i) for i in set_distr_c]
+            if c_states is None:    
+                distr_c_states=[]
+                for i in range(len(distr_c)):
+                    if write_name is not None:
+                        plot_name = write_name + '_dist' + str(i)
+                    else:
+                        plot_name = None
+                    try:
+                        distr_c_states.append(determine_state_limits(distr_c[i], gauss_bins, gauss_smooth, write_plots, plot_name))
+                    except:    
+                        print('Distribution C not clustering properly.\nTry altering Gaussian parameters or input custom states.')
             
-                
-        H_b=calculate_entropy(distr_b_states,distr_b)
-
-    ab_joint_states= distr_a_states + distr_b_states
-    ab_joint_distributions= distr_a + distr_b
-    
-    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
-
-    SSI = (H_a + H_b) - H_ab
-        
-    return SSI
-
-
-#CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
-def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
-        
-        
-    ##calculating the entropy for set_distr_a
-    if any(isinstance(i, list) for i in set_distr_a)==0:
-        distr_a=[periodic_correction(set_distr_a)]
-    else:
-        distr_a=[periodic_correction(i) for i in set_distr_a]
-    if a_states is None:    
-        distr_a_states=[]
-        for i in range(len(distr_a)):
-            if write_name is not None:
-                plot_name = write_name + '_dist' + str(i)
             else:
-                plot_name = None
-            distr_a_states.append(determine_state_limits(distr_a[i], gauss_bins, gauss_smooth, write_plots, plot_name))
-    else:
-        distr_a_states = a_states    
-    H_a=calculate_entropy(distr_a_states,distr_a)
+                distr_c_states = c_states
+            H_c=calculate_entropy(distr_c_states,distr_c)
+    
+        ##----------------
+        ab_joint_states= distr_a_states + distr_b_states
+        ab_joint_distributions= distr_a + distr_b
         
-    ##----------------
-    ##calculating the entropy for set_distr_b
-    if any(isinstance(i, list) for i in set_distr_b)==0:
-        distr_b=[periodic_correction(set_distr_b)]
-    else:
-        distr_b=[periodic_correction(i) for i in set_distr_b]
-    if b_states is None:    
-        distr_b_states=[]
-        for i in range(len(distr_b)):
-            if write_name is not None:
-                plot_name = write_name + '_dist' + str(i)
-            else:
-                plot_name = None
-            distr_b_states.append(determine_state_limits(distr_b[i], gauss_bins, gauss_smooth, write_plots, plot_name))
-    else:
-        distr_b_states = b_states
-    H_b=calculate_entropy(distr_b_states,distr_b) 
-    
-    ##----------------
-    ##calculating the entropy for set_distr_c
-    ## if no dist (None) then apply the binary dist for two simulations
-    if set_distr_c is None:
-        H_c=1
-        distr_c=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
-        distr_c_states= [[0,1,2]]  
-    else:
-        if any(isinstance(i, list) for i in set_distr_c)==0:
-            distr_c=[periodic_correction(set_distr_c)]
-        else:
-            distr_c=[periodic_correction(i) for i in set_distr_c]
-        if c_states is None:    
-            distr_c_states=[]
-            for i in range(len(distr_c)):
-                if write_name is not None:
-                    plot_name = write_name + '_dist' + str(i)
-                else:
-                    plot_name = None
-                distr_c_states.append(determine_state_limits(distr_c[i], gauss_bins, gauss_smooth, write_plots, plot_name))
-        else:
-            distr_c_states = c_states
-        H_c=calculate_entropy(distr_c_states,distr_c)
-
-    ##----------------
-    ab_joint_states= distr_a_states + distr_b_states
-    ab_joint_distributions= distr_a + distr_b
-    
-    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
-    ##----------------
-    ac_joint_states= distr_a_states + distr_c_states 
-    ac_joint_distributions= distr_a + distr_c
-    
-    H_ac= calculate_entropy(ac_joint_states,ac_joint_distributions)
-    ##----------------
-    bc_joint_states= distr_b_states + distr_c_states 
-    bc_joint_distributions= distr_b + distr_c
-    
-    H_bc= calculate_entropy(bc_joint_states,bc_joint_distributions)
-    ##----------------
-    abc_joint_states= distr_a_states + distr_b_states + distr_c_states 
-    abc_joint_distributions= distr_a + distr_b + distr_c
-    
-    H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)    
-    
-    
-    SSI = (H_a + H_b) - H_ab
-    coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
+        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+        ##----------------
+        ac_joint_states= distr_a_states + distr_c_states 
+        ac_joint_distributions= distr_a + distr_c
+        
+        H_ac= calculate_entropy(ac_joint_states,ac_joint_distributions)
+        ##----------------
+        bc_joint_states= distr_b_states + distr_c_states 
+        bc_joint_distributions= distr_b + distr_c
+        
+        H_bc= calculate_entropy(bc_joint_states,bc_joint_distributions)
+        ##----------------
+        abc_joint_states= distr_a_states + distr_b_states + distr_c_states 
+        abc_joint_distributions= distr_a + distr_b + distr_c
+        
+        H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)    
+        
+        
+        SSI = (H_a + H_b) - H_ab
+        coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
+        
+    except:
+        SSI = 0
+        coSSI = 0
+        print('WARNING: SSI & coSSI ERROR \nDefault output of 0.')   
         
     return SSI, coSSI
 
