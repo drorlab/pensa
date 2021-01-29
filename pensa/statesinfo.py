@@ -405,14 +405,19 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
         SSI = (H_a + H_b) - H_ab
     except:
         SSI = -1
-        print('WARNING: SSI ERROR \nDefault output of SSI= -1.')
+        if write_name is not None:
+            print('WARNING: SSI ERROR for ' + write_name)
+        else:
+            print('WARNING: SSI ERROR')
+            
+        print('Default output of SSI= -1.')
         
     return SSI
 
 
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
+                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name_=None):
         
     try:
         ##calculating the entropy for set_distr_a
