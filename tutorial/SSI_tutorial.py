@@ -80,6 +80,8 @@ multivar_res_timeseries_data_b=multivar_res_timeseries_data(b_rec_feat,b_rec_dat
 
 # # # Parsing data for SSI 
 folder='sc-torsions/'
+out_name_a = "condition-a"
+out_name_b = "condition-b"
 # # # Get names of all the torsion files within the folder
 names=get_filenames(folder)
 # # # Remove unique identifier for the different ensembles
@@ -129,9 +131,9 @@ for residue in filename_sequence_ordered:
     # # # The write_plots option maintains a constant binning on the distribution of 360 bins (1 degree resolution)
     # # # So the data is not affected by altering the clustering binning or smoothing parameters.
 
-# # # If we want to calculate the SSI shared between two residues, 
-# # # for example Arg165(R3.50) and Asn332(N7.49), we can input both distributions
-# # # into calculate_ssi()
+# # If we want to calculate the SSI shared between two residues, 
+# # for example Arg165(R3.50) and Asn332(N7.49), we can input both distributions
+# # into calculate_ssi()
 folder='sc-torsions/'
 out_name_a = "condition-a"
 out_name_b = "condition-b"
@@ -139,7 +141,7 @@ out_name_b = "condition-b"
 Tyr336_dist_a=[list(i) for i in import_distribution(folder,out_name_a+'TYR336.txt')]
 Tyr336_dist_b=[list(i) for i in import_distribution(folder,out_name_b+'TYR336.txt')]
 Tyr336_combined_dist=[]
-for j in range(len(ARG165_dist_a)):
+for j in range(len(Tyr336_dist_a)):
     # # # Make sure the ensembles have the same length of trajectory
     sim1,sim2=match_sim_lengths(Tyr336_dist_a[j],Tyr336_dist_b[j])
     # # # combine the ensembles into one distribution (condition_a + condition_b)
@@ -155,7 +157,7 @@ for j in range(len(Asn332_dist_a)):
     Asn332_combined_dist.append(sim1+sim2)
 
 # # # SSI between Arg165 and Asn332 is then calculated by running
-ssi = calculate_ssi(Tyr336_combined_dist,Asn332_combined_dist)
+ssi = calculate_ssi(Tyr336_combined_dist, Asn332_combined_dist, gauss_bins=300, write_plots=True,write_name="TEST")
 
 # # # Lets say we want to calculate what magnitude of information
 # # # shared between Tyr336 and Asn332 is information about the switch between ensembles
@@ -275,7 +277,8 @@ folder='traj/water_features/'
 out_name_a = "cond-a_water"
 out_name_b = "cond-b_water"
 O1_dist_a=[list(i) for i in import_distribution(folder,out_name_a+'O1.txt')]
-O1_dist_b=[list(i) for i in import_distribution(folder,out_name_b+'O1.txt')]
+O1_dist_b=[list(i) for i in import_distribution(folder,outThis example opens a file, writes content in the, file and comes out gracefully because there is no problem at all −
+
 O1_combined_dist=[]
 for i in range(len(O1_dist_a)):
     
