@@ -295,7 +295,7 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
 ##The function handles both residue angle distributions and water orientation/occupancy
 ##distributions. For waters, the assignment of an additional non-angular state is performed if
 ## changes in pocket occupancy occur.
-def determine_state_limits(distr, gauss_bins=180, gauss_smooth=10, write_plots=None, write_name=None):    
+def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):    
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
@@ -340,7 +340,7 @@ def calculate_entropy(state_limits,distribution_list):
 ##this function requires a list of angles for SSI
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
-                  gauss_bins=180, gauss_smooth=10, write_plots=None, write_name=None):
+                  gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):
         
     try:       
         ##calculating the entropy for set_distr_a
@@ -412,7 +412,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
 
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=180, gauss_smooth=10, write_plots=None,write_name=None):
+                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
         
     try:
         ##calculating the entropy for set_distr_a
