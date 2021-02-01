@@ -221,7 +221,7 @@ def sort_mult_trajs_along_common_tic(data, start_frame, top, trj, out_name, num_
     # Loop over time-lagged independent component.
     for evi in range(num_tic):
         # Project the combined data on the time-lagged independent component
-        proj = project_on_tic(data,evi,pca=pca)
+        proj = project_on_tic(data,evi,tica=tica)
         # Sort everything along the projection on th resp. PC
         sort_idx  = np.argsort(proj)
         proj_sort = proj[sort_idx]
