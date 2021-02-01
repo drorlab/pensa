@@ -9,15 +9,20 @@ import matplotlib.pyplot as plt
 # --- METHODS FOR TIME-LAGGED INDEPENDENT COMPONENT ANALYSIS ---
 # http://emma-project.org/latest/api/generated/pyemma.coordinates.tica.html#pyemma.coordinates.tica
 
+
 def calculate_tica(data):
     """
     Performs a PyEMMA TICA on the provided data.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
+    Parameters
+    ----------
+        data : float array
+            Trajectory data. Format: [frames,frame_data].
         
-    Returns:
-        tica (TICA obj): Time-lagged independent component information.
+    Returns
+    -------
+        tica : TICA obj
+            Time-lagged independent component information.
         
     """
     tica = pyemma.coordinates.tica(data)
@@ -28,10 +33,14 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     """
     Plots the highest eigenvalues over the numberr of the time-lagged independent components.
     
-    Args:
-        tica (TICA obj): Time-lagged independent components information.
-        num (int, optional): Number of eigenvalues to plot. Defaults to 12.
-        plot_file(str, optional): Path and name of the file to save the plot.
+    Parameters
+    ----------
+        tica : TICA obj
+            Time-lagged independent components information.
+        num : int, default=12
+            Number of eigenvalues to plot.
+        plot_file : str, optional
+            Path and name of the file to save the plot.
         
     """
     # Plot eigenvalues over component numbers
@@ -51,13 +60,19 @@ def tica_features(tica, features, num, threshold, plot_file=None):
     """
     Prints relevant features and plots feature correlations.
     
-    Args:
-        tica (TICA obj): The TICA of which to plot the features.
-        features (list of str): Features for which the TICA was performed.
+    Parameters
+    ----------
+        tica : TICA obj
+            The TICA of which to plot the features.
+        features : list of str
+            Features for which the TICA was performed
             (obtained from features object via .describe()).
-        num (float): Number of feature correlations to plot.
-        threshold (float): Features with a correlation above this will be printed.
-        plot_file(str, optional): Path and name of the file to save the plot.
+        num : float
+            Number of feature correlations to plot.
+        threshold : float
+            Features with a correlation above this will be printed.
+        plot_file : str, optional
+            Path and name of the file to save the plot.
         
     """
     # Plot the highest TIC correlations and print relevant features
@@ -80,14 +95,20 @@ def project_on_tic(data, ev_idx, tica=None):
     """
     Projects a trajectory onto an eigenvector of its TICA.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
-        ev_idx (int): Index of the eigenvector to project on.
-        tica (TICA obj, optional): Information of pre-calculated TICA. Defaults to None.
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        ev_idx : int
+            Index of the eigenvector to project on.
+        tica : TICA obj, optional
+            Information of pre-calculated TICA.
             Must be calculated for the same features (but not necessarily the same trajectory).
     
-    Returns:
-        projection (float array): value along the TIC for each frame.
+    Returns
+    -------
+        projection : float array
+            Value along the TIC for each frame.
         
     """
     # Perform TICA if none is provided
@@ -105,15 +126,23 @@ def sort_traj_along_tic(data, tica, start_frame, top, trj, out_name, num_tic=3):
     """
     Sort a trajectory along given time-lagged independent components.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data].
-        tica (TICA obj): Time-lagged independent components information.
-        num_tic (int): Sort along the first num_tic time-lagged independent components.
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top (str): File name of the reference topology for the trajectory. 
-        trj (str): File name of the trajetory from which the frames are picked. 
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        tica : TICA obj
+            Time-lagged independent components information.
+        num_tic : int
+            Sort along the first num_tic time-lagged independent components.
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top : str
+            File name of the reference topology for the trajectory. 
+        trj : str
+            File name of the trajetory from which the frames are picked. 
             Should be the same as data was from.
-        out_name (str): core part of the name of the output files
+        out_name : str
+            Core part of the name of the output files.
     
     """    
     # Remember the index in the simulation (taking into account cutoff)
@@ -141,17 +170,26 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
     """
     Sort two trajectories along their most important common time-lagged independent components.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data].
-        data_b (float array): Trajectory data [frames,frame_data].
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top_a (str): Reference topology for the first trajectory. 
-        top_b (str): Reference topology for the second trajectory. 
-        trj_a (str): First of the trajetories from which the frames are picked. 
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data].
+        data_b : float array
+            Trajectory data [frames,frame_data].
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top_a : str
+            Reference topology for the first trajectory. 
+        top_b : str
+            Reference topology for the second trajectory. 
+        trj_a : str
+            First of the trajetories from which the frames are picked. 
             Should be the same as data_a was from.
-        trj_b (str): Second of the trajetories from which the frames are picked. 
+        trj_b : str
+            Second of the trajetories from which the frames are picked. 
             Should be the same as data_b was from.
-        out_name (str): Core part of the name of the output files.
+        out_name : str
+            Core part of the name of the output files.
     
     """
     # Combine the input data
@@ -193,13 +231,21 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
 def sort_mult_trajs_along_common_tic(data, start_frame, top, trj, out_name, num_tic=3):
     """
     Sort multiple trajectories along their most important common time-lagged independent components.
-    Args:
-        data (list of float arrays): List of trajectory data arrays, each [frames,frame_data].
-        start_frame (int): Offset of the data with respect to the trajectories (defined below).
-        top (list of str): Reference topology files.
-        trj (list of str): Trajetories from which the frames are picked.
+
+    Parameters
+    ----------
+        data : list of float arrays
+            List of trajectory data arrays, each [frames,frame_data].
+        start_frame : int
+            Offset of the data with respect to the trajectories (defined below).
+        top : list of str
+            Reference topology files.
+        trj : list of str
+            Trajetories from which the frames are picked.
             trj[i] should be the same as data[i] was from.
-        out_name (str): Core part of the name of the output files.
+        out_name : str
+            Core part of the name of the output files.
+
     """
     num_frames = [len(d) for d in data]
     num_traj = len(data)
@@ -240,14 +286,22 @@ def compare_projections_tica(data_a, data_b, tica, num=3, saveas=None, label_a=N
     """
     Compare two datasets along a given time-lagged indepedent component.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data]
-        data_b (float array): Trajectory data [frames,frame_data]
-        tica (TICA object): Time-lagged independent components information.
-        num (int): Number of time-lagged independent components to plot. 
-        saveas (str, optional): Name of the output file.
-        label_a (str, optional): Label for the first dataset.
-        label_b (str, optional): Label for the second dataset.
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data]
+        data_b : float array
+            Trajectory data [frames,frame_data]
+        tica : TICA object
+            Time-lagged independent components information.
+        num : int, default=3
+            Number of time-lagged independent components to plot. 
+        saveas : str, optional
+            Name of the output file.
+        label_a : str, optional
+            Label for the first dataset.
+        label_b : str, optional
+            Label for the second dataset.
         
     """
     # Start the figure    
