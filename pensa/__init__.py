@@ -6,7 +6,7 @@ import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
-
+import biotite
 
 
 from .features import *
