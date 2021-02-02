@@ -295,7 +295,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
 
     for i,name in enumerate(names):
         # To each residue ...
-        resid = int( name.split(' ')[-1][:-1] )
+        resid = int( name.split(' ')[-1].replace(')','') )
         index = np.where(vis_resids == resid)[0][0]
         # ... assign the difference measures of the torsion angle with the higher (or lower) value
         if selection == 'max':

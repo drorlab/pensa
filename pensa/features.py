@@ -7,8 +7,8 @@ from pyemma.util.contexts import settings
 # -- Loading the Features --
 
 
-def get_features(pdb, xtc, features=['bb-torsions', 'sc-torsions'],
-                 start_frame=0, step_width=1, cossin=False):
+def get_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
+                 features=['bb-torsions','sc-torsions','bb-distances']):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
     http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
@@ -19,14 +19,14 @@ def get_features(pdb, xtc, features=['bb-torsions', 'sc-torsions'],
             File name for the reference file (PDB or GRO format).
         xtc : str
             File name for the trajectory (xtc format).
-        features : list of str, default=['bb-torsions', 'sc-torsions']
-            Names of the features to be extracted.
         start_frame : int, default=0
             First frame to return of the features. Already takes subsampling by stride>=1 into account.
         step_width : int, default=1
             Subsampling step width when reading the frames. 
         cossin : bool, default=False
             Use cosine and sine for angles.
+        features : list of str, default=['bb-torsions', 'sc-torsions']
+            Names of the features to be extracted.
         
     Returns
     -------
