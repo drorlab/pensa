@@ -107,9 +107,11 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
     
     u = mda.Universe(structure_input, xtc_input)
 
+    filename_write_out=structure_input.split(os.sep)[-1][:-4]
+
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = structure_input[0:-4]+"_WaterSites.pdb"
+        pdb_outname = filename_write_out+"_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
 
@@ -197,7 +199,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         if write is True:
             if not os.path.exists('water_features/'):
                 os.makedirs('water_features/')
-            filename= 'water_features/' + structure_input[0:-4] + water_ID + '.txt'
+            filename= 'water_features/' + filename_write_out + water_ID + '.txt'
             with open(filename, 'w') as output:
                 for row in water_out:
                     output.write(str(row)[1:-1] + '\n')
@@ -235,7 +237,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         u_pdb.atoms.write(pdb_outname)
 
     if write is True:
-        filename= 'water_features/' + structure_input[0:-4] + 'WaterPocketFrequencies.txt'
+        filename= 'water_features/' + filename_write_out + 'WaterPocketFrequencies.txt'
         with open(filename, 'w') as output:
             for row in water_frequencies:
                 output.write(str(row)[1:-1] + '\n')
@@ -246,10 +248,13 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
                      grid_input=None, top_atoms=None, write=None, pdb_vis=True,grid_write=None):
 
     u = mda.Universe(structure_input, xtc_input)
+
+    filename_write_out=structure_input.split(os.sep)[-1][:-4]
+
     
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = structure_input[0:-4]+"_IonSites.pdb"
+        pdb_outname = filename_write_out+"_IonSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
     
