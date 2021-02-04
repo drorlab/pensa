@@ -168,52 +168,52 @@ from pensa import *
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# # # Featurizing waters and calculating SSI 
+# # # # Featurizing waters and calculating SSI 
 
-# # # First we preprocess the trajectories to extract coordinates for protein 
-# # # and waters.
-root_dir = './mor-data'
-# Simulation A
-ref_file_a =  root_dir+'/11427_dyn_151.psf'
-pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
-trj_file_a = [root_dir+'/11423_trj_151.xtc',
-              root_dir+'/11424_trj_151.xtc',
-              root_dir+'/11425_trj_151.xtc']
-# Simulation B
-ref_file_b =  root_dir+'/11580_dyn_169.psf'
-pdb_file_b =  root_dir+'/11579_dyn_169.pdb'
-trj_file_b = [root_dir+'/11576_trj_169.xtc',
-              root_dir+'/11577_trj_169.xtc',
-              root_dir+'/11578_trj_169.xtc']
-# Base for the selection string for each simulation protein and all waters
-sel_base_a = "protein or byres name OH2"
-sel_base_b = "protein or byres name OH2"
-# Names of the output files
+# # # # First we preprocess the trajectories to extract coordinates for protein 
+# # # # and waters.
+# root_dir = './mor-data'
+# # Simulation A
+# ref_file_a =  root_dir+'/11427_dyn_151.psf'
+# pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
+# trj_file_a = [root_dir+'/11423_trj_151.xtc',
+#               root_dir+'/11424_trj_151.xtc',
+#               root_dir+'/11425_trj_151.xtc']
+# # Simulation B
+# ref_file_b =  root_dir+'/11580_dyn_169.psf'
+# pdb_file_b =  root_dir+'/11579_dyn_169.pdb'
+# trj_file_b = [root_dir+'/11576_trj_169.xtc',
+#               root_dir+'/11577_trj_169.xtc',
+#               root_dir+'/11578_trj_169.xtc']
+# # Base for the selection string for each simulation protein and all waters
+# sel_base_a = "protein or byres name OH2"
+# sel_base_b = "protein or byres name OH2"
+# # Names of the output files
 out_name_a = "traj/cond-a_water"
 out_name_b = "traj/cond-b_water"
 
-for subdir in ['traj','plots','vispdb','pca','clusters','results']:
-    if not os.path.exists(subdir):
-        os.makedirs(subdir)
+# for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+#     if not os.path.exists(subdir):
+#         os.makedirs(subdir)
 
-# # # Extract the coordinates of the receptor from the trajectory
-extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
-extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)
+# # # # Extract the coordinates of the receptor from the trajectory
+# extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
+# extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)
 
 # # # Before we extract the water densities, we need to first align the trajectories 
 # # # so that we can featurize water sites in both ensembles using the same coordinates
 condition_a = mda.Universe(out_name_a+".gro",out_name_a+".xtc")
-condition_b = mda.Universe(out_name_b+".gro",out_name_b+".xtc")
+# condition_b = mda.Universe(out_name_b+".gro",out_name_b+".xtc")
 
-align.AlignTraj(condition_b,  # trajectory to align
-                condition_a,  # reference
-                select='name CA',  # selection of atoms to align
-                filename= out_name_b + 'aligned.dcd',  # file to write the trajectory to
-                match_atoms=True,  # whether to match atoms based on mass
-                ).run()
+# align.AlignTraj(condition_b,  # trajectory to align
+#                 condition_a,  # reference
+#                 select='name CA',  # selection of atoms to align
+#                 filename= out_name_b + 'aligned.xtc',  # file to write the trajectory to
+#                 match_atoms=True,  # whether to match atoms based on mass
+#                 ).run()
 
 # # # re-define the condition_b universe with the aligned trajectory 
-condition_b_aligned = mda.Universe(out_name_b+".gro", out_name_b+"aligned.dcd")
+condition_b_aligned = mda.Universe(out_name_b+".gro", out_name_b+"aligned.xtc")
 
 # # # We then combine the ensembles into one universe
 Combined_conditions = mda.Merge(condition_a.atoms, condition_b_aligned.atoms)
@@ -236,7 +236,6 @@ merged_coords = np.hstack([sim1_coords,
 # # # the receptor in both conditions
 Combined_conditions.load_new(merged_coords, format=MemoryReader)
 
-
 # # # We extract the density grid from the combined condition universe
 density_atomgroup = Combined_conditions.select_atoms("name OH2")
 # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
@@ -256,14 +255,14 @@ water_frequencies_a = get_water_features(structure_input = out_name_a+".gro",
                                           top_waters = 10)
 
 water_frequencies_b = get_water_features(structure_input = out_name_b+".gro", 
-                                          xtc_input = out_name_b+"aligned.dcd",
+                                          xtc_input = out_name_b+"aligned.xtc",
                                           atomgroup = "OH2",
                                           grid_input = grid_combined,
                                           write = True,
                                           top_waters = 10)
 
 # # # Calculating SSI is then exactly the same as for residues
-folder='traj/water_features/'
+folder='water_features/'
 out_name_a = "cond-a_water"
 out_name_b = "cond-b_water"
 O1_dist_a=[list(i) for i in import_distribution(folder,out_name_a+'O1.txt')]
