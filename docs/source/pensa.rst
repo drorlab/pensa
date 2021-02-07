@@ -44,6 +44,14 @@ pensa.preprocessing module
    :undoc-members:
    :show-inheritance:
 
+pensa.tica module
+-----------------
+
+.. automodule:: pensa.tica
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
