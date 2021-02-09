@@ -395,7 +395,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
                 distr_b_states = b_states
                 
                     
-            H_b=calculate_entropy(distr_b_states,distr_b)
+        H_b=calculate_entropy(distr_b_states,distr_b)
     
         ab_joint_states= distr_a_states + distr_b_states
         ab_joint_distributions= distr_a + distr_b
@@ -417,7 +417,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
 
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name_=None):
+                    c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
         
     try:
         ##calculating the entropy for set_distr_a
@@ -438,7 +438,8 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
                     print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
 
         else:
-            distr_a_states = a_states    
+            distr_a_states = a_states 
+            
         H_a=calculate_entropy(distr_a_states,distr_a)
             
         ##----------------
@@ -460,6 +461,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
                     print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
         else:
             distr_b_states = b_states
+            
         H_b=calculate_entropy(distr_b_states,distr_b) 
         
         ##----------------
@@ -488,7 +490,8 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
             
             else:
                 distr_c_states = c_states
-            H_c=calculate_entropy(distr_c_states,distr_c)
+        
+        H_c=calculate_entropy(distr_c_states,distr_c)
     
         ##----------------
         ab_joint_states= distr_a_states + distr_b_states
