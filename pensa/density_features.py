@@ -353,7 +353,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     if write is True:
         if not os.path.exists('atom_features/'):
             os.makedirs('atom_features/')
-        filename= 'atom_features/PocketFrequencies.txt'
+        filename= 'atom_features/'+element+'PocketFrequencies.txt'
         with open(filename, 'w') as output:
             for row in atom_frequencies:
                 output.write(str(row)[1:-1] + '\n')
