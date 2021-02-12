@@ -154,6 +154,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
+            ##3.5 radius based off of length of hydrogen bonds. Water can in 
+            ##theory move 3.5 angstr and still maintain the same interactions
             radius = ' 3.5'
             atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] + radius).indices
             counting.append(atomgroup_IDS)
@@ -195,6 +197,9 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
 
         water_frequencies.append([water_ID,atom_location,water_pocket_occupation_frequency])
 
+        print('Completed water no: ',wat_no)
+        print(water_frequencies[-1])
+        
         ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
         if write is True:
             if not os.path.exists('water_features/'):
@@ -226,21 +231,21 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
                     
-    if pdb_vis is True:
-        u_pdb = mda.Universe(pdb_outname)
-        u_pdb.add_TopologyAttr('tempfactors')
-        # Write values as beta-factors ("tempfactors") to a PDB file
-        for res in range(len(water_frequencies)):
-            #scale the water resid by the starting resid
-            water_resid = len(u_pdb.residues) - top_waters + res
-            u_pdb.residues[water_resid].atoms.tempfactors = water_frequencies[res][2]
-        u_pdb.atoms.write(pdb_outname)
-
-    if write is True:
-        filename= 'water_features/' + filename_write_out + 'WaterPocketFrequencies.txt'
-        with open(filename, 'w') as output:
-            for row in water_frequencies:
-                output.write(str(row)[1:-1] + '\n')
+        # if pdb_vis is True:
+            u_pdb = mda.Universe(pdb_outname)
+            u_pdb.add_TopologyAttr('tempfactors')
+            # Write values as beta-factors ("tempfactors") to a PDB file
+            for res in range(len(water_frequencies)):
+                #scale the water resid by the starting resid
+                water_resid = len(u_pdb.residues) - wat_no-1 + res
+                u_pdb.residues[water_resid].atoms.tempfactors = water_frequencies[res][-1]
+            u_pdb.atoms.write(pdb_outname)
+        
+        if write is True:
+            filename= 'water_features/' + filename_write_out + 'WaterPocketFrequencies.txt'
+            with open(filename, 'w') as output:
+                for row in water_frequencies:
+                    output.write(str(row)[1:-1] + '\n')
             
     return water_frequencies
 
@@ -254,7 +259,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = filename_write_out+"_IonSites.pdb"
+        pdb_outname = filename_write_out+"_"+element+"_IonSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
     
@@ -305,8 +310,10 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         for i in tqdm(range(len(u.trajectory))):       
         # for i in tqdm(range(100)):       
             u.trajectory[i]
+            radius= ' 2.5'
+            ##radius is based off of hydrogen bond length between Na and oxygen
             ##list all water resids within sphere of radius 2 centered on water prob density maxima
-            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +' 2').indices)
+            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +radius).indices)
             ##select only those resids that have all three atoms within the water pocket
             if len(atomgroup_IDS)==0:
                 atomgroup_IDS=[-1]
@@ -317,7 +324,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         atom_location = coords[atom_no] + g.origin
 
         atom_frequencies.append([atom_ID,atom_location,pocket_occupation_frequency])
-
+        print('Completed atom no: ',atom_no)
+        print(atom_frequencies[-1])
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
         if pdb_vis is True:
@@ -340,23 +348,23 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
             
-    if pdb_vis is True:
-        u_pdb = mda.Universe(pdb_outname)
-        
-        u_pdb.add_TopologyAttr('tempfactors')
-        # Write values as beta-factors ("tempfactors") to a PDB file
-        for res in range(len(atom_frequencies)):
-            atom_resid = len(u_pdb.residues) - top_atoms + res
-            u_pdb.residues[atom_resid].atoms.tempfactors = atom_frequencies[res][2]
-        u_pdb.atoms.write(pdb_outname)
-
-    if write is True:
-        if not os.path.exists('atom_features/'):
-            os.makedirs('atom_features/')
-        filename= 'atom_features/'+element+'PocketFrequencies.txt'
-        with open(filename, 'w') as output:
-            for row in atom_frequencies:
-                output.write(str(row)[1:-1] + '\n')
+        # if pdb_vis is True:
+            u_pdb = mda.Universe(pdb_outname)
+            
+            u_pdb.add_TopologyAttr('tempfactors')
+            # Write values as beta-factors ("tempfactors") to a PDB file
+            for res in range(len(atom_frequencies)):
+                atom_resid = len(u_pdb.residues) - atom_no-1 + res
+                u_pdb.residues[atom_resid].atoms.tempfactors = atom_frequencies[res][-1]
+            u_pdb.atoms.write(pdb_outname)
+    
+        if write is True:
+            if not os.path.exists('atom_features/'):
+                os.makedirs('atom_features/')
+            filename= 'atom_features/'+element+'PocketFrequencies.txt'
+            with open(filename, 'w') as output:
+                for row in atom_frequencies:
+                    output.write(str(row)[1:-1] + '\n')
 
     return atom_frequencies
 
