@@ -36,8 +36,8 @@ if __name__ == "__main__":
     # -- FEATURES --
 
     # Load Features 
-    feat_a, data_a = get_features(args.ref_file_a, args.trj_file_a, args.start_frame)
-    feat_b, data_b = get_features(args.ref_file_b, args.trj_file_b, args.start_frame)
+    feat_a, data_a = get_features(args.ref_file_a, args.trj_file_a, start_frame=args.start_frame)
+    feat_b, data_b = get_features(args.ref_file_b, args.trj_file_b, start_frame=args.start_frame)
     # Report dimensions
     print('Feature dimensions from', args.trj_file_a)
     for k in data_a.keys(): 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     vis = residue_visualization(names, jsd, args.ref_file_a, 
                                 args.out_plots+"_sc-torsions_jsd.pdf",
                                 args.out_vispdb+"_sc-torsions_jsd.pdb",
-                                y_label='max. JS dist. of BB torsions')
+                                y_label='max. JS dist. of SC torsions')
 
     # Save the per-residue data in a CSV file
     np.savetxt(args.out_results+'_sc-torsions_max-jsd-per-residue.csv', np.array(vis).T,
