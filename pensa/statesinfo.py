@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@author: neilthomson
+@author: Neil J Thomson
 """
 
 import numpy as np
@@ -20,26 +20,56 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
 
-"""
-FUNCTIONS
-"""
 
-#CHECK IF VALUE IS BETWEEN X AND Y
+
 def check(value,x,y):
+    """
+    Check if a value is between x and y
+
+    Parameters
+    ----------
+    value : float
+        Value of interest.
+    x : float
+        Limit x.
+    y : float
+        Limit y.
+
+    Returns
+    -------
+    int
+        Numerical bool if value is between limits x and y.
+
+    """
     if x <= value <= y:
         return 1
     else:
         return 0
     
 
-#CORRECTING FOR THE PERIODICITY OF ANGLES
 def periodic_correction(angle1):
+    """
+    Correcting for the periodicity of angles in radians. This ensures state 
+    clustering defines states that span over the -pi, pi boundary as one state. 
+    Waters featurized using PENSA are assigned dscrete state of 10000.0 for 
+    representation of pocket occupancy, these values are ignored within the 
+    periodic correction so that only the water orientation periodicity is handled
+    
+    
+    Parameters
+    ----------
+    angle1 : list
+        Univariate distribution for a specific feature.
+
+    Returns
+    -------
+    new_dist : list
+        Periodically corrected distribution.
+
+    """
     new_dist=angle1.copy()
-    ##removing any discrete states for water occupancy 
     continuous_angles = [i for i in new_dist if i != 10000.0]
-    ##indexing all the continuous distribution angles
     index_cont_angles = [i for i, x in enumerate(new_dist) if x != 10000.0]      
-    ##generating a histogram of the chi angles
     heights=np.histogram(continuous_angles, bins=90, density=True)
     ##if the first bar height is not the minimum bar height
     ##then find the minimum bar and shift everything before that bar by 360
@@ -57,12 +87,46 @@ def periodic_correction(angle1):
 
 
 def import_distribution(simulation_folder, file_name):
-    dists = np.genfromtxt(simulation_folder + file_name, dtype=float, delimiter=",")
+    """
+    Import data written to a txt file.
+
+    Parameters
+    ----------
+    simulation_folder : str
+        Path to the folder containing files for import.
+    file_name : str
+        Name of the file within the simulation_folder to be imported.
+
+    Returns
+    -------
+    dists : array
+        Array of the file data.
+
+    """
+    dists = np.loadtxt(simulation_folder + file_name,  delimiter=",")
     return dists
     
     
 # this function makes sure that the two simulations are the same length
 def match_sim_lengths(sim1,sim2):
+    """
+    Make two lists the same length by truncating the longer list to match.
+
+    Parameters
+    ----------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    Returns
+    -------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    """
     if len(sim1)!=len(sim2):
         if len(sim1)>len(sim2):
             sim1=sim1[0:len(sim2)]
@@ -72,12 +136,49 @@ def match_sim_lengths(sim1,sim2):
         
 
 def get_filenames(folder):  
+    """
+    Obtain all the names of the files within a certain folder.
+
+    Parameters
+    ----------
+    folder : str
+        Location of the folder to obtain filenames.
+
+    Returns
+    -------
+    files : list of str
+        All filenames within folder.
+
+    """
     files = [f.split(folder)[1] for f in glob.glob(folder + "*", recursive=True)]
     return files
     
 
 #smoothing the kde data so that the extrema can be found without any of the small noise appearing as extrema
 def smooth(x,window_len,window=None):
+    """
+    
+
+    Parameters
+    ----------
+    x : list
+        Distribution to be smoothed.
+    window_len : int
+        number of bins to smooth over.
+    window : str, optional
+        Type of window to use for the smoothing. The default is None=Hanning.
+
+    Raises
+    ------
+    ValueError
+        If window argument is not recognised.
+
+    Returns
+    -------
+    list
+        Smoothed distribution.
+
+    """
     if window is None:
         window_type='hanning'
     if x.ndim != 1:
@@ -99,6 +200,22 @@ def smooth(x,window_len,window=None):
 
 #FINDING THE NEAREST NEIGHBOUR FUNCTION
 def find_nearest(array, value):
+    """
+    Find the nearest value in an array to an arbitrary reference value.
+
+    Parameters
+    ----------
+    array : array
+        
+    value : float
+        Reference value for array.
+
+    Returns
+    -------
+    float
+        Closest value to reference value in array.
+
+    """
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
@@ -106,7 +223,25 @@ def find_nearest(array, value):
 
 #GAUSSIAN FUNCTIONS
 def gauss(x, x0, sigma, a):
-    """ Gaussian function: """
+    """
+    Gaussian fuctions to fit the distribution x.
+
+    Parameters
+    ----------
+    x : list
+        The x-axis distribution over which the feature space spans.
+    x0 : float
+        Mean value.
+    sigma : float
+        Sigma of the distribution, estimated from the FWHM.
+    a : float
+        Amplitude/maxima of the distribution.
+
+    Returns
+    -------
+    Gaussian distribution with the corresponding sigma, mean and amplitude.
+
+    """
     return abs(a*np.exp(-(x-x0)**2/(2*sigma**2)))
 def bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
     """ Two gaussians """
@@ -127,21 +262,40 @@ def septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigm
     """ Seven gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)    
 def octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
-    """ Seven gaussians """
+    """ Eight gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)    
 def nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
-    """ Seven gaussians """
+    """ Nine gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)      
 def decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
-    """ Seven gaussians """
+    """ Ten gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)+gauss(x,mu10,sigma10,A10)        
 
 
 
 
 
-#PRINT K CLOSEST VALUES TO SPECIFIED VALUE
 def printKclosest(arr,n,x,k): 
+    """
+    Print K closest values to a specified value. 
+
+    Parameters
+    ----------
+    arr : list
+        The distribution of values.
+    n : int
+        Search through the first n values of arr for k closest values.
+    x : float
+        The reference value for which the closest values are sought.
+    k : int
+        Number of closest values desired.
+
+    Returns
+    -------
+    a : list
+        The closest k values to x.
+
+    """
     a=[]
     # Make a max heap of difference with  
     # first k elements.  
@@ -168,20 +322,58 @@ def printKclosest(arr,n,x,k):
         a.append(str("{} ".format(arr[q])))
     return a
 
-## Gaussian integral for evaluating state probabilities
 def integral(x, mu, sigma, A):
+    """
+    Gaussian integral for evaluating state probabilities. Integration between
+    negative infinity and x.
+
+    Parameters
+    ----------
+    x : float
+        Upper limit for integral.
+    mu : float
+        Gaussian mean.
+    sigma : float
+        Gaussian sigma.
+    A : float
+        Gaussian amplitude.
+
+    Returns
+    -------
+    integral : float
+        Area under Gaussian from negative infinity to x.
+
+    """
     integral = (A/2) * (1 + math.erf((x - mu) / (sigma * np.sqrt(2))))
     return integral
 
-## obatining the gaussians that fit the distribution
-## bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
-## smoothing is chosen based on 95% significance level (i.e. 0.05*binnumber) 
+
 def get_gaussian_fit(distribution, gauss_bin, gauss_smooth):    
+    """
+    Obtaining the gaussians to fit the distribution into a Gaussian mix. 
+    Bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
+
+    Parameters
+    ----------
+    distribution : list
+        Distribution of interest for the fitting.
+    gauss_bin : int
+        Bin the distribution into gauss_bin bins.
+    gauss_smooth : int
+        Smooth the distribution according to a Hanning window length of gauss_smooth.
+
+    Returns
+    -------
+    gaussians : list
+        y-axis values for the Gaussian distribution.
+    xline : list
+        x-axis values for the Gaussian distribution.
+
+    """
     histo=np.histogram(distribution, bins=gauss_bin, density=True)
     distributionx=smooth(histo[1][0:-1],gauss_smooth)
     ##this shifts the histo values down by the minimum value to help with finding a minimum
     distributiony=smooth(histo[0]-min(histo[0]),gauss_smooth)
-    ##getting an array of all the maxima indices
     maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
     ##the maxima may be an artifact of undersampling
     ##this grabs only the maxima that correspond to a density greater than the cutoff
@@ -194,8 +386,7 @@ def get_gaussian_fit(distribution, gauss_bin, gauss_smooth):
     ##number of closest neighbours
     ##setting for the sigma finding function
     noc=28
-    ##for all the extrema, find the 'noc' yval 
-    ##closest to half max yval
+    ##for all the extrema, find the 'noc' yval closest to half max yval
     ##this is to find the edges of the gaussians for calculating sigma
     sig_vals=[]
     for extrema in corrected_extrema:
@@ -240,8 +431,32 @@ def get_gaussian_fit(distribution, gauss_bin, gauss_smooth):
     return gaussians, xline
 
 
-# OBTAINING THE GAUSSIAN INTERSECTS
 def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=None):
+    """
+    Obtain the intersects of a mixture of Gaussians which have been obtained
+    from decomposing a distribution into Gaussians. Additional state limits are
+    added at the beginning and end of the distribution.
+
+    Parameters
+    ----------
+    gaussians : list of lists
+        A list of X gaussians.
+    distribution : list
+        The distribution that Gaussians have been obtained from.
+    xline : list
+        The x-axis linespace that the distribution spans.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is None.
+    write_name : str, optional
+        Filename for write_plots. The default is None.
+
+
+    Returns
+    -------
+    all_intersects : list
+        All the Gaussian intersects.
+
+    """
     ##adding the minimum angle value as the first boundary
     all_intersects=[min(distribution)]
     mean_gauss_xval=[]
@@ -291,11 +506,35 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
     return all_intersects
     
 
-##this function requires a distribution to cluster/discretize into states
-##The function handles both residue angle distributions and water orientation/occupancy
-##distributions. For waters, the assignment of an additional non-angular state is performed if
-## changes in pocket occupancy occur.
+
 def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):    
+    """
+    Cluster a distribution into discrete states with well-defined limits.
+    The function handles both residue angle distributions and water 
+    distributions. For waters, the assignment of an additional non-angular 
+    state is performed if changes in pocket occupancy occur. The clustering
+    requires that the distribution can be decomposed to a mixture of Gaussians. 
+
+    Parameters
+    ----------
+    distr : list
+        Distribution for specific feature.
+    gauss_bins : int, optional
+        Number of histogram bins to assign for the clustering algorithm. 
+        The default is 120.
+    gauss_smooth : int, optional
+        Number of bins to perform smoothing over. The default is 10.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is None.
+    write_name : str, optional
+        Filename for write_plots. The default is None.
+
+    Returns
+    -------
+    list
+        State intersects for each cluster in numerical order.
+
+    """
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
@@ -309,27 +548,38 @@ def determine_state_limits(distr, gauss_bins=120, gauss_smooth=10, write_plots=N
     return list(order_intersect)
 
 def calculate_entropy(state_limits,distribution_list):
+    """
+    Calculate the Shannon entropy of a distribution as the summation of all 
+    -p*log(p) where p refers to the probability of a conformational state. 
+    
+    Parameters
+    ----------
+    state_limits : list of lists
+        A list of values that represent the limits of each state for each
+        distribution.
+    distribution_list : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+
+    Returns
+    -------
+    entropy : float
+        The Shannon entropy value 
+
+    """
     ## subtract 1 since number of partitions = number of states - 1
     mut_prob=np.zeros(([len(state_limits[i])-1 for i in range(len(state_limits))]))     
-    ##obtaining the entropy
     entropy=0
     ##iterating over every multidimensional index in the array
     it = np.nditer(mut_prob, flags=['multi_index'])
     while not it.finished:
-        ##grabbing the indices of each element in the matrix
         arrayindices=list(it.multi_index)
-        ##making an array of the state occupancy of each distribution
         limit_occupancy_checks=np.zeros((len(arrayindices), len(distribution_list[0])))
         for i in range(len(arrayindices)):
-            ##obtaining the limits of each state 
-            ##in the identified array position            
             limits=[state_limits[i][arrayindices[i]],state_limits[i][arrayindices[i]+1]]
-            ##grabbing the distribution that the limits corresponds to
             distribution=distribution_list[i]
-            ##checking the occupancy of this state with the distribution
             for j in range(len(distribution)):
                 limit_occupancy_checks[i][j]=check(distribution[j],limits[0],limits[1]) 
-        ##calculating the probability as a function of the occupancy
         mut_prob[it.multi_index]=sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
         ##calculating the entropy as the summation of all -p*log(p) 
         if mut_prob[it.multi_index] != 0:
@@ -341,11 +591,12 @@ def calculate_entropy(state_limits,distribution_list):
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
                   gauss_bins=120, gauss_smooth=10, write_plots=None, write_name=None):
+ 
         
     try:       
         ##calculating the entropy for set_distr_a
         ## if set_distr_a only contains one distributions
-        if any(isinstance(i, list) for i in set_distr_a)==0:
+        if np.array(set_distr_a).ndim==1:
             distr_a=[periodic_correction(set_distr_a)]
         ## else set_distr_a is a nested list of multiple distributions (bivariate)
         else:
@@ -375,7 +626,7 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
             distr_b_states= [[0,1,2]]  
             
         else:
-            if any(isinstance(i, list) for i in set_distr_b)==0:
+            if np.array(set_distr_b).ndim==1:
                 distr_b=[periodic_correction(set_distr_b)]
             else:
                 distr_b=[periodic_correction(i) for i in set_distr_b]
@@ -418,10 +669,11 @@ def calculate_ssi(set_distr_a, set_distr_b=None, a_states=None, b_states=None,
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b_states=None,
                     c_states=None, gauss_bins=120, gauss_smooth=10, write_plots=None,write_name=None):
+
         
     try:
         ##calculating the entropy for set_distr_a
-        if any(isinstance(i, list) for i in set_distr_a)==0:
+        if np.array(set_distr_a).ndim==1:
             distr_a=[periodic_correction(set_distr_a)]
         else:
             distr_a=[periodic_correction(i) for i in set_distr_a]
@@ -444,7 +696,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
             
         ##----------------
         ##calculating the entropy for set_distr_b
-        if any(isinstance(i, list) for i in set_distr_b)==0:
+        if np.array(set_distr_b).ndim==1:
             distr_b=[periodic_correction(set_distr_b)]
         else:
             distr_b=[periodic_correction(i) for i in set_distr_b]
@@ -472,7 +724,7 @@ def calculate_cossi(set_distr_a, set_distr_b, set_distr_c=None, a_states=None, b
             distr_c=[[0.5]*int(len(distr_a[0])/2) + [1.5]*int(len(distr_a[0])/2)]
             distr_c_states= [[0,1,2]]  
         else:
-            if any(isinstance(i, list) for i in set_distr_c)==0:
+            if np.array(set_distr_c).ndim==1:
                 distr_c=[periodic_correction(set_distr_c)]
             else:
                 distr_c=[periodic_correction(i) for i in set_distr_c]
