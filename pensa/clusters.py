@@ -18,26 +18,38 @@ def obtain_clusters(data, algorithm='kmeans',
     """
     Clusters the provided data.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data]
-        algorithm (string): The algorithm to use for the clustering. 
+    Parameters
+    ----------
+        data : float array)
+            Trajectory data. Format: [frames,frame_data]
+        algorithm : string) 
+            The algorithm to use for the clustering. 
             Options: kmeans, rspace. 
             Default: kmeans
-        num_clusters (int, optional): Number of clusters for k-means clustering. 
+        num_clusters : int, optional
+            Number of clusters for k-means clustering. 
             Default: 2.
-        min_dist (float, optional): Minimum distance for regspace clustering. 
+        min_dist : float, optional
+            Minimum distance for regspace clustering. 
             Default: 12.
-        max_iter (int, optional): Maximum number of iterations. 
+        max_iter : int, optional
+            Maximum number of iterations. 
             Default: 100.
-        plot (bool, optional): Create a plot. 
+        plot : bool, optional
+            Create a plot. 
             Default: True
-        saveas (str, optional): Name of the file in which to save the plot.
+        saveas : str, optional
+            Name of the file in which to save the plot.
             (only needed if "plot" is True)
         
-    Returns:
-        cidx (int array): Cluster indices for each frame.
-        total_wss (float): With-in-sum-of-squares (WSS).
-        centroids (float array): Centroids for all the clusters.
+    Returns
+    -------
+        cidx : int array
+            Cluster indices for each frame.
+        total_wss : float
+            With-in-sum-of-squares (WSS).
+        centroids :float array
+            Centroids for all the clusters.
     
     """
     
@@ -81,35 +93,53 @@ def obtain_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B
     """
     Clusters a combination of two data sets.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data]
-        data_b (float array): Trajectory data [frames,frame_data]
-        label_a (str, optional): Label for the plot.
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data]
+        data_b : float array
+            Trajectory data [frames,frame_data]
+        label_a : str, optional
+            Label for the plot.
             Default: Sim A.
-        label_b (str, optional): Label for the plot.
+        label_b : str, optional
+            Label for the plot.
             Default: Sim B.
-        start_frame (int): Frame from which the clustering data starts.
+        start_frame : int
+            Frame from which the clustering data starts.
             Default: 0.
-        algorithm (string): The algorithm to use for the clustering. 
+        algorithm : string
+            The algorithm to use for the clustering. 
             Options: kmeans, rspace. 
             Default: kmeans
-        num_clusters (int, optional): Number of clusters for k-means clustering. 
+        num_clusters : int, optional
+            Number of clusters for k-means clustering. 
             Default: 2.
-        min_dist (float, optional): Minimum distance for regspace clustering. 
+        min_dist : float, optional
+            Minimum distance for regspace clustering. 
             Default: 12.
-        max_iter (int, optional): Maximum number of iterations. 
+        max_iter : int, optional
+            Maximum number of iterations. 
             Default: 100.
-        plot (bool, optional): Create a plot. 
+        plot : bool, optional
+            Create a plot. 
             Default: True
-        saveas (str, optional): Name of the file in which to save the plot.
+        saveas : str, optional
+            Name of the file in which to save the plot.
             (only needed if "plot" is True)
         
-    Returns:
-        cidx (int array): Cluster indices for each frame.
-        cond (int array): Index of the simulation the data came frome.
-        oidx (int array): Index of each frame in the original simulation (taking into account cutoff)
-        total_wss (float): With-in-sum-of-squares (WSS).
-        centroids (float array): Centroids for all the clusters.
+    Returns
+    -------
+        cidx : int array
+            Cluster indices for each frame.
+        cond : int array
+            Index of the simulation the data came frome.
+        oidx : int array
+            Index of each frame in the original simulation (taking into account cutoff)
+        total_wss : float
+            With-in-sum-of-squares (WSS).
+        centroids : float array
+            Centroids for all the clusters.
            
     """
     
@@ -168,12 +198,18 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     """
     Writes a trajectory into a separate file for each cluster.
     
-    Args:
-        cluster_idx (int array): Cluster index for each frame.
-        top_file (str): Reference topology for the second trajectory. 
-        trj_file (str): Trajetory file from which the frames are picked.
-        out_name (str): Core part of the name of the output files.
-        start_frame (int, optional): Frame from which to start reading the trajectory.
+    Parameters
+    ----------
+        cluster_idx : int array
+            Cluster index for each frame.
+        top_file : str
+            Reference topology for the second trajectory. 
+        trj_file : str
+            Trajetory file from which the frames are picked.
+        out_name : str
+            Core part of the name of the output files.
+        start_frame : int, optional
+            Frame from which to start reading the trajectory.
         
     """
     
@@ -182,7 +218,7 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     protein = u.select_atoms('all')
     print('Number of frames in trajectory:',len(u.trajectory))
     print('Number of cluster indices:',len(cluster_idx))
-    
+    return_protein = []
     # Loop over clusters
     num_clusters = np.max(cluster_idx)+1
     for nr in range(num_clusters):
@@ -191,7 +227,8 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
             for ts in u.trajectory:
                 if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr: 
                     W.write(protein)
-    return
+                    return_protein.append(protein)
+    return return_protein
                     
 
 def wss_over_number_of_clusters(data, algorithm='kmeans', 
@@ -201,22 +238,32 @@ def wss_over_number_of_clusters(data, algorithm='kmeans',
     Calculates the within-sum-of-squares (WSS) for different numbers of clusters,
     averaged over several iterations.
     
-    Args:
-        data (float array): Trajectory data [frames,frame_data]
-        algorithm (string): The algorithm to use for the clustering. 
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data]
+        algorithm : string
+            The algorithm to use for the clustering. 
             Options: kmeans, rspace. 
             Default: kmeans
-        max_iter (int, optional): Maximum number of iterations. 
+        max_iter : int, optional
+            Maximum number of iterations. 
             Default: 100.
-        num_repeats (int, optional): Number of times to run the clustering for each number of clusters.
+        num_repeats : int, optional
+            Number of times to run the clustering for each number of clusters.
             Default: 5.
-        max_num_clusters (int, optional): Maximum number of clusters for k-means clustering. 
+        max_num_clusters : int, optional
+            Maximum number of clusters for k-means clustering. 
             Default: 12.
-        plot_file (str, optional): Name of the file to save the plot.
+        plot_file : str, optional
+            Name of the file to save the plot.
         
-    Returns:
-        all_wss (float array): WSS values for each number of clusters (starting at 2).
-        std_wss (float array): standard deviations of the WSS.
+    Returns
+    -------
+        all_wss : float array
+            WSS values for each number of clusters (starting at 2).
+        std_wss : float array
+            Standard deviations of the WSS.
         
     """
     
@@ -256,26 +303,40 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     Calculates the Within-Sum-of-Squares for different numbers of clusters,
     averaged over several iterations.
     
-    Args:
-        data_a (float array): Trajectory data [frames,frame_data]
-        data_b (float array): Trajectory data [frames,frame_data]
-        label_a (str, optional): Label for the plot.
-        label_b (str, optional): Label for the plot.
-        start_frame (int, optional): Frame from which the clustering data starts.
-        algorithm (string): The algorithm to use for the clustering. 
+    Parameters
+    ----------
+        data_a : float array
+            Trajectory data [frames,frame_data]
+        data_b : float array
+            Trajectory data [frames,frame_data]
+        label_a : str, optional
+            Label for the plot.
+        label_b : str, optional
+            Label for the plot.
+        start_frame : int, optional
+            Frame from which the clustering data starts.
+        algorithm : string
+            The algorithm to use for the clustering. 
             Options: kmeans, rspace. 
             Default: kmeans
-        max_iter (int, optional): Maximum number of iterations.
+        max_iter : int, optional
+            Maximum number of iterations.
             Default: 100.
-        num_repeats (int, optional): Number of times to run the clustering for each number of clusters.
+        num_repeats : int, optional
+            Number of times to run the clustering for each number of clusters.
             Default: 5.
-        max_num_clusters (int, optional): Maximum number of clusters for k-means clustering.
+        max_num_clusters : int, optional
+            Maximum number of clusters for k-means clustering.
             Default: 12.
-        plot_file (str, optional): Name of the file to save the plot.
+        plot_file : str, optional
+            Name of the file to save the plot.
         
-    Returns:
-        all_wss (float array): WSS values for each number of clusters (starting at 2).
-        std_wss (float array): standard deviations of the WSS.
+    Returns
+    -------
+        all_wss : float array
+            WSS values for each number of clusters (starting at 2).
+        std_wss : float array
+            Standard deviations of the WSS.
     
     """
     
@@ -307,4 +368,3 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     if plot_file: fig.savefig(plot_file)
     
     return all_wss, std_wss
-
