@@ -82,8 +82,9 @@ def pca_features(pca, features, num, threshold, plot_file=None):
         relevant = pca.feature_PC_correlation[:,i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for PC %i:"%(threshold, i+1))
         for j, ft in enumerate(features):
-            if relevant[j]: print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
-              test_corr.append(pca.feature_PC_correlation[j,i])
+            if relevant[j]:
+                print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
+                test_corr.append(pca.feature_PC_correlation[j,i])
         ax[i].plot(pca.feature_PC_correlation[:,i])
         ax[i].set_xlabel('feature index')
         ax[i].set_ylabel('correlation with PC%i'%(i+1))
