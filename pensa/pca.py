@@ -75,19 +75,23 @@ def pca_features(pca, features, num, threshold, plot_file=None):
         
     """
     # Plot the highest PC correlations and print relevant features
+    test_graph = []
+    test_corr = []
     fig,ax = plt.subplots(num,1,figsize=[4,num*3],dpi=300,sharex=True)
     for i in range(num):
         relevant = pca.feature_PC_correlation[:,i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for PC %i:"%(threshold, i+1))
         for j, ft in enumerate(features):
             if relevant[j]: print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
+              test_corr.append(pca.feature_PC_correlation[j,i])
         ax[i].plot(pca.feature_PC_correlation[:,i])
         ax[i].set_xlabel('feature index')
         ax[i].set_ylabel('correlation with PC%i'%(i+1))
+        test_graph.append(pca.feature_PC_correlation[:,i])
     fig.tight_layout()
     # Save the figure to a file
     if plot_file: fig.savefig(plot_file,dpi=300)
-    return 
+    return test_graph, test_corr
     
     
 def project_on_pc(data, ev_idx, pca=None):
@@ -149,10 +153,13 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     # Define the MDAnalysis trajectories from where the frames come
     u = mda.Universe(top,trj)
     a = u.select_atoms('all')
+    return_str = []
+    all_proj = []
     # Loop through the principal components
     for evi in range(num_pc):
         # Project the combined data on the principal component
         proj = project_on_pc(data,evi,pca=pca)
+        all_proj.append(proj)
         # Sort everything along the projection onto the PC
         sort_idx  = np.argsort(proj)
         proj_sort = proj[sort_idx] 
@@ -161,8 +168,9 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
         with mda.Writer(out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
             for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
-                W.write(a)
-    return
+                W.write(a)     
+                return_str.append(a)
+    return return_str, all_proj
 
 
 def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_pc=3):
@@ -206,6 +214,7 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
     # ... and select all atoms
     aa = ua.select_atoms('all')
     ab = ub.select_atoms('all')
+    return_str = []
     # Loop over principal components.
     for evi in range(num_pc):
         # Project the combined data on the principal component
@@ -221,10 +230,12 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ua.trajectory[oidx_sort[i]]
                     W.write(aa)
+                    return_str.append(aa)
                 elif cond_sort[i] == 0: # arrestin bound
                     ts = ub.trajectory[oidx_sort[i]]
                     W.write(ab)
-    return
+                    return_str.append(ab)
+    return return_str
 
 
 def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_pc=3):
@@ -308,6 +319,7 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
     """
     # Start the figure    
     fig,ax = plt.subplots(num, 2, figsize=[8,3*num], dpi=300)
+    val = []
     # Loop over PCs
     for evi in range(num):
         # Calculate values along PC for each frame
@@ -327,11 +339,12 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
         if label_a and label_b:
             ax[evi,0].legend()
             ax[evi,1].legend()
+        val.append([proj_a, proj_b])
     fig.tight_layout()
     # Save the figure
     if saveas is not None:
         fig.savefig(saveas, dpi=300)
-    return
+    return val
     
     
 def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
@@ -381,4 +394,3 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
     if saveas is not None:
         fig.savefig(saveas, dpi=300)
     return
-
