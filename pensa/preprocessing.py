@@ -58,7 +58,6 @@ def load_selection(sel_file, sel_base=''):
             sel_string += range_to_string(*r)
     return sel_string
 
-
 def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
                         rename_segments=None ):
     """
@@ -83,6 +82,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
     # Read the reference+PDB files and extract selected parts.
     u = mda.Universe(ref,pdb)
     selection = u.select_atoms(sel_string)
+    num_at = selection.n_atoms
     if rename_segments is not None:
         for s in selection.segments: 
             s.segid = rename_segments
@@ -95,7 +95,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
             selection = u.select_atoms(sel_string)
             for ts in u.trajectory[start_frame:]:
                 W.write(selection)
-    return
+    return num_at
 
 
 def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0, verbose=False):
@@ -129,7 +129,7 @@ def extract_coordinates_combined(ref, trj, sel_string, out_name, start_frame=0, 
             selection = u.select_atoms(s)
             for ts in u.trajectory[start_frame:]:
                 W.write(selection)
-    return
+    return num_at
 
 
 def merge_coordinates(ref_files, trj_files, out_name, segid=None):
@@ -181,7 +181,6 @@ def merge_coordinates(ref_files, trj_files, out_name, segid=None):
             W.write(c.atoms)
     return univ
 
-
 # -- Functions to download from online repositories
 
 
@@ -207,5 +206,3 @@ def download_from_gpcrmd(filename, folder):
     os.makedirs(folder, exist_ok=True)
     open(out, 'wb').write(req.content)
     return
-
-

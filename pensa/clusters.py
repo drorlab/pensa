@@ -218,7 +218,7 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     protein = u.select_atoms('all')
     print('Number of frames in trajectory:',len(u.trajectory))
     print('Number of cluster indices:',len(cluster_idx))
-    
+    return_protein = []
     # Loop over clusters
     num_clusters = np.max(cluster_idx)+1
     for nr in range(num_clusters):
@@ -227,7 +227,8 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
             for ts in u.trajectory:
                 if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr: 
                     W.write(protein)
-    return
+                    return_protein.append(protein)
+    return return_protein
                     
 
 def wss_over_number_of_clusters(data, algorithm='kmeans', 
@@ -367,4 +368,3 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     if plot_file: fig.savefig(plot_file)
     
     return all_wss, std_wss
-
