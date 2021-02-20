@@ -6,6 +6,15 @@ tutorial/vispdb/
 tutorial/pca/
 tutorial/clusters/
 tutorial/mor-data/
+tests/traj/
+tests/results/
+tests/plots/
+tests/vispdb/
+tests/pca/
+tests/clusters/
+tests/mor-data/
+*.ipynb
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
