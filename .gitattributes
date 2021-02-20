@@ -1,5 +1,6 @@
-# mark tutorial for language statistics
+# mark tutorials for language statistics
 tutorial/* linguist-documentation
+*.ipynb linguist-documentation
 
 # mark documentation for language statistics
 docs/* linguist-documentation
