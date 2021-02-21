@@ -6,13 +6,14 @@ tutorial/vispdb/
 tutorial/pca/
 tutorial/clusters/
 tutorial/mor-data/
-tests/traj/
-tests/results/
-tests/plots/
-tests/vispdb/
-tests/pca/
-tests/clusters/
-tests/mor-data/
+tests/test_data/traj/
+tests/test_data/results/
+tests/test_data/plots/
+tests/test_data/vispdb/
+tests/test_data/pca/
+tests/test_data/clusters/
+tests/test_data/mor-data/
+tests/test_data/MOR-*/.*.npz
 *.ipynb
 .DS_Store
 
