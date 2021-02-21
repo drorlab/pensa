@@ -11,4 +11,5 @@ dependencies:
   - pyemma 
   - mdshare 
   - MDAnalysis 
-  - cython 
+  - cython
+  - pip 
