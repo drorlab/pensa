@@ -246,35 +246,39 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
 
 def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
     
-    #obtaining the feature names
-    feature_names = feat[feature_type]
+    # Initialize the dictionaries.
+    feature_names = {}
+    features_data = {}
+    
+    feat_name_list = feat[feature_type]
     #obtaining the residue numbers 
-    res_numbers = [int(i.split()[-1]) for i in feature_names]
+    res_numbers = [int(feat_name.split()[-1]) for feat_name in feat_name_list]
     #grouping indices where feature refers to same residue
-    index_same_res = [list(np.where(np.array(res_numbers)==i)[0])
-                      for i in list(set(res_numbers))]   
+    index_same_res = [list(np.where(np.array(res_numbers)==seq_num)[0])
+                      for seq_num in list(set(res_numbers))]   
     #obtaining timeseries data for each residue
     multivar_res_timeseries_data=[]
-    for i in range(len(index_same_res)):
+    sorted_names = []
+    for residue in range(len(index_same_res)):
         feat_timeseries=[]
-        
-        for j in index_same_res[i]:
-            single_feat_timeseries = get_feature_timeseries(feat,data,feature_type,feature_names[j])
-            
+        for residue_dim in index_same_res[residue]:
+            single_feat_timeseries = get_feature_timeseries(feat,data,feature_type,feat_name_list[residue_dim])            
             feat_timeseries.append(list(single_feat_timeseries))
-        
         multivar_res_timeseries_data.append(feat_timeseries)
-        
+        resname= ''.join(feat_name_list[residue_dim].split()[-2:])
+        sorted_names.append(resname)
         if write is True:
             for subdir in [feature_type+'/']:
                 if not os.path.exists(subdir):
                     os.makedirs(subdir)
-            filename= feature_type+'/' + out_name + feature_names[j].split()[-2] + feature_names[j].split()[-1] + ".txt"
-            with open(filename, 'w') as output:
-                for row in feat_timeseries:
-                    output.write(str(row)[1:-1] + '\n')
+            filename= feature_type+'/' + out_name + resname + ".txt"
+            np.savetxt(filename, feat_timeseries, delimiter=',', newline='\n')
             
-    return multivar_res_timeseries_data
+    # return multivar_res_timeseries_data
+    feature_names[feature_type]=sorted_names
+    features_data[feature_type]=np.array(multivar_res_timeseries_data, dtype=object)
+    # Return the dictionaries.
+    return feature_names, features_data            
 
 
 
