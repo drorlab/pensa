@@ -152,7 +152,7 @@ def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
 
 ##make atomgroup mandatory
 def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None,
-                       grid_input=None, top_waters=30, write=None, out_name=None, pdb_vis=True):
+                       grid_input=None, top_waters=30, write=None, out_name=None, pdb_vis=None):
     """
     
 
@@ -182,6 +182,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
     """
     
+    if write_grid_as is not None or write is not None or pdb_vis is not None and out_name is None:
+        print('WARNING: You must provide out_name if writing out result.')
+    
+    
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
@@ -191,7 +195,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = out_name+"_WaterSites.pdb"
+        pdb_outname = out_name + "_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
 
@@ -347,7 +351,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element,
                      grid_input=None, grid_write=None, top_atoms=None, 
-                     write=None, out_name=None, pdb_vis=True):
+                     write=None, out_name=None, pdb_vis=None):
     """
     
 
@@ -378,7 +382,11 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         DESCRIPTION.
 
     """
-
+    
+    if grid_write is not None or write is not None or pdb_vis is not None and out_name is None:
+        print('WARNING: You must provide out_name if writing out result.')
+        
+        
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
@@ -388,7 +396,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = out_name+element+"_IonSites.pdb"
+        pdb_outname = out_name + element + "_IonSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
     
@@ -436,8 +444,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         print('\n')
 
         counting=[]
-        for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
             u.trajectory[i]
             radius= ' 2.5'
             ##radius is based off of hydrogen bond length between Na and oxygen
