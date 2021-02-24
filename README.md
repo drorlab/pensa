@@ -19,6 +19,11 @@ All functionality is available as a python package (installation see below). For
 
 The [documentation](https://pensa.readthedocs.io/en/latest/) is still under construction. For now, please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
 
+## NEW: Demo on Google Colab
+We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
+
 
 ## Installation
 
@@ -49,7 +54,7 @@ To use the example scripts or tutorial folder, you'll have to download them from
 
 Within the environment created above, execute:
 
-    git clone https://github.com/drorlab/pensa.git
+    git clone https://github.com/drorlab/pensa.git  
     cd pensa
     pip install -e . 
 
