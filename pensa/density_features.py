@@ -235,8 +235,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         counting=[]
-        # for frame_no in tqdm(range(len(u.trajectory))):       
-        for frame_no in tqdm(range(100)):       
+        for frame_no in tqdm(range(len(u.trajectory))):       
+        # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
             ##3.5 radius based off of length of hydrogen bonds. Water can in 
@@ -249,8 +249,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        for frame_no in tqdm(range(100)):       
-        # for frame_no in tqdm(range(len(u.trajectory))):   
+        # for frame_no in tqdm(range(100)):       
+        for frame_no in tqdm(range(len(u.trajectory))):   
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             ##extracting the water coordinates for inside the pocket
@@ -444,8 +444,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         print('\n')
 
         counting=[]
-        # for i in tqdm(range(len(u.trajectory))):       
-        for i in tqdm(range(100)):       
+        for i in tqdm(range(len(u.trajectory))):       
+        # for i in tqdm(range(100)):       
             u.trajectory[i]
             radius= ' 2.5'
             ##radius is based off of hydrogen bond length between Na and oxygen
