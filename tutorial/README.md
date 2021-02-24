@@ -6,7 +6,7 @@ This repository provides a python library and several ready-to-use [python scrip
 We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/).
 Additionally, we host an animated version on Google Colab.
 
-[![Open Demo In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa?usp=sharing\)
+[(https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa?usp=sharing\)
 
 
 ## Rhodopsin Complexes
