@@ -3,7 +3,7 @@
 """
 Created on Mon Dec 14 20:38:48 2020
 
-@author: neil
+@author: Neil J Thomson
 
 This script is designed to obtain a distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
@@ -29,10 +29,37 @@ from MDAnalysis.analysis import align
 
 
 def copy_coords(ag):
+    """
+    
+
+    Parameters
+    ----------
+    ag : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     return ag.positions.copy()
 
 ## convert the cosine of the dipole moment into spherical coordinates 
 def get_dipole(water_atom_positions):
+    """
+    
+
+    Parameters
+    ----------
+    water_atom_positions : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
 
     ##obtaining the coordinates for each of the individual atoms
     Ot0 = np.array(water_atom_positions[0])
@@ -86,6 +113,28 @@ def local_maxima_3D(data, order=3):
 
 
 def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
+    """
+    
+
+    Parameters
+    ----------
+    structure_input : TYPE
+        DESCRIPTION.
+    xtc_input : TYPE
+        DESCRIPTION.
+    atomgroup : TYPE
+        DESCRIPTION.
+    grid_wat_model : TYPE
+        DESCRIPTION.
+    write : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    g : TYPE
+        DESCRIPTION.
+
+    """
  
     u = mda.Universe(structure_input, xtc_input)
     density_atomgroup = u.select_atoms("name " + atomgroup)
@@ -102,16 +151,47 @@ def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
 
 
 ##make atomgroup mandatory
-def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=None,
-                       grid_input=None, top_waters=30, write=None, pdb_vis=True):
+def get_water_features(structure_input, xtc_input, atomgroup, grid_write=None,
+                       grid_input=None, top_waters=30, write=None, out_name=None, pdb_vis=True):
+    """
+    
+
+    Parameters
+    ----------
+    structure_input : TYPE
+        DESCRIPTION.
+    xtc_input : TYPE
+        DESCRIPTION.
+    atomgroup : TYPE
+        DESCRIPTION.
+    grid_wat_model : TYPE, optional
+        DESCRIPTION. The default is None.
+    grid_input : TYPE, optional
+        DESCRIPTION. The default is None.
+    top_waters : TYPE, optional
+        DESCRIPTION. The default is 30.
+    write : TYPE, optional
+        DESCRIPTION. The default is None.
+    pdb_vis : TYPE, optional
+        DESCRIPTION. The default is True.
+
+    Returns
+    -------
+    water_frequencies : TYPE
+        DESCRIPTION.
+
+    """
+    
+    # Initialize the dictionaries.
+    feature_names = {}
+    features_data = {}
+    
     
     u = mda.Universe(structure_input, xtc_input)
 
-    filename_write_out=structure_input.split(os.sep)[-1][:-4]
-
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = filename_write_out+"_WaterSites.pdb"
+        pdb_outname = out_name+"_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
 
@@ -120,9 +200,9 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
-        if grid_wat_model is not None:
-            D.density.convert_density(grid_wat_model)
-            D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
+        if grid_write is not None:
+            D.density.convert_density(grid_write)
+            D.density.export(out_name + atomgroup + "_density.dx", type="double")
             grid_input = atomgroup + "_density.dx"
         g = D.density
     else:
@@ -132,9 +212,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
     xyz, val = local_maxima_3D(g.grid)
     ##negate the array to get descending order from most prob to least prob
     val_sort = np.argsort(-1*val.copy())
-    coords = [xyz[i] for i in val_sort]    
+    coords = [xyz[max_val] for max_val in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
-    water_frequencies=[]
+    water_information=[]
+    water_dists=[]
 
     if top_waters > len(coords):
         top_waters = len(coords)  
@@ -150,8 +231,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
 
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         counting=[]
-        for frame_no in tqdm(range(len(u.trajectory))):       
-        # for frame_no in tqdm(range(100)):       
+        # for frame_no in tqdm(range(len(u.trajectory))):       
+        for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
             ##3.5 radius based off of length of hydrogen bonds. Water can in 
@@ -164,8 +245,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        # for frame_no in tqdm(range(100)):       
-        for frame_no in tqdm(range(len(u.trajectory))):   
+        for frame_no in tqdm(range(100)):       
+        # for frame_no in tqdm(range(len(u.trajectory))):   
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             ##extracting the water coordinates for inside the pocket
@@ -190,25 +271,32 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
                 psilist.append(10000.0)
                 philist.append(10000.0)
 
-        water_out = [psilist, philist]        
+        water_out = [psilist, philist]
+        water_dists.append(water_out)        
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
-        atom_location = coords[wat_no] + g.origin
+        atom_location = list(coords[wat_no] + g.origin)
 
-        water_frequencies.append([water_ID,atom_location,water_pocket_occupation_frequency])
+        water_information.append([water_ID,atom_location,water_pocket_occupation_frequency])
 
         print('Completed water no: ',wat_no)
-        print(water_frequencies[-1])
+        print(water_information[-1])
         
         ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
         if write is True:
             if not os.path.exists('water_features/'):
                 os.makedirs('water_features/')
-            filename= 'water_features/' + filename_write_out + water_ID + '.txt'
+                
+            filename= 'water_features/' + out_name + water_ID + '.txt'
             with open(filename, 'w') as output:
                 for row in water_out:
                     output.write(str(row)[1:-1] + '\n')
 
+            filename= 'water_features/' + out_name + 'WaterPocketInformation.txt'
+            with open(filename, 'w') as output:
+                for row in water_information:
+                    output.write(str(row)[1:-1] + '\n')
+                    
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
         if pdb_vis is True:
@@ -231,35 +319,76 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_wat_model=Non
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
                     
-        # if pdb_vis is True:
             u_pdb = mda.Universe(pdb_outname)
             u_pdb.add_TopologyAttr('tempfactors')
             # Write values as beta-factors ("tempfactors") to a PDB file
-            for res in range(len(water_frequencies)):
+            for res in range(len(water_information)):
                 #scale the water resid by the starting resid
                 water_resid = len(u_pdb.residues) - wat_no-1 + res
-                u_pdb.residues[water_resid].atoms.tempfactors = water_frequencies[res][-1]
+                u_pdb.residues[water_resid].atoms.tempfactors = water_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
         
-        if write is True:
-            filename= 'water_features/' + filename_write_out + 'WaterPocketFrequencies.txt'
-            with open(filename, 'w') as output:
-                for row in water_frequencies:
-                    output.write(str(row)[1:-1] + '\n')
+    
+    # Add water pocket orientations
+    feature_names['WaterPocket_Distr']= [watinf[0] for watinf in water_information]
+    features_data['WaterPocket_Distr']= np.array(water_dists, dtype=object)
+    
+    # Add water pocket frequencies
+    feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
+    features_data['WaterPocket_Occup']= np.array([watinf[2] for watinf in water_information], dtype=object)
+    
+    # Add water pocket locations
+    feature_names['WaterPocket_xyz']= [watinf[0] for watinf in water_information]
+    features_data['WaterPocket_xyz']= np.array([watinf[1] for watinf in water_information], dtype=object)
+    
+    # Return the dictionaries.
+    return feature_names, features_data
             
-    return water_frequencies
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element,
-                     grid_input=None, top_atoms=None, write=None, pdb_vis=True,grid_write=None):
+                     grid_input=None, grid_write=None, top_atoms=None, 
+                     write=None, out_name=None, pdb_vis=True):
+    """
+    
+
+    Parameters
+    ----------
+    structure_input : TYPE
+        DESCRIPTION.
+    xtc_input : TYPE
+        DESCRIPTION.
+    atomgroup : TYPE
+        DESCRIPTION.
+    element : TYPE
+        DESCRIPTION.
+    grid_input : TYPE, optional
+        DESCRIPTION. The default is None.
+    top_atoms : TYPE, optional
+        DESCRIPTION. The default is None.
+    write : TYPE, optional
+        DESCRIPTION. The default is None.
+    pdb_vis : TYPE, optional
+        DESCRIPTION. The default is True.
+    grid_write : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    atom_frequencies : TYPE
+        DESCRIPTION.
+
+    """
+
+    # Initialize the dictionaries.
+    feature_names = {}
+    features_data = {}
+    
 
     u = mda.Universe(structure_input, xtc_input)
-
-    filename_write_out=structure_input.split(os.sep)[-1][:-4]
-
     
     if pdb_vis is True:
         protein = u.select_atoms("protein")
-        pdb_outname = filename_write_out+"_"+element+"_IonSites.pdb"
+        pdb_outname = out_name+element+"_IonSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
     
@@ -270,7 +399,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         D.run()
         if grid_write is not None:
             D.density.convert_density("Angstrom^{-3}")
-            D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
+            D.density.export(out_name + element + "_density.dx", type="double")
             grid_input = atomgroup + "_density.dx"
         g = D.density
     else:
@@ -289,10 +418,10 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     ##negate the array to get descending order from most prob to least prob
     val_sort = np.argsort(-1*val.copy())
     # values = [val[i] for i in val_sort]    
-    coords = [xyz[i] for i in val_sort]    
+    coords = [xyz[max_val] for max_val in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     
-    atom_frequencies=[]
+    atom_information=[]
     
     if top_atoms is None:
         top_atoms = len(coords)  
@@ -321,11 +450,11 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
 
         atom_ID = element + str(atom_no+1)
         pocket_occupation_frequency = 1 - counting.count(-1)/len(counting)    
-        atom_location = coords[atom_no] + g.origin
+        atom_location = list(coords[atom_no] + g.origin)
 
-        atom_frequencies.append([atom_ID,atom_location,pocket_occupation_frequency])
+        atom_information.append([atom_ID,atom_location,pocket_occupation_frequency])
         print('Completed atom no: ',atom_no)
-        print(atom_frequencies[-1])
+        print(atom_information[-1])
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
         if pdb_vis is True:
@@ -353,18 +482,26 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             
             u_pdb.add_TopologyAttr('tempfactors')
             # Write values as beta-factors ("tempfactors") to a PDB file
-            for res in range(len(atom_frequencies)):
+            for res in range(len(atom_information)):
                 atom_resid = len(u_pdb.residues) - atom_no-1 + res
-                u_pdb.residues[atom_resid].atoms.tempfactors = atom_frequencies[res][-1]
+                u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
     
         if write is True:
             if not os.path.exists('atom_features/'):
                 os.makedirs('atom_features/')
-            filename= 'atom_features/'+element+'PocketFrequencies.txt'
+            filename= 'atom_features/'+out_name+element+'PocketInformation.txt'
             with open(filename, 'w') as output:
-                for row in atom_frequencies:
+                for row in atom_information:
                     output.write(str(row)[1:-1] + '\n')
-
-    return atom_frequencies
-
+    
+    # Add atom pocket frequencies
+    feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
+    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information], dtype=object)
+    
+    # Add atom pocket locations
+    feature_names[element+'Pocket_xyz']= [atinfo[0] for atinfo in atom_information]
+    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information], dtype=object)
+    
+    # Return the dictionaries.
+    return feature_names, features_data
