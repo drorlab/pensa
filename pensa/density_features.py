@@ -151,7 +151,7 @@ def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
 
 
 ##make atomgroup mandatory
-def get_water_features(structure_input, xtc_input, atomgroup, grid_write=None,
+def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None,
                        grid_input=None, top_waters=30, write=None, out_name=None, pdb_vis=True):
     """
     
@@ -200,8 +200,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, grid_write=None,
         # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
         D = DensityAnalysis(density_atomgroup, delta=1.0)
         D.run()
-        if grid_write is not None:
-            D.density.convert_density(grid_write)
+        if write_grid_as is not None:
+            D.density.convert_density(write_grid_as)
             D.density.export(out_name + atomgroup + "_density.dx", type="double")
             grid_input = atomgroup + "_density.dx"
         g = D.density
