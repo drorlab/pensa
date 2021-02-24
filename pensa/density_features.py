@@ -7,7 +7,7 @@ Created on Mon Dec 14 20:38:48 2020
 
 This script is designed to obtain a distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
-For a water molecule to exist within a water pocket, all three water atoms must occupy the pocket. 
+For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket. 
 If there is ever an instance where two water molecules occupy the same pocket at the same time,
 then the water polarisation of the molecule ID that occupies the pocket most often is used.
 """
@@ -23,9 +23,9 @@ import os
 import biotite.structure as struc
 import biotite.structure.io as strucio
 from MDAnalysis.analysis.base import AnalysisFromFunction
-import numpy as np
 from MDAnalysis.coordinates.memory import MemoryReader
 from MDAnalysis.analysis import align
+from pensa.statesinfo import *
 
 
 def copy_coords(ag):
@@ -111,107 +111,106 @@ def local_maxima_3D(data, order=3):
 
     return coords, values
 
+def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
 
-def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
-    """
+    # # Before we extract the water densities, we need to first align the trajectories 
+    # # so that we can featurize water sites in both ensembles using the same coordinates
+    condition_a = mda.Universe(struc_a,xtc_a)
+    condition_b = mda.Universe(struc_b,xtc_b)
+    
+    align_xtc_name= struc_a[:-4] + 'aligned.xtc'    
+    
+    #align condition a to condition b
+    align.AlignTraj(condition_a,  # trajectory to align
+                    condition_b,  # reference
+                    select= 'name CA',  # selection of atoms to align
+                    filename= align_xtc_name,  # file to write the trajectory to
+                    match_atoms=True,  # whether to match atoms based on mass
+                    ).run()
+    
+def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name):
+    
+   
+    
+    # # # re-define the condition_a universe with the aligned trajectory 
+    condition_a = mda.Universe(struc_a, xtc_a)
+    condition_b = mda.Universe(struc_b, xtc_b)
+   
+    # # # We then combine the ensembles into one universe
+    Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
+    
+    # # # Extract the coordinates from the trajectories to add to the new universe
+    aligned_coords_a = AnalysisFromFunction(copy_coords,
+                                            condition_a.atoms).run().results
+    
+    aligned_coords_b = AnalysisFromFunction(copy_coords,
+                                            condition_b.atoms).run().results
+    
+    # # # The density needs to be formed from an even contribution of both conditions
+    # # # otherwise it will be unevely biased towards one condition.
+    # # # So we match the simulation lengths first
+    sim1_coords, sim2_coords = match_sim_lengths(aligned_coords_a,aligned_coords_b)
+    # # # Then we merge the coordinates into one system
+    merged_coords = np.hstack([sim1_coords,
+                               sim2_coords])
+    # # # We load in the merged coordinated into our new universe that contains
+    # # # the receptor in both conditions
+    Combined_conditions.load_new(merged_coords, format=MemoryReader)
+    
+    # # # We extract the density grid from the combined condition universe
+    density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
+    # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
+    D = DensityAnalysis(density_atomgroup, delta=1.0)
+    D.run()
+    D.density.convert_density(write_grid_as)
+    D.density.export(out_name + atomgroup +"_density.dx", type="double")
     
 
-    Parameters
-    ----------
-    structure_input : TYPE
-        DESCRIPTION.
-    xtc_input : TYPE
-        DESCRIPTION.
-    atomgroup : TYPE
-        DESCRIPTION.
-    grid_wat_model : TYPE
-        DESCRIPTION.
-    write : TYPE, optional
-        DESCRIPTION. The default is None.
-
-    Returns
-    -------
-    g : TYPE
-        DESCRIPTION.
-
-    """
+def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
  
-    u = mda.Universe(structure_input, xtc_input)
     density_atomgroup = u.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()
-    D.density.convert_density(grid_wat_model)
-    if write is not None:
-        D.density.export(structure_input[:-4] + atomgroup + "_density.dx", type="double")
-
     g = D.density
     
+    if write_grid_as is not None:
+        D.density.convert_density(write_grid_as)
+        D.density.export(out_name + atomgroup + "_density.dx", type="double")
+
     return g
+        
+        
+def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
+                       grid_input=None, write=None, write_grid_as=None, out_name=None):
 
-
-##make atomgroup mandatory
-def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None,
-                       grid_input=None, top_waters=30, data_write=None, out_name=None, pdb_write=None):
-    """
     
-
-    Parameters
-    ----------
-    structure_input : TYPE
-        DESCRIPTION.
-    xtc_input : TYPE
-        DESCRIPTION.
-    atomgroup : TYPE
-        DESCRIPTION.
-    grid_wat_model : TYPE, optional
-        DESCRIPTION. The default is None.
-    grid_input : TYPE, optional
-        DESCRIPTION. The default is None.
-    top_waters : TYPE, optional
-        DESCRIPTION. The default is 30.
-    write : TYPE, optional
-        DESCRIPTION. The default is None.
-    pdb_vis : TYPE, optional
-        DESCRIPTION. The default is True.
-
-    Returns
-    -------
-    water_frequencies : TYPE
-        DESCRIPTION.
-
-    """
-    
-    if write_grid_as is not None or data_write is not None or pdb_write is not None and out_name is None:
-        print('WARNING: You must provide out_name if writing out result.')
-    
+    if write is not None:
+        if out_name is None:
+            print('WARNING: You are writing results without providing out_name.')
+        if write_grid_as is None:
+            print('WARNING: You cannot write grid without specifying water model.')
+            print('Otions include:\nSPC\nTIP3P\nTIP4P\nwater')
     
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
-    
-    
+        
     u = mda.Universe(structure_input, xtc_input)
-
-    if pdb_write is True:
+    
+    if write is True:
+        if not os.path.exists('water_features/'):
+            os.makedirs('water_features/')
         protein = u.select_atoms("protein")
-        pdb_outname = out_name + "_WaterSites.pdb"
+        pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
-
-    if grid_input is None:
-        density_atomgroup = u.select_atoms("name " + atomgroup)
-        # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
-        D = DensityAnalysis(density_atomgroup, delta=1.0)
-        D.run()
-        if write_grid_as is not None:
-            D.density.convert_density(write_grid_as)
-            D.density.export(out_name + atomgroup + "_density.dx", type="double")
-            grid_input = atomgroup + "_density.dx"
-        g = D.density
+        if grid_input is None:
+            g = get_grid(u, atomgroup, write_grid_as, out_name)
+    elif grid_input is None:
+       g = get_grid(u, atomgroup)              
     else:
         g = Grid(grid_input)  
-    
     
     xyz, val = local_maxima_3D(g.grid)
     ##negate the array to get descending order from most prob to least prob
@@ -235,8 +234,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         counting=[]
-        for frame_no in tqdm(range(len(u.trajectory))):       
         # for frame_no in tqdm(range(100)):       
+        for frame_no in tqdm(range(len(u.trajectory))):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
             ##3.5 radius based off of length of hydrogen bonds. Water can in 
@@ -287,23 +286,19 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
         print(water_information[-1])
         
         ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
-        if data_write is True:
-            if not os.path.exists('water_features/'):
-                os.makedirs('water_features/')
-                
+        if write is True:                
             filename= 'water_features/' + out_name + water_ID + '.txt'
             with open(filename, 'w') as output:
                 for row in water_out:
                     output.write(str(row)[1:-1] + '\n')
 
-            filename= 'water_features/' + out_name + 'WaterPocketInformation.txt'
+            filename= 'water_features/' + out_name + 'WatersSummary.txt'
             with open(filename, 'w') as output:
                 for row in water_information:
                     output.write(str(row)[1:-1] + '\n')
                     
-        ##PDB_VISUALISATION     
-        ##rescursively add waters to the pdb file one by one as they are processed           
-        if pdb_write is True:
+            ##PDB_VISUALISATION     
+            ##rescursively add waters to the pdb file one by one as they are processed           
             # # Read the file into Biotite's structure object (atom array)
             atom_array = strucio.load_structure(pdb_outname)
             # Shifting the coordinates by the grid origin
@@ -349,69 +344,34 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
     return feature_names, features_data
             
 
-def get_atom_features(structure_input, xtc_input, atomgroup, element,
-                     grid_input=None, grid_write=None, top_atoms=None, 
-                     data_write=None, out_name=None, pdb_write=None):
-    """
+def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10, 
+                     grid_input=None, write=None, out_name=None):
+  
     
-
-    Parameters
-    ----------
-    structure_input : TYPE
-        DESCRIPTION.
-    xtc_input : TYPE
-        DESCRIPTION.
-    atomgroup : TYPE
-        DESCRIPTION.
-    element : TYPE
-        DESCRIPTION.
-    grid_input : TYPE, optional
-        DESCRIPTION. The default is None.
-    top_atoms : TYPE, optional
-        DESCRIPTION. The default is None.
-    write : TYPE, optional
-        DESCRIPTION. The default is None.
-    pdb_vis : TYPE, optional
-        DESCRIPTION. The default is True.
-    grid_write : TYPE, optional
-        DESCRIPTION. The default is None.
-
-    Returns
-    -------
-    atom_frequencies : TYPE
-        DESCRIPTION.
-
-    """
-    
-    if grid_write is not None or data_write is not None or pdb_write is not None and out_name is None:
-        print('WARNING: You must provide out_name if writing out result.')
-        
+    if write is not None:
+        if out_name is None:
+            print('WARNING: You must provide out_name if writing out result.')
         
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
-    
 
     u = mda.Universe(structure_input, xtc_input)
     
-    if pdb_write is True:
+    if write is True:
+        if not os.path.exists('atom_features/'):
+            os.makedirs('atom_features/')
         protein = u.select_atoms("protein")
-        pdb_outname = out_name + element + "_IonSites.pdb"
+        pdb_outname = 'atom_features/'+ out_name + element + "_Sites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
-    
-    ## The density will be obtained from the universe which depends on the .xtc and .gro
-    if grid_input is None:
-        density_atomgroup = u.select_atoms("name " + atomgroup)
-        D = DensityAnalysis(density_atomgroup, delta=1.0)
-        D.run()
-        if grid_write is not None:
-            D.density.convert_density("Angstrom^{-3}")
-            D.density.export(out_name + element + "_density.dx", type="double")
-            grid_input = atomgroup + "_density.dx"
-        g = D.density
+        if grid_input is None:
+            g = get_grid(u, atomgroup, "Angstrom^{-3}", out_name)
+    elif grid_input is None:
+        g = get_grid(u, atomgroup)
     else:
         g = Grid(grid_input)  
+    
         
     ##converting the density to a probability
     atom_number = len(u.select_atoms('name ' + atomgroup))
@@ -430,10 +390,9 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     
     atom_information=[]
-    
-    if top_atoms is None:
-        top_atoms = len(coords)  
-    elif top_atoms > len(coords):
+    atom_dists=[]
+
+    if top_atoms > len(coords):
         top_atoms = len(coords)  
 
     print('\n')
@@ -445,27 +404,38 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
 
         counting=[]
         for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(300,400)):       
             u.trajectory[i]
             radius= ' 2.5'
             ##radius is based off of hydrogen bond length between Na and oxygen
-            ##list all water resids within sphere of radius 2 centered on water prob density maxima
+            ##list all atom resids within sphere of radius 2 centered on atom prob density maxima
             atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +radius).indices)
-            ##select only those resids that have all three atoms within the water pocket
             if len(atomgroup_IDS)==0:
                 atomgroup_IDS=[-1]
             counting.append(atomgroup_IDS)
 
         atom_ID = element + str(atom_no+1)
-        pocket_occupation_frequency = 1 - counting.count(-1)/len(counting)    
-        atom_location = list(coords[atom_no] + g.origin)
 
+        ##making a list of the water IDs that appear in the simulation in that pocket
+        flat_list = [item for sublist in counting for item in sublist]
+        pocket_occupation_frequency = 1 - flat_list.count(-1)/len(flat_list)    
+        atom_location = list(coords[atom_no] + g.origin)
         atom_information.append([atom_ID,atom_location,pocket_occupation_frequency])
+        atom_dists.append(counting)
+        
         print('Completed atom no: ',atom_no)
         print(atom_information[-1])
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
-        if pdb_write is True:
+        if write is True:
+            file1= 'atom_features/' + out_name + atom_ID + '.txt'
+            with open(file1, 'w') as output:
+                output.write(str(counting)[1:-1])
+            file2= 'atom_features/'+out_name+element+'AtomsSummary.txt'
+            with open(file2, 'w') as output:
+                for row in atom_information:
+                    output.write(str(row)[1:-1] + '\n')
+                
             # # Read the file into Biotite's structure object (atom array)
             atom_array = strucio.load_structure(pdb_outname)
             # Shifting the coordinates by the grid origin
@@ -484,24 +454,18 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
             atom_array += struc.array([atom])
             # Save edited structure
             strucio.save_structure(pdb_outname, atom_array)
-            
-        # if pdb_vis is True:
             u_pdb = mda.Universe(pdb_outname)
-            
             u_pdb.add_TopologyAttr('tempfactors')
             # Write values as beta-factors ("tempfactors") to a PDB file
             for res in range(len(atom_information)):
                 atom_resid = len(u_pdb.residues) - atom_no-1 + res
                 u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
-    
-        if data_write is True:
-            if not os.path.exists('atom_features/'):
-                os.makedirs('atom_features/')
-            filename= 'atom_features/'+out_name+element+'PocketInformation.txt'
-            with open(filename, 'w') as output:
-                for row in atom_information:
-                    output.write(str(row)[1:-1] + '\n')
+            
+            
+    # Add atom pocket atomIDs
+    feature_names[element+'Pocket_Idx']= [atinfo[0] for atinfo in atom_information]
+    features_data[element+'Pocket_Idx']= np.array(atom_dists, dtype=object)    
     
     # Add atom pocket frequencies
     feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
@@ -513,3 +477,4 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
     
     # Return the dictionaries.
     return feature_names, features_data
+
