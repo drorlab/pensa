@@ -2,28 +2,30 @@
 
 This repository provides a python library and several ready-to-use [python scripts](https://github.com/drorlab/pensa/tree/master/scripts). 
 
-## mu-Opioid receptor from GPCRmd
-We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/).
-Additionally, we host an animated version on Google Colab.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
+Here we explain in example notebooks how to use the library and the scripts in the section below. 
 
 
-## Rhodopsin Complexes
-- [rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb) (for users on [Sherlock](https://www.sherlock.stanford.edu/) at Stanford only)
+## Accessing the PENSA Library
 
-and the scripts in the section below. 
-
-All of this requires that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
-
-
-## Accessing the library directly
+Make sure that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
 
 In your custom python script or Jupyter Notebook, import the PENSA methods via
 
     from pensa import *
     
-Have a look at the example notebooks that demonstrates the functionality of the library. 
+Have a look at one of the example notebooks below that demonstrate the functionality of the library. 
+
+## Example Notebooks
+
+### Comparing mu-Opioid receptor simulations from GPCRmd
+We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/).
+
+We host an animated version on Google Colab.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
+
+### Different binding modes of rhodopsin complexes
+Users of the [Sherlock cluster](https://www.sherlock.stanford.edu/) at Stanford, can also do the [demo with rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb).
 
 
 ## Usage-ready scripts
