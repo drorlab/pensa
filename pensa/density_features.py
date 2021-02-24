@@ -152,7 +152,7 @@ def get_grid(structure_input, xtc_input, atomgroup, grid_wat_model, write=None):
 
 ##make atomgroup mandatory
 def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None,
-                       grid_input=None, top_waters=30, write=None, out_name=None, pdb_vis=None):
+                       grid_input=None, top_waters=30, data_write=None, out_name=None, pdb_write=None):
     """
     
 
@@ -182,7 +182,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
     """
     
-    if write_grid_as is not None or write is not None or pdb_vis is not None and out_name is None:
+    if write_grid_as is not None or data_write is not None or pdb_write is not None and out_name is None:
         print('WARNING: You must provide out_name if writing out result.')
     
     
@@ -193,7 +193,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
     
     u = mda.Universe(structure_input, xtc_input)
 
-    if pdb_vis is True:
+    if pdb_write is True:
         protein = u.select_atoms("protein")
         pdb_outname = out_name + "_WaterSites.pdb"
         u.trajectory[0]
@@ -287,7 +287,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
         print(water_information[-1])
         
         ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
-        if write is True:
+        if data_write is True:
             if not os.path.exists('water_features/'):
                 os.makedirs('water_features/')
                 
@@ -303,7 +303,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
                     
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
-        if pdb_vis is True:
+        if pdb_write is True:
             # # Read the file into Biotite's structure object (atom array)
             atom_array = strucio.load_structure(pdb_outname)
             # Shifting the coordinates by the grid origin
@@ -351,7 +351,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, write_grid_as=None
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element,
                      grid_input=None, grid_write=None, top_atoms=None, 
-                     write=None, out_name=None, pdb_vis=None):
+                     data_write=None, out_name=None, pdb_write=None):
     """
     
 
@@ -383,7 +383,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
 
     """
     
-    if grid_write is not None or write is not None or pdb_vis is not None and out_name is None:
+    if grid_write is not None or data_write is not None or pdb_write is not None and out_name is None:
         print('WARNING: You must provide out_name if writing out result.')
         
         
@@ -394,7 +394,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
 
     u = mda.Universe(structure_input, xtc_input)
     
-    if pdb_vis is True:
+    if pdb_write is True:
         protein = u.select_atoms("protein")
         pdb_outname = out_name + element + "_IonSites.pdb"
         u.trajectory[0]
@@ -465,7 +465,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
         print(atom_information[-1])
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
-        if pdb_vis is True:
+        if pdb_write is True:
             # # Read the file into Biotite's structure object (atom array)
             atom_array = strucio.load_structure(pdb_outname)
             # Shifting the coordinates by the grid origin
@@ -495,7 +495,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element,
                 u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
     
-        if write is True:
+        if data_write is True:
             if not os.path.exists('atom_features/'):
                 os.makedirs('atom_features/')
             filename= 'atom_features/'+out_name+element+'PocketInformation.txt'
