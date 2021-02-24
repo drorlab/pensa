@@ -77,6 +77,9 @@ def periodic_correction(angle1):
                 continuous_angles[angle_index]+=2*np.pi
     for index in range(len(index_cont_angles)):
         new_dist[index_cont_angles[index]] = continuous_angles[index]
+    
+    
+    
     return new_dist
 
 
