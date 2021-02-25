@@ -28,36 +28,21 @@ from MDAnalysis.analysis import align
 from pensa.statesinfo import *
 
 
-def copy_coords(ag):
-    """
-    
-
-    Parameters
-    ----------
-    ag : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    TYPE
-        DESCRIPTION.
-
-    """
-    return ag.positions.copy()
-
-## convert the cosine of the dipole moment into spherical coordinates 
 def get_dipole(water_atom_positions):
     """
-    
+    Convert cartesian coordinates of water atoms into spherical coordinates of water dipole.
 
     Parameters
     ----------
-    water_atom_positions : TYPE
-        DESCRIPTION.
+    water_atom_positions : list
+        xyz coordinates for water oxygen atom.
 
     Returns
     -------
-    None.
+    psi : float
+        Psi value (spherical coordinates) for water orientation.
+    phi : float
+        Phi value (spherical coordinates) for water orientation.
 
     """
 
@@ -80,12 +65,13 @@ def get_dipole(water_atom_positions):
     psi=np.arctan2(y_axis,x_axis)
     phi=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))
 
-    return(psi,phi)
+    return psi, phi
     
 
 # obtain  coordinates for maxima of the dens 
 def local_maxima_3D(data, order=3):
-    """Detects local maxima in a 3D array
+    """
+    Detects local maxima in a 3D array
 
     Parameters
     ---------
@@ -112,6 +98,22 @@ def local_maxima_3D(data, order=3):
     return coords, values
 
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
+    """
+    Writes out combined atomgroup density for both input simulations.
+    
+
+    Parameters
+    ----------
+    struc_a : str
+        File name for the reference file (PDB or GRO format).
+    xtc_a : str
+        File name for the trajectory (xtc format).
+    struc_b : str
+        File name for the reference file (PDB or GRO format).
+    xtc_b : str
+        File name for the trajectory (xtc format).
+
+    """
 
     # # Before we extract the water densities, we need to first align the trajectories 
     # # so that we can featurize water sites in both ensembles using the same coordinates
@@ -127,8 +129,51 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
                     filename= align_xtc_name,  # file to write the trajectory to
                     match_atoms=True,  # whether to match atoms based on mass
                     ).run()
+   
+
+def copy_coords(ag):
+    """
+    Copy the coordinates of the frames in the aligned universe.    
+
+    Parameters
+    ----------
+    ag : Universe.atoms
+
+    Returns
+    -------
+    array
+        Copied atom positions.
+
+    """
+    return ag.positions.copy()
+
     
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name):
+    """
+    Writes out combined atomgroup density for both input simulations.
+    
+
+    Parameters
+    ----------
+    struc_a : str
+        File name for the reference file (PDB or GRO format).
+    xtc_a : str
+        File name for the trajectory (xtc format).
+    struc_b : str
+        File name for the reference file (PDB or GRO format).
+    xtc_b : str
+        File name for the trajectory (xtc format).
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    write_grid_as : str
+        The water model to convert the density into. 
+        Options are:
+            SPC, TIP3P, TIP4P, water
+    out_name : str
+        Prefix for written filename. 
+
+
+    """
     
    
     
@@ -167,6 +212,28 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     
 
 def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
+    """
+    Obtain the grid for atomgroup density.
+
+    Parameters
+    ----------
+    u : MDAnalysis universe
+        Universe to obtain density grid.
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    write_grid_as : str, optional
+        If you choose to write out the grid, you must specify the water model 
+        to convert the density into. The default is None.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+
+
+    Returns
+    -------
+    g : grid
+        Density grid.
+
+    """
  
     density_atomgroup = u.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
@@ -183,6 +250,38 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
         
 def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
+    """
+    Featurize water pockets for the top X most probable waters (top_waters).
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (PDB or GRO format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    top_waters : int, optional
+        Number of waters to featurize. The default is 10.
+    grid_input : str, optional
+        File name for the density grid input. The default is None, and a grid is automatically generated.
+    write : bool, optional
+        If true, the following data will be written out: reference pdb with occupancies,
+        water distributions, water data summary. The default is None.
+    write_grid_as : str, optional
+        If you choose to write out the grid, you must specify the water model 
+        to convert the density into. The default is None. Options are suggested if default.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all features
+        features_data : numpy array
+            Data for all features
+
+    """
 
     
     if write is not None:
@@ -205,7 +304,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
-        if grid_input is None:
+        if grid_input is None and write_grid_as is not None:
             g = get_grid(u, atomgroup, write_grid_as, out_name)
     elif grid_input is None:
        g = get_grid(u, atomgroup)              
@@ -346,6 +445,38 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10, 
                      grid_input=None, write=None, out_name=None):
+    """
+    Featurize atom pockets for the top X most probable atoms (top_atoms).
+  
+    
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (PDB or GRO format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    element : TYPE
+        DESCRIPTION.
+    top_atoms : int, optional
+        Number of atoms to featurize. The default is 10.
+    grid_input : str, optional
+        File name for the density grid input. The default is None, and a grid is automatically generated.
+    write : bool, optional
+        If true, the following data will be written out: reference pdb with occupancies,
+        atom distributions, atom data summary. The default is None.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+    
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all features
+        features_data : numpy array
+            Data for all features
+    """
   
     
     if write is not None:
