@@ -3,7 +3,7 @@
 """
 Created on Wed Jan  6 16:08:39 2021
 
-@author: neil
+@author: Neil J Thomson
 """
 
 import os
