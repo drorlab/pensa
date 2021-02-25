@@ -767,7 +767,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
             
         print('Default output of SSI= -1.')
         
-    return SSI
+    return round(SSI,4)
 
 
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
@@ -933,9 +933,37 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
             
         print('Default output of -1.')   
         
-    return SSI, coSSI
+    return round(SSI,4), round(coSSI,4)
 
 def ssi_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, write_plots=None):
+    """
+    Calculates State Specific Information statistic for two distributions.
+    
+    Parameters
+    ----------
+    features_a : list of str
+        Feature names of the first ensemble. 
+    features_b : list of str
+        Feature names of the first ensemble. 
+        Must be the same as features_a. Provided as a sanity check. 
+    all_data_a : float array
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
+    all_data_b : float array
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
+    verbose : bool, default=True
+        Print intermediate results.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is None.
+        
+        
+    Returns
+    -------
+        data_names : list of str
+            Feature names.
+        data_ssi : float array
+            State Specific Information statistics for each feature.
+
+    """
 
     
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
@@ -971,4 +999,3 @@ def ssi_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, w
             print(data_names[residue],data_ssi[residue])
         
     return data_names, data_ssi
-
