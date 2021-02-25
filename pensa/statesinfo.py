@@ -221,22 +221,23 @@ def find_nearest(distr, value):
 #GAUSSIAN FUNCTIONS
 def gauss(x, x0, sigma, a):
     """
+    Create a Gaussian distribution for a given x-axis linsapce and Gaussian parameters.
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    x0 : TYPE
-        DESCRIPTION.
-    sigma : TYPE
-        DESCRIPTION.
-    a : TYPE
-        DESCRIPTION.
+    x : list
+        x-axis distribution.
+    x0 : float
+        Mean x-value for Gaussian.
+    sigma : float
+        Gaussian sigma, related to FWHM.
+    a : float
+        Gaussian amplitude.
 
     Returns
     -------
-    gaussian : TYPE
-        DESCRIPTION.
+    gaussian : list
+        y-axis Gaussian distribution over the x-axis space.
 
     """
 
@@ -434,6 +435,32 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
 
 ##new function to adjust the gaussian parameters until they work
 def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
+    """
+    Obtaining the gaussians to fit the distribution into a Gaussian mix. 
+    Bin number automatically adjusted if the Gaussian fit experiences errors.
+
+    Parameters
+    ----------
+    distr : list
+        Distribution of interest for the fitting.
+    gauss_bins : int, optional
+        Bin the distribution into gauss_bin bins. The default is 120.
+    gauss_smooth : int, optional
+        Smooth the distribution according to a Hanning window length of gauss_smooth.
+        The default is 10% of gauss_bins.
+    write_name : str, optional
+        Used in warning to notify which feature has had binning altered during clustering.
+        The default is None.
+
+    Returns
+    -------
+    gaussians : list
+        y-axis values for the Gaussian distribution.
+    xline : list
+        x-axis values for the Gaussian distribution.
+
+
+    """
     
         
     if gauss_smooth is None:
@@ -456,11 +483,11 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
             trial=0
             gauss_bins= bin_origin + bin_adjust[attempt_no]
         
-    if attempt_no > 0:
+    if attempt_no > 0.1*bin_origin:
         if write_name is None:
-            print('Warning: Altered gauss_bins by '+str(bin_adjust[attempt_no])+' for clustering.\nYou might want to check cluster plot.')
+            print('Warning: Altered gauss_bins by >10% for clustering.\nYou might want to check cluster plot.')
         else:
-            print('Warning: Altered gauss_bins by '+str(bin_adjust[attempt_no])+' for clustering of '+write_name+'.\nYou might want to check cluster plot.')
+            print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
     return gaussians, xline
 
@@ -630,6 +657,41 @@ def calculate_entropy(state_limits,distribution_list):
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=None,
                   gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):
+    """
+    Calculates the State Specific Information SSI [bits] between two features from two ensembles. 
+    By default, the second feature is the binary switch between ensembles.
+
+
+    Parameters
+    ----------
+    distr_a_input : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+    distr_b_input : list of lists, optional
+        A list containing multivariate distributions (lists) for a particular
+        residue or water. The default is None and a binary switch is assigned.
+    a_states : list of lists, optional
+        A list of values that represent the limits of each state for each
+        distribution. The default is None and state limits are calculated automatically.
+    b_states : list of lists, optional
+        A list of values that represent the limits of each state for each
+        distribution. The default is None and state limits are calculated automatically.
+    gauss_bins : int, optional
+        Number of histogram bins to assign for the clustering algorithm. 
+        The default is 120.
+    gauss_smooth : int, optional
+        Number of bins to perform smoothing over. The default is ~10% of gauss_bins.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is None.
+    write_name : str, optional
+        Filename for write_plots. The default is None.
+
+    Returns
+    -------
+    SSI : float
+        State Specific Information (SSI[bits]) shared between input a and input b (default is binary switch).
+
+    """
     
     
     if gauss_smooth is None:
@@ -711,6 +773,51 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
 #CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=None, b_states=None,
                     c_states=None, gauss_bins=120, gauss_smooth=None, write_plots=None,write_name=None):
+    """
+    Calculates the State Specific Information Co-SSI [bits] between three features from two ensembles. 
+    By default, the third feature is the binary switch between ensembles.
+    
+    
+    Parameters
+    ----------
+        
+
+    distr_a_input : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+    distr_b_input : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water. 
+    distr_c_input : list of lists, optional
+        A list containing multivariate distributions (lists) for a particular
+        residue or water. The default is None and a binary switch is assigned.
+    a_states : list of lists, optional
+        A list of values that represent the limits of each state for each
+        distribution. The default is None and state limits are calculated automatically.
+    b_states : list of lists, optional
+        A list of values that represent the limits of each state for each
+        distribution. The default is None and state limits are calculated automatically.
+    c_states : list of lists, optional
+        A list of values that represent the limits of each state for each
+        distribution. The default is None and state limits are calculated automatically.
+    gauss_bins : int, optional
+        Number of histogram bins to assign for the clustering algorithm. 
+        The default is 120.
+    gauss_smooth : int, optional
+        Number of bins to perform smoothing over. The default is ~10% of gauss_bins.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is None.
+    write_name : str, optional
+        Filename for write_plots. The default is None.
+
+    Returns
+    -------
+    SSI : float
+        SSI[bits] shared between input a and input b (default is binary switch).
+    coSSI : float
+        Co-SSI[bits] shared between input a, input b and input c (default is binary switch).
+
+    """
 
     
     if gauss_smooth is None:
@@ -827,4 +934,41 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         print('Default output of -1.')   
         
     return SSI, coSSI
+
+def ssi_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, write_plots=None):
+
+    
+    all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    # Assert that the features are the same and data sets have same number of features
+    assert features_a == features_b
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+    # Extract the names of the features
+    data_names = features_a
+    # Initialize relative entropy and average value
+    data_ssi = np.zeros(len(data_names))
+    # Loop over all features    
+    for residue in range(len(all_data_a)):
+        data_a = all_data_a[residue]
+        data_b = all_data_b[residue]
+    
+        combined_dist=[]
+        for dist_no in range(len(data_a)):
+            # # # Make sure the ensembles have the same length of trajectory
+            sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            data_both = sim1+sim2      
+            combined_dist.append(data_both)
+            
+        if write_plots is True:
+            write_name = data_names[residue]
+            data_ssi[residue] = calculate_ssi(data_both,
+                                              write_plots=write_plots,
+                                              write_name=write_name)
+        else:
+            data_ssi[residue] = calculate_ssi(data_both)
+            
+        if verbose is True:
+            print(data_names[residue],data_ssi[residue])
+        
+    return data_names, data_ssi
 
