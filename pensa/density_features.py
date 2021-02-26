@@ -25,7 +25,34 @@ import biotite.structure.io as strucio
 from MDAnalysis.analysis.base import AnalysisFromFunction
 from MDAnalysis.coordinates.memory import MemoryReader
 from MDAnalysis.analysis import align
-from pensa.statesinfo import *
+# from pensa.statesinfo import *
+# this function makes sure that the two simulations are the same length
+def match_sim_lengths(sim1,sim2):
+    """
+    Make two lists the same length by truncating the longer list to match.
+
+    Parameters
+    ----------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    Returns
+    -------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    """
+    if len(sim1)!=len(sim2):
+        if len(sim1)>len(sim2):
+            sim1=sim1[0:len(sim2)]
+        if len(sim1)<len(sim2):
+            sim2=sim2[0:len(sim1)]  
+    return sim1, sim2
+        
 
 
 def get_dipole(water_atom_positions):
@@ -247,6 +274,30 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
 
     return g
         
+def convert_to_occ(distr, unocc_no):
+    """
+    Convert a distribution of pocket angles and occupancies into just occupancies.
+
+    Parameters
+    ----------
+    distr : list
+        Distribution to convert.
+    unocc_no : float
+        Value that represents unoccupied in the distribution.
+
+    Returns
+    -------
+    occ : list
+        Distribution representing pocket occupancy.
+
+    """
+    
+    occ=np.ones(len(distr))
+    for item in range(len(occ)):
+        if distr[item] == unocc_no:
+            occ[item] == 0
+    
+    return list(occ)
         
 def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
@@ -427,13 +478,20 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             u_pdb.atoms.write(pdb_outname)
         
     
+    
+    
+    
     # Add water pocket orientations
     feature_names['WaterPocket_Distr']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_Distr']= np.array(water_dists, dtype=object)
     
-    # Add water pocket frequencies
+    # Add water pocket occupancies
     feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_Occup']= np.array([watinf[2] for watinf in water_information], dtype=object)
+    
+    # Add water pocket occupancy timeseries
+    feature_names['WaterPocket_OccupDistr']= [watinf[0] for watinf in water_information]
+    features_data['WaterPocket_OccupDistr']= np.array([convert_to_occ(distr, 10000.0) for distr in water_dists], dtype=object)
     
     # Add water pocket locations
     feature_names['WaterPocket_xyz']= [watinf[0] for watinf in water_information]
@@ -444,7 +502,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             
 
 def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10, 
-                     grid_input=None, write=None, out_name=None):
+                      grid_input=None, write=None, out_name=None):
     """
     Featurize atom pockets for the top X most probable atoms (top_atoms).
   
@@ -522,7 +580,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
     
     atom_information=[]
     atom_dists=[]
-
+    
+    
     if top_atoms > len(coords):
         top_atoms = len(coords)  
 
@@ -538,7 +597,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         # for i in tqdm(range(300,400)):       
             u.trajectory[i]
             radius= ' 2.5'
-            ##radius is based off of hydrogen bond length between Na and oxygen
+            ##radius is based off of bond length between Na and oxygen
+            ##For Ca the bond length is ~2.42 =~2.5 so the same length can be used for various ions.
             ##list all atom resids within sphere of radius 2 centered on atom prob density maxima
             atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +radius).indices)
             if len(atomgroup_IDS)==0:
@@ -601,6 +661,10 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
     # Add atom pocket frequencies
     feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
     features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information], dtype=object)
+
+    # Add atom pocket occupancy timeseries
+    feature_names[element+'Pocket_OccupDistr']= [atinfo[0] for atinfo in atom_information]
+    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1) for distr in atom_dists], dtype=object)
     
     # Add atom pocket locations
     feature_names[element+'Pocket_xyz']= [atinfo[0] for atinfo in atom_information]
