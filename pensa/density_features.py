@@ -274,7 +274,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
 
     return g
         
-def convert_to_occ(distr, unocc_no):
+def convert_to_occ(distr, unocc_no, water=True):
     """
     Convert a distribution of pocket angles and occupancies into just occupancies.
 
@@ -292,10 +292,16 @@ def convert_to_occ(distr, unocc_no):
 
     """
     
-    occ=np.ones(len(distr))
-    for item in range(len(occ)):
-        if distr[item] == unocc_no:
-            occ[item] == 0
+    occ = np.ones(len(distr))
+    
+    if water is True:
+        for item in range(len(occ)):
+            if distr[item] == unocc_no:
+                occ[item] = 0
+    else:
+        for item in range(len(occ)):
+            if distr[item][0] == unocc_no:
+                occ[item] = 0
     
     return list(occ)
         
@@ -384,8 +390,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         counting=[]
-        # for frame_no in tqdm(range(100)):       
-        for frame_no in tqdm(range(len(u.trajectory))):       
+        for frame_no in tqdm(range(100)):       
+        # for frame_no in tqdm(range(len(u.trajectory))):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
             ##3.5 radius based off of length of hydrogen bonds. Water can in 
@@ -398,8 +404,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        # for frame_no in tqdm(range(100)):       
-        for frame_no in tqdm(range(len(u.trajectory))):   
+        for frame_no in tqdm(range(100)):       
+        # for frame_no in tqdm(range(len(u.trajectory))):   
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             ##extracting the water coordinates for inside the pocket
@@ -456,7 +462,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             # Add an HETATM
             atom = struc.Atom(
                 coord = atom_location,
-                chain_id = "W",
+                chain_id = "X",
                 # The residue ID is the last ID in the file +1
                 res_id = atom_array.res_id[-1] + 1,
                 res_name = water_ID,
@@ -483,19 +489,19 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     
     # Add water pocket orientations
     feature_names['WaterPocket_Distr']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_Distr']= np.array(water_dists, dtype=object)
+    features_data['WaterPocket_Distr']= np.array(water_dists)
     
     # Add water pocket occupancies
     feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_Occup']= np.array([watinf[2] for watinf in water_information], dtype=object)
+    features_data['WaterPocket_Occup']= np.array([watinf[2] for watinf in water_information])
     
     # Add water pocket occupancy timeseries
     feature_names['WaterPocket_OccupDistr']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_OccupDistr']= np.array([convert_to_occ(distr, 10000.0) for distr in water_dists], dtype=object)
+    features_data['WaterPocket_OccupDistr']= np.array([convert_to_occ(distr[0], 10000.0) for distr in water_dists])
     
     # Add water pocket locations
     feature_names['WaterPocket_xyz']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_xyz']= np.array([watinf[1] for watinf in water_information], dtype=object)
+    features_data['WaterPocket_xyz']= np.array([watinf[1] for watinf in water_information])
     
     # Return the dictionaries.
     return feature_names, features_data
@@ -593,8 +599,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         print('\n')
 
         counting=[]
-        for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(300,400)):       
+        # for i in tqdm(range(len(u.trajectory))):       
+        for i in tqdm(range(100)):       
             u.trajectory[i]
             radius= ' 2.5'
             ##radius is based off of bond length between Na and oxygen
@@ -634,7 +640,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
             # Add an HETATM
             atom = struc.Atom(
                 coord = atom_location,
-                chain_id = "W",
+                chain_id = "X",
                 # The residue ID is the last ID in the file +1
                 res_id = atom_array.res_id[-1] + 1,
                 res_name = atom_ID,
@@ -656,19 +662,19 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
             
     # Add atom pocket atomIDs
     feature_names[element+'Pocket_Idx']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_Idx']= np.array(atom_dists, dtype=object)    
+    features_data[element+'Pocket_Idx']= np.array(atom_dists)    
     
     # Add atom pocket frequencies
     feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information], dtype=object)
+    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information])
 
     # Add atom pocket occupancy timeseries
     feature_names[element+'Pocket_OccupDistr']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1) for distr in atom_dists], dtype=object)
+    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists])
     
     # Add atom pocket locations
     feature_names[element+'Pocket_xyz']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information], dtype=object)
+    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information])
     
     # Return the dictionaries.
     return feature_names, features_data
