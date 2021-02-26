@@ -545,7 +545,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
                 atomgroup_IDS=[-1]
             counting.append(atomgroup_IDS)
 
-        atom_ID = element + str(atom_no+1)
+        atom_ID = 'a' + str(atom_no+1)
 
         ##making a list of the water IDs that appear in the simulation in that pocket
         flat_list = [item for sublist in counting for item in sublist]
