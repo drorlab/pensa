@@ -935,9 +935,9 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         
     return round(SSI,4), round(coSSI,4)
 
-def ssi_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, write_plots=None):
     """
-    Calculates State Specific Information statistic for two distributions.
+    Calculates State Specific Information statistic for a feature across two ensembles.
     
     Parameters
     ----------
@@ -989,13 +989,154 @@ def ssi_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, w
             
         if write_plots is True:
             write_name = data_names[residue]
-            data_ssi[residue] = calculate_ssi(data_both,
+            data_ssi[residue] = calculate_ssi(combined_dist,
                                               write_plots=write_plots,
                                               write_name=write_name)
         else:
-            data_ssi[residue] = calculate_ssi(data_both)
+            data_ssi[residue] = calculate_ssi(combined_dist)
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
         
     return data_names, data_ssi
+
+def ssi_feature_analysis(features_a, all_data_a, 
+                         features_b, all_data_b, 
+                         verbose=True):
+    """
+    Calculates State Specific Information statistic for a feature across two ensembles.
+    
+    Parameters
+    ----------
+    features_a : list of str
+        Feature names of the first ensemble. 
+    features_b : list of str
+        Feature names of the first ensemble. 
+        Must be the same as features_a. Provided as a sanity check. 
+    all_data_a : float array
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
+    all_data_b : float array
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
+    verbose : bool, default=True
+        Print intermediate results.
+        
+        
+    Returns
+    -------
+        data_names : list of str
+            Feature names.
+        data_ssi : float array
+            State Specific Information statistics for each feature.
+
+    """
+
+    
+    all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    # Assert that the features are the same and data sets have same number of features
+    assert features_a == features_b
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+    # Extract the names of the features
+    data_names = features_a
+    # Initialize relative entropy and average value
+    data_ssi = np.zeros((len(data_names),len(data_names)))
+    # Loop over all features
+    for res1 in range(len(all_data_a)):
+
+        res1_data_ens1 = all_data_a[res1]
+        res1_data_ens2 = all_data_b[res1]
+        res1_combined_dist=[]
+        for dist_no in range(len(res1_data_ens1)):
+            # # # Make sure the ensembles have the same length of trajectory
+            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            res1_data_both = sim1+sim2      
+            res1_combined_dist.append(res1_data_both)
+                
+        for res2 in range(res1, len(all_data_a)):
+                
+            res2_data_ens1 = all_data_a[res2]
+            res2_data_ens2 = all_data_b[res2]     
+            res2_combined_dist=[]
+            for dist_no in range(len(res2_data_ens1)):
+                # # # Make sure the ensembles have the same length of trajectory
+                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
+                # # # combine the ensembles into one distribution (condition_a + condition_b)
+                res2_data_both = sim1+sim2      
+                res2_combined_dist.append(res2_data_both)            
+            
+                data_ssi[res1][res2] = calculate_ssi(res1_combined_dist,
+                                                     res2_combined_dist)
+                
+                data_ssi[res2][res1] = data_ssi[res1][res2]    
+                
+                
+            if verbose is True:
+                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])
+    
+    return data_names, data_ssi
+
+def cossi_featens_analysis(features_a, all_data_a, 
+                           features_b, all_data_b,
+                           cossi_features_a, cossi_all_data_a, 
+                           cossi_features_b, cossi_all_data_b, 
+                           verbose=True):
+
+
+    
+    all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    # Assert that the features are the same and data sets have same number of features
+    assert features_a == features_b
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+    # Extract the names of the features
+    data_names = features_a
+
+    cossi_all_data_a, cossi_all_data_b = cossi_all_data_a.T, cossi_all_data_b.T
+    # Assert that the features are the same and data sets have same number of features
+    assert cossi_features_a == cossi_features_b
+    assert cossi_all_data_a.shape[0] == cossi_all_data_b.shape[0] 
+    # Extract the names of the features
+    cossi_data_names = cossi_features_a
+    
+    # Initialize relative entropy and average value
+    data_ssi = np.zeros((len(data_names),len(cossi_data_names)))
+    data_cossi = np.zeros((len(data_names),len(cossi_data_names)))
+
+    # Loop over all features
+    for res1 in range(len(all_data_a)):
+
+        res1_data_ens1 = all_data_a[res1]
+        res1_data_ens2 = all_data_b[res1]
+        res1_combined_dist=[]
+        for dist_no in range(len(res1_data_ens1)):
+            # # # Make sure the ensembles have the same length of trajectory
+            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            res1_data_both = sim1+sim2      
+            res1_combined_dist.append(res1_data_both)
+                
+        for res2 in range(len(cossi_all_data_a)):
+                
+            res2_data_ens1 = cossi_all_data_a[res2]
+            res2_data_ens2 = cossi_all_data_b[res2]     
+            res2_combined_dist=[]
+            for dist_no in range(len(res2_data_ens1)):
+                # # # Make sure the ensembles have the same length of trajectory
+                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
+                # # # combine the ensembles into one distribution (condition_a + condition_b)
+                res2_data_both = sim1+sim2      
+                res2_combined_dist.append(res2_data_both)            
+            
+                data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
+                                                         res2_combined_dist)
+                
+                data_ssi[res2][res1] = data_ssi[res1][res2]    
+                data_cossi[res2][res1] = data_cossi[res1][res2]    
+               
+                
+            if verbose is True:
+                print(data_names[res1], cossi_data_names[res2],
+                      'SSI[bits]: ', data_ssi[res1][res2],
+                      'Co-SSI[bits]: ', data_cossi[res1][res2])
+    
+    return data_names, cossi_data_names, data_ssi, data_cossi
+
