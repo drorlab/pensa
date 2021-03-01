@@ -41,8 +41,8 @@ from pensa import *
 # sel_base_a = "(not name H*) and protein"
 # sel_base_b = "(not name H*) and protein"
 # # Names of the output files
-# out_name_a = "traj/condition-a"
-# out_name_b = "traj/condition-b"
+out_name_a = "traj/condition-a"
+out_name_b = "traj/condition-b"
 
 # # # # for subdir in ['traj','plots','vispdb','pca','clusters','results']:
 # # # #     if not os.path.exists(subdir):
@@ -53,37 +53,37 @@ from pensa import *
 # # # # extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", sel_base_b)
      
 # # # # Extract the features from the beginning (start_frame) of the trajectory
-# start_frame=0  
-# a_rec = get_features(out_name_a+"_receptor.gro",
-#                       out_name_a+"_receptor.xtc", 
-#                       start_frame)
+start_frame=0  
+a_rec = get_features(out_name_a+"_receptor.gro",
+                      out_name_a+"_receptor.xtc", 
+                      start_frame)
 
-# a_rec_feat, a_rec_data = a_rec
+a_rec_feat, a_rec_data = a_rec
 
-# b_rec = get_features(out_name_b+"_receptor.gro",
-#                       out_name_b+"_receptor.xtc", 
-#                       start_frame)
+b_rec = get_features(out_name_b+"_receptor.gro",
+                      out_name_b+"_receptor.xtc", 
+                      start_frame)
 
-# b_rec_feat, b_rec_data = b_rec
-
-
-# out_name_a = "condition-a"
-# out_name_b = "condition-b"
+b_rec_feat, b_rec_data = b_rec
 
 
-# # # # Extract the multivariate torsion coordinates of each residue as a 
-# # # # timeseries from the trajectory and write into subdirectory   
-# # # # output = [[torsion 1 timeseries],[torsion 2 timeseries],...,[torsion n timeseries]]
-# sc_multivar_res_feat_a, sc_multivar_res_data_a = multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
-# sc_multivar_res_feat_b, sc_multivar_res_data_b = multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
+out_name_a = "condition-a"
+out_name_b = "condition-b"
+
+
+# # # Extract the multivariate torsion coordinates of each residue as a 
+# # # timeseries from the trajectory and write into subdirectory   
+# # # output = [[torsion 1 timeseries],[torsion 2 timeseries],...,[torsion n timeseries]]
+sc_multivar_res_feat_a, sc_multivar_res_data_a = multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
+sc_multivar_res_feat_b, sc_multivar_res_data_b = multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
 
 # # # We can calculate the State Specific Information (SSI) shared between the 
 # # # ensemble switch and the combined ensemble residue conformations.
 # # # Set write_plots=True to generate a folder with all the clustered states for each residue.
-# data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-#                                              sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
-#                                              write_plots=None,
-#                                              verbose=True)
+data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
+                                              sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
+                                              write_plots=None,
+                                              verbose=True)
 
 # # # # We can calculate the State Specific Information (SSI) shared between the 
 # # # # ensemble switch and the combined ensemble residue conformations.
@@ -94,16 +94,6 @@ from pensa import *
 #                                             sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
 #                                             verbose=True)
 
-
-# # # # # Lets say we want to calculate wheter magnitude of information
-# # # # # shared between features is information about the switch between ensembles
-# # # # # then we can use co-SSI. The output of co-SSI also includes SSI between the 
-# # # # # two variables for comparison. 
-# data_names, data_ssi, data_cossi = cossi_featens_analysis(features_a, all_data_a, 
-#                                                           features_b, all_data_b,
-#                                                           cossi_features_a, cossi_all_data_a, 
-#                                                           cossi_features_b, cossi_all_data_b, 
-#                                                           verbose=True)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -153,7 +143,8 @@ out_name_b = "traj/cond-b_water"
 
 grid_combined = "ab_grid_OH2_density.dx"
 
-# # Then we  featurize the waters common to both simulations
+# # # Then we featurize the waters common to both simulations
+# # # We can do the same analysis for ions using the get_atom_features featurizer. 
 water_feat_a, water_data_a = get_water_features(structure_input = out_name_a+".gro", 
                                                 xtc_input = out_name_a+"aligned.xtc",
                                                 top_waters = 2,
@@ -179,21 +170,28 @@ data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],w
                                              verbose=True)
 
 
-# # # # # Alternatively we can see if the pocket occupancy (the presence/absence of water at the site) shares SSI
+# # # Alternatively we can see if the pocket occupancy (the presence/absence of water at the site) shares SSI
+# # # Currently this is only enabled with ssi_ensemble_analysis
 data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_data_a['WaterPocket_OccupDistr'],
                                              water_feat_b['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
-                                             occupancy=True, verbose=True)
+                                             wat_occupancy=True, verbose=True)
 
-# # # In this example we can see that it is the orientation of the waters, 
-# # # and not the occupancy of the water site, that is important in distinguishing between ensembles
+
+# # # In this example we can see that it is the presence or absence of water O1, 
+# # # and not the orientation of the water site, that is more important in distinguishing between ensembles.
+# # # Water 02 has no functional significance with respect to what these ensembles are investigating.
+
+
 
 
 # # # If we want to find out the impact of water on the SSI between 
 # # # features and the ensemble (ssi_ensemble_analysis), we can use co-SSI. 
-# feat_names, cossi_feat_names, data_ssi, data_cossi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-#                                                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
-#                                                                            water_feat_a['WaterPocket_Distr'],water_data_a['WaterPocket_Distr'],
-#                                                                            water_feat_b['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
-#                                                                            verbose=True)
+# # # An equivalent interpretation of co-SSI is how much the switch between ensembles
+# # # is involved in the communication between two features.
+feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
+                                                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'],  
+                                                                            water_feat_a['WaterPocket_OccupDistr'],water_data_a['WaterPocket_OccupDistr'],
+                                                                            water_feat_b['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
+                                                                            verbose=True)
 
 
