@@ -394,8 +394,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
         counting=[]
-        for frame_no in tqdm(range(100)):       
-        # for frame_no in tqdm(range(len(u.trajectory))):       
+        # for frame_no in tqdm(range(100)):       
+        for frame_no in tqdm(range(len(u.trajectory))):       
             u.trajectory[frame_no]
             ##list all water oxygens within sphere of radius X centered on water prob density maxima
             ##3.5 radius based off of length of hydrogen bonds. Water can in 
@@ -408,8 +408,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         flat_list = [item for sublist in counting for item in sublist]
         
         ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        for frame_no in tqdm(range(100)):       
-        # for frame_no in tqdm(range(len(u.trajectory))):   
+        # for frame_no in tqdm(range(100)):       
+        for frame_no in tqdm(range(len(u.trajectory))):   
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             ##extracting the water coordinates for inside the pocket
@@ -500,7 +500,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_Occup']= np.array(occup, dtype=object)
     
-    occup_distr=[convert_to_occ(distr[0], 10000.0) for distr in water_dists]
+    
+    occup_distr=[[convert_to_occ(distr[0], 10000.0)] for distr in water_dists]
     # Add water pocket occupancy timeseries
     feature_names['WaterPocket_OccupDistr']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_OccupDistr']= np.array(occup_distr, dtype=object)
