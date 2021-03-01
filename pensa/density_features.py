@@ -344,9 +344,9 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     if write is not None:
         if out_name is None:
             print('WARNING: You are writing results without providing out_name.')
-        if write_grid_as is None:
-            print('WARNING: You cannot write grid without specifying water model.')
-            print('Otions include:\nSPC\nTIP3P\nTIP4P\nwater')
+        # if write_grid_as is None:
+        #     print('WARNING: You cannot write grid without specifying water model.')
+        #     print('write_grid_as options include:\nSPC\nTIP3P\nTIP4P\nwater')
     
     # Initialize the dictionaries.
     feature_names = {}
@@ -361,12 +361,16 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
         u.trajectory[0]
         protein.write(pdb_outname)
-        if grid_input is None and write_grid_as is not None:
-            g = get_grid(u, atomgroup, write_grid_as, out_name)
+        if grid_input is None:
+            g = get_grid(u, atomgroup, write_grid_as, out_name)           
+        else:
+            g = Grid(grid_input)  
     elif grid_input is None:
-       g = get_grid(u, atomgroup)              
+        g = get_grid(u, atomgroup)              
     else:
         g = Grid(grid_input)  
+
+    
     
     xyz, val = local_maxima_3D(g.grid)
     ##negate the array to get descending order from most prob to least prob
@@ -383,7 +387,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     print('Featurizing ',top_waters,' Waters')
     for wat_no in range(top_waters):
         print('\n')
-        print('Water no: ',wat_no)
+        print('Water no: ',wat_no+1)
         print('\n')
         philist=[]
         psilist=[]
@@ -438,7 +442,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
         water_information.append([water_ID,atom_location,water_pocket_occupation_frequency])
 
-        print('Completed water no: ',wat_no)
+        print('Completed water no: ',wat_no+1)
         print(water_information[-1])
         
         ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
@@ -489,19 +493,22 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     
     # Add water pocket orientations
     feature_names['WaterPocket_Distr']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_Distr']= np.array(water_dists)
+    features_data['WaterPocket_Distr']= np.array(water_dists, dtype=object)
     
+    occup=[watinf[2] for watinf in water_information]
     # Add water pocket occupancies
     feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_Occup']= np.array([watinf[2] for watinf in water_information])
+    features_data['WaterPocket_Occup']= np.array(occup, dtype=object)
     
+    occup_distr=[convert_to_occ(distr[0], 10000.0) for distr in water_dists]
     # Add water pocket occupancy timeseries
     feature_names['WaterPocket_OccupDistr']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_OccupDistr']= np.array([convert_to_occ(distr[0], 10000.0) for distr in water_dists])
+    features_data['WaterPocket_OccupDistr']= np.array(occup_distr, dtype=object)
     
+    loc=[watinf[1] for watinf in water_information]
     # Add water pocket locations
     feature_names['WaterPocket_xyz']= [watinf[0] for watinf in water_information]
-    features_data['WaterPocket_xyz']= np.array([watinf[1] for watinf in water_information])
+    features_data['WaterPocket_xyz']= np.array(loc, dtype=object)
     
     # Return the dictionaries.
     return feature_names, features_data
@@ -561,12 +568,13 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         u.trajectory[0]
         protein.write(pdb_outname)
         if grid_input is None:
-            g = get_grid(u, atomgroup, "Angstrom^{-3}", out_name)
+            g = get_grid(u, atomgroup, "Angstrom^{-3}", out_name)        
+        else:
+            g = Grid(grid_input)  
     elif grid_input is None:
-        g = get_grid(u, atomgroup)
+        g = get_grid(u, atomgroup)              
     else:
         g = Grid(grid_input)  
-    
         
     ##converting the density to a probability
     atom_number = len(u.select_atoms('name ' + atomgroup))
@@ -595,12 +603,12 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
     print('Featurizing ',top_atoms,' Atoms')
     for atom_no in range(top_atoms):
         print('\n')
-        print('Atom no: ',atom_no)
+        print('Atom no: ',atom_no+1)
         print('\n')
 
         counting=[]
-        # for i in tqdm(range(len(u.trajectory))):       
-        for i in tqdm(range(100)):       
+        for i in tqdm(range(len(u.trajectory))):       
+        # for i in tqdm(range(100)):       
             u.trajectory[i]
             radius= ' 2.5'
             ##radius is based off of bond length between Na and oxygen
@@ -620,7 +628,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         atom_information.append([atom_ID,atom_location,pocket_occupation_frequency])
         atom_dists.append(counting)
         
-        print('Completed atom no: ',atom_no)
+        print('Completed atom no: ',atom_no+1)
         print(atom_information[-1])
         ##PDB_VISUALISATION     
         ##rescursively add waters to the pdb file one by one as they are processed           
@@ -662,19 +670,19 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
             
     # Add atom pocket atomIDs
     feature_names[element+'Pocket_Idx']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_Idx']= np.array(atom_dists)    
+    features_data[element+'Pocket_Idx']= np.array(atom_dists, dtype=object)    
     
     # Add atom pocket frequencies
     feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information])
+    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information],dtype=object)
 
     # Add atom pocket occupancy timeseries
     feature_names[element+'Pocket_OccupDistr']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists])
+    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists],dtype=object)
     
     # Add atom pocket locations
     feature_names[element+'Pocket_xyz']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information])
+    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information],dtype=object)
     
     # Return the dictionaries.
     return feature_names, features_data
