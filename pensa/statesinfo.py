@@ -747,10 +747,8 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
                         print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
                 
             else:
-                set_b_states = b_states
-                
-                    
-        H_b=calculate_entropy(set_b_states,set_distr_b)
+                set_b_states = b_states 
+            H_b=calculate_entropy(set_b_states,set_distr_b)
     
         ab_joint_states= set_a_states + set_b_states
         ab_joint_distributions= set_distr_a + set_distr_b
@@ -822,8 +820,12 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
     
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)        
+ 
         
-    try:
+ 
+    try:       
+        ##calculating the entropy for set_distr_a
+        ## if set_distr_a only contains one distributions
         if type(distr_a_input[0]) is not list:
             set_distr_a=[periodic_correction(distr_a_input)]
         ## else set_distr_a is a nested list of multiple distributions (bivariate)
@@ -844,14 +846,17 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         else:
             set_a_states = a_states
             
-        H_a=calculate_entropy(set_a_states,set_distr_a) 
+        H_a=calculate_entropy(set_a_states,set_distr_a)     
+
 
         ##----------------
         ##calculating the entropy for set_distr_b
         if type(distr_b_input[0]) is not list:
             set_distr_b=[periodic_correction(distr_b_input)]
+        ## else set_distr_a is a nested list of multiple distributions (bivariate)
         else:
             set_distr_b=[periodic_correction(distr_b) for distr_b in distr_b_input]
+        
         if b_states is None:    
             set_b_states=[]
             for dim_num in range(len(set_distr_b)):
@@ -861,12 +866,12 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
                     plot_name = None
                 try:
                     set_b_states.append(determine_state_limits(set_distr_b[dim_num], gauss_bins, gauss_smooth, write_plots, plot_name))
-                except:    
-                    print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                except:
+                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
         else:
             set_b_states = b_states
             
-        H_b=calculate_entropy(set_b_states,set_distr_b) 
+        H_b=calculate_entropy(set_b_states,set_distr_b)     
         
         ##----------------
         ##calculating the entropy for set_distr_c
@@ -891,20 +896,18 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
                         set_c_states.append(determine_state_limits(set_distr_c[dim_num], gauss_bins, gauss_smooth, write_plots, plot_name))
                     except:    
                         print('Distribution C not clustering properly.\nTry altering Gaussian parameters or input custom states.')
-            
             else:
                 set_c_states = c_states
-        
-        H_c=calculate_entropy(set_c_states,set_distr_c)
+            H_c=calculate_entropy(set_c_states,set_distr_c)
     
         ##----------------
-        ab_joint_states= set_distr_a + set_b_states
-        ab_joint_distributions= set_a_states + set_distr_b
+        ab_joint_states= set_a_states + set_b_states
+        ab_joint_distributions= set_distr_a + set_distr_b
         
         H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
         ##----------------
-        ac_joint_states= set_distr_a + set_c_states 
-        ac_joint_distributions= set_a_states + set_distr_c
+        ac_joint_states=  set_a_states + set_c_states 
+        ac_joint_distributions= set_distr_a + set_distr_c
         
         H_ac= calculate_entropy(ac_joint_states,ac_joint_distributions)
         ##----------------
@@ -913,8 +916,8 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         
         H_bc= calculate_entropy(bc_joint_states,bc_joint_distributions)
         ##----------------
-        abc_joint_states= set_distr_a + set_b_states + set_c_states 
-        abc_joint_distributions= set_a_states + set_distr_b + set_distr_c
+        abc_joint_states= set_a_states + set_b_states + set_c_states 
+        abc_joint_distributions= set_distr_a + set_distr_b + set_distr_c
         
         H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)    
         
@@ -927,15 +930,15 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         coSSI = -1
         
         if write_name is not None:
-            print('WARNING: Input error for ' + write_name)
+            print('WARNING: Error for ' + write_name)
         else:
-            print('WARNING: Input error')
+            print('WARNING: Error')
             
         print('Default output of -1.')   
         
     return round(SSI,4), round(coSSI,4)
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, occupancy=None, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, verbose=True, write_plots=None):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -966,7 +969,6 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, occupa
     """
 
     
-    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -980,33 +982,26 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, occupa
         data_b = all_data_b[residue]
 
         combined_dist=[]
-        if type(data_a[0]) is np.float64:
+        for dist_no in range(len(data_a)):
             # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(data_a),list(data_b))
+            sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             data_both = sim1+sim2      
-            combined_dist.append(data_both)  
-        else:
-            for dist_no in range(len(data_a)):
-                # # # Make sure the ensembles have the same length of trajectory
-                sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
-                data_both = sim1+sim2      
-                combined_dist.append(data_both)
-        
+            combined_dist.append(data_both)
+    
             
-        if occupancy is True: 
-            occupancy = [[-0.5,0.5,1.5]]
+        if wat_occupancy is True: 
+            wat_occupancy = [[-0.5,0.5,1.5]]
             
         if write_plots is True:
             write_name = data_names[residue]
             data_ssi[residue] = calculate_ssi(combined_dist,
-                                              a_states = occupancy,
+                                              a_states = wat_occupancy,
                                               write_plots=write_plots,
                                               write_name=write_name)
         else:
             data_ssi[residue] = calculate_ssi(combined_dist,
-                                              a_states = occupancy)
+                                              a_states = wat_occupancy)
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -1015,6 +1010,8 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, occupa
 
 def ssi_feature_analysis(features_a, all_data_a, 
                          features_b, all_data_b, 
+                         occupancy_a=None,
+                         occupancy_b=None,
                          verbose=True):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -1044,7 +1041,6 @@ def ssi_feature_analysis(features_a, all_data_a,
     """
 
     
-    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -1078,10 +1074,10 @@ def ssi_feature_analysis(features_a, all_data_a,
                 res2_data_both = sim1+sim2      
                 res2_combined_dist.append(res2_data_both)            
             
-                data_ssi[res1][res2] = calculate_ssi(res1_combined_dist,
-                                                     res2_combined_dist)
-                
-                data_ssi[res2][res1] = data_ssi[res1][res2]    
+            data_ssi[res1][res2] = calculate_ssi(res1_combined_dist,
+                                                 res2_combined_dist)
+            
+            data_ssi[res2][res1] = data_ssi[res1][res2]    
                 
                 
             if verbose is True:
@@ -1097,14 +1093,12 @@ def cossi_featens_analysis(features_a, all_data_a,
 
 
     
-    all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract the names of the features
     data_names = features_a
 
-    cossi_all_data_a, cossi_all_data_b = cossi_all_data_a.T, cossi_all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert cossi_features_a == cossi_features_b
     assert cossi_all_data_a.shape[0] == cossi_all_data_b.shape[0] 
@@ -1114,8 +1108,6 @@ def cossi_featens_analysis(features_a, all_data_a,
     # Initialize relative entropy and average value
     data_ssi = np.zeros((len(data_names),len(cossi_data_names)))
     data_cossi = np.zeros((len(data_names),len(cossi_data_names)))
-
-    # Loop over all features
     for res1 in range(len(all_data_a)):
 
         res1_data_ens1 = all_data_a[res1]
@@ -1140,12 +1132,9 @@ def cossi_featens_analysis(features_a, all_data_a,
                 res2_data_both = sim1+sim2      
                 res2_combined_dist.append(res2_data_both)            
             
-                data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
-                                                         res2_combined_dist)
-                
-                data_ssi[res2][res1] = data_ssi[res1][res2]    
-                data_cossi[res2][res1] = data_cossi[res1][res2]    
-               
+            data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
+                                                                           res2_combined_dist)
+            
                 
             if verbose is True:
                 print(data_names[res1], cossi_data_names[res2],
