@@ -935,7 +935,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         
     return round(SSI,4), round(coSSI,4)
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, occupancy=None, verbose=True, write_plots=None):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -966,7 +966,7 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, verbos
     """
 
     
-    all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -978,22 +978,35 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, verbos
     for residue in range(len(all_data_a)):
         data_a = all_data_a[residue]
         data_b = all_data_b[residue]
-    
+
         combined_dist=[]
-        for dist_no in range(len(data_a)):
+        if type(data_a[0]) is np.float64:
             # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
+            sim1,sim2=match_sim_lengths(list(data_a),list(data_b))
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             data_both = sim1+sim2      
-            combined_dist.append(data_both)
+            combined_dist.append(data_both)  
+        else:
+            for dist_no in range(len(data_a)):
+                # # # Make sure the ensembles have the same length of trajectory
+                sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
+                # # # combine the ensembles into one distribution (condition_a + condition_b)
+                data_both = sim1+sim2      
+                combined_dist.append(data_both)
+        
+            
+        if occupancy is True: 
+            occupancy = [[-0.5,0.5,1.5]]
             
         if write_plots is True:
             write_name = data_names[residue]
             data_ssi[residue] = calculate_ssi(combined_dist,
+                                              a_states = occupancy,
                                               write_plots=write_plots,
                                               write_name=write_name)
         else:
-            data_ssi[residue] = calculate_ssi(combined_dist)
+            data_ssi[residue] = calculate_ssi(combined_dist,
+                                              a_states = occupancy)
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -1031,7 +1044,7 @@ def ssi_feature_analysis(features_a, all_data_a,
     """
 
     
-    all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -1040,6 +1053,7 @@ def ssi_feature_analysis(features_a, all_data_a,
     # Initialize relative entropy and average value
     data_ssi = np.zeros((len(data_names),len(data_names)))
     # Loop over all features
+    
     for res1 in range(len(all_data_a)):
 
         res1_data_ens1 = all_data_a[res1]
