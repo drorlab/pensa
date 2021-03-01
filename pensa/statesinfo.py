@@ -462,18 +462,21 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
 
     """
     
-        
+    smooth_origin=gauss_smooth
+    bin_origin=gauss_bins
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)        
-        
     
+   
     trial=0
     attempt_no=0
-    bin_origin=gauss_bins
+    
+    ##making a list of +/- values for bin trials to ensure minimal change
     bin_adjust_up= np.array(range(1,10000))
     bin_adjust_down= bin_adjust_up.copy()*-1
     bin_adjust= np.insert(bin_adjust_up, np.arange(len(bin_adjust_down)), bin_adjust_down)
     
+    ##if clustering does not work for a given bin number then adjust the bin number
     while trial<1:
         try:
             gaussians, xline = gauss_fit(distr, gauss_bins, gauss_smooth)
@@ -482,12 +485,14 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
             attempt_no+=1
             trial=0
             gauss_bins= bin_origin + bin_adjust[attempt_no]
-        
-    if attempt_no > 0.1*bin_origin:
-        if write_name is None:
-            print('Warning: Altered gauss_bins by >10% for clustering.\nYou might want to check cluster plot.')
-        else:
-            print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
+    
+    ##only warn about clustering changes if specific parameters were input
+    if bin_origin == 120 and smooth_origin is None:
+        if attempt_no > 0.1*bin_origin:
+            if write_name is None:
+                print('Warning: Altered gauss_bins by >10% for clustering.\nYou might want to check cluster plot.')
+            else:
+                print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
     return gaussians, xline
 
@@ -1090,6 +1095,46 @@ def cossi_featens_analysis(features_a, all_data_a,
                            cossi_features_a, cossi_all_data_a, 
                            cossi_features_b, cossi_all_data_b, 
                            verbose=True):
+    """
+    
+
+    Parameters
+    ----------
+    
+    features_a : list of str
+        Feature names of the first ensemble. 
+    features_b : list of str
+        Feature names of the first ensemble. 
+        Must be the same as features_a. Provided as a sanity check. 
+    all_data_a : float array
+        Trajectory data from the first ensemble.
+    all_data_b : float array
+        Trajectory data from the second ensemble. 
+    cossi_features_a : list of str
+        Feature names of the first ensemble. 
+    cossi_features_b : list of str
+        Feature names of the first ensemble. 
+        Must be the same as features_a. Provided as a sanity check. 
+    cossi_all_data_a : float array
+        Trajectory data from the first ensemble. 
+    cossi_all_data_b : float array
+        Trajectory data from the second ensemble. 
+    verbose : bool, default=True
+        Print intermediate results.
+
+
+    Returns
+    -------
+    data_names : list of str
+        Feature names.
+    data_ssi : float array
+        State Specific Information SSI statistics for each feature.
+    cossi_data_names : list of str
+        Feature names of stabilizing feature.
+    data_cossi : float array
+        State Specific Information Co-SSI statistics for each feature.
+
+    """
 
 
     
@@ -1130,16 +1175,15 @@ def cossi_featens_analysis(features_a, all_data_a,
                 sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
                 # # # combine the ensembles into one distribution (condition_a + condition_b)
                 res2_data_both = sim1+sim2      
-                res2_combined_dist.append(res2_data_both)            
+                res2_combined_dist.append(res2_data_both)
             
             data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
                                                                            res2_combined_dist)
-            
                 
             if verbose is True:
-                print(data_names[res1], cossi_data_names[res2],
-                      'SSI[bits]: ', data_ssi[res1][res2],
-                      'Co-SSI[bits]: ', data_cossi[res1][res2])
+                print('\nFeature Pair: ', data_names[res1], cossi_data_names[res2],
+                      '\nSSI[bits]: ', data_ssi[res1][res2],
+                      '\nCo-SSI[bits]: ', data_cossi[res1][res2])
     
     return data_names, cossi_data_names, data_ssi, data_cossi
 
