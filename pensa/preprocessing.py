@@ -236,4 +236,5 @@ def get_transmem_from_uniprot(uniprot_id):
             l = l.replace('\'','')
             s = l.split('.')
             tm.append((int(s[0]),int(s[-1])))
+    for tmi in tm: print(*tmi)
     return tm
