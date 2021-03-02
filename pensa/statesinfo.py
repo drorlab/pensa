@@ -658,14 +658,14 @@ def calculate_entropy(state_limits,distribution_list):
     return entropy
 
 
-##this function requires a list of angles for SSI
-##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=None,
                   gauss_bins=120, gauss_smooth=None, pbc=True, write_plots=None, write_name=None):
     """
     Calculates the State Specific Information SSI [bits] between two features from two ensembles. 
     By default, the second feature is the binary switch between ensembles.
 
+    SSI(a,b) = H_a + H_b H_ab
+    H = Conformational state entropy
 
     Parameters
     ----------
@@ -781,13 +781,14 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
     return round(SSI,4)
 
 
-#CoSSI = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=None, b_states=None,
                     c_states=None, gauss_bins=120, gauss_smooth=None, write_plots=None,write_name=None):
     """
     Calculates the State Specific Information Co-SSI [bits] between three features from two ensembles. 
     By default, the third feature is the binary switch between ensembles.
     
+    CoSSI(a,b,c) = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
+    H = Conformational state entropy
     
     Parameters
     ----------
