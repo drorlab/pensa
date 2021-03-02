@@ -661,7 +661,7 @@ def calculate_entropy(state_limits,distribution_list):
 ##this function requires a list of angles for SSI
 ##SSI(A,B) = H(A) + H(B) - H(A,B)
 def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=None,
-                  gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):
+                  gauss_bins=120, gauss_smooth=None, pbc=True, write_plots=None, write_name=None):
     """
     Calculates the State Specific Information SSI [bits] between two features from two ensembles. 
     By default, the second feature is the binary switch between ensembles.
@@ -705,11 +705,16 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
     try:       
         ##calculating the entropy for set_distr_a
         ## if set_distr_a only contains one distributions
-        if type(distr_a_input[0]) is not list:
-            set_distr_a=[periodic_correction(distr_a_input)]
-        ## else set_distr_a is a nested list of multiple distributions (bivariate)
+        if pbc is True:
+            if type(distr_a_input[0]) is not list:
+                set_distr_a=[periodic_correction(distr_a_input)]
+            ## else set_distr_a is a nested list of multiple distributions (bivariate)
+            else:
+                set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
         else:
-            set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
+            set_distr_a=distr_a_input
+                
+                
         
         if a_states is None:    
             set_a_states=[]
@@ -735,10 +740,14 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
             set_b_states= [[0,1,2]]  
             
         else:
-            if type(distr_b_input[0]) is not list:
-                set_distr_b=[periodic_correction(distr_b_input)]
+            if pbc is True:
+                if type(distr_b_input[0]) is not list:
+                    set_distr_b=[periodic_correction(distr_b_input)]
+                else:
+                    set_distr_b=[periodic_correction(distr_b) for distr_b in distr_b_input]
             else:
-                set_distr_b=[periodic_correction(distr_b) for distr_b in distr_b_input]
+                set_distr_b=distr_b_input
+                
             if b_states is None:    
                 set_b_states=[]
                 for dim_num in range(len(set_distr_b)):
@@ -757,7 +766,6 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
     
         ab_joint_states= set_a_states + set_b_states
         ab_joint_distributions= set_distr_a + set_distr_b
-        
         H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
     
         SSI = (H_a + H_b) - H_ab
@@ -943,7 +951,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         
     return round(SSI,4), round(coSSI,4)
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -1003,10 +1011,12 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
             data_ssi[residue] = calculate_ssi(combined_dist,
                                               a_states = wat_occupancy,
                                               write_plots=write_plots,
-                                              write_name=write_name)
+                                              write_name=write_name,
+                                              pbc=pbc)
         else:
             data_ssi[residue] = calculate_ssi(combined_dist,
-                                              a_states = wat_occupancy)
+                                              a_states = wat_occupancy,
+                                              pbc=pbc)
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -1015,8 +1025,6 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
 
 def ssi_feature_analysis(features_a, all_data_a, 
                          features_b, all_data_b, 
-                         occupancy_a=None,
-                         occupancy_b=None,
                          verbose=True):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
