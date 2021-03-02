@@ -13,3 +13,4 @@ dependencies:
   - MDAnalysis 
   - cython
   - pip 
+  - biotite
