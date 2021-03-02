@@ -171,18 +171,15 @@ data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],w
 
 
 # # # Alternatively we can see if the pocket occupancy (the presence/absence of water at the site) shares SSI
-# # # Currently this is only enabled with ssi_ensemble_analysis
+# # # Currently this is only enabled with ssi_ensemble_analysis. We need to turn off the periodic boundary conditions
+# # # as the distributions are no longer periodic.
 data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_data_a['WaterPocket_OccupDistr'],
                                              water_feat_b['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
-                                             wat_occupancy=True, verbose=True)
-
+                                             wat_occupancy=True, pbc=False, verbose=True)
 
 # # # In this example we can see that it is the presence or absence of water O1, 
 # # # and not the orientation of the water site, that is more important in distinguishing between ensembles.
 # # # Water 02 has no functional significance with respect to what these ensembles are investigating.
-
-
-
 
 # # # If we want to find out the impact of water on the SSI between 
 # # # features and the ensemble (ssi_ensemble_analysis), we can use co-SSI. 
