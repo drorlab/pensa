@@ -31,5 +31,8 @@ jobs:
     - name: Test with pytest
       run: |
         conda install pytest
+<<<<<<< HEAD
         pip install -e .
+=======
+>>>>>>> 32f40aa0af6038bd7ca92d99e31f3ae2f262438f
         pytest
