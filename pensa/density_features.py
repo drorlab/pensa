@@ -17,7 +17,7 @@ from MDAnalysis.analysis.density import DensityAnalysis
 import numpy as np
 from scipy import ndimage as ndi
 from gridData import Grid
-import MDAnalysis.analysis.hbonds
+# import MDAnalysis.analysis.hbonds
 from tqdm import tqdm
 import os
 import biotite.structure as struc
@@ -26,6 +26,7 @@ from MDAnalysis.analysis.base import AnalysisFromFunction
 from MDAnalysis.coordinates.memory import MemoryReader
 from MDAnalysis.analysis import align
 # from pensa.statesinfo import *
+
 # this function makes sure that the two simulations are the same length
 def match_sim_lengths(sim1,sim2):
     """
@@ -217,18 +218,17 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     
     aligned_coords_b = AnalysisFromFunction(copy_coords,
                                             condition_b.atoms).run().results
-    
     # # # The density needs to be formed from an even contribution of both conditions
     # # # otherwise it will be unevely biased towards one condition.
     # # # So we match the simulation lengths first
     sim1_coords, sim2_coords = match_sim_lengths(aligned_coords_a,aligned_coords_b)
+
     # # # Then we merge the coordinates into one system
-    merged_coords = np.hstack([sim1_coords,
-                               sim2_coords])
+    merged_coords = np.hstack([sim1_coords, sim2_coords])
     # # # We load in the merged coordinated into our new universe that contains
     # # # the receptor in both conditions
     Combined_conditions.load_new(merged_coords, format=MemoryReader)
-    
+   
     # # # We extract the density grid from the combined condition universe
     density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
@@ -438,6 +438,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water_dists.append(water_out)        
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
+        water_pocket_occupation_frequency = round(water_pocket_occupation_frequency,4)
         atom_location = list(coords[wat_no] + g.origin)
 
         water_information.append([water_ID,atom_location,water_pocket_occupation_frequency])
@@ -624,7 +625,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
 
         ##making a list of the water IDs that appear in the simulation in that pocket
         flat_list = [item for sublist in counting for item in sublist]
-        pocket_occupation_frequency = 1 - flat_list.count(-1)/len(flat_list)    
+        pocket_occupation_frequency = 1 - flat_list.count(-1)/len(flat_list)   
+        pocket_occupation_frequency = round(pocket_occupation_frequency,4)
         atom_location = list(coords[atom_no] + g.origin)
         atom_information.append([atom_ID,atom_location,pocket_occupation_frequency])
         atom_dists.append(counting)
