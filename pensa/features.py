@@ -119,17 +119,14 @@ def describe_dist_without_atom_numbers(feature_names):
 def sort_sincos_torsions_by_resnum(tors, data):
     """
     Sort sin/cos of torsion features by the residue number..
-
     Parameters
     ----------
         tors : list of str
             The list of torsion features.
-
     Returns
     -------
         new_tors : list of str
             The sorted list of torsion features.
-
     """
     renamed = []
     for t in tors:
@@ -146,17 +143,14 @@ def sort_sincos_torsions_by_resnum(tors, data):
 def sort_distances_by_resnum(dist, data):
     """
     Sort distance features by the residue number..
-
     Parameters
     ----------
         dist : list of str
             The list of distance features.
-
     Returns
     -------
         new_dist : list of str
             The sorted list of distance features.
-
     """
     renamed = []
     for d in dist:
@@ -166,5 +160,3 @@ def sort_distances_by_resnum(dist, data):
     new_dist = np.array(dist)[new_order].tolist()
     new_data = data[:,new_order]
     return new_dist, new_data
-
-

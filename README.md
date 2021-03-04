@@ -31,7 +31,7 @@ We demonstrate how to use the PENSA library in an interactive and animated examp
 
 Create and activate a conda environment:
 
-    conda create --name pensa python=3.7 numpy scipy matplotlib mdtraj==1.9.3 pyemma mdshare MDAnalysis cython -c conda-forge
+    conda create --name pensa python=3.7 numpy scipy matplotlib mdtraj==1.9.3 pyemma mdshare MDAnalysis cython biotite -c conda-forge
     conda activate pensa
 
 If you want to use PENSA with Jupyter notebooks:
