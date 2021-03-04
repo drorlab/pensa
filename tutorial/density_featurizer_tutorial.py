@@ -32,7 +32,7 @@ struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
 water_feat, water_data = get_water_features(structure_input = struc, 
                                             xtc_input = xtc,
-                                            top_waters = 3,
+                                            top_waters = 1,
                                             atomgroup = "OH2",
                                             write = True,
                                             write_grid_as="TIP3P",
