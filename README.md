@@ -19,7 +19,7 @@ All functionality is available as a python package (installation see below). For
 
 The [documentation](https://pensa.readthedocs.io/en/latest/) is still under construction. For now, please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
 
-## NEW: Demo on Google Colab
+## Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
@@ -72,8 +72,11 @@ To get the citation and DOI for a particular version, see [Zenodo](https://zenod
 
 ## Acknowledgments
 
+#### Contributors
+Martin Vögele, Neil Thomson, Sang Truong
+
 #### Beta-Tests
-Alex Powers, Sang Truong, Lukas Stelzl
+Alex Powers, Lukas Stelzl
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).
