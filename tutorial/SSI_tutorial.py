@@ -149,7 +149,7 @@ water_feat_a, water_data_a = get_water_features(structure_input = out_name_a+".g
                                                 xtc_input = out_name_a+"aligned.xtc",
                                                 top_waters = 2,
                                                 atomgroup = "OH2",
-                                                grid_input = grid_combined
+                                                grid_input = grid_combined,
                                                 write = True,
                                                 out_name = "cond_a")
 
@@ -157,7 +157,7 @@ water_feat_b, water_data_b  = get_water_features(structure_input = out_name_b+".
                                                  xtc_input = out_name_b+".xtc",
                                                  top_waters = 2,
                                                  atomgroup = "OH2",
-                                                 grid_input = grid_combined
+                                                 grid_input = grid_combined,
                                                  write = True,
                                                  out_name = "cond_b")
 
