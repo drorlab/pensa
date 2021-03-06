@@ -9,9 +9,10 @@ from pyemma.util.contexts import settings
 
 def get_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                  features=['bb-torsions','sc-torsions','bb-distances']):
-
+    """
+    This function is deprecated. Use get_structure_features() to retain its old behavior."
+    """
     warnings.warn("The function get_features() is deprecated. Use get_structure_features() to retain its old behavior.", FutureWarning)
-
     return get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                                   features=['bb-torsions','sc-torsions','bb-distances'])
 
@@ -74,98 +75,4 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
 
 
 
-# -- Utilities to process the features
 
-
-def remove_atom_numbers_from_distance(feat_str):
-    """
-    Remove atom numbers from a distance feature string.
-    
-    Parameters
-    ----------
-        feat_str : str
-            The string describing a single feature.
-    
-    Returns
-    -------
-        new_feat : str
-            The feature string without atom numbers.
-    
-    """
-    # Split the feature string in its parts
-    parts = feat_str.split(' ')
-    # Glue the desired parts back together
-    new_feat = parts[0]
-    for nr in [1,2,3,5,6,7,8]:
-        new_feat += ' '+parts[nr]
-    return new_feat
-
-
-def describe_dist_without_atom_numbers(feature_names):
-    """
-    Provides feature descriptors without atom numbers.
-    
-    Parameters
-    ----------
-        feature_names : dict
-            Names of all features (assumes distances).
-    
-    Returns
-    -------
-        desc : list of str
-            The feature descriptors without atom numbers.
-    
-    """
-    desc = feature_names.describe()
-    desc = [ remove_atom_numbers_from_distance(d) for d in desc ]
-    return desc
-
-
-
-# -- Utilities to sort the features
-
-
-def sort_sincos_torsions_by_resnum(tors, data):
-    """
-    Sort sin/cos of torsion features by the residue number..
-    Parameters
-    ----------
-        tors : list of str
-            The list of torsion features.
-    Returns
-    -------
-        new_tors : list of str
-            The sorted list of torsion features.
-    """
-    renamed = []
-    for t in tors:
-        rn = t.split(' ')[-1].replace(')','')
-        ft = t.split(' ')[0].replace('(',' ')
-        sincos, angle = ft.split(' ')
-        renamed.append('%09i %s %s'%(int(rn),angle,sincos))
-    new_order = np.argsort(renamed)
-    new_tors = np.array(tors)[new_order].tolist()
-    new_data = data[:,new_order]
-    return new_tors, new_data
-
-
-def sort_distances_by_resnum(dist, data):
-    """
-    Sort distance features by the residue number..
-    Parameters
-    ----------
-        dist : list of str
-            The list of distance features.
-    Returns
-    -------
-        new_dist : list of str
-            The sorted list of distance features.
-    """
-    renamed = []
-    for d in dist:
-        rn1, at1, rn2, at2 = np.array(d.split(' '))[np.array([2,3,6,7])]
-        renamed.append('%09i %s %09i %s'%(int(rn1),at1,int(rn2),at2))
-    new_order = np.argsort(renamed)
-    new_dist = np.array(dist)[new_order].tolist()
-    new_data = data[:,new_order]
-    return new_dist, new_data

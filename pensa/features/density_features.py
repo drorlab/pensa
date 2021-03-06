@@ -159,7 +159,7 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
                     ).run()
    
 
-def copy_coords(ag):
+def _copy_coords(ag):
     """
     Copy the coordinates of the frames in the aligned universe.    
 
@@ -202,8 +202,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
 
     """
     
-   
-    
     # # # re-define the condition_a universe with the aligned trajectory 
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
@@ -212,10 +210,10 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
     
     # # # Extract the coordinates from the trajectories to add to the new universe
-    aligned_coords_a = AnalysisFromFunction(copy_coords,
+    aligned_coords_a = AnalysisFromFunction(_copy_coords,
                                             condition_a.atoms).run().results
     
-    aligned_coords_b = AnalysisFromFunction(copy_coords,
+    aligned_coords_b = AnalysisFromFunction(_copy_coords,
                                             condition_b.atoms).run().results
     # # # The density needs to be formed from an even contribution of both conditions
     # # # otherwise it will be unevely biased towards one condition.
@@ -339,7 +337,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
     """
 
-    
     if write is not None:
         if out_name is None:
             print('WARNING: You are writing results without providing out_name.')
@@ -369,8 +366,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     else:
         g = Grid(grid_input)  
 
-    
-    
     xyz, val = local_maxima_3D(g.grid)
     ##negate the array to get descending order from most prob to least prob
     val_sort = np.argsort(-1*val.copy())
@@ -487,10 +482,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
                 u_pdb.residues[water_resid].atoms.tempfactors = water_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
         
-    
-    
-    
-    
     # Add water pocket orientations
     feature_names['WaterPocket_Distr']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_Distr']= np.array(water_dists, dtype=object)
@@ -499,7 +490,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     # Add water pocket occupancies
     feature_names['WaterPocket_Occup']= [watinf[0] for watinf in water_information]
     features_data['WaterPocket_Occup']= np.array(occup, dtype=object)
-    
     
     occup_distr=[[convert_to_occ(distr[0], 10000.0)] for distr in water_dists]
     # Add water pocket occupancy timeseries

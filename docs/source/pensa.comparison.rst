@@ -1,14 +1,6 @@
 pensa.comparison
 ========================
 
-pensa.comparison.processing
-----------------------------------
-
-.. automodule:: pensa.comparison.processing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pensa.comparison.relative\_entropy
 -----------------------------------------
 

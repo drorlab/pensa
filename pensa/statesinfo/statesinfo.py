@@ -16,7 +16,7 @@ import os
 import re
 
 
-def check(value,x,y):
+def _check(value,x,y):
     """
     Check if a value is between x and y
 
@@ -219,7 +219,7 @@ def find_nearest(distr, value):
 
 
 #GAUSSIAN FUNCTIONS
-def gauss(x, x0, sigma, a):
+def _gauss(x, x0, sigma, a):
     """
     Create a Gaussian distribution for a given x-axis linsapce and Gaussian parameters.
 
@@ -245,36 +245,67 @@ def gauss(x, x0, sigma, a):
         gaussian = abs(a*np.exp(-(x-x0)**2/(2*sigma**2)))
     return gaussian
 
-def bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
+def _bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
     """ Two gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)
-def trimodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3):
+
+def _trimodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3):
     """ Three gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)
-def quadmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4):
+
+def _quadmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4):
     """ Four gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)
-def quinmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5):
+
+def _quinmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5):
     """ Five gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)
-def sexmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6):
+
+def _sexmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6):
     """ Six gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)   
-def septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7):
+
+def _septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7):
     """ Seven gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)    
-def octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
+
+def _octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
     """ Eight gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)    
-def nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
+
+def _nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
     """ Nine gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)      
-def decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
+
+def _decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
     """ Ten gaussians """
     return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)+gauss(x,mu10,sigma10,A10)        
 
 
+def _integral(x, mu, sigma, A):
+    """
+    Gaussian integral for evaluating state probabilities. Integration between
+    negative infinity and x.
 
+    Parameters
+    ----------
+    x : float
+        Upper limit for integral.
+    mu : float
+        Gaussian mean.
+    sigma : float
+        Gaussian sigma.
+    A : float
+        Gaussian amplitude.
+
+    Returns
+    -------
+    integral : float
+        Area under Gaussian from negative infinity to x.
+
+    """
+    integral = (A/2) * (1 + math.erf((x - mu) / (sigma * np.sqrt(2))))
+    return integral
 
 
 def printKclosest(arr,n,x,k): 
@@ -324,31 +355,6 @@ def printKclosest(arr,n,x,k):
         a.append(str("{} ".format(arr[q])))
     return a
 
-def integral(x, mu, sigma, A):
-    """
-    Gaussian integral for evaluating state probabilities. Integration between
-    negative infinity and x.
-
-    Parameters
-    ----------
-    x : float
-        Upper limit for integral.
-    mu : float
-        Gaussian mean.
-    sigma : float
-        Gaussian sigma.
-    A : float
-        Gaussian amplitude.
-
-    Returns
-    -------
-    integral : float
-        Area under Gaussian from negative infinity to x.
-
-    """
-    integral = (A/2) * (1 + math.erf((x - mu) / (sigma * np.sqrt(2))))
-    return integral
-
 
 def gauss_fit(distribution, gauss_bin, gauss_smooth):    
     """
@@ -392,7 +398,6 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     ##this is to find the edges of the gaussians for calculating sigma
     sig_vals=[]
     for extrema in corrected_extrema:
-        
         mean_xval=distributionx[np.where(distributiony==extrema)[0][0]]
         ##finding the "noc" closest y values to the 1/2 max value of each extrema
         closest=printKclosest(distributiony, len(distributiony), extrema*0.5, noc)
@@ -411,7 +416,7 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     ##x is the space of angles
     xline=np.linspace(min(distribution),max(distribution),10000)                
     ##choosing the fitting mode
-    peak_number=[gauss,bimodal,trimodal,quadmodal,quinmodal,sexmodal,septmodal,octomodal,nonamodal,decamodal]
+    peak_number=[_gauss,_bimodal,_trimodal,_quadmodal,_quinmodal,_sexmodal,_septmodal,_octomodal,_nonamodal,_decamodal]
     mode=peak_number[len(sig_vals)-1]    
     expected=[]
     for param_num in range(len(mean_pop)):
@@ -421,17 +426,17 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     # try:
     params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
     # except:
-        
     gaussians=[]
     gauss_num_space=np.linspace(0,(len(params))-3,int(len(params)/3))    
     # for j in gaussnumber:
     #     gaussians.append(gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]))
     for gauss_index in gauss_num_space:
-        intmax = integral(max(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
-        intmin = integral(min(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
+        intmax = _integral(max(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
+        intmin = _integral(min(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
         if np.abs(intmax-intmin)>0.02:
             gaussians.append(gauss(xline, params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)]))
     return gaussians, xline
+
 
 ##new function to adjust the gaussian parameters until they work
 def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
@@ -459,14 +464,12 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     xline : list
         x-axis values for the Gaussian distribution.
 
-
     """
     
     smooth_origin=gauss_smooth
     bin_origin=gauss_bins
     if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)        
-    
+        gauss_smooth = int(gauss_bins*0.1)
    
     trial=0
     attempt_no=0
@@ -495,6 +498,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
                 print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
     return gaussians, xline
+
 
 def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=None):
     """
@@ -570,7 +574,6 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
     
     return all_intersects
     
-
 
 def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):    
     """
@@ -648,7 +651,7 @@ def calculate_entropy(state_limits,distribution_list):
             distribution=distribution_list[dist_num]
         
             for frame_num in range(len(distribution)):
-                limit_occupancy_checks[dist_num][frame_num]= check(distribution[frame_num],limits[0],limits[1]) 
+                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
         mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
         ##calculating the entropy as the summation of all -p*log(p) 
         
@@ -698,7 +701,6 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
 
     """
     
-    
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)
     
@@ -712,9 +714,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
             else:
                 set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
         else:
-            set_distr_a=distr_a_input
-                
-                
+            set_distr_a=distr_a_input        
         
         if a_states is None:    
             set_a_states=[]
@@ -831,11 +831,8 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
 
     """
 
-    
     if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)        
- 
-        
+        gauss_smooth = int(gauss_bins*0.1)              
  
     try:       
         ##calculating the entropy for set_distr_a
@@ -861,7 +858,6 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
             set_a_states = a_states
             
         H_a=calculate_entropy(set_a_states,set_distr_a)     
-
 
         ##----------------
         ##calculating the entropy for set_distr_b
@@ -934,8 +930,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         abc_joint_distributions= set_distr_a + set_distr_b + set_distr_c
         
         H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)    
-        
-        
+               
         SSI = (H_a + H_b) - H_ab
         coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
         

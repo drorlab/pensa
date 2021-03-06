@@ -9,6 +9,14 @@ pensa.features.density\_features
    :undoc-members:
    :show-inheritance:
 
+pensa.features.processing
+--------------------------------
+
+.. automodule:: pensa.features.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.features.pyemma\_features
 --------------------------------------
 
