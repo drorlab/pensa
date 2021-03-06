@@ -8,9 +8,8 @@ from pyemma.util.contexts import settings
 from pensa.clusters import *
 from pensa.comparison import *
 from pensa.features import *
-from pensa.pca import *
+from pensa.dimensionality import *
 from pensa.preprocessing import *
-from pensa.tica import *
 
 
 #py_file_location = '/Users/sangtruong_2021/Documents/GitHub/pensa/./test_data/'
