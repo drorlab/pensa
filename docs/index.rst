@@ -14,9 +14,13 @@ Welcome to PENSA's documentation!
 .. toctree::
    :maxdepth: 1
    :caption: API Documentation
-
-   source/pensa
-
+   
+   source/pensa.preprocessing
+   source/pensa.features
+   source/pensa.comparison
+   source/pensa.dimensionality
+   source/pensa.clusters
+   source/pensa.statesinfo
 
 Indices and tables
 ==================
