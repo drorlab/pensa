@@ -8,8 +8,8 @@ Created on Wed Jan  6 16:08:39 2021
 
 import os
 import sys
-path_to_pensa_folder='pensa'
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(path_to_pensa_folder), '..')))
+#path_to_pensa_folder='pensa'
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(path_to_pensa_folder), '..')))
 from pensa import *
 
 
@@ -42,7 +42,7 @@ water_feat, water_data = get_water_features(structure_input = struc,
 # # # # # Here we add the write=True option to write out the 
 struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
-grid = "mor-data/11426_dyn_151OH2_density.dx"
+grid = "water_features/11426_dyn_151OH2_density.dx"
 water_feat, water_data = get_water_features(structure_input = struc, 
                                             xtc_input = xtc,
                                             top_waters = 1,
