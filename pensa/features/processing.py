@@ -103,54 +103,6 @@ def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=
 
 
 
-# -- Utilities to process the features
-
-
-def remove_atom_numbers_from_distance(feat_str):
-    """
-    Remove atom numbers from a distance feature string.
-    
-    Parameters
-    ----------
-        feat_str : str
-            The string describing a single feature.
-    
-    Returns
-    -------
-        new_feat : str
-            The feature string without atom numbers.
-    
-    """
-    # Split the feature string in its parts
-    parts = feat_str.split(' ')
-    # Glue the desired parts back together
-    new_feat = parts[0]
-    for nr in [1,2,3,5,6,7,8]:
-        new_feat += ' '+parts[nr]
-    return new_feat
-
-
-def describe_dist_without_atom_numbers(feature_names):
-    """
-    Provides feature descriptors without atom numbers.
-    
-    Parameters
-    ----------
-        feature_names : dict
-            Names of all features (assumes distances).
-    
-    Returns
-    -------
-        desc : list of str
-            The feature descriptors without atom numbers.
-    
-    """
-    desc = feature_names.describe()
-    desc = [ remove_atom_numbers_from_distance(d) for d in desc ]
-    return desc
-
-
-
 # -- Utilities to sort the features
 
 
