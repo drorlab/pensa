@@ -9,7 +9,7 @@ Welcome to PENSA's documentation!
 
    getting_started
    tutorials
-
+   contribute
 
 .. toctree::
    :maxdepth: 1
