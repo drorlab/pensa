@@ -8,6 +8,8 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
+All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
+
 ## Functionality
 
 Compare structural ensembles of proteins via
