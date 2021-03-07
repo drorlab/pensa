@@ -20,8 +20,8 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'PENSA'
-copyright = '2021, Martin Vögele'
-author = 'Martin Vögele'
+copyright = '2020-2021, Martin Vögele, Neil Thomson, Sang Truong'
+author = 'Martin Vögele, Neil Thomson, Sang Truong'
 
 
 # -- General configuration ---------------------------------------------------
