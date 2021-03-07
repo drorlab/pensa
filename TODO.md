@@ -2,15 +2,13 @@
 
 - [ ] Refactoring and fixes for release 0.2
   - [x] Restructure modules to subpackages
-  - [ ] Adapt README
+  - [x] Adapt README
   - [x] Adapt API documentation
   - [ ] Include SSI to example scripts
-  - [ ] Numbering of principal component trajectories starts with 0, should start with 1
-  - [ ] Axis labels and legend name for distance matrix plot
-  - [ ] Function pca_features() does not have labels
-  - [ ] Function compare_projections() does not have labels or legend
-  - [ ] Expand axis or minimize legend in matplotlib
-  - [ ] Pick file format (png/pdf?) for matplotlib
+  - [x] Numbering of principal component trajectories starts with 0, should start with 1
+  - [x] Axis labels and legend name for distance matrix plot
+  - [x] Function pca_features() does not have labels
+  - [x] Function compare_projections() does not have labels or legend
 - [ ] Tests
   - [x] Workflow test with example data
   - [ ] Trivial examples for each function
@@ -52,7 +50,10 @@
   - [ ] First tests
   - [ ] write module
   - [ ] write unit tests
-  
+- [ ] Put shared functionality of PCA and TICA into shared functions.
+- [ ] Include TICA in unit tests
+- [ ] Make file format (png/pdf?) for matplotlib optional.
+
 ### Ideas
 
 - [ ] Hydrogen bonds as features

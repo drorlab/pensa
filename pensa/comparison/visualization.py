@@ -82,7 +82,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
         
 
 def distances_visualization(dist_names, dist_diff, plot_filename, 
-                            vmin=None, vmax=None, verbose=True):
+                            vmin=None, vmax=None, verbose=True, cbar_label=None):
     """
     Visualizes features per residue as plot and in PDB files, assuming values from 0 to 1. 
     
@@ -100,6 +100,8 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
             Maximum value for the heat map.
         verbose : bool, optional
             Print numbers of first and last residue. Defaults to True.
+        cbar_label : str, optional
+            Label for the color bar.
         
     Returns
     -------
@@ -130,7 +132,10 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
     ax.set_yticks(np.arange(50-firstres,lastres-firstres+1,50))
     ax.set_xticklabels(np.arange(50,lastres+1,50))
     ax.set_yticklabels(np.arange(50,lastres+1,50))
-    fig.colorbar(img,ax=ax)
+    ax.xaxis.set_label_position('top')
+    ax.set_xlabel('residue number')
+    ax.set_ylabel('residue number')
+    fig.colorbar(img, ax=ax, label=cbar_label)
     fig.tight_layout()
     fig.savefig(plot_filename,dpi=300)  
     return diff

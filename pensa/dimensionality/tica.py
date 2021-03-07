@@ -100,7 +100,7 @@ def project_on_tic(data, ev_idx, tica=None):
         data : float array
             Trajectory data [frames,frame_data].
         ev_idx : int
-            Index of the eigenvector to project on.
+            Index of the eigenvector to project on (starts with zero).
         tica : TICA obj, optional
             Information of pre-calculated TICA.
             Must be calculated for the same features (but not necessarily the same trajectory).
@@ -159,7 +159,7 @@ def sort_traj_along_tic(data, tica, start_frame, top, trj, out_name, num_tic=3):
         proj_sort = proj[sort_idx] 
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the TIC
-        with mda.Writer(out_name+"_tic"+str(evi)+".xtc", a.n_atoms) as W:
+        with mda.Writer(out_name+"_tic"+str(evi+1)+".xtc", a.n_atoms) as W:
             for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)
@@ -210,7 +210,7 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
     # Loop over time-lagged independent components.
     for evi in range(num_tic):
         # Project the combined data on the time-lagged independent component
-        proj = project_on_tic(data,evi,tica=tica)
+        proj = project_on_tic(data,evi+1,tica=tica)
         # Sort everything along the projection on th resp. PC
         sort_idx  = np.argsort(proj)
         proj_sort = proj[sort_idx] 
