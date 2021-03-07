@@ -7,31 +7,16 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362136.svg)](https://doi.org/10.5281/zenodo.4362136)
 
 A collection of Python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
-
 All functionality is available as a Python package. For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. 
 
 To get started, see the [documentation](https://pensa.readthedocs.io/en/latest/) and the [tutorials](https://github.com/drorlab/pensa/tree/master/tutorial).
 
 ## Functionality
 
-Compare structural ensembles of proteins via
-- the relative entropy of their features
-- statistical tests
-- state-specific information
-
-and visualize deviations on a reference structure.
-
-Project several ensembles on a joint reduced representations using
-- principal component analysis (PCA)
-- time-lagged independent component analysis (tICA)
-
-and sort the structures along the obtained components.
-
-Cluster structures via 
-- k-means 
-- regular-space clustering 
-
-and write out the resulting clusters as trajectories.
+With PENSA, you can (currently):
+- Compare structural ensembles of proteins via the relative entropy of their features, statistical tests, or state-specific information and visualize deviations on a reference structure.
+- Project several ensembles on a joint reduced representations using principal component analysis (PCA) or time-lagged independent component analysis (tICA) and sort the structures along the obtained components.
+- Cluster structures via k-means or regular-space clustering and write out the resulting clusters as trajectories.
 
 We also provide the first easily applicable implementation of state-specific information analysis methods.
 
@@ -48,41 +33,6 @@ We demonstrate how to use the PENSA library in an interactive and animated examp
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
 
-
-## Installation
-
-### Conda environment
-
-Create and activate a conda environment:
-
-    conda create --name pensa python=3.7 numpy scipy matplotlib mdtraj==1.9.3 pyemma mdshare MDAnalysis cython biotite -c conda-forge
-    conda activate pensa
-
-If you want to use PENSA with Jupyter notebooks:
-
-    conda install jupyter
-
-### Library installation
-
-#### Option 1: Install the PENSA library from PyPI
-
-Within the environment created above, execute:
-
-    pip install pensa
-
-This installs the latest released version.
-
-To use the example scripts or tutorial folder, you'll have to download them from the repository.
-
-#### Option 2: Create editable installation from source
-
-Within the environment created above, execute:
-
-    git clone https://github.com/drorlab/pensa.git  
-    cd pensa
-    pip install -e . 
-
-This installs the latest version from the repository, which might not yet be officially released.
 
 ## Citation
 
