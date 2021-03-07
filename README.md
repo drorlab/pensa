@@ -6,9 +6,11 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 [![PyPI version](https://badge.fury.io/py/pensa.svg)](https://badge.fury.io/py/pensa)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4362136.svg)](https://doi.org/10.5281/zenodo.4362136)
 
-A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
+A collection of Python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
-All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
+All functionality is available as a Python package. For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. 
+
+To get started, see the [documentation](https://pensa.readthedocs.io/en/latest/) and the [tutorials](https://github.com/drorlab/pensa/tree/master/tutorial).
 
 ## Functionality
 
@@ -38,9 +40,8 @@ Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using back
 Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/).
 
 ## Documentation
-You can find our documentation pages [here](https://pensa.readthedocs.io/en/latest/). 
-While the API documentation is complete, the intro pages are still under construction.
-Please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
+PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/). 
+You can also refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
 
 #### Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
