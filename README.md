@@ -8,18 +8,39 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 
 A collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 
-With PENSA, you can (currently):
-- compare structural ensembles of proteins via the relative entropy of their features and visualize deviations on a reference structure.
-- project ensembles on their combined principal components (PCs) and sort the structures along a PC.
-- cluster structures via k-means and via regular-space clustering and write out the resulting clusters as trajectories.
+## Functionality
 
-Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/). 
+Compare structural ensembles of proteins via
+- the relative entropy of their features
+- statistical tests
+- state-specific information
 
-All functionality is available as a python package (installation see below). For the most common applications, example [python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. To get started, see the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
+and visualize deviations on a reference structure.
 
-The [documentation](https://pensa.readthedocs.io/en/latest/) is still under construction. For now, please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
+Project several ensembles on a joint reduced representations using
+- principal component analysis (PCA)
+- time-lagged independent component analysis (tICA)
 
-## Demo on Google Colab
+and sort the structures along the obtained components.
+
+Cluster structures via 
+- k-means 
+- regular-space clustering 
+
+and write out the resulting clusters as trajectories.
+
+We also provide the first easily applicable implementation of state-specific information analysis methods.
+
+Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide methods to featurize water pockets.
+
+Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/).
+
+## Documentation
+You can find our documentation pages [here](https://pensa.readthedocs.io/en/latest/). 
+While the API documentation is complete, the intro pages are still under construction.
+Please refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
+
+#### Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
