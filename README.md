@@ -25,8 +25,8 @@ Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using back
 Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/).
 
 ## Documentation
-PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/). 
-You can also refer to the [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial) and the installation instructions below.
+PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/), where you find installation instructions and API documentation.
+To see PENSA in action, please see the [tutorials](https://github.com/drorlab/pensa/tree/master/tutorial).
 
 #### Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
