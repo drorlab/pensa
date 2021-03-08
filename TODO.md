@@ -4,7 +4,7 @@
   - [x] Restructure modules to subpackages
   - [x] Adapt README
   - [x] Adapt API documentation
-  - [ ] Include SSI to example scripts
+  - [ ] Include SSI to example scripts?
   - [x] Numbering of principal component trajectories starts with 0, should start with 1
   - [x] Axis labels and legend name for distance matrix plot
   - [x] Function pca_features() does not have labels
@@ -25,9 +25,9 @@
   - [ ] Find useful application or leave it out.
 - [ ] Colab Tutorial
   - [x] Put Notebook on Colab and get it to run.
-  - [x] Add animations.
-  - [ ] Fix installation via pip.
-  - [ ] Add SSI example.  
+  - [x] Add visualizations.
+  - [x] Fix installation via pip.
+  - [ ] Fix animations (they only show white canvas).  
 
 ### Plans
 
