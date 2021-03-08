@@ -9,15 +9,15 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 A collection of Python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
 All functionality is available as a Python package. For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. 
 
-To get started, see the [documentation](https://pensa.readthedocs.io/en/latest/) and the [tutorials](https://github.com/drorlab/pensa/tree/master/tutorial).
+To get started, see the [__documentation__](https://pensa.readthedocs.io/en/latest/) and the [__tutorials__](https://github.com/drorlab/pensa/tree/master/tutorial).
 
 ## Functionality
 
 With PENSA, you can (currently):
-- compare structural ensembles of proteins via the relative entropy of their features, statistical tests, or state-specific information and visualize deviations on a reference structure.
-- project several ensembles on a joint reduced representations using principal component analysis (PCA) or time-lagged independent component analysis (tICA) and sort the structures along the obtained components.
-- cluster structures via k-means or regular-space clustering and write out the resulting clusters as trajectories.
-- trace allosteric information flow through a protein using state-specific information analysis methods.
+- __compare structural ensembles__ of proteins via the relative entropy of their features, statistical tests, or state-specific information and visualize deviations on a reference structure.
+- project several ensembles on a __joint reduced representation__ using principal component analysis (PCA) or time-lagged independent component analysis (tICA) and sort the structures along the obtained components.
+- __cluster structures across ensembles__ via k-means or regular-space clustering and write out the resulting clusters as trajectories.
+- trace allosteric information flow through a protein using __state-specific information__ analysis methods.
 
 Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide density-based methods to featurize water pockets.
 
