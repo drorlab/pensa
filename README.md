@@ -35,12 +35,11 @@ We demonstrate how to use the PENSA library in an interactive and animated examp
 
 ## Citation
 
-General:
+General citation, representing the "concept" of the software:
 ```
-Martin Vögele. PENSA. http://doi.org/10.5281/zenodo.4362136
+Martin Vögele. (2021). PENSA. Zenodo. http://doi.org/10.5281/zenodo.4362136
 ```
-
-To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136):
+To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136).
 
 
 ## Acknowledgments
@@ -53,5 +52,4 @@ Alex Powers, Lukas Stelzl
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).
-
 
