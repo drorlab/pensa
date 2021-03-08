@@ -14,13 +14,12 @@ To get started, see the [documentation](https://pensa.readthedocs.io/en/latest/)
 ## Functionality
 
 With PENSA, you can (currently):
-- Compare structural ensembles of proteins via the relative entropy of their features, statistical tests, or state-specific information and visualize deviations on a reference structure.
-- Project several ensembles on a joint reduced representations using principal component analysis (PCA) or time-lagged independent component analysis (tICA) and sort the structures along the obtained components.
-- Cluster structures via k-means or regular-space clustering and write out the resulting clusters as trajectories.
+- compare structural ensembles of proteins via the relative entropy of their features, statistical tests, or state-specific information and visualize deviations on a reference structure.
+- project several ensembles on a joint reduced representations using principal component analysis (PCA) or time-lagged independent component analysis (tICA) and sort the structures along the obtained components.
+- cluster structures via k-means or regular-space clustering and write out the resulting clusters as trajectories.
+- trace allosteric information flow through a protein using state-specific information analysis methods.
 
-We also provide the first easily applicable implementation of state-specific information analysis methods.
-
-Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide methods to featurize water pockets.
+Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide density-based methods to featurize water pockets.
 
 Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/).
 
