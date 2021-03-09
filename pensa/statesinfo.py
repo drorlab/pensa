@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
-import re
+# import re
 
 
 def check(value,x,y):
