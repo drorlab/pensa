@@ -16,7 +16,7 @@ import os
 # import re
 
 
-def check(value,x,y):
+def _check(value,x,y):
     """
     Check if a value is between x and y
 
@@ -219,7 +219,7 @@ def find_nearest(distr, value):
 
 
 #GAUSSIAN FUNCTIONS
-def gauss(x, x0, sigma, a):
+def _gauss(x, x0, sigma, a):
     """
     Create a Gaussian distribution for a given x-axis linsapce and Gaussian parameters.
 
@@ -245,36 +245,67 @@ def gauss(x, x0, sigma, a):
         gaussian = abs(a*np.exp(-(x-x0)**2/(2*sigma**2)))
     return gaussian
 
-def bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
+def _bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
     """ Two gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)
-def trimodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)
+
+def _trimodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3):
     """ Three gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)
-def quadmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)
+
+def _quadmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4):
     """ Four gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)
-def quinmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)
+
+def _quinmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5):
     """ Five gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)
-def sexmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)
+
+def _sexmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6):
     """ Six gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)   
-def septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)   
+
+def _septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7):
     """ Seven gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)    
-def octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)    
+
+def _octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
     """ Eight gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)    
-def nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)    
+
+def _nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
     """ Nine gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)      
-def decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)+_gauss(x,mu9,sigma9,A9)      
+
+def _decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
     """ Ten gaussians """
-    return gauss(x,mu1,sigma1,A1)+gauss(x,mu2,sigma2,A2)+gauss(x,mu3,sigma3,A3)+gauss(x,mu4,sigma4,A4)+gauss(x,mu5,sigma5,A5)+gauss(x,mu6,sigma6,A6)+gauss(x,mu7,sigma7,A7)+gauss(x,mu8,sigma8,A8)+gauss(x,mu9,sigma9,A9)+gauss(x,mu10,sigma10,A10)        
+    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)+_gauss(x,mu9,sigma9,A9)+_gauss(x,mu10,sigma10,A10)        
 
 
+def _integral(x, mu, sigma, A):
+    """
+    Gaussian integral for evaluating state probabilities. Integration between
+    negative infinity and x.
 
+    Parameters
+    ----------
+    x : float
+        Upper limit for integral.
+    mu : float
+        Gaussian mean.
+    sigma : float
+        Gaussian sigma.
+    A : float
+        Gaussian amplitude.
+
+    Returns
+    -------
+    integral : float
+        Area under Gaussian from negative infinity to x.
+
+    """
+    integral = (A/2) * (1 + math.erf((x - mu) / (sigma * np.sqrt(2))))
+    return integral
 
 
 def printKclosest(arr,n,x,k): 
@@ -324,31 +355,6 @@ def printKclosest(arr,n,x,k):
         a.append(str("{} ".format(arr[q])))
     return a
 
-def integral(x, mu, sigma, A):
-    """
-    Gaussian integral for evaluating state probabilities. Integration between
-    negative infinity and x.
-
-    Parameters
-    ----------
-    x : float
-        Upper limit for integral.
-    mu : float
-        Gaussian mean.
-    sigma : float
-        Gaussian sigma.
-    A : float
-        Gaussian amplitude.
-
-    Returns
-    -------
-    integral : float
-        Area under Gaussian from negative infinity to x.
-
-    """
-    integral = (A/2) * (1 + math.erf((x - mu) / (sigma * np.sqrt(2))))
-    return integral
-
 
 def gauss_fit(distribution, gauss_bin, gauss_smooth):    
     """
@@ -392,7 +398,6 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     ##this is to find the edges of the gaussians for calculating sigma
     sig_vals=[]
     for extrema in corrected_extrema:
-        
         mean_xval=distributionx[np.where(distributiony==extrema)[0][0]]
         ##finding the "noc" closest y values to the 1/2 max value of each extrema
         closest=printKclosest(distributiony, len(distributiony), extrema*0.5, noc)
@@ -411,7 +416,7 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     ##x is the space of angles
     xline=np.linspace(min(distribution),max(distribution),10000)                
     ##choosing the fitting mode
-    peak_number=[gauss,bimodal,trimodal,quadmodal,quinmodal,sexmodal,septmodal,octomodal,nonamodal,decamodal]
+    peak_number=[_gauss,_bimodal,_trimodal,_quadmodal,_quinmodal,_sexmodal,_septmodal,_octomodal,_nonamodal,_decamodal]
     mode=peak_number[len(sig_vals)-1]    
     expected=[]
     for param_num in range(len(mean_pop)):
@@ -421,17 +426,17 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     # try:
     params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
     # except:
-        
     gaussians=[]
     gauss_num_space=np.linspace(0,(len(params))-3,int(len(params)/3))    
     # for j in gaussnumber:
-    #     gaussians.append(gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]))
+    #     gaussians.append(_gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]))
     for gauss_index in gauss_num_space:
-        intmax = integral(max(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
-        intmin = integral(min(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
+        intmax = _integral(max(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
+        intmin = _integral(min(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
         if np.abs(intmax-intmin)>0.02:
-            gaussians.append(gauss(xline, params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)]))
+            gaussians.append(_gauss(xline, params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)]))
     return gaussians, xline
+
 
 ##new function to adjust the gaussian parameters until they work
 def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
@@ -459,14 +464,12 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     xline : list
         x-axis values for the Gaussian distribution.
 
-
     """
     
     smooth_origin=gauss_smooth
     bin_origin=gauss_bins
     if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)        
-    
+        gauss_smooth = int(gauss_bins*0.1)
    
     trial=0
     attempt_no=0
@@ -495,6 +498,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
                 print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
     return gaussians, xline
+
 
 def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=None):
     """
@@ -570,7 +574,6 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
     
     return all_intersects
     
-
 
 def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):    
     """
@@ -648,7 +651,7 @@ def calculate_entropy(state_limits,distribution_list):
             distribution=distribution_list[dist_num]
         
             for frame_num in range(len(distribution)):
-                limit_occupancy_checks[dist_num][frame_num]= check(distribution[frame_num],limits[0],limits[1]) 
+                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
         mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
         ##calculating the entropy as the summation of all -p*log(p) 
         
@@ -698,7 +701,6 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
 
     """
     
-    
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)
     
@@ -712,9 +714,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
             else:
                 set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
         else:
-            set_distr_a=distr_a_input
-                
-                
+            set_distr_a=distr_a_input        
         
         if a_states is None:    
             set_a_states=[]
@@ -831,11 +831,8 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
 
     """
 
-    
     if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)        
- 
-        
+        gauss_smooth = int(gauss_bins*0.1)              
  
     try:       
         ##calculating the entropy for set_distr_a
@@ -861,7 +858,6 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
             set_a_states = a_states
             
         H_a=calculate_entropy(set_a_states,set_distr_a)     
-
 
         ##----------------
         ##calculating the entropy for set_distr_b
@@ -934,8 +930,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         abc_joint_distributions= set_distr_a + set_distr_b + set_distr_c
         
         H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)    
-        
-        
+               
         SSI = (H_a + H_b) - H_ab
         coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
         
@@ -952,247 +947,4 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         
     return round(SSI,4), round(coSSI,4)
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
-    """
-    Calculates State Specific Information statistic for a feature across two ensembles.
-    
-    Parameters
-    ----------
-    features_a : list of str
-        Feature names of the first ensemble. 
-    features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
-    all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
-    verbose : bool, default=True
-        Print intermediate results.
-    write_plots : bool, optional
-        If true, visualise the states over the raw distribution. The default is None.
-        
-        
-    Returns
-    -------
-        data_names : list of str
-            Feature names.
-        data_ssi : float array
-            State Specific Information statistics for each feature.
-
-    """
-
-    
-    # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
-    # Extract the names of the features
-    data_names = features_a
-    # Initialize relative entropy and average value
-    data_ssi = np.zeros(len(data_names))
-    # Loop over all features    
-    for residue in range(len(all_data_a)):
-        data_a = all_data_a[residue]
-        data_b = all_data_b[residue]
-
-        combined_dist=[]
-        for dist_no in range(len(data_a)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            data_both = sim1+sim2      
-            combined_dist.append(data_both)
-    
-            
-        if wat_occupancy is True: 
-            wat_occupancy = [[-0.5,0.5,1.5]]
-            
-        if write_plots is True:
-            write_name = data_names[residue]
-            data_ssi[residue] = calculate_ssi(combined_dist,
-                                              a_states = wat_occupancy,
-                                              write_plots=write_plots,
-                                              write_name=write_name,
-                                              pbc=pbc)
-        else:
-            data_ssi[residue] = calculate_ssi(combined_dist,
-                                              a_states = wat_occupancy,
-                                              pbc=pbc)
-            
-        if verbose is True:
-            print(data_names[residue],data_ssi[residue])
-        
-    return data_names, data_ssi
-
-def ssi_feature_analysis(features_a, all_data_a, 
-                         features_b, all_data_b, 
-                         verbose=True):
-    """
-    Calculates State Specific Information statistic for a feature across two ensembles.
-    
-    Parameters
-    ----------
-    features_a : list of str
-        Feature names of the first ensemble. 
-    features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
-    all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
-    verbose : bool, default=True
-        Print intermediate results.
-        
-        
-    Returns
-    -------
-        data_names : list of str
-            Feature names.
-        data_ssi : float array
-            State Specific Information statistics for each feature.
-
-    """
-
-    
-    # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
-    # Extract the names of the features
-    data_names = features_a
-    # Initialize relative entropy and average value
-    data_ssi = np.zeros((len(data_names),len(data_names)))
-    # Loop over all features
-    
-    for res1 in range(len(all_data_a)):
-
-        res1_data_ens1 = all_data_a[res1]
-        res1_data_ens2 = all_data_b[res1]
-        res1_combined_dist=[]
-        for dist_no in range(len(res1_data_ens1)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = sim1+sim2      
-            res1_combined_dist.append(res1_data_both)
-                
-        for res2 in range(res1, len(all_data_a)):
-                
-            res2_data_ens1 = all_data_a[res2]
-            res2_data_ens2 = all_data_b[res2]     
-            res2_combined_dist=[]
-            for dist_no in range(len(res2_data_ens1)):
-                # # # Make sure the ensembles have the same length of trajectory
-                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = sim1+sim2      
-                res2_combined_dist.append(res2_data_both)            
-            
-            data_ssi[res1][res2] = calculate_ssi(res1_combined_dist,
-                                                 res2_combined_dist)
-            
-            data_ssi[res2][res1] = data_ssi[res1][res2]    
-                
-                
-            if verbose is True:
-                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])
-    
-    return data_names, data_ssi
-
-def cossi_featens_analysis(features_a, all_data_a, 
-                           features_b, all_data_b,
-                           cossi_features_a, cossi_all_data_a, 
-                           cossi_features_b, cossi_all_data_b, 
-                           verbose=True):
-    """
-    
-
-    Parameters
-    ----------
-    
-    features_a : list of str
-        Feature names of the first ensemble. 
-    features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    all_data_a : float array
-        Trajectory data from the first ensemble.
-    all_data_b : float array
-        Trajectory data from the second ensemble. 
-    cossi_features_a : list of str
-        Feature names of the first ensemble. 
-    cossi_features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    cossi_all_data_a : float array
-        Trajectory data from the first ensemble. 
-    cossi_all_data_b : float array
-        Trajectory data from the second ensemble. 
-    verbose : bool, default=True
-        Print intermediate results.
-
-
-    Returns
-    -------
-    data_names : list of str
-        Feature names.
-    data_ssi : float array
-        State Specific Information SSI statistics for each feature.
-    cossi_data_names : list of str
-        Feature names of stabilizing feature.
-    data_cossi : float array
-        State Specific Information Co-SSI statistics for each feature.
-
-    """
-
-
-    
-    # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
-    # Extract the names of the features
-    data_names = features_a
-
-    # Assert that the features are the same and data sets have same number of features
-    assert cossi_features_a == cossi_features_b
-    assert cossi_all_data_a.shape[0] == cossi_all_data_b.shape[0] 
-    # Extract the names of the features
-    cossi_data_names = cossi_features_a
-    
-    # Initialize relative entropy and average value
-    data_ssi = np.zeros((len(data_names),len(cossi_data_names)))
-    data_cossi = np.zeros((len(data_names),len(cossi_data_names)))
-    for res1 in range(len(all_data_a)):
-
-        res1_data_ens1 = all_data_a[res1]
-        res1_data_ens2 = all_data_b[res1]
-        res1_combined_dist=[]
-        for dist_no in range(len(res1_data_ens1)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = sim1+sim2      
-            res1_combined_dist.append(res1_data_both)
-                
-        for res2 in range(len(cossi_all_data_a)):
-                
-            res2_data_ens1 = cossi_all_data_a[res2]
-            res2_data_ens2 = cossi_all_data_b[res2]     
-            res2_combined_dist=[]
-            for dist_no in range(len(res2_data_ens1)):
-                # # # Make sure the ensembles have the same length of trajectory
-                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = sim1+sim2      
-                res2_combined_dist.append(res2_data_both)
-            
-            data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
-                                                                           res2_combined_dist)
-                
-            if verbose is True:
-                print('\nFeature Pair: ', data_names[res1], cossi_data_names[res2],
-                      '\nSSI[bits]: ', data_ssi[res1][res2],
-                      '\nCo-SSI[bits]: ', data_cossi[res1][res2])
-    
-    return data_names, cossi_data_names, data_ssi, data_cossi
 

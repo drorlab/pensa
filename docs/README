@@ -2,11 +2,11 @@ Installations needed:
 pip install sphinx
 pip install sphinx_rtd_theme
 
-To build the docs from the .rst files, run
-sphinx-build -b html . _build
-
 Auto-generate API docs:
 sphinx-apidoc -o ./source ../pensa
+
+To build the docs from the .rst files, run
+sphinx-build -b html . _build
 
 This project uses the NumPy docstring format:
 https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html

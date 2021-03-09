@@ -6,7 +6,10 @@ tutorial/vispdb/
 tutorial/pca/
 tutorial/clusters/
 tutorial/mor-data/
-<<<<<<< HEAD
+tutorial/mor_tm.txt
+tutorial/atom_features/
+tutorial/water_features/
+tutorial/sc-torsions/
 tests/test_data/traj/
 tests/test_data/results/
 tests/test_data/plots/
@@ -17,8 +20,6 @@ tests/test_data/mor-data/
 tests/test_data/MOR-*/.*.npz
 *.ipynb
 .DS_Store
-=======
->>>>>>> 32f40aa0af6038bd7ca92d99e31f3ae2f262438f
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

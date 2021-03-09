@@ -20,8 +20,8 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'PENSA'
-copyright = '2021, Martin Vögele'
-author = 'Martin Vögele'
+copyright = '2020-2021, Martin Vögele, Neil Thomson, Sang Truong'
+author = 'Martin Vögele, Neil Thomson, Sang Truong'
 
 
 # -- General configuration ---------------------------------------------------
@@ -68,10 +68,14 @@ autodoc_mock_imports = [
     'pyemma',
     'mdshare',
     'MDAnalysis',
-    'cython'
+    'cython',
+    'biotite'
 ]
 
 # Docstrings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True 
+
+# Short module names
+add_module_names = False
 

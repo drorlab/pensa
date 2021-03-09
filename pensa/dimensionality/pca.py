@@ -104,7 +104,7 @@ def project_on_pc(data, ev_idx, pca=None):
         data : float array
             Trajectory data [frames,frame_data].
         ev_idx : int
-            Index of the eigenvector to project on.
+            Index of the eigenvector to project on (starts with zero). 
         pca : PCA obj, optional
             Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
@@ -166,7 +166,7 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
         proj_sort = proj[sort_idx] 
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", a.n_atoms) as W:
+        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", a.n_atoms) as W:
             for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)     
@@ -226,7 +226,7 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", aa.n_atoms) as W:
+        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", aa.n_atoms) as W:
             for i in range(data.shape[0]):
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ua.trajectory[oidx_sort[i]]
