@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@author: Neil J Thomson
-"""
-
 import numpy as np
 from queue import PriorityQueue 
 import math
