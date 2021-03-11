@@ -90,9 +90,9 @@ data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions
 # # # Write_plots is disabled for this function as the combinatorial nature
 # # # of comaring all features will generate the same plot features**2 times.
 # # # To view clustered distributions, use ssi_ensemble_analysis, which is much quicker.
-data_names, data_ssi = ssi_feature_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
-                                            verbose=True)
+# data_names, data_ssi = ssi_feature_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
+#                                             sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
+#                                             verbose=True)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -185,10 +185,10 @@ data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDist
 # # # features and the ensemble (ssi_ensemble_analysis), we can use co-SSI. 
 # # # An equivalent interpretation of co-SSI is how much the switch between ensembles
 # # # is involved in the communication between two features.
-feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-                                                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'],  
-                                                                            water_feat_a['WaterPocket_Distr'],water_data_a['WaterPocket_Distr'],
-                                                                            water_feat_b['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'],
-                                                                            verbose=True)
+# feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
+#                                                                             sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'],  
+#                                                                             water_feat_a['WaterPocket_Distr'],water_data_a['WaterPocket_Distr'],
+#                                                                             water_feat_b['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'],
+#                                                                             verbose=True)
 
 
