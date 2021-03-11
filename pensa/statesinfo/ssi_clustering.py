@@ -9,6 +9,7 @@ import os
 from pensa.features import *
 from pensa.statesinfo import *
 
+# -- Functions to cluster feature distributions into discrete states--
 
 
 def smooth(x,window_len,window=None):
@@ -54,7 +55,6 @@ def smooth(x,window_len,window=None):
     y=np.convolve(w/w.sum(),s,mode='valid')
     return y
 
-
 def find_nearest(distr, value):
     """
     Find the nearest value in a distribution to an arbitrary reference value.
@@ -75,6 +75,53 @@ def find_nearest(distr, value):
     array = np.array(distr)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
+
+def printKclosest(arr,n,x,k): 
+    """
+    Print K closest values to a specified value. 
+
+    Parameters
+    ----------
+    arr : list
+        The distribution of values.
+    n : int
+        Search through the first n values of arr for k closest values.
+    x : float
+        The reference value for which the closest values are sought.
+    k : int
+        Number of closest values desired.
+
+    Returns
+    -------
+    a : list
+        The closest k values to x.
+
+    """
+    a=[]
+    # Make a max heap of difference with  
+    # first k elements.  
+    pq = PriorityQueue() 
+    for neighb in range(k): 
+        pq.put((-abs(arr[neighb]-x),neighb)) 
+    # Now process remaining elements 
+    for neighb in range(k,n): 
+        diff = abs(arr[neighb]-x) 
+        p,pi = pq.get() 
+        curr = -p 
+        # If difference with current  
+        # element is more than root,  
+        # then put it back.  
+        if diff>curr: 
+            pq.put((-curr,pi)) 
+            continue
+        else: 
+            # Else remove root and insert 
+            pq.put((-diff,neighb))           
+    # Print contents of heap. 
+    while(not pq.empty()): 
+        p,q = pq.get() 
+        a.append(str("{} ".format(arr[q])))
+    return a
 
 
 def _gauss(x, x0, sigma, a):
@@ -139,7 +186,6 @@ def _decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sig
     """ Ten gaussians """
     return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)+_gauss(x,mu9,sigma9,A9)+_gauss(x,mu10,sigma10,A10)        
 
-
 def _integral(x, mu, sigma, A):
     """
     Gaussian integral for evaluating state probabilities. Integration between
@@ -166,53 +212,6 @@ def _integral(x, mu, sigma, A):
     return integral
 
 
-def printKclosest(arr,n,x,k): 
-    """
-    Print K closest values to a specified value. 
-
-    Parameters
-    ----------
-    arr : list
-        The distribution of values.
-    n : int
-        Search through the first n values of arr for k closest values.
-    x : float
-        The reference value for which the closest values are sought.
-    k : int
-        Number of closest values desired.
-
-    Returns
-    -------
-    a : list
-        The closest k values to x.
-
-    """
-    a=[]
-    # Make a max heap of difference with  
-    # first k elements.  
-    pq = PriorityQueue() 
-    for neighb in range(k): 
-        pq.put((-abs(arr[neighb]-x),neighb)) 
-    # Now process remaining elements 
-    for neighb in range(k,n): 
-        diff = abs(arr[neighb]-x) 
-        p,pi = pq.get() 
-        curr = -p 
-        # If difference with current  
-        # element is more than root,  
-        # then put it back.  
-        if diff>curr: 
-            pq.put((-curr,pi)) 
-            continue
-        else: 
-            # Else remove root and insert 
-            pq.put((-diff,neighb))           
-    # Print contents of heap. 
-    while(not pq.empty()): 
-        p,q = pq.get() 
-        a.append(str("{} ".format(arr[q])))
-    return a
-
 
 def gauss_fit(distribution, gauss_bin, gauss_smooth):    
     """
@@ -236,63 +235,72 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
         x-axis values for the Gaussian distribution.
 
     """
-    histo=np.histogram(distribution, bins=gauss_bin, density=True)
-    distributionx=smooth(histo[1][0:-1],gauss_smooth)
-    ##this shifts the histo values down by the minimum value to help with finding a minimum
-    distributiony=smooth(histo[0]-min(histo[0]),gauss_smooth)
-    maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
-    ##the maxima may be an artifact of undersampling
-    ##this grabs only the maxima that correspond to a density greater than the cutoff
-    ##cutoff= 0.75% at a 99.25% significance level
-    corrected_extrema=[item for item in maxima if item > max(distributiony)*0.0075]
-    ##finding the guess parameters for the plots
-    ##empty lists for the guess params to be added to
+    histo = np.histogram(distribution, bins=gauss_bin, density=True)
+    distributionx = smooth(histo[1][0:-1], gauss_smooth)
+    ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
+    distributiony = smooth(histo[0]-min(histo[0]), gauss_smooth)
+    ## Obtaining maxima below cutoff = 0.75% of global maximum
+    all_maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
+    corrected_extrema = [item for item in all_maxima if item > max(distributiony)*0.0075]
+    
+    ## Obtain Gaussian guess params
     mean_pop=[]
     sigma_pop=[]
-    ##number of closest neighbours
-    ##setting for the sigma finding function
-    noc=28
-    ##for all the extrema, find the 'noc' yval closest to half max yval
-    ##this is to find the edges of the gaussians for calculating sigma
+    num_closest_neighb=28
+    ## Locate sigma from FWHM for each maxima
     sig_vals=[]
     for extrema in corrected_extrema:
-        mean_xval=distributionx[np.where(distributiony==extrema)[0][0]]
-        ##finding the "noc" closest y values to the 1/2 max value of each extrema
-        closest=printKclosest(distributiony, len(distributiony), extrema*0.5, noc)
-        ##finding the x closest to the mean
-        xlist=[np.where(distributiony==float(closesty))[0][0] for closesty in closest]
-        xsig=find_nearest(distributionx[xlist],mean_xval)
-        ##obtaining the width of the distribution
-        FWHM=np.absolute(xsig-mean_xval)
+        ## Finding closest values to half maximum
+        closest_yvals = printKclosest(distributiony, len(distributiony), extrema*0.5, num_closest_neighb)
+        closest_xvals=[np.where(distributiony==float(closesty))[0][0] for closesty in closest_yvals]
+
+        mean_xval = distributionx[np.where(distributiony==extrema)[0][0]]
+        half_max_xval=find_nearest(distributionx[closest_xvals],mean_xval)
+        
+        FWHM=np.absolute(half_max_xval - mean_xval)
         sigma = FWHM /(2*(np.sqrt(2*np.log(2)))) 
         sig_vals.append(sigma)        
+        
     ##the mean x of the gaussian is the value of x at the peak of y
     mean_vals=[distributionx[np.where(distributiony==extrema)[0][0]] for extrema in corrected_extrema]
     for extr_num in range(len(corrected_extrema)):
         mean_pop.append(mean_vals[extr_num])
         sigma_pop.append(sig_vals[extr_num])
+        
     ##x is the space of angles
     xline=np.linspace(min(distribution),max(distribution),10000)                
     ##choosing the fitting mode
     peak_number=[_gauss,_bimodal,_trimodal,_quadmodal,_quinmodal,_sexmodal,_septmodal,_octomodal,_nonamodal,_decamodal]
     mode=peak_number[len(sig_vals)-1]    
     expected=[]
+    
     for param_num in range(len(mean_pop)):
         expected.append(mean_pop[param_num])
         expected.append(sigma_pop[param_num])
         expected.append(corrected_extrema[param_num])    
-    # try:
+
     params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
-    # except:
+
     gaussians=[]
     gauss_num_space=np.linspace(0,(len(params))-3,int(len(params)/3))    
-    # for j in gaussnumber:
-    #     gaussians.append(_gauss(xline, params[0+int(j)], params[1+int(j)], params[2+int(j)]))
+
     for gauss_index in gauss_num_space:
-        intmax = _integral(max(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
-        intmin = _integral(min(distribution),params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)])
+        intmax = _integral(max(distribution),
+                           params[0+int(gauss_index)], 
+                           params[1+int(gauss_index)], 
+                           params[2+int(gauss_index)])
+        
+        intmin = _integral(min(distribution),
+                           params[0+int(gauss_index)],
+                           params[1+int(gauss_index)], 
+                           params[2+int(gauss_index)])
+        
         if np.abs(intmax-intmin)>0.02:
-            gaussians.append(_gauss(xline, params[0+int(gauss_index)], params[1+int(gauss_index)], params[2+int(gauss_index)]))
+            gaussians.append(_gauss(xline, 
+                                    params[0+int(gauss_index)],
+                                    params[1+int(gauss_index)], 
+                                    params[2+int(gauss_index)]))
+            
     return gaussians, xline
 
 
@@ -355,7 +363,6 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
                 print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
     return gaussians, xline
-
 
 def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=None):
     """
@@ -431,7 +438,6 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
     
     return all_intersects
     
-
 def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):    
     """
     Cluster a distribution into discrete states with well-defined limits.
