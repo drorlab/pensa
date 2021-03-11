@@ -12,7 +12,7 @@ from pensa.features import *
 from pensa.statesinfo import *
 
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -42,7 +42,9 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
 
     """
 
-    
+    for fa, fb in zip(features_a, features_b):
+        print(fa,' - ',fb,' - ',fa==fb)
+
     # Assert that the features are the same and data sets have same number of features
     assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -85,8 +87,8 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, all_data_a, 
-                         features_b, all_data_b, 
+def ssi_feature_analysis(features_a, features_b,
+                         all_data_a, all_data_b, 
                          verbose=True):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -161,10 +163,10 @@ def ssi_feature_analysis(features_a, all_data_a,
     return data_names, data_ssi
 
 
-def cossi_featens_analysis(features_a, all_data_a, 
-                           features_b, all_data_b,
-                           cossi_features_a, cossi_all_data_a, 
-                           cossi_features_b, cossi_all_data_b, 
+def cossi_featens_analysis(features_a, features_b,
+                           all_data_a, all_data_b,
+                           cossi_features_a, cossi_features_b,
+                           cossi_all_data_a, cossi_all_data_b, 
                            verbose=True):
     """
     
