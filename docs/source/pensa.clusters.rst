@@ -1,6 +1,11 @@
 pensa.clusters
 ======================
 
+.. automodule:: pensa.clusters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.clusters.clustering
 --------------------------------
 
@@ -24,4 +29,3 @@ pensa.clusters.wss
    :members:
    :undoc-members:
    :show-inheritance:
-

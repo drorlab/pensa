@@ -1,15 +1,18 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec 14 20:38:48 2020
-
-@author: Neil J Thomson
-
-This script is designed to obtain a distribution for the water pockets which respresents
+Methods to obtain a distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
+
 For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket. 
 If there is ever an instance where two water molecules occupy the same pocket at the same time,
 then the water polarisation of the molecule ID that occupies the pocket most often is used.
+
+The methods here are based on the following paper:
+
+    |    Neil J. Thomson, Owen N. Vickery, Callum M. Ives, Ulrich Zachariae: 
+    |    Ion-water coupling controls class A GPCR signal transduction pathways. 
+    |    https://doi.org/10.1101/2020.08.28.271510
+    
 """
 
 import MDAnalysis as mda

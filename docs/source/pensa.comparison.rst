@@ -1,6 +1,11 @@
 pensa.comparison
 ========================
 
+.. automodule:: pensa.comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.comparison.relative\_entropy
 -----------------------------------------
 
@@ -32,4 +37,3 @@ pensa.comparison.visualization
    :members:
    :undoc-members:
    :show-inheritance:
-

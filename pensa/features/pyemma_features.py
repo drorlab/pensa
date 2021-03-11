@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Methods to featurize a protein, based on PyEMMA.
+
+More options are described here:
+http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
+"""
+
 import warnings
 import numpy as np
 import pyemma
@@ -21,7 +29,6 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                            features=['bb-torsions','sc-torsions','bb-distances']):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
-    http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
     
     Parameters
     ----------

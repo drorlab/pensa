@@ -1,6 +1,11 @@
 pensa.dimensionality
 ============================
 
+.. automodule:: pensa.dimensionality
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.dimensionality.pca
 -------------------------------
 
@@ -16,4 +21,3 @@ pensa.dimensionality.tica
    :members:
    :undoc-members:
    :show-inheritance:
-

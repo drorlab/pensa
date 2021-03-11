@@ -1,6 +1,11 @@
 pensa.preprocessing
 ===========================
 
+.. automodule:: pensa.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.preprocessing.coordinates
 --------------------------------------
 
@@ -24,4 +29,3 @@ pensa.preprocessing.selection
    :members:
    :undoc-members:
    :show-inheritance:
-

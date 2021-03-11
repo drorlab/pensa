@@ -1,6 +1,11 @@
 pensa.features
 ======================
 
+.. automodule:: pensa.features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.features.density\_features
 ---------------------------------------
 
@@ -24,4 +29,3 @@ pensa.features.pyemma\_features
    :members:
    :undoc-members:
    :show-inheritance:
-

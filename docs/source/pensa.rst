@@ -1,6 +1,11 @@
 pensa
 =============
 
+.. automodule:: pensa
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,4 +18,3 @@ Subpackages
    pensa.features
    pensa.preprocessing
    pensa.statesinfo
-
