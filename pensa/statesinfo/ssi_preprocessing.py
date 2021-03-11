@@ -5,6 +5,8 @@ from pensa.features import *
 from pensa.statesinfo import *
 
 
+# -- Functions to preprocess feature distributions for state clustering --
+
 def import_distribution(simulation_folder, file_name):
     """
     Import data written to a txt file.
@@ -24,34 +26,6 @@ def import_distribution(simulation_folder, file_name):
     """
     dists = np.loadtxt(simulation_folder + file_name,  delimiter=",")
     return dists
-    
-    
-def match_sim_lengths(sim1,sim2):
-    """
-    Make two lists the same length by truncating the longer list to match.
-
-    Parameters
-    ----------
-    sim1 : list
-        A one dimensional distribution of a specific feature.
-    sim2 : list
-        A one dimensional distribution of a specific feature.
-
-    Returns
-    -------
-    sim1 : list
-        A one dimensional distribution of a specific feature.
-    sim2 : list
-        A one dimensional distribution of a specific feature.
-
-    """
-    if len(sim1)!=len(sim2):
-        if len(sim1)>len(sim2):
-            sim1=sim1[0:len(sim2)]
-        if len(sim1)<len(sim2):
-            sim2=sim2[0:len(sim1)]  
-    return sim1, sim2
-        
 
 def get_filenames(folder):  
     """
@@ -71,15 +45,15 @@ def get_filenames(folder):
     files = [file.split(folder)[1] for file in glob.glob(folder + "*", recursive=True)]
     return files
     
-    
+
 
 def periodic_correction(angle1):
     """
-    Correcting for the periodicity of angles in radians. This ensures state 
-    clustering defines states that span over the -pi, pi boundary as one state. 
+    Correcting for the periodicity of angles [radians]. This ensures that
+    states that span over the -pi, pi boundary are clustered as one state. 
     Waters featurized using PENSA are assigned dscrete state of 10000.0 for 
     representation of pocket occupancy, these values are ignored within the 
-    periodic correction so that only the water orientation periodicity is handled
+    periodic correction so that only the water orientation periodicity is handled.
     
     
     Parameters
@@ -115,5 +89,34 @@ def periodic_correction(angle1):
     return new_dist
 
 
+    
+def match_sim_lengths(sim1,sim2):
+    """
+    Make two lists the same length by truncating the longer list to match.
+    This is necessary for clustering to ensure state clusters are not 
+    biased towards one ensemble. Also this is necessary for SSI as a binary 
+    distribution is created for the ensemble switch based off of equal length
+    simulations.
 
+    Parameters
+    ----------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    Returns
+    -------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    """
+    if len(sim1)!=len(sim2):
+        if len(sim1)>len(sim2):
+            sim1=sim1[0:len(sim2)]
+        if len(sim1)<len(sim2):
+            sim2=sim2[0:len(sim1)]  
+    return sim1, sim2
 
