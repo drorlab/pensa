@@ -89,7 +89,7 @@ def ssi_feature_analysis(features_a, all_data_a,
                          features_b, all_data_b, 
                          verbose=True):
     """
-    Calculates State Specific Information statistic for a feature across two ensembles.
+    Calculates State Specific Information statistic between two features across two ensembles.
     
     Parameters
     ----------
@@ -167,6 +167,8 @@ def cossi_featens_analysis(features_a, all_data_a,
                            cossi_features_b, cossi_all_data_b, 
                            verbose=True):
     """
+    Calculates State Specific Information CoSSI statistic between
+    two features and the binary ensemble change.
     
 
     Parameters
