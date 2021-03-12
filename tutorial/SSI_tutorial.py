@@ -178,7 +178,7 @@ data_names, data_ssi = ssi_feature_analysis(water_feat_a['WaterPocket_Distr'],wa
                                             verbose=True)
 
 # # # An equivalent interpretation of co-SSI is how much the switch between ensembles
-# # # is involved in stabilizing/destablizing the communication between two features. 
+# # # is involved in stabilizing (positive co-SSI) / destablizing (negative co-SSI) the communication between two features. 
 feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
                                                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                                                             water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
