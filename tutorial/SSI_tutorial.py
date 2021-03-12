@@ -166,9 +166,9 @@ data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDist
                                              water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
                                              wat_occupancy=True, pbc=False, verbose=True)
 
-# # # In this example we can see that the state of water 01 shares 0.25 bits of
-# # # information with the ensembles, but the occupancy of water 1 pocket shares 0.07 bits, 
-# # # revealing that the polarisation of this water is functionally important with respect
+# # # In this example we can see that the state of water 01 shares ~0.25 bits of
+# # # information with the ensembles, but the occupancy of water 1 pocket shares ~0.07 bits, 
+# # # revealing that the polarisation of this water is more functionally important with respect
 # # # to what these ensembles are investigating.
 
 # # # We can calculate the State Specific Information (SSI) shared between the 
@@ -177,11 +177,15 @@ data_names, data_ssi = ssi_feature_analysis(water_feat_a['WaterPocket_Distr'],wa
                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                             verbose=True)
 
+# # # The ssi_feature_analysis() tells us that these two water pockets are conformationally to some extent.
+
 # # # An equivalent interpretation of co-SSI is how much the switch between ensembles
-# # # is involved in stabilizing (positive co-SSI) / destablizing (negative co-SSI) the communication between two features. 
+# # # is involved in strengthening (positive co-SSI) / weakening (negative co-SSI) the conformational coupling between two features. 
 feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
                                                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                                                             water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
                                                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                                                             verbose=True)
 
+# # # The cossi_featens_analysis() tells us that the conformational coupling between these
+# # # water pockets is slightly weakened by the change performed in the ensemble switch.
