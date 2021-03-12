@@ -12,7 +12,7 @@ from pensa.features import *
 from pensa.statesinfo import *
 
 
-def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -27,6 +27,12 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    wat_occupancy : bool, optional
+        Set to 'True' if the data input is water pocket occupancy distribution.
+        The default is None.
+    pbc : bool, optional
+        If true, the apply periodic bounary corrections on angular distribution inputs.
+        The input for periodic correction must be radians. The default is True.
     verbose : bool, default=True
         Print intermediate results.
     write_plots : bool, optional
@@ -41,6 +47,8 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
             State Specific Information statistics for each feature.
 
     """
+
+
 
     
     # Assert that the features are the same and data sets have same number of features
@@ -65,6 +73,7 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
     
             
         if wat_occupancy is True: 
+            ## Define states for water occupancy 
             wat_occupancy = [[-0.5,0.5,1.5]]
             
         if write_plots is True:
@@ -85,9 +94,8 @@ def ssi_ensemble_analysis(features_a, all_data_a, features_b, all_data_b, wat_oc
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, all_data_a, 
-                         features_b, all_data_b, 
-                         verbose=True):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
+
     """
     Calculates State Specific Information statistic between two features across two ensembles.
     
@@ -161,11 +169,12 @@ def ssi_feature_analysis(features_a, all_data_a,
     return data_names, data_ssi
 
 
-def cossi_featens_analysis(features_a, all_data_a, 
-                           features_b, all_data_b,
-                           cossi_features_a, cossi_all_data_a, 
-                           cossi_features_b, cossi_all_data_b, 
+def cossi_featens_analysis(features_a, features_b, 
+                           all_data_a, all_data_b, 
+                           cossi_features_a, cossi_features_b, 
+                           cossi_all_data_a, cossi_all_data_b, 
                            verbose=True):
+
     """
     Calculates State Specific Information CoSSI statistic between
     two features and the binary ensemble change.

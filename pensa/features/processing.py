@@ -183,3 +183,8 @@ def sort_distances_by_resnum(dist, data):
     new_data = data[:,new_order]
     return new_dist, new_data
 
+
+
+
+
+

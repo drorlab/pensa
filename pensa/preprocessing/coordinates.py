@@ -3,6 +3,7 @@ import pyemma
 import numpy as np
 import os
 import requests
+from MDAnalysis.analysis import align
 
 
 # -- Functions to preprocess trajectories --

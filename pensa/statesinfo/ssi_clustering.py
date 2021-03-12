@@ -1,18 +1,17 @@
 import numpy as np
 from queue import PriorityQueue 
 import math
-#from tqdm import tqdm
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
 from pensa.features import *
-from pensa.statesinfo import *
+from pensa.statesinfo import * 
 
-# -- Functions to cluster feature distributions into discrete states--
+# -- Functions to cluster feature distributions into discrete states --
 
 
-def smooth(x,window_len,window=None):
+def _smooth(x,window_len,window=None):
     """
     Smooth data so that true extrema can be found without any noise
 
@@ -55,7 +54,7 @@ def smooth(x,window_len,window=None):
     y=np.convolve(w/w.sum(),s,mode='valid')
     return y
 
-def find_nearest(distr, value):
+def _find_nearest(distr, value):
     """
     Find the nearest value in a distribution to an arbitrary reference value.
 
@@ -76,7 +75,7 @@ def find_nearest(distr, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def printKclosest(arr,n,x,k): 
+def _printKclosest(arr,n,x,k): 
     """
     Print K closest values to a specified value. 
 
@@ -122,7 +121,6 @@ def printKclosest(arr,n,x,k):
         p,q = pq.get() 
         a.append(str("{} ".format(arr[q])))
     return a
-
 
 def _gauss(x, x0, sigma, a):
     """
@@ -215,7 +213,7 @@ def _integral(x, mu, sigma, A):
 
 def gauss_fit(distribution, gauss_bin, gauss_smooth):    
     """
-    Obtaining the gaussians to fit the distribution into a Gaussian mix. 
+    Obtaining the gaussians to fit the distribution into a Gaussian mix.
     Bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
 
     Parameters
@@ -236,9 +234,9 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
 
     """
     histo = np.histogram(distribution, bins=gauss_bin, density=True)
-    distributionx = smooth(histo[1][0:-1], gauss_smooth)
+    distributionx = _smooth(histo[1][0:-1], gauss_smooth)
     ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
-    distributiony = smooth(histo[0]-min(histo[0]), gauss_smooth)
+    distributiony = _smooth(histo[0]-min(histo[0]), gauss_smooth)
     ## Obtaining maxima below cutoff = 0.75% of global maximum
     all_maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
     corrected_extrema = [item for item in all_maxima if item > max(distributiony)*0.0075]
@@ -251,13 +249,13 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
     sig_vals=[]
     for extrema in corrected_extrema:
         ## Finding closest values to half maximum
-        closest_yvals = printKclosest(distributiony, len(distributiony), extrema*0.5, num_closest_neighb)
-        closest_xvals=[np.where(distributiony==float(closesty))[0][0] for closesty in closest_yvals]
+        closest_yvals = _printKclosest(distributiony, len(distributiony), extrema*0.5, num_closest_neighb)
+        closest_xvals = [np.where(distributiony==float(closesty))[0][0] for closesty in closest_yvals]
 
         mean_xval = distributionx[np.where(distributiony==extrema)[0][0]]
-        half_max_xval=find_nearest(distributionx[closest_xvals],mean_xval)
+        half_max_xval = _find_nearest(distributionx[closest_xvals],mean_xval)
         
-        FWHM=np.absolute(half_max_xval - mean_xval)
+        FWHM = np.absolute(half_max_xval - mean_xval)
         sigma = FWHM /(2*(np.sqrt(2*np.log(2)))) 
         sig_vals.append(sigma)        
         
@@ -268,7 +266,7 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
         sigma_pop.append(sig_vals[extr_num])
         
     ##x is the space of angles
-    xline=np.linspace(min(distribution),max(distribution),10000)                
+    Gauss_xvals=np.linspace(min(distribution),max(distribution),10000)                
     ##choosing the fitting mode
     peak_number=[_gauss,_bimodal,_trimodal,_quadmodal,_quinmodal,_sexmodal,_septmodal,_octomodal,_nonamodal,_decamodal]
     mode=peak_number[len(sig_vals)-1]    
@@ -279,7 +277,7 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
         expected.append(sigma_pop[param_num])
         expected.append(corrected_extrema[param_num])    
 
-    params,cov=curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
+    params, cov = curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
 
     gaussians=[]
     gauss_num_space=np.linspace(0,(len(params))-3,int(len(params)/3))    
@@ -296,12 +294,12 @@ def gauss_fit(distribution, gauss_bin, gauss_smooth):
                            params[2+int(gauss_index)])
         
         if np.abs(intmax-intmin)>0.02:
-            gaussians.append(_gauss(xline, 
+            gaussians.append(_gauss(Gauss_xvals, 
                                     params[0+int(gauss_index)],
                                     params[1+int(gauss_index)], 
                                     params[2+int(gauss_index)]))
             
-    return gaussians, xline
+    return gaussians, Gauss_xvals
 
 
 def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
@@ -331,28 +329,28 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
 
     """
     
-    smooth_origin=gauss_smooth
-    bin_origin=gauss_bins
+    smooth_origin = gauss_smooth
+    bin_origin = gauss_bins
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)
    
-    trial=0
-    attempt_no=0
+    trial = 0
+    attempt_no = 0
     
     ##making a list of +/- values for bin trials to ensure minimal change
-    bin_adjust_up= np.array(range(1,10000))
-    bin_adjust_down= bin_adjust_up.copy()*-1
-    bin_adjust= np.insert(bin_adjust_up, np.arange(len(bin_adjust_down)), bin_adjust_down)
+    bin_adjust_up = np.array(range(1,10000))
+    bin_adjust_down = bin_adjust_up.copy()*-1
+    bin_adjust = np.insert(bin_adjust_up, np.arange(len(bin_adjust_down)), bin_adjust_down)
     
     ##if clustering does not work for a given bin number then adjust the bin number
-    while trial<1:
+    while trial < 1:
         try:
-            gaussians, xline = gauss_fit(distr, gauss_bins, gauss_smooth)
-            trial+=1
+            gaussians, Gauss_xvals = gauss_fit(distr, gauss_bins, gauss_smooth)
+            trial += 1
         except:
-            attempt_no+=1
-            trial=0
-            gauss_bins= bin_origin + bin_adjust[attempt_no]
+            attempt_no += 1
+            trial = 0
+            gauss_bins = bin_origin + bin_adjust[attempt_no]
     
     ##only warn about clustering changes if specific parameters were input
     if bin_origin == 120 and smooth_origin is None:
@@ -362,9 +360,9 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
             else:
                 print('Warning: Altered gauss_bins by >10% for clustering of '+write_name+'.\nYou might want to check cluster plot.')
   
-    return gaussians, xline
+    return gaussians, Gauss_xvals
 
-def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=None):
+def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_name=None):
     """
     Obtain the intersects of a mixture of Gaussians which have been obtained
     from decomposing a distribution into Gaussians. Additional state limits are
@@ -394,7 +392,7 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
     all_intersects=[min(distribution)]
     mean_gauss_xval=[]
     for gauss_num in range(len(gaussians)):
-        mean_gauss_xval.append(xline[list(gaussians[gauss_num]).index(max(gaussians[gauss_num]))])
+        mean_gauss_xval.append(Gauss_xvals[list(gaussians[gauss_num]).index(max(gaussians[gauss_num]))])
         
     reorder_indices=[mean_gauss_xval.index(mean) for mean in sorted(mean_gauss_xval)]    
     ##sort gaussians in order of their mean xval and ignore gaussians with maxima below 0.0001 (99% sig)
@@ -404,30 +402,30 @@ def get_intersects(gaussians,distribution,xline, write_plots=None,write_name=Non
         ##Find indices between neighbouring gaussians
         idx = np.argwhere(np.diff(np.sign(reorder_gaussians[gauss_index] - reorder_gaussians[gauss_index+1]))).flatten()
         if len(idx)==1:
-            all_intersects.append(float(xline[idx][0]) )
+            all_intersects.append(float(Gauss_xvals[idx][0]) )
         elif len(idx)!=0:
             ##selects the intersect with the maximum probability
             ##to stop intersects occuring when the gaussians trail to zero further right on the plot
             intersect_ymax=max([reorder_gaussians[gauss_index][intersect] for intersect in idx])
             intersect_ymax_index=[item for item in idx if reorder_gaussians[gauss_index][item]==intersect_ymax]            
-            all_intersects.append(float(xline[intersect_ymax_index]))
+            all_intersects.append(float(Gauss_xvals[intersect_ymax_index]))
         ##for gaussian neighbours that don't intersect, set state limit as center between maxima
         elif len(idx)==0:            
             gauss_max1=list(reorder_gaussians[gauss_index]).index(max(reorder_gaussians[gauss_index]))
             gauss_max2=list(reorder_gaussians[gauss_index+1]).index(max(reorder_gaussians[gauss_index+1]))
-            intersect =  0.5* np.abs(xline[gauss_max2] +  xline[gauss_max1])
+            intersect =  0.5* np.abs(Gauss_xvals[gauss_max2] +  Gauss_xvals[gauss_max1])
             all_intersects.append(float(intersect))
             
     all_intersects.append(max(distribution))  
         
-    if write_plots is not None:
+    if write_plots is True:
         if not os.path.exists('ssi_plots/'):
             os.makedirs('ssi_plots/')
         plt.figure()      
         plt.ion()
         plt.hist(distribution,bins=360, density=True, alpha=0.5)
         for gauss_index in range(len(reorder_gaussians)):
-            plt.plot(xline, reorder_gaussians[gauss_index], lw=2)        
+            plt.plot(Gauss_xvals, reorder_gaussians[gauss_index], lw=2)        
         for intersect_index in range(len(all_intersects)):
             plt.axvline(all_intersects[intersect_index],color='k',lw=1,ls='--')   
         plt.xlabel('Radians')
@@ -469,10 +467,10 @@ def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
-    gaussians, xline = smart_gauss_fit(distribution,gauss_bins, gauss_smooth, write_name)
+    gaussians, Gauss_xvals = smart_gauss_fit(distribution,gauss_bins, gauss_smooth, write_name)
     # gaussians, xline = gauss_fit(distribution,gauss_bins,gauss_smooth)            
     ##discretising each state by gaussian intersects       
-    intersection_of_states = get_intersects(gaussians, distribution, xline,  write_plots, write_name)   
+    intersection_of_states = get_intersects(gaussians, distribution, Gauss_xvals,  write_plots, write_name)   
     if distr.count(10000.0)>=1:
         intersection_of_states.append(20000.0)  
     

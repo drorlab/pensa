@@ -1,9 +1,11 @@
 import numpy as np
 import math
-#from tqdm import tqdm
 import os
 from pensa.features import *
 from pensa.statesinfo import *
+
+# -- Functions to calculate State Specific Information quantities --
+
 
 def _check(value,x,y):
     """
