@@ -211,7 +211,7 @@ def _integral(x, mu, sigma, A):
 
 
 
-def gauss_fit(distribution, gauss_bin, gauss_smooth):    
+def _gauss_fit(distribution, gauss_bin, gauss_smooth):    
     """
     Obtaining the gaussians to fit the distribution into a Gaussian mix.
     Bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
@@ -345,7 +345,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     ##if clustering does not work for a given bin number then adjust the bin number
     while trial < 1:
         try:
-            gaussians, Gauss_xvals = gauss_fit(distr, gauss_bins, gauss_smooth)
+            gaussians, Gauss_xvals = _gauss_fit(distr, gauss_bins, gauss_smooth)
             trial += 1
         except:
             attempt_no += 1

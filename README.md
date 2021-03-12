@@ -19,7 +19,7 @@ With PENSA, you can (currently):
 - __cluster structures across ensembles__ via k-means or regular-space clustering and write out the resulting clusters as trajectories.
 - trace allosteric information flow through a protein using __state-specific information__ analysis methods.
 
-Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide density-based methods to featurize water pockets.
+Proteins are featurized via [PyEMMA](http://emma-project.org/latest/) using backbone torsions, sidechain torsions, or backbone C-alpha distances, making PENSA compatible to all functionality available in PyEMMA. In addition, we provide density-based methods to featurize water and ion pockets.
 
 Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis.org/). Plots are generated using [Matplotlib](https://matplotlib.org/).
 
@@ -48,7 +48,7 @@ To get the citation and DOI for a particular version, see [Zenodo](https://zenod
 Martin Vögele, Neil Thomson, Sang Truong
 
 #### Beta-Tests
-Alex Powers, Lukas Stelzl
+Alex Powers, Lukas Stelzl, Nicole Ong, Eleanore Ocana, Callum Ives
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).

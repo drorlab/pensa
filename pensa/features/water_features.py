@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Methods to obtain a distribution for the water pockets which respresents
+Methods to obtain a timeseries distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
 
-For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket. 
-If there is ever an instance where two water molecules occupy the same pocket at the same time,
-then the water polarisation of the molecule ID that occupies the pocket most often is used.
+Water pockets are defined as radius 3.5 Angstroms (based off of hydrogen bond lengths)
+centered on the probability density maxima of waters. If there is ever an instance 
+where two water molecules occupy the same pocket at the same time, then the water that 
+occupies the pocket most often is used to obtain the polarisation.
 
 The methods here are based on the following paper:
 
@@ -18,8 +19,6 @@ The methods here are based on the following paper:
 import MDAnalysis as mda
 import numpy as np
 from gridData import Grid
-
-# import MDAnalysis.analysis.hbonds
 from tqdm import tqdm
 import os
 from pensa.features.density_preprocessing import *
@@ -103,9 +102,6 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     if write is not None:
         if out_name is None:
             print('WARNING: You are writing results without providing out_name.')
-        # if write_grid_as is None:
-        #     print('WARNING: You cannot write grid without specifying water model.')
-        #     print('write_grid_as options include:\nSPC\nTIP3P\nTIP4P\nwater')
     
     # Initialize the dictionaries.
     feature_names = {}
@@ -130,7 +126,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         g = Grid(grid_input)  
 
     xyz, val = local_maxima_3D(g.grid)
-    ##negate the array to get descending order from most prob to least prob
+    ## Negate the array to get probabilities in descending order
     val_sort = np.argsort(-1*val.copy())
     coords = [xyz[max_val] for max_val in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
@@ -150,34 +146,30 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         philist=[]
         psilist=[]
 
-        ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
+        ## Find all water atoms within 3.5 Angstroms of density maxima
         counting=[]
-        for frame_no in tqdm(range(100)):       
-        # for frame_no in tqdm(range(len(u.trajectory))):       
+        for frame_no in tqdm(range(len(u.trajectory))):       
+        # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
-            ##list all water oxygens within sphere of radius X centered on water prob density maxima
-            ##3.5 radius based off of length of hydrogen bonds. Water can in 
-            ##theory move 3.5 angstr and still maintain the same interactions
             radius = ' 3.5'
             atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] + radius).indices
             counting.append(atomgroup_IDS)
             
-        ##making a list of the water IDs that appear in the simulation in that pocket
+        ## Water atom indices that appear in the water site
         flat_list = [item for sublist in counting for item in sublist]
         
-        ###extracting (psi,phi) coordinates for each water dipole specific to the frame they are bound
-        for frame_no in tqdm(range(100)):       
-        # for frame_no in tqdm(range(len(u.trajectory))):   
+        ## Extract water orientation timeseries
+        for frame_no in tqdm(range(len(u.trajectory))):   
+        # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
-            ##extracting the water coordinates for inside the pocket
             if len(waters_resid)==1:        
-                ##(x,y,z) positions for the water atom (residue) at frame i
+                ## (x,y,z) positions for the water oxygen at trajectory frame_no
                 water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(waters_resid[0])).positions]
                 psi, phi = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
                 philist.append(phi)
-            ##if multiple waters in pocket then use water with largest frequency of pocket occupation
+            ## Featurize water with highest pocket occupation (if multiple waters in pocket)
             elif len(waters_resid)>1:
                 freq_count=[]
                 for ID in waters_resid:
@@ -187,7 +179,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
                 psi, phi = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
                 philist.append(phi)
-            ##10000.0 = no waters bound
+            ## 10000.0 = no waters bound
             elif len(waters_resid)<1:
                 psilist.append(10000.0)
                 philist.append(10000.0)
@@ -200,11 +192,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         atom_location = coords[wat_no] + g.origin
 
         water_information.append([water_ID,list(atom_location),water_pocket_occupation_frequency])
-
-        print('Completed water no: ',wat_no+1)
-        print(water_information[-1])
         
-        ##WRITE OUT WATER FEATURES INTO SUBDIRECTORY
+        ## Write data out and visualize water sites in pdb           
         if write is True:    
             data_out('water_features/' + out_name + water_ID + '.txt', water_out)                    
             data_out('water_features/' + out_name + 'WatersSummary.txt', water_information)                          

@@ -32,7 +32,7 @@ def _check(value,x,y):
         return 0
     
 
-def calculate_entropy(state_limits,distribution_list):
+def _calculate_entropy(state_limits,distribution_list):
     """
     Calculate the Shannon entropy of a distribution as the summation of all 
     -p*log(p) where p refers to the probability of a conformational state. 
@@ -361,7 +361,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         SSI = (H_a + H_b) - H_ab
         coSSI = (H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc 
         ##conditional mutual info for sanity check
-        con_mut_inf = H_ac + H_bc - H_c - H_abc
+        # con_mut_inf = H_ac + H_bc - H_c - H_abc
         
     except:
         SSI = -1

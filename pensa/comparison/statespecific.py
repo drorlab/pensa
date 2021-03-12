@@ -1,13 +1,14 @@
 import numpy as np
-import scipy as sp
-import scipy.stats
-import scipy.spatial
-import scipy.spatial.distance
-import pyemma
-from pyemma.util.contexts import settings
-import MDAnalysis as mda
-import matplotlib.pyplot as plt
-import os
+# import scipy as sp
+# import scipy.stats
+# import scipy.spatial
+# import scipy.spatial.distance
+# import pyemma
+# from pyemma.util.contexts import settings
+# import MDAnalysis as mda
+# import matplotlib.pyplot as plt
+# import os
+from tqdm import tqdm
 from pensa.features import *
 from pensa.statesinfo import *
 
@@ -59,7 +60,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
     # Initialize relative entropy and average value
     data_ssi = np.zeros(len(data_names))
     # Loop over all features    
-    for residue in range(len(all_data_a)):
+    for residue in tqdm(range(len(all_data_a))):
         data_a = all_data_a[residue]
         data_b = all_data_b[residue]
 

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Methods to obtain a distribution for the water pockets which respresents
-a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
+Methods to obtain a timeseries distribution for the atom/ion pockets' occupancies.
 
-For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket. 
-If there is ever an instance where two water molecules occupy the same pocket at the same time,
-then the water polarisation of the molecule ID that occupies the pocket most often is used.
+Atom pockets are defined as radius 2.5 Angstroms (based off of bond lengths between Na and O, and Ca and O) 
+centered on the probability density maxima of the atoms.
+
 
 The methods here are based on the following paper:
 
@@ -117,19 +116,17 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         print('\n')
 
         counting=[]
-        # for i in tqdm(range(len(u.trajectory))):       
-        for i in tqdm(range(100)):       
+        ## Find all water atoms within 2.5 Angstroms of density maxima
+        for i in tqdm(range(len(u.trajectory))):       
+        # for i in tqdm(range(100)):       
             u.trajectory[i]
             radius= ' 2.5'
-            ##radius is based off of bond length between Na and oxygen
-            ##For Ca the bond length is ~2.42 =~2.5 so the same length can be used for various ions.
-            ##list all atom resids within sphere of radius 2 centered on atom prob density maxima
             atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +radius).indices)
             if len(atomgroup_IDS)==0:
                 atomgroup_IDS=[-1]
             counting.append(atomgroup_IDS)
 
-        ## The atomgroup_IDs that appear in the pocket
+        ## Atom indices that appear in the atom site
         flat_list = [item for sublist in counting for item in sublist]
 
         atom_ID = 'a' + str(atom_no+1)
@@ -138,11 +135,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         pocket_occupation_frequency = round(pocket_occupation_frequency,4)
         atom_information.append([atom_ID,list(atom_location),pocket_occupation_frequency])
         atom_dists.append(counting)
-        
-        print('Completed atom no: ',atom_no+1)
-        print(atom_information[-1])
-        ##PDB_VISUALISATION     
-        ##rescursively add waters to the pdb file one by one as they are processed           
+
+        ## Write data out and visualize atom sites in pdb           
         if write is True:
             data_out('atom_features/' + out_name + atom_ID + '.txt', [counting])                    
             data_out('atom_features/'+out_name+element+'AtomsSummary.txt', atom_information)                          
