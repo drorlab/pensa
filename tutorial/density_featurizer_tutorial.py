@@ -38,20 +38,6 @@ water_feat, water_data = get_water_features(structure_input = struc,
                                             write_grid_as="TIP3P",
                                             out_name = "11426_dyn_151")
 
-# # # # # If we have already obtained the grid, we can speed up featurization by reading it in.
-# # # # # Here we add the write=True option to write out the 
-struc = "mor-data/11426_dyn_151.pdb"
-xtc = "mor-data/11423_trj_151.xtc"
-grid = "water_features/11426_dyn_151OH2_density.dx"
-water_feat, water_data = get_water_features(structure_input = struc, 
-                                            xtc_input = xtc,
-                                            top_waters = 1,
-                                            atomgroup = "OH2",
-                                            grid_input = grid)
-
-
-
-
 # # # We can use the get_atom_features, which provides the same
 # # # functionality but ignores orientations as atoms are considered spherically symmetric.
 struc = "mor-data/11426_dyn_151.pdb"
@@ -66,5 +52,14 @@ atom_feat, atom_data = get_atom_features(structure_input = struc,
                                          write = True,
                                          out_name = "11426_dyn_151")
 
-# # # If we have already written a grid, we can set that as input 
-# # # using the argument grid_input="gridname.dx" to speed up the featurization
+
+# # # # # If we have already obtained the grid, we can speed up featurization by reading it in.
+struc = "mor-data/11426_dyn_151.pdb"
+xtc = "mor-data/11423_trj_151.xtc"
+grid = "water_features/11426_dyn_151OH2_density.dx"
+water_feat, water_data = get_water_features(structure_input = struc, 
+                                            xtc_input = xtc,
+                                            top_waters = 1,
+                                            atomgroup = "OH2",
+                                            grid_input = grid)
+

@@ -43,28 +43,29 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
 
 def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
     """
+    Returns the timeseries of one particular feature.
     
-
     Parameters
     ----------
-    feat : TYPE
-        DESCRIPTION.
-    data : TYPE
-        DESCRIPTION.
-    feature_type : TYPE
-        DESCRIPTION.
-    write : TYPE, optional
-        DESCRIPTION. The default is None.
-    out_name : TYPE, optional
-        DESCRIPTION. The default is None.
+    feat : list of str
+        List with all feature names.
+    data : float array
+        Feature values data from the simulation.
+    feature_type : str
+        Type of the selected feature 
+        ('bb-torsions', 'bb-distances', 'sc-torsions').
+    write : bool, optional
+        If true, write out th data into a directory titled with the feature_type str.
+        The default is None.
+    out_name : str, optional
+        Prefix for the written data. The default is None.    
 
     Returns
     -------
-    feature_names : TYPE
-        DESCRIPTION.
-    features_data : TYPE
-        DESCRIPTION.
-
+    feature_names : list of str
+        Names of all features
+    features_data : numpy array
+        Data for all features
     """
     
     # Initialize the dictionaries.
@@ -181,4 +182,9 @@ def sort_distances_by_resnum(dist, data):
     new_dist = np.array(dist)[new_order].tolist()
     new_data = data[:,new_order]
     return new_dist, new_data
+
+
+
+
+
 

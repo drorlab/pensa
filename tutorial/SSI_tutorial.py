@@ -7,12 +7,10 @@ Created on Wed Jan  6 16:08:39 2021
 """
 
 import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname("pensa"), '..')))
 from pensa import *
 
 
-# # Define where to save the GPCRmd files
+# # # Define where to save the GPCRmd files
 root_dir = './mor-data'
 # Define which files to download
 md_files = ['11427_dyn_151.psf','11426_dyn_151.pdb', # MOR-apo
@@ -52,7 +50,7 @@ for subdir in ['traj','plots','vispdb','pca','clusters','results']:
 extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
 extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", sel_base_b)
      
-# # # Extract the features from the beginning (start_frame) of the trajectory
+# # # # Extract the features from the beginning (start_frame) of the trajectory
 start_frame=0  
 a_rec = get_features(out_name_a+"_receptor.gro",
                       out_name_a+"_receptor.xtc", 
@@ -78,22 +76,14 @@ sc_multivar_res_feat_a, sc_multivar_res_data_a = multivar_res_timeseries_data(a_
 sc_multivar_res_feat_b, sc_multivar_res_data_b = multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
 
 # # # We can calculate the State Specific Information (SSI) shared between the 
-# # # ensemble switch and the combined ensemble residue conformations.
-# # # Set write_plots=True to generate a folder with all the clustered states for each residue.
-data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-                                              sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
-                                              write_plots=None,
-                                              verbose=True)
-
-# # # We can calculate the State Specific Information (SSI) shared between the 
-# # # ensemble switch and the combined ensemble residue conformations.
-# # # Write_plots is disabled for this function as the combinatorial nature
-# # # of comaring all features will generate the same plot features**2 times.
-# # # To view clustered distributions, use ssi_ensemble_analysis, which is much quicker.
-data_names, data_ssi = ssi_feature_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'], 
-                                            verbose=True)
-
+# # # ensemble switch and the combined ensemble residue conformations. As the ensemble 
+# # # is a binary change, SSI can exist within the range [0,1] units=bits.
+# # # 0 bits = no information, 1 bits = maximum information, i.e. you can predict the state of the ensemble with 
+# # # certainty from the state of the residue.
+# # # Set write_plots = True to generate a folder with all the clustered states for each residue.
+data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'], sc_multivar_res_feat_b['sc-torsions'],
+                                             sc_multivar_res_data_a['sc-torsions'], sc_multivar_res_data_b['sc-torsions'],
+                                             verbose=False)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -117,7 +107,7 @@ trj_file_b = [root_dir+'/11576_trj_169.xtc',
 # Base for the selection string for each simulation protein and all waters
 sel_base_a = "protein or byres name OH2"
 sel_base_b = "protein or byres name OH2"
-# # # Names of the output files
+# # # # Names of the output files
 out_name_a = "traj/cond-a_water"
 out_name_b = "traj/cond-b_water"
 
@@ -129,9 +119,9 @@ for subdir in ['traj','plots','vispdb','pca','clusters','results']:
 extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
 extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)
 
-# # # Extract the coordinates of the ensemble a aligned to ensemble b 
+# # # # Extract the coordinates of the ensemble a aligned to ensemble b 
 extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
-                        out_name_b+".gro", out_name_b+".xtc")
+                       out_name_b+".gro", out_name_b+".xtc")
 
 
 # # # Extract the combined density of the waters in both ensembles a and b 
@@ -154,41 +144,48 @@ water_feat_a, water_data_a = get_water_features(structure_input = out_name_a+".g
                                                 out_name = "cond_a")
 
 water_feat_b, water_data_b  = get_water_features(structure_input = out_name_b+".gro", 
-                                                 xtc_input = out_name_b+".xtc",
-                                                 top_waters = 2,
-                                                 atomgroup = "OH2",
-                                                 grid_input = grid_combined,
-                                                 write = True,
-                                                 out_name = "cond_b")
+                                                xtc_input = out_name_b+".xtc",
+                                                top_waters = 2,
+                                                atomgroup = "OH2",
+                                                grid_input = grid_combined,
+                                                write = True,
+                                                out_name = "cond_b")
 
 
 # # # Calculating SSI is then exactly the same as for residues
 
 # # # SSI shared between waters and the switch between ensemble conditions
-data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],water_data_a['WaterPocket_Distr'],
-                                             water_feat_b['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
+data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
+                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                              verbose=True)
-
 
 # # # Alternatively we can see if the pocket occupancy (the presence/absence of water at the site) shares SSI
 # # # Currently this is only enabled with ssi_ensemble_analysis. We need to turn off the periodic boundary conditions
 # # # as the distributions are no longer periodic.
-data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_data_a['WaterPocket_OccupDistr'],
-                                             water_feat_b['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
+data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_feat_b['WaterPocket_OccupDistr'],
+                                             water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
                                              wat_occupancy=True, pbc=False, verbose=True)
 
-# # # In this example we can see that it is the presence or absence of water O1, 
-# # # and not the orientation of the water site, that is more important in distinguishing between ensembles.
-# # # Water 02 has no functional significance with respect to what these ensembles are investigating.
+# # # In this example we can see that the state of water 01 shares ~0.25 bits of
+# # # information with the ensembles, but the occupancy of water 1 pocket shares ~0.07 bits, 
+# # # revealing that the polarisation of this water is more functionally important with respect
+# # # to what these ensembles are investigating.
 
-# # # If we want to find out the impact of water on the SSI between 
-# # # features and the ensemble (ssi_ensemble_analysis), we can use co-SSI. 
+# # # We can calculate the State Specific Information (SSI) shared between the 
+# # # water pockets across both ensembles. This quantity is no longer bound by 1 bit.
+data_names, data_ssi = ssi_feature_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
+                                            water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
+                                            verbose=True)
+
+# # # The ssi_feature_analysis() tells us that these two water pockets are conformationally to some extent.
+
 # # # An equivalent interpretation of co-SSI is how much the switch between ensembles
-# # # is involved in the communication between two features.
-feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(sc_multivar_res_feat_a['sc-torsions'],sc_multivar_res_data_a['sc-torsions'],
-                                                                            sc_multivar_res_feat_b['sc-torsions'],sc_multivar_res_data_b['sc-torsions'],  
-                                                                            water_feat_a['WaterPocket_Distr'],water_data_a['WaterPocket_Distr'],
-                                                                            water_feat_b['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'],
+# # # is involved in strengthening (positive co-SSI) / weakening (negative co-SSI) the conformational coupling between two features. 
+feat_names, cossi_feat_names, data_ssi, data_cossi = cossi_featens_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
+                                                                            water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
+                                                                            water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
+                                                                            water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
                                                                             verbose=True)
 
-
+# # # The cossi_featens_analysis() tells us that the conformational coupling between these
+# # # water pockets is slightly weakened by the change performed in the ensemble switch.
