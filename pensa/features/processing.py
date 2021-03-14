@@ -216,6 +216,13 @@ def sort_distances_by_resnum(dist, data):
     return new_dist, new_data
 
 
+def select_common_features(features_a, features_b):
+    intersect = set(features_a).intersection(features_b)
+    is_common_a = [f in intersect for f in features_a]
+    is_common_b = [f in intersect for f in features_b]
+    return np.array(is_common_a), np.array(is_common_b)
+    
+
 
 # -- Utilities to process feature data --
 
