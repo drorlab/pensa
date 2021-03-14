@@ -14,9 +14,11 @@ from pensa.features import *
 
 
 def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename, 
-                          selection='max', y_label='max. JS dist. of BB torsions'):
+                          selection='max', y_label='max. JS dist. of BB torsions', 
+                          offset=0):
     """
-    Visualizes features per residue as plot and in PDB files, assuming values from 0 to 1. 
+    Visualizes features per residue as plot and in PDB files.
+    Assumes values from 0 to 1. 
     
     Parameters
     ----------
@@ -35,6 +37,8 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
             Options: 'max', 'min'.
         y_label : str, default='max. JS dist. of BB torsions'
             Label of the y axis of the plot.
+        offset : int, default=0
+            Number to subtract from the residue numbers that are loaded from the reference file.
         
     Returns
     -------
@@ -47,6 +51,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     # -- INITIALIZATION --
     # Structure to use for visualization
     u = mda.Universe(ref_filename)
+    u.residues.resids -= offset
     vis_resids = u.residues.resids
     # Output values
     default = 0 if selection=='max' else 1
