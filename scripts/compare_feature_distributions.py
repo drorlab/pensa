@@ -36,8 +36,8 @@ if __name__ == "__main__":
     # -- FEATURES --
 
     # Load Features 
-    feat_a, data_a = get_features(args.ref_file_a, args.trj_file_a, start_frame=args.start_frame)
-    feat_b, data_b = get_features(args.ref_file_b, args.trj_file_b, start_frame=args.start_frame)
+    feat_a, data_a = get_structure_features(args.ref_file_a, args.trj_file_a, start_frame=args.start_frame)
+    feat_b, data_b = get_structure_features(args.ref_file_b, args.trj_file_b, start_frame=args.start_frame)
     # Report dimensions
     print('Feature dimensions from', args.trj_file_a)
     for k in data_a.keys(): 

@@ -106,11 +106,6 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
     # Return the dictionaries.
     return feature_names, features_data            
 
-
-def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
-    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)
-    return get_multivar_res_timeseries(feat, data, feature_type, write=write, out_name=out_name)
-
   
 def match_sim_lengths(sim1,sim2):
     """
@@ -225,41 +220,34 @@ def sort_distances_by_resnum(dist, data):
 # -- Utilities to process feature data --
 
 
-def correct_angle_periodicity(angle1):
+def correct_angle_periodicity(angle):
     """
     Correcting for the periodicity of angles [radians].  
     Waters featurized using PENSA and including discrete occupancy are handled.
     
-    
     Parameters
     ----------
-    angle1 : list
-        Univariate data for a specific feature.
+    angle : list
+        Univariate data for an angle feature.
 
     Returns
     -------
-    new_dist : list
-        Periodically corrected distribution.
+    new_angle : list
+        Periodically corrected angle feature.
 
     """
-    new_dist=angle1.copy()
-    continuous_angles = [angle for angle in new_dist if angle != 10000.0]
-    index_cont_angles = [index for index, angle in enumerate(new_dist) if angle != 10000.0]      
-    heights=np.histogram(continuous_angles, bins=90, density=True)
+    new_angle = angle.copy()
+    continuous_angles = [angle for angle in new_angle if angle != 10000.0]
+    index_cont_angles = [index for index, angle in enumerate(new_angle) if angle != 10000.0]      
+    heights = np.histogram(continuous_angles, bins=90, density=True)
     ## Shift everything before bin with minimum height by periodic amount
     if heights[0][0] > min(heights[0]):   
-        perbound=heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
+        perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
         for angle_index in range(len(continuous_angles)):
             if continuous_angles[angle_index] < perbound:
-                continuous_angles[angle_index]+=2*np.pi
+                continuous_angles[angle_index] += 2*np.pi
     for index in range(len(index_cont_angles)):
-        new_dist[index_cont_angles[index]] = continuous_angles[index]
-    
-    return new_dist
-
-
-def periodic_correction(angle1):
-    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)    
-    return correct_angle_periodicity(angle1)
+        new_angle[index_cont_angles[index]] = continuous_angles[index]
+    return new_angle
 
 

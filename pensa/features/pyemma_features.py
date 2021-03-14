@@ -15,16 +15,6 @@ from pyemma.util.contexts import settings
 
 # -- Loading the Features --
 
-def get_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
-                 features=['bb-torsions','sc-torsions','bb-distances']):
-    """
-    This function is deprecated. Use get_structure_features() to retain its old behavior."
-    """
-    warnings.warn("The function get_features() is deprecated. Use get_structure_features() to retain its old behavior.", FutureWarning)
-    return get_structure_features(pdb, xtc, start_frame=start_frame, 
-                                  step_width=step_width, cossin=cossin,
-                                  features=features)
-
 
 def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                            features=['bb-torsions','sc-torsions','bb-distances']):

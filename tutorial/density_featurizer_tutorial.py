@@ -8,8 +8,6 @@ Created on Wed Jan  6 16:08:39 2021
 
 import os
 import sys
-#path_to_pensa_folder='pensa'
-#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(path_to_pensa_folder), '..')))
 from pensa import *
 
 

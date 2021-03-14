@@ -6,10 +6,18 @@ pensa.features
    :undoc-members:
    :show-inheritance:
 
-pensa.features.density\_features
----------------------------------------
+pensa.features.atom\_features
+------------------------------------
 
-.. automodule:: pensa.features.density_features
+.. automodule:: pensa.features.atom_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pensa.features.density\_preprocessing
+--------------------------------------------
+
+.. automodule:: pensa.features.density_preprocessing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -26,6 +34,14 @@ pensa.features.pyemma\_features
 --------------------------------------
 
 .. automodule:: pensa.features.pyemma_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pensa.features.water\_features
+-------------------------------------
+
+.. automodule:: pensa.features.water_features
    :members:
    :undoc-members:
    :show-inheritance:

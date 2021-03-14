@@ -29,22 +29,22 @@ class Test_pensa(unittest.TestCase):
     print("done set up 1 ======================================")
     start_frame = 0
     # -- Rec
-    sim_a_rec = get_features(test_data_path + "/traj/condition-a_receptor.gro",
-                              test_data_path + "/traj/condition-a_receptor.xtc",
-                              start_frame)
-    sim_b_rec = get_features(test_data_path + "/traj/condition-b_receptor.gro",
-                              test_data_path + "/traj/condition-b_receptor.xtc",
-                              start_frame)
+    sim_a_rec = get_structure_features(test_data_path + "/traj/condition-a_receptor.gro",
+                                       test_data_path + "/traj/condition-a_receptor.xtc",
+                                       start_frame)
+    sim_b_rec = get_structure_features(test_data_path + "/traj/condition-b_receptor.gro",
+                                       test_data_path + "/traj/condition-b_receptor.xtc",
+                                       start_frame)
     self.sim_a_rec_feat, self.sim_a_rec_data = sim_a_rec
     self.sim_b_rec_feat, self.sim_b_rec_data = sim_b_rec
 
     # -- TMR
-    sim_a_tmr = get_features(test_data_path + "/traj/condition-a_tm.gro",
-                              test_data_path + "/traj/condition-a_tm.xtc",
-                              start_frame)
-    sim_b_tmr = get_features(test_data_path + "/traj/condition-b_tm.gro",
-                                test_data_path + "/traj/condition-b_tm.xtc",
-                                start_frame)
+    sim_a_tmr = get_structure_features(test_data_path + "/traj/condition-a_tm.gro",
+                                       test_data_path + "/traj/condition-a_tm.xtc",
+                                       start_frame)
+    sim_b_tmr = get_structure_features(test_data_path + "/traj/condition-b_tm.gro",
+                                       test_data_path + "/traj/condition-b_tm.xtc",
+                                       start_frame)
     self.sim_a_tmr_feat, self.sim_a_tmr_data = sim_a_tmr
     self.sim_b_tmr_feat, self.sim_b_tmr_data = sim_b_tmr
 

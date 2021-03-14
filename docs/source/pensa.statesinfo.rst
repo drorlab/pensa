@@ -6,10 +6,18 @@ pensa.statesinfo
    :undoc-members:
    :show-inheritance:
 
-pensa.statesinfo.statesinfo
-----------------------------------
+pensa.statesinfo.discrete\_states
+----------------------------------------
 
-.. automodule:: pensa.statesinfo.statesinfo
+.. automodule:: pensa.statesinfo.discrete_states
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pensa.statesinfo.ssi
+---------------------------
+
+.. automodule:: pensa.statesinfo.ssi
    :members:
    :undoc-members:
    :show-inheritance:
