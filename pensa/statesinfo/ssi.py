@@ -2,7 +2,8 @@ import numpy as np
 import math
 import os
 from pensa.features import *
-from .ssi_clustering import *
+from .discrete_states import *
+
 
 # -- Functions to calculate State Specific Information quantities --
 

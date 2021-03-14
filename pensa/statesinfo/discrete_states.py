@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
 from pensa.features import *
-from pensa.statesinfo import * 
+
 
 # -- Functions to cluster feature distributions into discrete states --
 
