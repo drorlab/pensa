@@ -9,6 +9,5 @@ The methods here are based on the following paper:
     |    https://doi.org/10.1101/2020.08.28.271510
     
 """
-from .ssi_preprocessing import * 
 from .ssi_clustering import * 
 from .ssi_calculations import *

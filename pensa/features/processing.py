@@ -8,8 +8,12 @@ from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
+import warnings
 from pensa.features import *
 
+
+
+# -- Utilities to extract time series --
 
 
 def get_feature_timeseries(feat, data, feature_type, feature_name):
@@ -41,7 +45,7 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
     return timeseries
 
 
-def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
+def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None):
     """
     Returns the timeseries of one particular feature.
     
@@ -55,7 +59,7 @@ def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=
         Type of the selected feature 
         ('bb-torsions', 'bb-distances', 'sc-torsions').
     write : bool, optional
-        If true, write out th data into a directory titled with the feature_type str.
+        If true, write out the data into a directory titled with the feature_type str.
         The default is None.
     out_name : str, optional
         Prefix for the written data. The default is None.    
@@ -103,6 +107,39 @@ def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=
     return feature_names, features_data            
 
 
+def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
+    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)
+    return get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None)
+
+  
+def match_sim_lengths(sim1,sim2):
+    """
+    Make two lists the same length by truncating the longer list to match.
+
+
+    Parameters
+    ----------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    Returns
+    -------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    """
+    if len(sim1)!=len(sim2):
+        if len(sim1)>len(sim2):
+            sim1=sim1[0:len(sim2)]
+        if len(sim1)<len(sim2):
+            sim2=sim2[0:len(sim1)]  
+    return sim1, sim2
+
+
 
 # -- Utilities to sort the features
 
@@ -113,15 +150,15 @@ def sort_features(names, sortby):
     
     Parameters
     ----------
-        names : str array
-            Array of feature names.
-        sortby : float array
-            Array of the values to sort the names by.
+    names : str array
+        Array of feature names.
+    sortby : float array
+        Array of the values to sort the names by.
         
     Returns
     -------
-        sort : array of tuples [str,float]
-            Array of sorted tuples with feature and value.
+    sort : array of tuples [str,float]
+        Array of sorted tuples with feature and value.
     
     """
     # Get the indices of the sorted order
@@ -143,12 +180,12 @@ def sort_sincos_torsions_by_resnum(tors, data):
     Sort sin/cos of torsion features by the residue number..
     Parameters
     ----------
-        tors : list of str
-            The list of torsion features.
+    tors : list of str
+        The list of torsion features.
     Returns
     -------
-        new_tors : list of str
-            The sorted list of torsion features.
+    new_tors : list of str
+        The sorted list of torsion features.
     """
     renamed = []
     for t in tors:
@@ -167,12 +204,12 @@ def sort_distances_by_resnum(dist, data):
     Sort distance features by the residue number..
     Parameters
     ----------
-        dist : list of str
-            The list of distance features.
+    dist : list of str
+        The list of distance features.
     Returns
     -------
-        new_dist : list of str
-            The sorted list of distance features.
+    new_dist : list of str
+        The sorted list of distance features.
     """
     renamed = []
     for d in dist:
@@ -185,6 +222,44 @@ def sort_distances_by_resnum(dist, data):
 
 
 
+# -- Utilities to process feature data --
 
+
+def correct_angle_periodicity(angle1):
+    """
+    Correcting for the periodicity of angles [radians].  
+    Waters featurized using PENSA and including discrete occupancy are handled.
+    
+    
+    Parameters
+    ----------
+    angle1 : list
+        Univariate data for a specific feature.
+
+    Returns
+    -------
+    new_dist : list
+        Periodically corrected distribution.
+
+    """
+    new_dist=angle1.copy()
+    continuous_angles = [angle for angle in new_dist if angle != 10000.0]
+    index_cont_angles = [index for index, angle in enumerate(new_dist) if angle != 10000.0]      
+    heights=np.histogram(continuous_angles, bins=90, density=True)
+    ## Shift everything before bin with minimum height by periodic amount
+    if heights[0][0] > min(heights[0]):   
+        perbound=heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
+        for angle_index in range(len(continuous_angles)):
+            if continuous_angles[angle_index] < perbound:
+                continuous_angles[angle_index]+=2*np.pi
+    for index in range(len(index_cont_angles)):
+        new_dist[index_cont_angles[index]] = continuous_angles[index]
+    
+    return new_dist
+
+
+def periodic_correction(angle1):
+    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)
+    return correct_angle_periodicity(angle1)
 
 
