@@ -231,8 +231,6 @@ def cossi_featens_analysis(features_a, features_b,
 
     """
 
-
-    
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
         assert len(features_a) == len(features_b)

@@ -52,16 +52,14 @@ extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", 
      
 # # # # Extract the features from the beginning (start_frame) of the trajectory
 start_frame=0  
-a_rec = get_features(out_name_a+"_receptor.gro",
-                      out_name_a+"_receptor.xtc", 
-                      start_frame)
-
+a_rec = get_structure_features(out_name_a+"_receptor.gro",
+                               out_name_a+"_receptor.xtc", 
+                               start_frame)
 a_rec_feat, a_rec_data = a_rec
 
-b_rec = get_features(out_name_b+"_receptor.gro",
-                      out_name_b+"_receptor.xtc", 
-                      start_frame)
-
+b_rec = get_structure_features(out_name_b+"_receptor.gro",
+                               out_name_b+"_receptor.xtc", 
+                               start_frame)
 b_rec_feat, b_rec_data = b_rec
 
 
@@ -72,8 +70,8 @@ out_name_b = "condition-b"
 # # Extract the multivariate torsion coordinates of each residue as a 
 # # timeseries from the trajectory and write into subdirectory   
 # # output = [[torsion 1 timeseries],[torsion 2 timeseries],...,[torsion n timeseries]]
-sc_multivar_res_feat_a, sc_multivar_res_data_a = multivar_res_timeseries_data(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
-sc_multivar_res_feat_b, sc_multivar_res_data_b = multivar_res_timeseries_data(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
+sc_multivar_res_feat_a, sc_multivar_res_data_a = get_multivar_res_timeseries(a_rec_feat,a_rec_data,'sc-torsions',write=True,out_name=out_name_a)
+sc_multivar_res_feat_b, sc_multivar_res_data_b = get_multivar_res_timeseries(b_rec_feat,b_rec_data,'sc-torsions',write=True,out_name=out_name_b)
 
 # # # We can calculate the State Specific Information (SSI) shared between the 
 # # # ensemble switch and the combined ensemble residue conformations. As the ensemble 

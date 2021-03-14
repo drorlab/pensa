@@ -9,7 +9,7 @@ import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
 import warnings
-from pensa.features import *
+#from pensa.features import *
 
 
 
@@ -109,7 +109,7 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
 
 def multivar_res_timeseries_data(feat, data, feature_type, write=None, out_name=None):
     warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)
-    return get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None)
+    return get_multivar_res_timeseries(feat, data, feature_type, write=write, out_name=out_name)
 
   
 def match_sim_lengths(sim1,sim2):
@@ -259,7 +259,7 @@ def correct_angle_periodicity(angle1):
 
 
 def periodic_correction(angle1):
-    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)
+    warnings.warn("This function is deprecated and will not work in future versions.\nReplace it with pensa.features.correct_angle_periodicity().", FutureWarning)    
     return correct_angle_periodicity(angle1)
 
 

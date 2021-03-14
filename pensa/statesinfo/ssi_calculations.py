@@ -2,7 +2,7 @@ import numpy as np
 import math
 import os
 from pensa.features import *
-from pensa.statesinfo import *
+from .ssi_clustering import *
 
 # -- Functions to calculate State Specific Information quantities --
 
@@ -32,7 +32,7 @@ def _check(value,x,y):
         return 0
     
 
-def _calculate_entropy(state_limits,distribution_list):
+def calculate_entropy(state_limits,distribution_list):
     """
     Calculate the Shannon entropy of a distribution as the summation of all 
     -p*log(p) where p refers to the probability of a conformational state. 
@@ -120,15 +120,16 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
     if gauss_smooth is None:
         gauss_smooth = int(gauss_bins*0.1)
     
-    try:       
+    #try:
+    if True:       
         ##calculating the entropy for set_distr_a
         ## if set_distr_a only contains one distributions
         if pbc is True:
             if type(distr_a_input[0]) is not list:
-                set_distr_a=[periodic_correction(distr_a_input)]
+                set_distr_a=[correct_angle_periodicity(distr_a_input)]
             ## else set_distr_a is a nested list of multiple distributions (bivariate)
             else:
-                set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
+                set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in distr_a_input]
         else:
             set_distr_a=distr_a_input        
         
@@ -158,9 +159,9 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
         else:
             if pbc is True:
                 if type(distr_b_input[0]) is not list:
-                    set_distr_b=[periodic_correction(distr_b_input)]
+                    set_distr_b=[correct_angle_periodicity(distr_b_input)]
                 else:
-                    set_distr_b=[periodic_correction(distr_b) for distr_b in distr_b_input]
+                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in distr_b_input]
             else:
                 set_distr_b=distr_b_input
                 
@@ -185,7 +186,8 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
         H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
     
         SSI = (H_a + H_b) - H_ab
-    except:
+    else:   
+    #except:
         SSI = -1
         if write_name is not None:
             print('WARNING: Input error for ' + write_name)
@@ -255,10 +257,10 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         ##calculating the entropy for set_distr_a
         ## if set_distr_a only contains one distributions
         if type(distr_a_input[0]) is not list:
-            set_distr_a=[periodic_correction(distr_a_input)]
+            set_distr_a=[correct_angle_periodicity(distr_a_input)]
         ## else set_distr_a is a nested list of multiple distributions (bivariate)
         else:
-            set_distr_a=[periodic_correction(distr_a) for distr_a in distr_a_input]
+            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in distr_a_input]
         
         if a_states is None:    
             set_a_states=[]
@@ -283,10 +285,10 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         ##----------------
         ##calculating the entropy for set_distr_b
         if type(distr_b_input[0]) is not list:
-            set_distr_b=[periodic_correction(distr_b_input)]
+            set_distr_b=[correct_angle_periodicity(distr_b_input)]
         ## else set_distr_b is a nested list of multiple distributions (bivariate)
         else:
-            set_distr_b=[periodic_correction(distr_b) for distr_b in distr_b_input]
+            set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in distr_b_input]
         
         if b_states is None:    
             set_b_states=[]
@@ -319,9 +321,9 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
             
         else:
             if type(distr_c_input[0]) is not list:
-                set_distr_c=[periodic_correction(distr_c_input)]
+                set_distr_c=[correct_angle_periodicity(distr_c_input)]
             else:
-                set_distr_c=[periodic_correction(distr_c) for distr_c in distr_c_input]
+                set_distr_c=[correct_angle_periodicity(distr_c) for distr_c in distr_c_input]
             if c_states is None:    
                 set_c_states=[]
                 for dim_num in range(len(set_distr_c)):
