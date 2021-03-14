@@ -1,16 +1,8 @@
 import numpy as np
-# import scipy as sp
-# import scipy.stats
-# import scipy.spatial
-# import scipy.spatial.distance
-# import pyemma
-# from pyemma.util.contexts import settings
-# import MDAnalysis as mda
-# import matplotlib.pyplot as plt
-# import os
 from tqdm import tqdm
 from pensa.features import *
 from pensa.statesinfo import *
+
 
 
 def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, 
@@ -50,9 +42,6 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
             State Specific Information statistics for each feature.
 
     """
-
-
-
     
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
@@ -76,7 +65,6 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             data_both = sim1+sim2      
             combined_dist.append(data_both)
-    
             
         if wat_occupancy is True: 
             ## Define states for water occupancy 
@@ -130,7 +118,6 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose
             State Specific Information statistics for each feature.
 
     """
-
     
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
