@@ -13,7 +13,8 @@ from pensa.features import *
 from pensa.statesinfo import *
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, verbose=True, write_plots=None):
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, 
+                          verbose=True, write_plots=None, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -38,7 +39,8 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
         Print intermediate results.
     write_plots : bool, optional
         If true, visualise the states over the raw distribution. The default is None.
-        
+    override_name_check : bool, default=False
+        Only check number of features, not their names.   
         
     Returns
     -------
@@ -53,7 +55,10 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
 
     
     # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract the names of the features
     data_names = features_a
@@ -95,7 +100,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -113,6 +118,8 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose
         Trajectory data from the second ensemble. Format: [frames,frame_data].
     verbose : bool, default=True
         Print intermediate results.
+    override_name_check : bool, default=False
+        Only check number of features, not their names.
         
         
     Returns
@@ -126,7 +133,10 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose
 
     
     # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract the names of the features
     data_names = features_a
@@ -174,7 +184,7 @@ def cossi_featens_analysis(features_a, features_b,
                            all_data_a, all_data_b, 
                            cossi_features_a, cossi_features_b, 
                            cossi_all_data_a, cossi_all_data_b, 
-                           verbose=True):
+                           verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information CoSSI statistic between
@@ -204,6 +214,8 @@ def cossi_featens_analysis(features_a, features_b,
         Trajectory data from the second ensemble. 
     verbose : bool, default=True
         Print intermediate results.
+    override_name_check : bool, default=False
+        Only check number of features, not their names.
 
 
     Returns
@@ -222,13 +234,19 @@ def cossi_featens_analysis(features_a, features_b,
 
     
     # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract the names of the features
     data_names = features_a
 
     # Assert that the features are the same and data sets have same number of features
-    assert cossi_features_a == cossi_features_b
+    if override_name_check:
+        assert len(cossi_features_a) == len(cossi_features_b)
+    else:
+        assert cossi_features_a == cossi_features_b
     assert cossi_all_data_a.shape[0] == cossi_all_data_b.shape[0] 
     # Extract the names of the features
     cossi_data_names = cossi_features_a

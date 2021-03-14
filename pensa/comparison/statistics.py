@@ -13,7 +13,8 @@ from pensa.features import *
 
 
 
-def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
+def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True,
+                                override_name_check=False):
     """
     Calculates Kolmogorov-Smirnov statistic for two distributions.
     
@@ -32,6 +33,8 @@ def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, 
             Trajectory data from the second ensemble. Format: [frames,frame_data].
         verbose : bool, default=True
             Print intermediate results.
+        override_name_check : bool, default=False
+            Only check number of features, not their names.
 
     Returns
     -------
@@ -45,7 +48,10 @@ def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, 
     """
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract names of features
     data_names = features_a
@@ -72,7 +78,8 @@ def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, 
 
 
 
-def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True):
+def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True, 
+                             override_name_check=False):
     """
     Compares the arithmetic means of two distance distributions.
     
@@ -93,6 +100,8 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
             Bin width for the axis to compare the distributions on.
         verbose : bool, default=True
             Print intermediate results.
+        override_name_check : bool, default=False
+            Only check number of features, not their names.
 
     Returns
     -------
@@ -106,7 +115,10 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
     """
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract names of features
     data_names = features_a

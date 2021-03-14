@@ -12,7 +12,7 @@ from pensa.features import *
 
 
 
-def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True):
+def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False):
     """
     Calculates the Jensen-Shannon distance and the Kullback-Leibler divergences for each feature from two ensembles.
     
@@ -36,6 +36,8 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
             Number of bins for the axis to compare the distributions on (only if bin_width=None).
         verbose : bool, default=True
             Print intermediate results.
+        override_name_check : bool, default=False
+            Only check number of features, not their names.
     
     Returns
     -------
@@ -51,7 +53,10 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
     """
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
     # Assert that the features are the same and data sets have same number of features
-    assert features_a == features_b
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+    else:
+        assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
     # Extract the names of the features
     data_names = features_a
