@@ -160,9 +160,10 @@ def _remove_resnum_offset(features, offset):
     if 'bb-distances' in features.keys():
         for f in features['bb-distances']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[2])-offset
-            fsplit[2] = str(resnum)
-            fsplit[6] = str(resnum)
+            resnum1 = int(f.split(' ')[2])-offset
+            resnum2 = int(f.split(' ')[6])-offset
+            fsplit[2] = str(resnum1)
+            fsplit[6] = str(resnum2)
             new_features['bb-distances'].append(' '.join(fsplit))
         
     return new_features
