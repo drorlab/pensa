@@ -42,7 +42,10 @@
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
-  - [ ] First tests
+  - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
+  - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
+  - [ ] First tests with (regular) t-SNE
+  - [ ] Test time-lagged t-SNE. How to handle time-dependence across simulations/ensembles?
   - [ ] write module
   - [ ] write unit tests
 - [ ] Implement a clustering algorithem designed for structural ensembles
@@ -57,6 +60,7 @@
 ### Ideas
 
 - [ ] Hydrogen bonds as features
+- [ ] Contacts as features (can PyEMMA do this?)
 - [ ] Position deviations as features (similar to components of RMSD)
 - [ ] Calculate correlation times (and use them to estimate a threshold for significance)
 - [ ] Wasserstein distance to compare ensembles
