@@ -19,7 +19,7 @@ import numpy as np
 from gridData import Grid
 from tqdm import tqdm
 import os
-from pensa.preprocessing import *
+from pensa.preprocessing.density import *
 
 
 
