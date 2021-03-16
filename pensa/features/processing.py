@@ -91,13 +91,15 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
             single_feat_timeseries = get_feature_timeseries(feat,data,feature_type,feat_name_list[residue_dim])            
             feat_timeseries.append(list(single_feat_timeseries))
         multivar_res_timeseries_data.append(feat_timeseries)
-        resname= ''.join(feat_name_list[residue_dim].split()[-2:])
+        feat_name_split = feat_name_list[residue_dim].split()
+        resname = feat_name_split[-1] + ' ' + feat_name_split[-2] 
         sorted_names.append(resname)
         if write is True:
             for subdir in [feature_type+'/']:
                 if not os.path.exists(subdir):
                     os.makedirs(subdir)
-            filename= feature_type+'/' + out_name + resname + ".txt"
+            resname_out = feat_name_split[-1] + feat_name_split[-2] 
+            filename= feature_type+'/' + out_name + resname_out + ".txt"
             np.savetxt(filename, feat_timeseries, delimiter=',', newline='\n')
             
     # return multivar_res_timeseries_data

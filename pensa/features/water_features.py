@@ -21,7 +21,7 @@ import numpy as np
 from gridData import Grid
 from tqdm import tqdm
 import os
-from pensa.features.density_preprocessing import *
+from pensa.preprocessing import *
         
 
 def _convert_to_dipole(water_atom_positions):
