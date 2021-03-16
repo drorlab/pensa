@@ -41,6 +41,9 @@
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
+- [ ] Implement clustering in principal component space
+- [ ] Facilitate calculation of JSD etc. on principal components
+- [ ] Facilitate calculation of SSI on results of joint clustering. 
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
