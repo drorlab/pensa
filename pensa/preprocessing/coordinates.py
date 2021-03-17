@@ -10,7 +10,7 @@ from MDAnalysis.analysis import align
 
 
 def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
-                        rename_segments=None ):
+                        rename_segments=None, residues_offset=0 ):
     """
     Extracts selected coordinates from a trajectory file.
     
@@ -32,6 +32,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
     """
     # Read the reference+PDB files and extract selected parts.
     u = mda.Universe(ref,pdb)
+    u.residues.resids -= residues_offset
     selection = u.select_atoms(sel_string)
     num_at = selection.n_atoms
     if rename_segments is not None:
@@ -43,6 +44,7 @@ def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
     with mda.Writer(out_name+'.xtc', selection.n_atoms) as W:
         for trj in trj_list:
             u = mda.Universe(ref,trj)
+            u.residues.resids -= residues_offset
             selection = u.select_atoms(sel_string)
             for ts in u.trajectory[start_frame:]:
                 W.write(selection)
