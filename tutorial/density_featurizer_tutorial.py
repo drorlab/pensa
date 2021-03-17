@@ -10,7 +10,6 @@ import os
 import sys
 from pensa import *
 
-
 """
 for the pdb visualisation, the trajectory needs to be fit to the first frame of the simulation
 so that the density and protein align with each other
@@ -54,7 +53,7 @@ atom_feat, atom_data = get_atom_features(structure_input = struc,
 # # # # # If we have already obtained the grid, we can speed up featurization by reading it in.
 struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
-grid = "water_features/11426_dyn_151OH2_density.dx"
+grid = "dens/11426_dyn_151OH2_density.dx"
 water_feat, water_data = get_water_features(structure_input = struc, 
                                             xtc_input = xtc,
                                             top_waters = 1,

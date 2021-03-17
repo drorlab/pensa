@@ -117,7 +117,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         u.trajectory[0]
         protein.write(pdb_outname)
         if grid_input is None:
-            g = get_grid(u, atomgroup, write_grid_as, 'water_features/' + out_name)           
+            g = get_grid(u, atomgroup, write_grid_as,  out_name)           
         else:
             g = Grid(grid_input)  
     elif grid_input is None:

@@ -11,16 +11,16 @@ from pensa import *
 
 
 # # # # Define where to save the GPCRmd files
-# root_dir = './mor-data'
-# # Define which files to download
-# md_files = ['11427_dyn_151.psf','11426_dyn_151.pdb', # MOR-apo
-#             '11423_trj_151.xtc','11424_trj_151.xtc','11425_trj_151.xtc',
-#             '11580_dyn_169.psf','11579_dyn_169.pdb', # MOR-BU72
-#             '11576_trj_169.xtc','11577_trj_169.xtc','11578_trj_169.xtc']
-# # Download all the files that do not exist yet
-# for file in md_files:
-#     if not os.path.exists(os.path.join(root_dir,file)):
-#         download_from_gpcrmd(file,root_dir)
+root_dir = './mor-data'
+# Define which files to download
+md_files = ['11427_dyn_151.psf','11426_dyn_151.pdb', # MOR-apo
+            '11423_trj_151.xtc','11424_trj_151.xtc','11425_trj_151.xtc',
+            '11580_dyn_169.psf','11579_dyn_169.pdb', # MOR-BU72
+            '11576_trj_169.xtc','11577_trj_169.xtc','11578_trj_169.xtc']
+# Download all the files that do not exist yet
+for file in md_files:
+    if not os.path.exists(os.path.join(root_dir,file)):
+        download_from_gpcrmd(file,root_dir)
 
 root_dir = './mor-data'
 # # Simulation A
@@ -123,18 +123,18 @@ extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc",
 
 
 # # # Extract the combined density of the waters in both ensembles a and b 
-extract_combined_grid(out_name_a+".gro", out_name_a+"aligned.xtc", 
+extract_combined_grid(out_name_a+".gro", "dens/cond-a_wateraligned.xtc", 
                       out_name_b+".gro", out_name_b+".xtc",
                       atomgroup="OH2",
                       write_grid_as="TIP3P",
                       out_name= "ab_grid_")
 
-grid_combined = "ab_grid_OH2_density.dx"
+grid_combined = "dens/ab_grid_OH2_density.dx"
 
 # # # Then we featurize the waters common to both simulations
 # # # We can do the same analysis for ions using the get_atom_features featurizer. 
 water_feat_a, water_data_a = get_water_features(structure_input = out_name_a+".gro", 
-                                                xtc_input = out_name_a+"aligned.xtc",
+                                                xtc_input = "dens/cond-a_wateraligned.xtc",
                                                 top_waters = 2,
                                                 atomgroup = "OH2",
                                                 grid_input = grid_combined,
