@@ -10,20 +10,20 @@ import os
 from pensa import *
 
 
-# # # Define where to save the GPCRmd files
-root_dir = './mor-data'
-# Define which files to download
-md_files = ['11427_dyn_151.psf','11426_dyn_151.pdb', # MOR-apo
-            '11423_trj_151.xtc','11424_trj_151.xtc','11425_trj_151.xtc',
-            '11580_dyn_169.psf','11579_dyn_169.pdb', # MOR-BU72
-            '11576_trj_169.xtc','11577_trj_169.xtc','11578_trj_169.xtc']
-# Download all the files that do not exist yet
-for file in md_files:
-    if not os.path.exists(os.path.join(root_dir,file)):
-        download_from_gpcrmd(file,root_dir)
+# # # # Define where to save the GPCRmd files
+# root_dir = './mor-data'
+# # Define which files to download
+# md_files = ['11427_dyn_151.psf','11426_dyn_151.pdb', # MOR-apo
+#             '11423_trj_151.xtc','11424_trj_151.xtc','11425_trj_151.xtc',
+#             '11580_dyn_169.psf','11579_dyn_169.pdb', # MOR-BU72
+#             '11576_trj_169.xtc','11577_trj_169.xtc','11578_trj_169.xtc']
+# # Download all the files that do not exist yet
+# for file in md_files:
+#     if not os.path.exists(os.path.join(root_dir,file)):
+#         download_from_gpcrmd(file,root_dir)
 
 root_dir = './mor-data'
-# Simulation A
+# # Simulation A
 ref_file_a =  root_dir+'/11427_dyn_151.psf'
 pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
 trj_file_a = [root_dir+'/11423_trj_151.xtc',
@@ -38,13 +38,13 @@ trj_file_b = [root_dir+'/11576_trj_169.xtc',
 # Base for the selection string for each simulation
 sel_base_a = "(not name H*) and protein"
 sel_base_b = "(not name H*) and protein"
-# # # Names of the output files
+# # # # Names of the output files
 out_name_a = "traj/condition-a"
 out_name_b = "traj/condition-b"
 
-for subdir in ['traj','plots','vispdb','pca','clusters','results']:
-    if not os.path.exists(subdir):
-        os.makedirs(subdir)
+# for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+#     if not os.path.exists(subdir):
+#         os.makedirs(subdir)
 
 # # # Extract the coordinates of the receptor from the trajectory
 extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)

@@ -97,7 +97,9 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Prefix for written filename. 
 
 
-    """
+    """        
+    if not os.path.exists('dens/'):
+        os.makedirs('dens/')
     
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
@@ -121,15 +123,15 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     merged_coords = np.hstack([sim1_coords, sim2_coords])
     # # # We load in the merged coordinated into our new universe that contains
     # # # the receptor in both conditions
-    Combined_conditions.load_new(merged_coords, format=MemoryReader)
-   
+    Combined_conditions.load_new(merged_coords, format=MemoryReader)    
+
     # # # We extract the density grid from the combined condition universe
     density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()
     D.density.convert_density(write_grid_as)
-    D.density.export(out_name + atomgroup +"_density.dx", type="double")
+    D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
     
     
     
@@ -150,13 +152,15 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
         File name for the trajectory (xtc format).
 
     """
-
+    if not os.path.exists('dens/'):
+        os.makedirs('dens/')
+    
     # # Before we extract the water densities, we need to first align the trajectories 
     # # so that we can featurize water sites in both ensembles using the same coordinates
     condition_a = mda.Universe(struc_a,xtc_a)
     condition_b = mda.Universe(struc_b,xtc_b)
     
-    align_xtc_name= struc_a[:-4] + 'aligned.xtc'    
+    align_xtc_name='dens/' + struc_a[:-4] + 'aligned.xtc'    
     
     #align condition a to condition b
     align.AlignTraj(condition_a,  # trajectory to align
@@ -197,8 +201,10 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
     g = D.density
     
     if write_grid_as is not None:
+        if not os.path.exists('dens/'):
+            os.makedirs('dens/')
         D.density.convert_density(write_grid_as)
-        D.density.export(out_name + atomgroup + "_density.dx", type="double")
+        D.density.export('dens/' + out_name + atomgroup + "_density.dx", type="double")
 
     return g
         
@@ -218,6 +224,7 @@ def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
         MDAnalysis atomgroup to describe the atom.
 
     """
+    
     ##PDB_VISUALISATION     
     ##rescursively add waters to the pdb file one by one as they are processed           
     # # Read the file into Biotite's structure object (atom array)
