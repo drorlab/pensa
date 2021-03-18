@@ -210,14 +210,14 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
     # Loop over time-lagged independent components.
     for evi in range(num_tic):
         # Project the combined data on the time-lagged independent component
-        proj = project_on_tic(data,evi+1,tica=tica)
+        proj = project_on_tic(data,evi,tica=tica)
         # Sort everything along the projection on th resp. PC
         sort_idx  = np.argsort(proj)
         proj_sort = proj[sort_idx] 
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_tic"+str(evi)+".xtc", aa.n_atoms) as W:
+        with mda.Writer(out_name+"_tic"+str(evi+1)+".xtc", aa.n_atoms) as W:
             for i in range(data.shape[0]):
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ua.trajectory[oidx_sort[i]]
@@ -274,7 +274,7 @@ def sort_mult_trajs_along_common_tic(data, start_frame, top, trj, out_name, num_
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_tic"+str(evi)+".xtc", atoms[0].n_atoms) as W:
+        with mda.Writer(out_name+"_tic"+str(evi+1)+".xtc", atoms[0].n_atoms) as W:
             for i in range(data.shape[0]):
                 j = cond_sort[i] 
                 ts = univs[j].trajectory[oidx_sort[i]]
