@@ -28,7 +28,7 @@
   - [x] Add visualizations.
   - [x] Fix installation via pip.
   - [x] Fix animations (they only show white canvas).
-  - [ ] Add TICA to Colab tutorial.
+  - [x] Add TICA to Colab tutorial.
 
 ### Plans
 
@@ -58,8 +58,8 @@
   - [ ] write module
   - [ ] write unit tests
 - [ ] Put shared functionality of PCA and TICA into shared functions.
-- [ ] Include TICA in unit tests
-- [ ] Make file format (png/pdf?) for matplotlib optional.
+- [x] Include TICA in unit tests
+- [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
 
 ### Ideas
 
@@ -82,6 +82,6 @@
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
 - [ ] Try to integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
-- [ ] Having a Slack channel for all developers and testers, and to provide support for the user community. 
+- [ ] Having a Slack channel for all developers and testers, and to provide support for the user community. ----------------
 
 ### Done  ✓
