@@ -23,11 +23,12 @@
   - [x] First tests (not very promising).
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
-- [ ] Colab Tutorial
+- [x] Colab Tutorial
   - [x] Put Notebook on Colab and get it to run.
   - [x] Add visualizations.
   - [x] Fix installation via pip.
-  - [ ] Fix animations (they only show white canvas).  
+  - [x] Fix animations (they only show white canvas).
+  - [ ] Add TICA to Colab tutorial.
 
 ### Plans
 
@@ -81,5 +82,6 @@
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
 - [ ] Try to integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
+- [ ] Having a Slack channel for all developers and testers, and to provide support for the user community. 
 
 ### Done  ✓
