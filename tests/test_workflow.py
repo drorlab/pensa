@@ -335,6 +335,45 @@ class Test_pensa(unittest.TestCase):
       self.assertEqual(len(_centroids[i]), 460)
 
 
+  # -- calculate_tica
+  def test_tica_combine(self):
+    self.assertEqual(self.tica_combined.lag, 10)
+    self.assertEqual(self.tica_combined.kinetic_map, True)
+
+  # -- tica_eigenvalues_plot()
+  def test_tica_eigenvalues_plot(self):
+    arr_1, arr_2 = tica_eigenvalues_plot(self.tica_combined, num=12, plot_file='plots/combined_tmr_eigenvalues.pdf')
+    self.assertEqual(len(arr_1), 12)
+    self.assertEqual(len(arr_2), 12)
+  
+  # -- tica_features()
+  def test_tica_features(self):
+    test_feature = tica_features(self.tica_combined,self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
+    self.assertEqual(len(test_feature), 920)
+    
+  # -- sort_trajs_along_common_tic()
+  def test_sort_trajs_along_common_tic(self):
+    proj, atom = sort_trajs_along_common_tic(self.sim_a_tmr_data['bb-torsions'],
+                            self.sim_b_tmr_data['bb-torsions'], 0,
+                            "traj/condition-a_receptor.gro",
+                            "traj/condition-b_receptor.gro",
+                            "traj/condition-a_receptor.xtc",
+                            "traj/condition-b_receptor.xtc",
+                            "pca/receptor_by_tmr",
+                             num_tic=3)
+    self.assertEqual(len(proj), 60)
+    self.assertEqual(len(atom), 60)
+
+  # -- sort_traj_along_tic()
+  def test_sort_traj_along_tic(self):
+    oidx = sort_traj_along_tic(self.sim_a_tmr_data['bb-torsions'], self.tica_a, 0,
+                                 "traj/condition-a_receptor.gro",
+                                 "traj/condition-a_receptor.xtc",
+                                 "pca/condition-a_receptor_by_tmr", num_tic=3)
+    self.assertEqual(len(oidx), 30)
+
+
+
 # -- Extract coordinate
 
 root_dir_a = test_data_path + '/MOR-apo'
