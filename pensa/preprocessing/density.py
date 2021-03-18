@@ -17,6 +17,7 @@ The methods here are based on the following paper:
 
 import numpy as np
 from scipy import ndimage as ndi
+import os
 # from gridData import Grid
 import MDAnalysis as mda
 from MDAnalysis.analysis.density import DensityAnalysis
@@ -25,10 +26,37 @@ from MDAnalysis.coordinates.memory import MemoryReader
 from MDAnalysis.analysis import align
 import biotite.structure as struc
 import biotite.structure.io as strucio
-from pensa import *
-from pensa.statesinfo import *
+# from pensa import *
+# from pensa.features.processing import *
 
 # -- Processing trajectories for density analysis
+
+def _match_sim_lengths(sim1,sim2):
+    """
+    Make two lists the same length by truncating the longer list to match.
+
+
+    Parameters
+    ----------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    Returns
+    -------
+    sim1 : list
+        A one dimensional distribution of a specific feature.
+    sim2 : list
+        A one dimensional distribution of a specific feature.
+
+    """
+    if len(sim1)!=len(sim2):
+        if len(sim1)>len(sim2):
+            sim1=sim1[0:len(sim2)]
+        if len(sim1)<len(sim2):
+            sim2=sim2[0:len(sim1)]  
+    return sim1, sim2
 
 def _copy_coords(ag):
     """
@@ -117,7 +145,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     # # # The density needs to be formed from an even contribution of both conditions
     # # # otherwise it will be unevely biased towards one condition.
     # # # So we match the simulation lengths first
-    sim1_coords, sim2_coords = match_sim_lengths(aligned_coords_a,aligned_coords_b)
+    sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a,aligned_coords_b)
 
     # # # Then we merge the coordinates into one system
     merged_coords = np.hstack([sim1_coords, sim2_coords])
@@ -158,9 +186,9 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     # # Before we extract the water densities, we need to first align the trajectories 
     # # so that we can featurize water sites in both ensembles using the same coordinates
     condition_a = mda.Universe(struc_a,xtc_a)
-    condition_b = mda.Universe(struc_b,xtc_b)
+    condition_b = mda.Universe(struc_b,xtc_b)    
     
-    align_xtc_name='dens/' + struc_a[:-4] + 'aligned.xtc'    
+    align_xtc_name='dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'    
     
     #align condition a to condition b
     align.AlignTraj(condition_a,  # trajectory to align
