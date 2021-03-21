@@ -1,30 +1,104 @@
 Ensemble Comparison 
 ===================
 
-[Briefly describe general concept]
+Here we compare the two ensembles using measures for the relative
+entropy.
 
-Systematically compare features
-*******************************
+You can as well calculate the Kolmogorov-Smirnov metric and the
+corresponding p value using the function
+``kolmogorov_smirnov_analysis()``.
 
-Relative Entropy
-----------------
+Another possibility is to compare only the means and standard deviations
+of the distributions using ``mean_difference_analysis()``.
 
-Kolmogorov-Smirnov Statistic
-----------------------------
+Backbone Torsions
+~~~~~~~~~~~~~~~~~
 
-State-Specific Information 
---------------------------
+We start with the backbone torsions, which we can select via
+``'bb-torsions'``. To do the same analysis on sidechain torsions,
+replace ``'bb-torsions'`` with ``'sc-torsions'``.
 
-Visualization
-*************
+.. code:: ipython3
 
-Plot per-residue values
-------------------------
+    # Relative Entropy analysis with torsions
+    relen = relative_entropy_analysis(sim_a_rec_feat['bb-torsions'], 
+                                      sim_b_rec_feat['bb-torsions'], 
+                                      sim_a_rec_data['bb-torsions'], 
+                                      sim_b_rec_data['bb-torsions'],
+                                      bin_num=10, verbose=False)
+    names_bbtors, jsd_bbtors, kld_ab_bbtors, kld_ba_bbtors = relen 
 
-Visualize per-residue values
-----------------------------
+The above function also returns the Kullback-Leibler divergences of A
+with respect to B and vice versa.
 
-Plot distances
-------------------
+To find out where the ensembles differ the most, let’s print out the
+most different features and the corresponding value.
+
+.. code:: ipython3
+
+    # Print the features with the 12 highest values
+    sf = sort_features(names_bbtors, jsd_bbtors)
+    for f in sf[:12]: print(f[0], f[1])
+
+To get an overview of how strongly the ensembles differ in which region,
+we can plot the maximum deviation of the features related to a certain
+residue.
+
+.. code:: ipython3
+
+    # Plot the maximum Jensen-Shannon distance per residue as "B factor" in a PDB file
+    ref_filename = "traj/condition-a_receptor.gro"
+    out_filename = "receptor_bbtors-deviations_tremd"
+    vis = residue_visualization(names_bbtors, jsd_bbtors, ref_filename, 
+                                "plots/"+out_filename+"_jsd.pdf", 
+                                "vispdb/"+out_filename+"_jsd.pdb",
+                                y_label='max. JS dist. of BB torsions')
+
+
+.. code:: ipython3
+
+    # Save the corresponding data
+    np.savetxt('results/'+out_filename+'_relen.csv', 
+               np.array(relen).T, fmt='%s', delimiter=',', 
+               header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+    np.savetxt('results/'+out_filename+'_jsd.csv', 
+               np.array(vis).T, fmt='%s', delimiter=',', 
+               header='Residue, max. JSD(A,B)')
+
+Backbone C-alpha Distances
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another common representation for the overall structure of a protein are
+the distances between the C-alpha atoms. We can perform the same
+analysis on them.
+
+.. code:: ipython3
+
+    # Relative entropy analysis for C-alpha distances
+    relen = relative_entropy_analysis(sim_a_rec_feat['bb-distances'], 
+                                      sim_b_rec_feat['bb-distances'], 
+                                      sim_a_rec_data['bb-distances'], 
+                                      sim_b_rec_data['bb-distances'],
+                                      bin_num=10, verbose=False)
+    names_bbdist, jsd_bbdist, kld_ab_bbdist, kld_ba_bbdist = relen 
+
+.. code:: ipython3
+
+    # Print the features with the 12 highest values
+    sf = sort_features(names_bbdist, jsd_bbdist)
+    for f in sf[:12]: print(f[0], f[1])
+
+To visualize distances, we need a two-dimensional representation with
+the residues on each axis. We color each field with the value of the
+Jensen-Shannon distance (but could as well use Kullback-Leibler
+divergence, Kolmogorov-Smirnov statistic etc. instead).
+
+.. code:: ipython3
+
+    # Visualize the deviations in a matrix plot
+    matrix = distances_visualization(names_bbdist, jsd_bbdist, 
+                                     "plots/receptor_jsd-bbdist.pdf",
+                                     vmin = 0.0, vmax = 1.0,
+                                     cbar_label='JSD')
 
 
