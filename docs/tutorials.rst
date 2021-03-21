@@ -14,4 +14,4 @@ The tutorial folder contains
 
 An animated version of the notebook is on `Google Colab <https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa>`_.
 
-Feel free to get in touch or open an issue if you have questions!
+Feel free to get in touch or `open an issue <https://github.com/drorlab/pensa/issues>`_ if you have questions!
