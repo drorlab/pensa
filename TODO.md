@@ -23,12 +23,6 @@
   - [x] First tests (not very promising).
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
-- [x] Colab Tutorial
-  - [x] Put Notebook on Colab and get it to run.
-  - [x] Add visualizations.
-  - [x] Fix installation via pip.
-  - [x] Fix animations (they only show white canvas).
-  - [x] Add TICA to Colab tutorial.
 
 ### Plans
 
@@ -45,7 +39,7 @@
 - [ ] Implement clustering in principal component space
 - [ ] Facilitate calculation of JSD etc. on principal components
 - [ ] Facilitate calculation of SSI on results of joint clustering. 
-- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
+- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE) ----------------
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
   - [ ] First tests with (regular) t-SNE
@@ -62,7 +56,7 @@
 - [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
 
 ### Ideas
-
+- [ ] Logo
 - [ ] Hydrogen bonds as features
 - [ ] Contacts as features (can PyEMMA do this?)
 - [ ] Position deviations as features (similar to components of RMSD)
@@ -85,3 +79,9 @@
 - [ ] Having a Slack channel for all developers and testers, and to provide support for the user community. ----------------
 
 ### Done  ✓
+- [x] Colab Tutorial
+  - [x] Put Notebook on Colab and get it to run.
+  - [x] Add visualizations.
+  - [x] Fix installation via pip.
+  - [x] Fix animations (they only show white canvas).
+  - [x] Add TICA to Colab tutorial.
