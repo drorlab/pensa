@@ -1,14 +1,5 @@
 ### In Progress
 
-- [ ] Refactoring and fixes for release 0.2
-  - [x] Restructure modules to subpackages
-  - [x] Adapt README
-  - [x] Adapt API documentation
-  - [ ] Include SSI to example scripts?
-  - [x] Numbering of principal component trajectories starts with 0, should start with 1
-  - [x] Axis labels and legend name for distance matrix plot
-  - [x] Function pca_features() does not have labels
-  - [x] Function compare_projections() does not have labels or legend
 - [ ] Tests
   - [x] Workflow test with example data
   - [ ] Trivial examples for each function
@@ -23,16 +14,21 @@
   - [x] First tests (not very promising).
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
+- [ ] Unified tutorial in documentation. Make one page for each subpackage
+  - [ ] preprocessing
+    - [x] coordinates
+    - [ ] densities
+  - [ ] featurization
+    - [x] structure features
+    - [ ] water features
+    - [ ] atom features
+  - [x] comparison
+  - [x] dimensionality reduction
+  - [ ] clusters (leave out until we can cluster on PCs)
+  - [ ] SSI
 
 ### Plans
 
-- [ ] Write "getting started" for documentation 
-- [ ] Unify tutorial format. Make one for each subpackage
-  - [ ] preprocessing and featurization
-  - [ ] comparison
-  - [ ] dimensionality reduction
-  - [ ] clusters
-  - [ ] SSI
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
@@ -52,7 +48,6 @@
   - [ ] write module
   - [ ] write unit tests
 - [ ] Put shared functionality of PCA and TICA into shared functions.
-- [x] Include TICA in unit tests
 - [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
 
 ### Ideas
@@ -76,7 +71,6 @@
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
 - [ ] Try to integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
-- [ ] Having a Slack channel for all developers and testers, and to provide support for the user community. ----------------
 
 ### Done  ✓
 - [x] Colab Tutorial
@@ -85,3 +79,16 @@
   - [x] Fix installation via pip.
   - [x] Fix animations (they only show white canvas).
   - [x] Add TICA to Colab tutorial.
+- [x] Include TICA in unit tests
+- [x] Write "getting started" for documentation
+- [x] Refactoring and fixes for release 0.2
+  - [x] Restructure modules to subpackages
+  - [x] Adapt README
+  - [x] Adapt API documentation
+  - [x] Include SSI to comparison example script
+  - [x] Numbering of principal component trajectories starts with 0, should start with 1
+  - [x] Axis labels and legend name for distance matrix plot
+  - [x] Function pca_features() does not have labels
+  - [x] Function compare_projections() does not have labels or legend
+- [x] Slack channel for all developers and testers, and to provide support for the user community.
+

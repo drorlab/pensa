@@ -13,6 +13,120 @@ from pensa import *
 
 
 
+def workflow_torsions_jsd(args, feat_a, feat_b, data_a, data_b, tors='bb'):
+
+    # Use only features that are common to both ensembles
+    if args.only_common_sctors and tors=='sc':
+        select_a, select_b = select_common_features(feat_a[tors+'-torsions'], 
+                                                    feat_b[tors+'-torsions'])
+    else:
+        select_a = np.arange(len(feat_a[tors+'-torsions']))
+        select_b = np.arange(len(feat_b[tors+'-torsions']))
+
+    # Relative Entropy analysis with BB torsions   
+    relen = relative_entropy_analysis(list(np.array(feat_a[tors+'-torsions'])[select_a]), 
+                                      list(np.array(feat_b[tors+'-torsions'])[select_b]), 
+                                      data_a[tors+'-torsions'][:,select_a], 
+                                      data_b[tors+'-torsions'][:,select_b],
+                                      bin_width=None, bin_num=10, verbose=False,
+                                      override_name_check=args.override_name_check)
+    names, jsd, kld_ab, kld_ba = relen
+
+    # Save all results (per feature) in CSV files 
+    np.savetxt(args.out_results+'_'+tors+'-torsions_relative-entropy.csv', np.array(relen).T,
+               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+
+    # Save the Jensen-Shannon distance as "B factor" in a PDB file
+    vis = residue_visualization(names, jsd, args.ref_file_a, 
+                                args.out_plots+"_"+tors+"-torsions_jsd.pdf", 
+                                args.out_vispdb+"_"+tors+"-torsions_jsd.pdb",
+                                y_label='max. JS dist. of '+tors.upper()+' torsions')
+
+    # Print the features with the highest values
+    print(tors.upper()+" torsions with the strongest deviations (JSD):")
+    sf = sort_features(names, jsd)
+    for f in sf[:args.print_num]: print(f[0], f[1])
+
+    return names, jsd  
+
+
+def workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='bb'):
+
+    # Use only features that are common to both ensembles
+    if args.only_common_sctors and tors=='sc':
+        select_a, select_b = select_common_features(feat_a[tors+'-torsions'], 
+                                                    feat_b[tors+'-torsions'])
+    else:
+        select_a = np.arange(len(feat_a[tors+'-torsions']))
+        select_b = np.arange(len(feat_b[tors+'-torsions']))
+
+    # Kolmogorov-Smirnov analysis with BB torsions
+    ksana = kolmogorov_smirnov_analysis(list(np.array(feat_a[tors+'-torsions'])[select_a]), 
+                                        list(np.array(feat_b[tors+'-torsions'])[select_b]), 
+                                        data_a[tors+'-torsions'][:,select_a], 
+                                        data_b[tors+'-torsions'][:,select_b],
+                                        verbose=False, 
+                                        override_name_check=args.override_name_check)
+    names, kss, ksp = ksana
+
+    # Save all results (per feature) in CSV files
+    np.savetxt(args.out_results+'_'+tors+'-torsions_kolmogorov-smirnov.csv', np.array(ksana).T,
+               fmt='%s', delimiter=',', header='Name, KSS(A,B), p-value')
+
+    # Save the Kolmogorov-Smirnov statistic as "B factor" in a PDB file
+    vis = residue_visualization(names, kss, args.ref_file_a,
+                                args.out_plots+"_"+tors+"-torsions_kss.pdf",
+                                args.out_vispdb+"_"+tors+"-torsions_kss.pdb",
+                                y_label='max. KS stat. of '+tors.upper()+' torsions')
+
+    # Print the features with the highest values
+    print(tors.upper()+" torsions with the strongest deviations (KSS):")
+    sf = sort_features(names, kss)
+    for f in sf[:args.print_num]: print(f[0], f[1])
+
+    return names, kss
+
+
+def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
+
+    # Use only features that are common to both ensembles
+    if args.only_common_sctors and tors=='sc':
+        select_a, select_b = select_common_features(feat_a[tors+'-torsions'], 
+                                                    feat_b[tors+'-torsions'])
+    else:
+        select_a = np.arange(len(feat_a[tors+'-torsions']))
+        select_b = np.arange(len(feat_b[tors+'-torsions']))
+        
+    # SSI analysis with BB torsions
+    bb_res_feat_a, bb_res_data_a = get_multivar_res_timeseries({tors+'-torsions': list(np.array(feat_a[tors+'-torsions'])[select_a])}, 
+                                                               {tors+'-torsions': data_a[tors+'-torsions'][:,select_a]}, 
+                                                               tors+'-torsions', write=False, out_name='')
+    bb_res_feat_b, bb_res_data_b = get_multivar_res_timeseries({tors+'-torsions': list(np.array(feat_b[tors+'-torsions'])[select_b])}, 
+                                                               {tors+'-torsions': data_b[tors+'-torsions'][:,select_b]}, 
+                                                               tors+'-torsions', write=False, out_name='')
+    ana = ssi_ensemble_analysis(bb_res_feat_a[tors+'-torsions'], bb_res_feat_b[tors+'-torsions'],
+                                bb_res_data_a[tors+'-torsions'], bb_res_data_b[tors+'-torsions'],
+                                verbose=False, override_name_check=args.override_name_check)
+    resnames, ssi = ana
+
+    # Save all results (per feature) in CSV files 
+    np.savetxt(args.out_results+'_'+tors+'-torsions_state-specific-information.csv', np.array(ana).T,
+               fmt='%s', delimiter=',', header='Name, SSI(A,B)')
+
+    # Save the state-specific information as "B factor" in a PDB file
+    vis = residue_visualization(resnames, ssi, args.ref_file_a, 
+                                args.out_plots+"_"+tors+"-torsions_ssi.pdf", 
+                                args.out_vispdb+"_"+tors+"-torsions_ssi.pdb",
+                                y_label='SSI of '+tors.upper()+' torsions')
+
+    # Print the features with the highest values
+    print(tors.upper()+" torsions with the strongest deviations (SSI):")
+    sf = sort_features(resnames, ssi)
+    for f in sf[:args.print_num]: print(f[0], f[1])
+
+    return resnames, ssi
+
+
 
 # -------------#
 # --- MAIN --- #
@@ -30,14 +144,16 @@ if __name__ == "__main__":
     parser.add_argument( "--out_results", type=str, default='results/rhodopsin_receptor' )
     parser.add_argument( "--start_frame", type=int, default=0 )
     parser.add_argument( "--print_num",   type=int, default=12 )
+    parser.add_argument( "--override_name_check", dest="override_name_check", default=False, action="store_true")
+    parser.add_argument( "--only_common_sctors",  dest="only_common_sctors",  default=False, action="store_true")
     args = parser.parse_args()
 
 
     # -- FEATURES --
 
     # Load Features 
-    feat_a, data_a = get_structure_features(args.ref_file_a, args.trj_file_a, start_frame=args.start_frame)
-    feat_b, data_b = get_structure_features(args.ref_file_b, args.trj_file_b, start_frame=args.start_frame)
+    feat_a, data_a = get_structure_features(args.ref_file_a, args.trj_file_a, args.start_frame)
+    feat_b, data_b = get_structure_features(args.ref_file_b, args.trj_file_b, args.start_frame)
     # Report dimensions
     print('Feature dimensions from', args.trj_file_a)
     for k in data_a.keys(): 
@@ -47,68 +163,23 @@ if __name__ == "__main__":
         print(k, data_b[k].shape)
 
 
-    # -- BACKBONE TORSIONS --
-
-    print('BACKBONE TORSIONS')
-
-    # Relative Entropy analysis with BB torsions
-    relen = relative_entropy_analysis(feat_a['bb-torsions'], feat_b['bb-torsions'], 
-                                      data_a['bb-torsions'], data_b['bb-torsions'],
-                                      bin_width=None, bin_num=10, verbose=False)
-    names, jsd, kld_ab, kld_ba = relen
-
-    # Save all results (per feature) in a CSV file 
-    np.savetxt(args.out_results+'_bb-torsions_relative-entropy.csv', np.array(relen).T, 
-               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+    # -- TORSIONS -- #
     
-    # Save the Jensen-Shannon distance as "B factor" in a PDB file
-    vis = residue_visualization(names, jsd, args.ref_file_a, 
-                                args.out_plots+"_bb-torsions_jsd.pdf", 
-                                args.out_vispdb+"_bb-torsions_jsd.pdb",
-                                y_label='max. JS dist. of BB torsions')
-
-    # Save the per-residue data in a CSV file
-    np.savetxt(args.out_results+'_bb-torsions_max-jsd-per-residue.csv', np.array(vis).T, 
-               fmt='%s', delimiter=',', header='Residue, max. JSD(A,B)')
-
-    # Print the features with the highest values
-    print("Backbone torsions with the strongest deviations:")
-    sf = sort_features(names, jsd)
-    for f in sf[:args.print_num]: print(f[0], f[1])
-
-
-    # -- SIDECHAIN TORSIONS --
-
+    print('BACKBONE TORSIONS')
+    
+    names, jsd = workflow_torsions_jsd(args, feat_a, feat_b, data_a, data_b, tors='bb')
+    names, kss = workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='bb')
+    names, ssi = workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb')
+    
     print('SIDECHAIN TORSIONS')
-
-    # Relative Entropy analysis with sidechain torsions
-    relen = relative_entropy_analysis(feat_a['sc-torsions'], feat_b['sc-torsions'],
-                                      data_a['sc-torsions'], data_b['sc-torsions'],
-                                      bin_width=None, bin_num=10, verbose=False)
-    names, jsd, kld_ab, kld_ba = relen
-
-    # Save all results (per feature) in a CSV file 
-    np.savetxt(args.out_results+'_sc-torsions_relative-entropy.csv', np.array(relen).T,
-               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)') 
-
-    # Save the Jensen-Shannon distance as "B factor" in a PDB file
-    vis = residue_visualization(names, jsd, args.ref_file_a, 
-                                args.out_plots+"_sc-torsions_jsd.pdf",
-                                args.out_vispdb+"_sc-torsions_jsd.pdb",
-                                y_label='max. JS dist. of SC torsions')
-
-    # Save the per-residue data in a CSV file
-    np.savetxt(args.out_results+'_sc-torsions_max-jsd-per-residue.csv', np.array(vis).T,
-               fmt='%s', delimiter=',', header='Residue, max. JSD(A,B)')
-
-    # Print the features with the highest values
-    print("Sidechain torsions with the strongest deviations:")
-    sf = sort_features(names, jsd)
-    for f in sf[:args.print_num]: print(f[0], f[1])
+    
+    names, jsd = workflow_torsions_jsd(args, feat_a, feat_b, data_a, data_b, tors='sc')
+    names, kss = workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='sc')
+    names, ssi = workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='sc')
 
 
     # -- BACKBONE C-ALPHA DISTANCES --
-
+    
     print('BACKBONE C-ALPHA DISTANCES')
 
     # Relative entropy analysis for C-alpha distances
