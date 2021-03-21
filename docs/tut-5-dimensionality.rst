@@ -16,14 +16,14 @@ tutorial:
 
 .. code:: ipython3
 
-    sim_a_rec = get_structure_features("traj/condition-a_receptor.gro", 
-                                       "traj/condition-a_receptor.xtc",
+    sim_a_tmr = get_structure_features("traj/condition-a_tm.gro", 
+                                       "traj/condition-a_tm.xtc",
                                        cossin=True)
-    sim_b_rec = get_structure_features("traj/condition-b_receptor.gro",
-                                       "traj/condition-b_receptor.xtc",
+    sim_b_tmr = get_structure_features("traj/condition-b_tm.gro", 
+                                       "traj/condition-b_tm.xtc",
                                        cossin=True)
-    sim_a_rec_feat, sim_a_rec_data = sim_a_rec
-    sim_b_rec_feat, sim_b_rec_data = sim_b_rec
+    sim_a_tmr_feat, sim_a_tmr_data = sim_a_tmr
+    sim_b_tmr_feat, sim_b_tmr_data = sim_b_tmr
     
 Note that here we load the cosine/sine of the torsions instead of their 
 values in radians.
