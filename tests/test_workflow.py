@@ -16,7 +16,7 @@ from pensa.preprocessing import *
 #sys.path.append(os.path.abspath(py_file_location))
 
 test_data_path = './tests/test_data'
-for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+for subdir in ['traj','plots','vispdb','pca','tica','clusters','results']:
     if not os.path.exists(test_data_path+'/'+subdir):
         os.makedirs(test_data_path+'/'+subdir)
 
@@ -66,6 +66,7 @@ class Test_pensa(unittest.TestCase):
 
     combined_data_tors = np.concatenate([self.sim_a_tmr_data['bb-torsions'],self.sim_b_tmr_data['bb-torsions']],0)
     self.pca_combined = calculate_pca(combined_data_tors)
+    self.tica_combined = calculate_tica(combined_data_tors)
     
     # -- obtain combined clusters
     self.cidx, self.cond, self.oidx, self.wss, self.centroids = obtain_combined_clusters(self.sim_a_tmr_data['bb-torsions'],self.sim_b_tmr_data['bb-torsions'],
@@ -219,6 +220,9 @@ class Test_pensa(unittest.TestCase):
     plt.close()
     del matrix
 
+
+  # ** DIMENSIONALITY **
+
   # -- calculate_pca()
   def test_calculate_pca(self):
     self.assertEqual(len(self.pca_combined.mean), 460)
@@ -228,13 +232,96 @@ class Test_pensa(unittest.TestCase):
     self.assertEqual(self.pca_combined.stride, 1)
     self.assertEqual(self.pca_combined.var_cutoff, 0.95)
 
+  # -- calculate_tica
+  def test_tica_combined(self):
+    self.assertEqual(self.tica_combined.lag, 10)
+    self.assertEqual(self.tica_combined.kinetic_map, True)
+
+
   # -- pca_eigenvalues_plot()
   def test_pca_eigenvalues_plot(self):
-    arr = pca_eigenvalues_plot(self.pca_combined, num=12, plot_file=test_data_path + '/plots/combined_tmr_eigenvalues.pdf')
+    arr = pca_eigenvalues_plot(self.pca_combined, num=12, plot_file=test_data_path+'/plots/combined_tmr_eigenvalues.pdf')
     self.assertEqual(len(arr[0]), 12)
     self.assertEqual(len(arr[1]), 12)
     plt.close()
     del arr
+
+  # -- tica_eigenvalues_plot()
+  def test_tica_eigenvalues_plot(self):
+    arr_1, arr_2 = tica_eigenvalues_plot(self.tica_combined, num=12, plot_file=test_data_path+'/plots/combined_tmr_eigenvalues.pdf')
+    self.assertEqual(len(arr_1), 12)
+    self.assertEqual(len(arr_2), 12)
+
+
+  #-- pca_features()
+  def test_pca_features(self):
+    self.assertEqual(len(self.graph), 3)
+    plt.close()
+
+    # -- Graph
+    for i in range(len(self.graph)):
+      self.assertEqual(len(self.graph[i]), 460)
+
+    # -- Corr
+    self.assertEqual(len(self.corr), 51)
+
+  # -- tica_features()
+  def test_tica_features(self):
+    test_feature = tica_features(self.tica_combined,self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
+    self.assertEqual(len(test_feature), 460)
+
+
+  # -- sort_trajs_along_common_pc() + sort_traj_along_pc() + project_on_pc()
+  def test_sort_trajs_along_pc(self):
+    self.assertEqual(len(self.sort_common_traj), 180)
+    for ele in self.sort_common_traj:
+      self.assertEqual(ele.n_atoms, 2322)
+
+    self.assertEqual(len(self.sort_traj), 90)
+    for ele in self.sort_traj:
+      self.assertEqual(ele.n_atoms, 2322)
+
+    self.assertEqual(len(self.all_proj), 3)
+
+  # -- sort_trajs_along_common_tic()
+  def test_sort_trajs_along_common_tic(self):
+    proj, atom = sort_trajs_along_common_tic(self.sim_a_tmr_data['bb-torsions'],
+                            self.sim_b_tmr_data['bb-torsions'], 0,
+                            test_data_path + "/traj/condition-a_receptor.gro",
+                            test_data_path + "/traj/condition-b_receptor.gro",
+                            test_data_path + "/traj/condition-a_receptor.xtc",
+                            test_data_path + "/traj/condition-b_receptor.xtc",
+                            test_data_path + "/tica/receptor_by_tmr",
+                             num_tic=3)
+    self.assertEqual(len(proj), 60)
+    self.assertEqual(len(atom), 60)
+
+  # -- sort_traj_along_tic()
+  def test_sort_traj_along_tic(self):
+    oidx = sort_traj_along_tic(self.sim_a_tmr_data['bb-torsions'], self.tica_combined, 0,
+                               test_data_path + "/traj/condition-a_receptor.gro",
+                               test_data_path + "/traj/condition-a_receptor.xtc",
+                               test_data_path + "/pca/condition-a_receptor_by_tmr", num_tic=3)
+    self.assertEqual(len(oidx), 30)
+
+
+  # -- compare_projections()
+  def test_compare_projections(self):
+    self.assertEqual(len(self.val), 3)
+    self.assertEqual(len(self.val[0]), 2)
+    self.assertEqual(len(self.val[1]), 2)
+    self.assertEqual(len(self.val[2]), 2)
+
+    self.assertEqual(len(self.val[0][0]), 30)
+    self.assertEqual(len(self.val[0][1]), 30)
+    self.assertEqual(len(self.val[1][0]), 30)
+    self.assertEqual(len(self.val[1][1]), 30)
+    self.assertEqual(len(self.val[2][0]), 30)
+    self.assertEqual(len(self.val[2][1]), 30)
+
+
+
+  # ** CLUSTERING **
 
   # -- obtain_combined_clusters()
   def test_obtain_combined_clusters(self):
@@ -250,43 +337,6 @@ class Test_pensa(unittest.TestCase):
     self.assertEqual(len(self.centroids[2]), 460)
     for i in range(len(self.oidx)):
       self.assertEqual(self.oidx[i], test_oidx[i])
-
-  #-- pca_features()
-  def test_pca_features(self):
-    self.assertEqual(len(self.graph), 3)
-    plt.close()
-
-    # -- Graph
-    for i in range(len(self.graph)):
-      self.assertEqual(len(self.graph[i]), 460)
-
-    # -- Corr
-    self.assertEqual(len(self.corr), 51)
-
-  # -- sort_trajs_along_common_pc() + sort_traj_along_pc() + project_on_pc()
-  def test_sort_trajs_along_pc(self):
-    self.assertEqual(len(self.sort_common_traj), 180)
-    for ele in self.sort_common_traj:
-      self.assertEqual(ele.n_atoms, 2322)
-
-    self.assertEqual(len(self.sort_traj), 90)
-    for ele in self.sort_traj:
-      self.assertEqual(ele.n_atoms, 2322)
-
-    self.assertEqual(len(self.all_proj), 3)
-  # -- compare_projections()
-  def test_compare_projections(self):
-    self.assertEqual(len(self.val), 3)
-    self.assertEqual(len(self.val[0]), 2)
-    self.assertEqual(len(self.val[1]), 2)
-    self.assertEqual(len(self.val[2]), 2)
-
-    self.assertEqual(len(self.val[0][0]), 30)
-    self.assertEqual(len(self.val[0][1]), 30)
-    self.assertEqual(len(self.val[1][0]), 30)
-    self.assertEqual(len(self.val[1][1]), 30)
-    self.assertEqual(len(self.val[2][0]), 30)
-    self.assertEqual(len(self.val[2][1]), 30)
 
   # -- write_cluster_traj()
   def test_write_cluster_traj(self):
@@ -333,44 +383,6 @@ class Test_pensa(unittest.TestCase):
     self.assertEqual(len(_centroids), 5)
     for i in range(len(_centroids)):
       self.assertEqual(len(_centroids[i]), 460)
-
-
-  # -- calculate_tica
-  def test_tica_combine(self):
-    self.assertEqual(self.tica_combined.lag, 10)
-    self.assertEqual(self.tica_combined.kinetic_map, True)
-
-  # -- tica_eigenvalues_plot()
-  def test_tica_eigenvalues_plot(self):
-    arr_1, arr_2 = tica_eigenvalues_plot(self.tica_combined, num=12, plot_file='plots/combined_tmr_eigenvalues.pdf')
-    self.assertEqual(len(arr_1), 12)
-    self.assertEqual(len(arr_2), 12)
-  
-  # -- tica_features()
-  def test_tica_features(self):
-    test_feature = tica_features(self.tica_combined,self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
-    self.assertEqual(len(test_feature), 920)
-    
-  # -- sort_trajs_along_common_tic()
-  def test_sort_trajs_along_common_tic(self):
-    proj, atom = sort_trajs_along_common_tic(self.sim_a_tmr_data['bb-torsions'],
-                            self.sim_b_tmr_data['bb-torsions'], 0,
-                            "traj/condition-a_receptor.gro",
-                            "traj/condition-b_receptor.gro",
-                            "traj/condition-a_receptor.xtc",
-                            "traj/condition-b_receptor.xtc",
-                            "pca/receptor_by_tmr",
-                             num_tic=3)
-    self.assertEqual(len(proj), 60)
-    self.assertEqual(len(atom), 60)
-
-  # -- sort_traj_along_tic()
-  def test_sort_traj_along_tic(self):
-    oidx = sort_traj_along_tic(self.sim_a_tmr_data['bb-torsions'], self.tica_a, 0,
-                                 "traj/condition-a_receptor.gro",
-                                 "traj/condition-a_receptor.xtc",
-                                 "pca/condition-a_receptor_by_tmr", num_tic=3)
-    self.assertEqual(len(oidx), 30)
 
 
 
