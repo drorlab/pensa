@@ -24,9 +24,6 @@ We host an animated version on Google Colab.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
 
-### Different binding modes of rhodopsin complexes
-Users of the [Sherlock cluster](https://www.sherlock.stanford.edu/) at Stanford, can also do the [demo with rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb).
-
 
 ## Usage-ready scripts
 
