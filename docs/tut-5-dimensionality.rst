@@ -10,7 +10,7 @@ membrane do not distort the more important slow motions in the receptor
 core.
 
 Featurization
--------------
+^^^^^^^^^^^^^^^^^
 First, load the structural features as described in the corresponding 
 tutorial:
 
@@ -29,7 +29,7 @@ Note that here we load the cosine/sine of the torsions instead of their
 values in radians.
     
 Combined PCA
-------------
+^^^^^^^^^^^^^^^^^
 
 In the spirit of comparing two simulations, we calculate the principal
 components of their joint ensemble of structures.
