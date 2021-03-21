@@ -11,8 +11,21 @@ corresponding p value using the function
 Another possibility is to compare only the means and standard deviations
 of the distributions using ``mean_difference_analysis()``.
 
+Featurization
+-------------
+First, load the structural features as described in the previous tutorial:
+
+.. code:: ipython3
+
+    sim_a_rec = get_structure_features("traj/condition-a_receptor.gro", 
+                                       "traj/condition-a_receptor.xtc")
+    sim_b_rec = get_structure_features("traj/condition-b_receptor.gro",
+                                       "traj/condition-b_receptor.xtc")
+    sim_a_rec_feat, sim_a_rec_data = sim_a_rec
+    sim_b_rec_feat, sim_b_rec_data = sim_b_rec
+
 Backbone Torsions
-~~~~~~~~~~~~~~~~~
+-----------------
 
 We start with the backbone torsions, which we can select via
 ``'bb-torsions'``. To do the same analysis on sidechain torsions,
@@ -66,7 +79,7 @@ residue.
                header='Residue, max. JSD(A,B)')
 
 Backbone C-alpha Distances
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 Another common representation for the overall structure of a protein are
 the distances between the C-alpha atoms. We can perform the same
