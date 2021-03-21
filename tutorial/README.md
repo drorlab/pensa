@@ -17,8 +17,7 @@ Have a look at one of the example notebooks below that demonstrate the functiona
 
 ## Example Notebooks
 
-### Comparing mu-Opioid receptor simulations from GPCRmd
-We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/).
+We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb), comparing freely available  mu-Opioid receptor simulations from [GPCRmd](https://submission.gpcrmd.org/home/).
 
 We host an animated version on Google Colab.
 
