@@ -4,6 +4,147 @@ Preprocessing
 Coordinates
 ***********
 
+To work with the protein coordinates, we first need to extract them from
+the simulation, i.e., remove the solvent, lipids etc. This is the
+hardest part but you usually only have to do it once and can then play
+with your data. Preprocessing can handle many common trajectory formats
+(as it is based on MDAnalysis) but the internal featurization (based on
+PyEMMA) is a bit more restrictive, so we will always write xtc
+trajectories. For large trajectories, you might want to use the scripts
+provided in the PENSA repository, e.g., to run them on the computing
+cluster and then download the processed data. Once you know how PENSA
+works, you can write your own scripts.
+
+Files and Directories
+---------------------
+
+In the following, we define the necessary files. For each simulation, we
+need a reference file (.psf for AMBER), a PDB file, and the trajetory.
+
+To run this tutorial on another system, you’ll have to adapt the file
+paths and names and, in case you need them, the
+residue selections in the folder ``selections``. We explain how they
+work further below. Note that for some PENSA functions it is sufficient
+that the derived features are the same while for others (especially
+those that involve trajectory manipulation), all atoms need to be the
+same. In our particular example, we exclude hydrogen atoms because
+residue Asp114 is protonated in the BU72 simulation but not in the apo
+simulation.
+
+.. code:: ipython3
+
+    root_dir = './mor-data'
+    # Simulation A
+    ref_file_a =  root_dir+'/11427_dyn_151.psf'
+    pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
+    trj_file_a = [root_dir+'/11423_trj_151.xtc',
+                  root_dir+'/11424_trj_151.xtc',
+                  root_dir+'/11425_trj_151.xtc']
+    # Simulation B
+    ref_file_b =  root_dir+'/11580_dyn_169.psf'
+    pdb_file_b =  root_dir+'/11579_dyn_169.pdb'
+    trj_file_b = [root_dir+'/11576_trj_169.xtc',
+                  root_dir+'/11577_trj_169.xtc',
+                  root_dir+'/11578_trj_169.xtc']
+    # Base for the selection string for each simulation
+    sel_base_a = "(not name H*) and protein"
+    sel_base_b = "(not name H*) and protein"
+    # Names of the output files
+    out_name_a = "traj/condition-a"
+    out_name_b = "traj/condition-b"
+    out_name_combined="traj/combined"
+
+For this tutorial, we will save the processed trajectories in the
+subfolder ``traj``. We also create subfolders for other results that we
+will generate.
+
+.. code:: ipython3
+
+    for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+        if not os.path.exists(subdir):
+            os.makedirs(subdir)
+
+Extracting Coordinates
+----------------------
+
+We have to ensure that from both simulations, we use the exact same
+parts of the receptor for the analysis. Often, this will be easy and you
+just provide a simple selection string for the corresponding segment.
+For more complicated cases, we can use the function ``load_selection()``
+to generate a complete residue list from a plain text file. This file
+should provide in each line the first and the last residue to be
+considered for a part of the protein.
+
+In the first case, we will extract all protein residues, assuming
+(correctly) that the same ones are present in both simulations.
+
+.. code:: ipython3
+
+    # Extract the coordinates of the receptor from the trajectory
+    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
+    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", sel_base_b)
+
+In many cases, you probably have several runs of the same simulation
+that you want to combine to one structural ensemble. This is why the
+trajectory argument takes a list as arguments, e.g.
+
+::
+
+   extract_coordinates(system.psf, system.pdb, ['run1.nc','run2.nc','run3.nc'], 
+                       'rho_receptor', 'protein', start_frame=1000)
+                                
+
+With the option ``start_frame``, you can exclude the equilibrium phase
+already at this stage. Be aware that in combined simulations, there is
+no straightforward way to exclude it later as it would require
+bookkeeping about how long each simulation was etc.
+
+Selecting Subsets of Coordinates
+--------------------------------
+
+For some analysis types, we only want to use the part of the receptor
+that is inside the membrane. In this way, very flexible loops outside
+the membrane cannot distort the analysis result. We can manually
+construct a selection string in MDAnalysis format or load the selections
+from a file. We call this file ``mor_tm.txt`` and generate it on the fly
+so we can demonstrate the loader function. We use selections based on
+the definitions of transmembrane helices in the
+`GPCRdb <https://gpcrdb.org/protein/oprm_human/>`__.
+
+.. code:: ipython3
+
+    ! echo "76 98\n105 133\n138 173\n182 208\n226 264\n270 308\n315 354" > mor_tm.txt
+    ! cat mor_tm.txt
+
+.. code:: ipython3
+
+    # Load the selection and generate the strings
+    sel_string_a = load_selection("mor_tm.txt", sel_base_a+" and ")
+    print('Selection A:\n', sel_string_a, '\n')
+    sel_string_b = load_selection("mor_tm.txt", sel_base_b+" and ")
+    print('Selection B:\n', sel_string_b, '\n')
+    # Extract the coordinates of the transmembrane region from the trajectory
+    extract_coordinates(ref_file_a, pdb_file_a, [trj_file_a], out_name_a+"_tm", sel_string_a)
+    extract_coordinates(ref_file_b, pdb_file_b, [trj_file_b], out_name_b+"_tm", sel_string_b)
+        
+Loading from Multiple Simulations
+---------------------------------
+    
+If you want to combine data from different simulation conditions, you
+can use the ``_combined`` version of the extraction function:
+``extract_coordinates_combined()``. It takes lists as arguments for the
+topology files, too. To use the same selection, “multiply” a list of one
+string, as demonstrated below. For this to work, the two selections need
+to have the exactly same atoms.
+
+.. code:: ipython3
+
+    extract_coordinates_combined([ref_file_a]*3 + [ref_file_b]*3,
+                                 trj_file_a + trj_file_b, 
+                                 [sel_string_a]*3 + [sel_string_b]*3, 
+                                 'traj/combined_tm.xtc', 
+                                 start_frame=400)
+
 Densities
 *********
 
