@@ -31,7 +31,7 @@ same. In our particular example, we exclude hydrogen atoms because
 residue Asp114 is protonated in the BU72 simulation but not in the apo
 simulation.
 
-.. code:: ipython3
+.. code:: python
 
     root_dir = './mor-data'
     # Simulation A
@@ -58,7 +58,7 @@ For this tutorial, we will save the processed trajectories in the
 subfolder ``traj``. We also create subfolders for other results that we
 will generate.
 
-.. code:: ipython3
+.. code:: python
 
     for subdir in ['traj','plots','vispdb','pca','clusters','results']:
         if not os.path.exists(subdir):
@@ -78,7 +78,7 @@ considered for a part of the protein.
 In the first case, we will extract all protein residues, assuming
 (correctly) that the same ones are present in both simulations.
 
-.. code:: ipython3
+.. code:: python
 
     # Extract the coordinates of the receptor from the trajectory
     extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
@@ -111,12 +111,12 @@ so we can demonstrate the loader function. We use selections based on
 the definitions of transmembrane helices in the
 `GPCRdb <https://gpcrdb.org/protein/oprm_human/>`__.
 
-.. code:: ipython3
+.. code:: python
 
     ! echo "76 98\n105 133\n138 173\n182 208\n226 264\n270 308\n315 354" > mor_tm.txt
     ! cat mor_tm.txt
 
-.. code:: ipython3
+.. code:: python
 
     # Load the selection and generate the strings
     sel_string_a = load_selection("mor_tm.txt", sel_base_a+" and ")
@@ -137,7 +137,7 @@ topology files, too. To use the same selection, “multiply” a list of one
 string, as demonstrated below. For this to work, the two selections need
 to have the exactly same atoms.
 
-.. code:: ipython3
+.. code:: python
 
     extract_coordinates_combined([ref_file_a]*3 + [ref_file_b]*3,
                                  trj_file_a + trj_file_b, 
@@ -147,4 +147,7 @@ to have the exactly same atoms.
 
 Densities
 *********
+
+[under construction]
+
 

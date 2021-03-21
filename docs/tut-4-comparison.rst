@@ -15,7 +15,7 @@ Featurization
 -------------
 First, load the structural features as described in the previous tutorial:
 
-.. code:: ipython3
+.. code:: python
 
     sim_a_rec = get_structure_features("traj/condition-a_receptor.gro", 
                                        "traj/condition-a_receptor.xtc")
@@ -31,7 +31,7 @@ We start with the backbone torsions, which we can select via
 ``'bb-torsions'``. To do the same analysis on sidechain torsions,
 replace ``'bb-torsions'`` with ``'sc-torsions'``.
 
-.. code:: ipython3
+.. code:: python
 
     # Relative Entropy analysis with torsions
     relen = relative_entropy_analysis(sim_a_rec_feat['bb-torsions'], 
@@ -47,7 +47,7 @@ with respect to B and vice versa.
 To find out where the ensembles differ the most, let’s print out the
 most different features and the corresponding value.
 
-.. code:: ipython3
+.. code:: python
 
     # Print the features with the 12 highest values
     sf = sort_features(names_bbtors, jsd_bbtors)
@@ -57,7 +57,7 @@ To get an overview of how strongly the ensembles differ in which region,
 we can plot the maximum deviation of the features related to a certain
 residue.
 
-.. code:: ipython3
+.. code:: python
 
     # Plot the maximum Jensen-Shannon distance per residue as "B factor" in a PDB file
     ref_filename = "traj/condition-a_receptor.gro"
@@ -68,7 +68,7 @@ residue.
                                 y_label='max. JS dist. of BB torsions')
 
 
-.. code:: ipython3
+.. code:: python
 
     # Save the corresponding data
     np.savetxt('results/'+out_filename+'_relen.csv', 
@@ -85,7 +85,7 @@ Another common representation for the overall structure of a protein are
 the distances between the C-alpha atoms. We can perform the same
 analysis on them.
 
-.. code:: ipython3
+.. code:: python
 
     # Relative entropy analysis for C-alpha distances
     relen = relative_entropy_analysis(sim_a_rec_feat['bb-distances'], 
@@ -95,7 +95,7 @@ analysis on them.
                                       bin_num=10, verbose=False)
     names_bbdist, jsd_bbdist, kld_ab_bbdist, kld_ba_bbdist = relen 
 
-.. code:: ipython3
+.. code:: python
 
     # Print the features with the 12 highest values
     sf = sort_features(names_bbdist, jsd_bbdist)
@@ -106,7 +106,7 @@ the residues on each axis. We color each field with the value of the
 Jensen-Shannon distance (but could as well use Kullback-Leibler
 divergence, Kolmogorov-Smirnov statistic etc. instead).
 
-.. code:: ipython3
+.. code:: python
 
     # Visualize the deviations in a matrix plot
     matrix = distances_visualization(names_bbdist, jsd_bbdist, 

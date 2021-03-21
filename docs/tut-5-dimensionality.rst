@@ -14,7 +14,7 @@ Featurization
 First, load the structural features as described in the corresponding 
 tutorial:
 
-.. code:: ipython3
+.. code:: python
 
     sim_a_tmr = get_structure_features("traj/condition-a_tm.gro", 
                                        "traj/condition-a_tm.xtc",
@@ -34,7 +34,7 @@ Combined PCA
 In the spirit of comparing two simulations, we calculate the principal
 components of their joint ensemble of structures.
 
-.. code:: ipython3
+.. code:: python
 
     # Combine the data of the different simulations
     combined_data_tors = np.concatenate([sim_a_tmr_data['bb-torsions'],sim_b_tmr_data['bb-torsions']],0)
@@ -44,14 +44,14 @@ The corresponding function returns a PyEMMA PCA object, so you can
 combine it with all functionality in PyEMMA to perform more advanced or
 specialized analysis.
 
-.. code:: ipython3
+.. code:: python
 
     pca_combined = calculate_pca(combined_data_tors)
 
 To find out how relevant each PC is, let’s have a look at their
 eigenvalues.
 
-.. code:: ipython3
+.. code:: python
 
     pca_eigenvalues_plot(pca_combined, num=12, plot_file='plots/combined_tmr_eigenvalues.pdf')
 
@@ -60,14 +60,14 @@ principal components. Here, we define a feature as important if its
 correlation with the respective PC is above a threshold of 0.4. The
 function also plots the correlation analysis for each PC.
 
-.. code:: ipython3
+.. code:: python
 
     pca_features(pca_combined,sim_a_tmr_feat['bb-torsions'], 3, 0.4)
 
 Now we can compare how the frames of each ensemble are distributed along
 the principal components.
 
-.. code:: ipython3
+.. code:: python
 
     compare_projections(sim_a_tmr_data['bb-torsions'],
                         sim_b_tmr_data['bb-torsions'],
@@ -85,7 +85,7 @@ The trajectory to be sorted does not have to be the same subsystem from
 which we calcualted the PCA. Here, we are going to write frames with the
 entire receptor, sorted by the PCs of the transmembrane region.
 
-.. code:: ipython3
+.. code:: python
 
     _ = sort_trajs_along_common_pc(sim_a_tmr_data['bb-torsions'],
                                    sim_b_tmr_data['bb-torsions'],
@@ -107,19 +107,19 @@ Single simulation
 
 Here are the major steps of a PCA demonstrated for a single simulation.
 
-.. code:: ipython3
+.. code:: python
 
     sim_a_tmr_data['bb-torsions'].shape
 
-.. code:: ipython3
+.. code:: python
 
     pca_a = calculate_pca(sim_a_tmr_data['bb-torsions'])
 
-.. code:: ipython3
+.. code:: python
 
     pca_features(pca_a, sim_a_tmr_feat['bb-torsions'], 3, 0.4)
 
-.. code:: ipython3
+.. code:: python
 
     _, __ = sort_traj_along_pc(sim_a_tmr_data['bb-torsions'], 
                                pca_a, feature_start_frame, 

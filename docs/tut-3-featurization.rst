@@ -16,13 +16,13 @@ even if it is not included in PENSA.
 The function ``get_structure_features`` loads the names of the features
 and their values separately
 
-.. code:: ipython3
+.. code:: python
 
     sim_a_rec = get_structure_features("traj/condition-a_receptor.gro", 
                                        "traj/condition-a_receptor.xtc")
     sim_a_rec_feat, sim_a_rec_data = sim_a_rec
 
-.. code:: ipython3
+.. code:: python
 
     sim_b_rec = get_structure_features("traj/condition-b_receptor.gro",
                                        "traj/condition-b_receptor.xtc")
@@ -32,19 +32,19 @@ Having a look at the shape of the loaded data, we see that the first
 dimension is the number of frames. The second dimension is the number of
 features. It must be the same for both simulations.
 
-.. code:: ipython3
+.. code:: python
 
     for k in sim_a_rec_data.keys(): 
         print(k, sim_a_rec_data[k].shape)
 
-.. code:: ipython3
+.. code:: python
 
     for k in sim_b_rec_data.keys(): 
         print(k, sim_b_rec_data[k].shape)
 
 Now do the same only for the transmembrane region.
 
-.. code:: ipython3
+.. code:: python
 
     sim_a_tmr = get_structure_features("traj/condition-a_tm.gro", 
                                        "traj/condition-a_tm.xtc")
@@ -62,6 +62,10 @@ Now do the same only for the transmembrane region.
 Water Features
 **************
 
+[under construction]
+
 Single-Atom Features
 ********************
+
+[under construction]
 
