@@ -55,7 +55,10 @@
 - [ ] Hydrogen bonds as features
 - [ ] Contacts as features (can PyEMMA do this?)
 - [ ] Position deviations as features (similar to components of RMSD)
-- [ ] Calculate correlation times (and use them to estimate a threshold for significance)
+- [ ] Estimate thresholds for significance of feature differences
+  - [ ] Calculate correlation times within trajectories
+  - [ ] modify p-value of KS test using correlation time 
+  - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
 - [ ] Featurizers for other molecule types
   - [ ] ions
