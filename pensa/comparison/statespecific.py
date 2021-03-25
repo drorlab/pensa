@@ -54,18 +54,19 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
     # Initialize relative entropy and average value
     data_ssi = np.zeros(len(data_names))
     # Loop over all features    
-    for residue in tqdm(range(len(all_data_a))):
+    for residue in range(len(all_data_a)):
         data_a = all_data_a[residue]
         data_b = all_data_b[residue]
 
         combined_dist=[]
         for dist_no in range(len(data_a)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(data_a[dist_no]),list(data_b[dist_no]))
             # # # combine the ensembles into one distribution (condition_a + condition_b)
-            data_both = sim1+sim2      
+            data_both = list(data_a[dist_no]) + list(data_b[dist_no])      
             combined_dist.append(data_both)
             
+        ## Saving distribution length
+        dist_a_len = len(data_a[dist_no])   
+         
         if wat_occupancy is True: 
             ## Define states for water occupancy 
             wat_occupancy = [[-0.5,0.5,1.5]]
@@ -73,12 +74,14 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
         if write_plots is True:
             write_name = data_names[residue]
             data_ssi[residue] = calculate_ssi(combined_dist,
+                                              traj1_len = dist_a_len,
                                               a_states = wat_occupancy,
                                               write_plots=write_plots,
                                               write_name=write_name,
                                               pbc=pbc)
         else:
             data_ssi[residue] = calculate_ssi(combined_dist,
+                                              traj1_len = dist_a_len,
                                               a_states = wat_occupancy,
                                               pbc=pbc)
             
@@ -152,11 +155,15 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose
                 # # # Make sure the ensembles have the same length of trajectory
                 sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
                 # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = sim1+sim2      
+                res2_data_both = sim1 + sim2      
                 res2_combined_dist.append(res2_data_both)            
             
-            data_ssi[res1][res2] = calculate_ssi(res1_combined_dist,
-                                                 res2_combined_dist)
+            ## Saving distribution length
+            traj1_len = len(res2_data_ens1[dist_no])               
+            
+            data_ssi[res1][res2] = calculate_ssi(distr_a_input = res1_combined_dist,
+                                                 traj1_len = traj1_len,
+                                                 distr_b_input = res2_combined_dist)
             
             data_ssi[res2][res1] = data_ssi[res1][res2]    
                 
@@ -262,8 +269,12 @@ def cossi_featens_analysis(features_a, features_b,
                 # # # combine the ensembles into one distribution (condition_a + condition_b)
                 res2_data_both = sim1+sim2      
                 res2_combined_dist.append(res2_data_both)
+                
+            ## Saving distribution length
+            traj1_len = len(res2_data_ens1[dist_no])        
             
             data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
+                                                                           # traj1_len,
                                                                            res2_combined_dist)
                 
             if verbose is True:
