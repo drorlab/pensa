@@ -78,8 +78,8 @@ def calculate_entropy(state_limits,distribution_list):
     return entropy
 
 
-def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=None,
-                  gauss_bins=120, gauss_smooth=None, pbc=True, write_plots=None, write_name=None):
+def calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, b_states=None,
+                  gauss_bins=180, gauss_smooth=None, pbc=True, write_plots=None, write_name=None):
     """
     Calculates the State Specific Information SSI [bits] between two features from two ensembles. 
     By default, the second feature is the binary switch between ensembles.
@@ -103,7 +103,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
         distribution. The default is None and state limits are calculated automatically.
     gauss_bins : int, optional
         Number of histogram bins to assign for the clustering algorithm. 
-        The default is 120.
+        The default is 180.
     gauss_smooth : int, optional
         Number of bins to perform smoothing over. The default is ~10% of gauss_bins.
     write_plots : bool, optional
@@ -118,11 +118,8 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
 
     """
     
-    if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)
     
-    #try:
-    if True:       
+    try:
         ##calculating the entropy for set_distr_a
         ## if set_distr_a only contains one distributions
         if pbc is True:
@@ -142,7 +139,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
                 else:
                     plot_name = None
                 try:
-                    set_a_states.append(determine_state_limits(set_distr_a[dim_num], gauss_bins, gauss_smooth, write_plots, plot_name))
+                    set_a_states.append(determine_state_limits(set_distr_a[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
                 except:
                     print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
         else:
@@ -154,7 +151,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_b_input is None:       
             H_b=1
-            set_distr_b=[[0.5]*int(len(set_distr_a[0])/2) + [1.5]*int(len(set_distr_a[0])/2)]
+            set_distr_b=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
             set_b_states= [[0,1,2]]  
             
         else:
@@ -174,7 +171,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
                     else:
                         plot_name = None
                     try:
-                        set_b_states.append(determine_state_limits(set_distr_b[dim_num], gauss_bins, gauss_smooth, write_plots, plot_name))
+                        set_b_states.append(determine_state_limits(set_distr_b[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
                     except:    
                         print('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
                 
@@ -187,8 +184,7 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
         H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
     
         SSI = (H_a + H_b) - H_ab
-    else:   
-    #except:
+    except:
         SSI = -1
         if write_name is not None:
             print('WARNING: Input error for ' + write_name)
@@ -200,8 +196,8 @@ def calculate_ssi(distr_a_input, distr_b_input=None, a_states=None, b_states=Non
     return round(SSI,4)
 
 
-def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=120, gauss_smooth=None, write_plots=None,write_name=None):
+def calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None, a_states=None, b_states=None,
+                    c_states=None, gauss_bins=180, gauss_smooth=None, write_plots=None,write_name=None):
     """
     Calculates the State Specific Information Co-SSI [bits] between three features from two ensembles. 
     By default, the third feature is the binary switch between ensembles.
@@ -234,7 +230,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         distribution. The default is None and state limits are calculated automatically.
     gauss_bins : int, optional
         Number of histogram bins to assign for the clustering algorithm. 
-        The default is 120.
+        The default is 180.
     gauss_smooth : int, optional
         Number of bins to perform smoothing over. The default is ~10% of gauss_bins.
     write_plots : bool, optional
@@ -249,10 +245,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
     coSSI : float
         Co-SSI[bits] shared between input a, input b and input c (default is binary switch).
 
-    """
-
-    if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)              
+    """     
  
     try:       
         ##calculating the entropy for set_distr_a
@@ -271,7 +264,8 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
                 else:
                     plot_name = None
                 try:
-                    set_a_states.append(determine_state_limits(set_distr_a[dim_num], 
+                    set_a_states.append(determine_state_limits(set_distr_a[dim_num],
+                                                               traj1_len,
                                                                gauss_bins, 
                                                                gauss_smooth, 
                                                                write_plots, 
@@ -300,6 +294,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
                     plot_name = None
                 try:
                     set_b_states.append(determine_state_limits(set_distr_b[dim_num],
+                                                               traj1_len,
                                                                gauss_bins, 
                                                                gauss_smooth, 
                                                                write_plots, 
@@ -316,7 +311,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_c_input is None:
             H_c=1
-            set_distr_c=[[0.5]*int(len(set_distr_a[0])/2) + [1.5]*int(len(set_distr_a[0])/2)]
+            set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
             set_c_states= [[0,1,2]]  
             
             
@@ -333,7 +328,7 @@ def calculate_cossi(distr_a_input, distr_b_input, distr_c_input=None, a_states=N
                     else:
                         plot_name = None
                     try:
-                        set_c_states.append(determine_state_limits(set_distr_c[dim_num], gauss_bins, gauss_smooth, write_plots, plot_name))
+                        set_c_states.append(determine_state_limits(set_distr_c[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
                     except:    
                         print('Distribution C not clustering properly.\nTry altering Gaussian parameters or input custom states.')
             else:
