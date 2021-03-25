@@ -83,12 +83,13 @@ def tica_features(tica, features, num, threshold, plot_file=None):
         for j, ft in enumerate(features):
             if relevant[j]: print(ft, "%6.3f"%(tica.feature_TIC_correlation[j,i]))
         ax[i].plot(tica.feature_TIC_correlation[:,i])
+        test_feature = tica.feature_TIC_correlation[:,i]
         ax[i].set_xlabel('feature index')
         ax[i].set_ylabel('correlation with TIC%i'%(i+1))
     fig.tight_layout()
     # Save the figure to a file
     if plot_file: fig.savefig(plot_file,dpi=300)
-    return 
+    return test_feature
     
     
 def project_on_tic(data, ev_idx, tica=None):
@@ -163,7 +164,7 @@ def sort_traj_along_tic(data, tica, start_frame, top, trj, out_name, num_tic=3):
             for i in range(data.shape[0]):
                 ts = u.trajectory[oidx_sort[i]]
                 W.write(a)
-    return
+    return oidx_sort
 
 
 def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_tic=3):
@@ -210,14 +211,14 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
     # Loop over time-lagged independent components.
     for evi in range(num_tic):
         # Project the combined data on the time-lagged independent component
-        proj = project_on_tic(data,evi+1,tica=tica)
+        proj = project_on_tic(data,evi,tica=tica)
         # Sort everything along the projection on th resp. PC
         sort_idx  = np.argsort(proj)
         proj_sort = proj[sort_idx] 
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_tic"+str(evi)+".xtc", aa.n_atoms) as W:
+        with mda.Writer(out_name+"_tic"+str(evi+1)+".xtc", aa.n_atoms) as W:
             for i in range(data.shape[0]):
                 if cond_sort[i] == 1: # G-protein bound
                     ts = ua.trajectory[oidx_sort[i]]
@@ -225,7 +226,7 @@ def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a
                 elif cond_sort[i] == 0: # arrestin bound
                     ts = ub.trajectory[oidx_sort[i]]
                     W.write(ab)
-    return
+    return proj, oidx_sort
 
 
 def sort_mult_trajs_along_common_tic(data, start_frame, top, trj, out_name, num_tic=3):
@@ -274,7 +275,7 @@ def sort_mult_trajs_along_common_tic(data, start_frame, top, trj, out_name, num_
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_tic"+str(evi)+".xtc", atoms[0].n_atoms) as W:
+        with mda.Writer(out_name+"_tic"+str(evi+1)+".xtc", atoms[0].n_atoms) as W:
             for i in range(data.shape[0]):
                 j = cond_sort[i] 
                 ts = univs[j].trajectory[oidx_sort[i]]

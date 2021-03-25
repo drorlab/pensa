@@ -4,12 +4,25 @@ Welcome to PENSA's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents
+   :maxdepth: 1
+   :caption: Introduction 
 
-   getting_started
+   about
+   installation 
    tutorials
+   examples
    contribute
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorial
+
+   tut-1-intro
+   tut-2-preprocessing
+   tut-3-featurization
+   tut-4-comparison.rst
+   tut-5-dimensionality.rst
+   tut-6-ssi.rst
 
 .. toctree::
    :maxdepth: 1

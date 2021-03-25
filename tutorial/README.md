@@ -17,15 +17,11 @@ Have a look at one of the example notebooks below that demonstrate the functiona
 
 ## Example Notebooks
 
-### Comparing mu-Opioid receptor simulations from GPCRmd
-We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb) using freely available simulation data from [GPCRmd](https://submission.gpcrmd.org/home/).
+We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb), comparing freely available  mu-Opioid receptor simulations from [GPCRmd](https://submission.gpcrmd.org/home/).
 
 We host an animated version on Google Colab.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
-
-### Different binding modes of rhodopsin complexes
-Users of the [Sherlock cluster](https://www.sherlock.stanford.edu/) at Stanford, can also do the [demo with rhodopsin complexes](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_Sherlock.ipynb).
 
 
 ## Usage-ready scripts

@@ -286,7 +286,7 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
         cond_sort = cond[sort_idx]
         oidx_sort = oidx[sort_idx]
         # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi)+".xtc", atoms[0].n_atoms) as W:
+        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", atoms[0].n_atoms) as W:
             for i in range(data.shape[0]):
                 j = cond_sort[i]
                 o = oidx_sort[i]

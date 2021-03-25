@@ -1,14 +1,5 @@
 ### In Progress
 
-- [ ] Refactoring and fixes for release 0.2
-  - [x] Restructure modules to subpackages
-  - [x] Adapt README
-  - [x] Adapt API documentation
-  - [ ] Include SSI to example scripts?
-  - [x] Numbering of principal component trajectories starts with 0, should start with 1
-  - [x] Axis labels and legend name for distance matrix plot
-  - [x] Function pca_features() does not have labels
-  - [x] Function compare_projections() does not have labels or legend
 - [ ] Tests
   - [x] Workflow test with example data
   - [ ] Trivial examples for each function
@@ -23,25 +14,28 @@
   - [x] First tests (not very promising).
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
-- [ ] Colab Tutorial
-  - [x] Put Notebook on Colab and get it to run.
-  - [x] Add visualizations.
-  - [x] Fix installation via pip.
-  - [ ] Fix animations (they only show white canvas).  
+- [ ] Unified tutorial in documentation. Make one page for each subpackage
+  - [ ] preprocessing
+    - [x] coordinates
+    - [ ] densities
+  - [ ] featurization
+    - [x] structure features
+    - [ ] water features
+    - [ ] atom features
+  - [x] comparison
+  - [x] dimensionality reduction
+  - [ ] clusters (leave out until we can cluster on PCs)
+  - [ ] SSI
 
 ### Plans
 
-- [ ] Write "getting started" for documentation 
-- [ ] Unify tutorial format. Make one for each subpackage
-  - [ ] preprocessing and featurization
-  - [ ] comparison
-  - [ ] dimensionality reduction
-  - [ ] clusters
-  - [ ] SSI
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
-- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
+- [ ] Implement clustering in principal component space
+- [ ] Facilitate calculation of JSD etc. on principal components
+- [ ] Facilitate calculation of SSI on results of joint clustering. 
+- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE) ----------------
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
   - [ ] First tests with (regular) t-SNE
@@ -54,15 +48,17 @@
   - [ ] write module
   - [ ] write unit tests
 - [ ] Put shared functionality of PCA and TICA into shared functions.
-- [ ] Include TICA in unit tests
-- [ ] Make file format (png/pdf?) for matplotlib optional.
+- [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
 
 ### Ideas
-
+- [ ] Logo
 - [ ] Hydrogen bonds as features
 - [ ] Contacts as features (can PyEMMA do this?)
 - [ ] Position deviations as features (similar to components of RMSD)
-- [ ] Calculate correlation times (and use them to estimate a threshold for significance)
+- [ ] Estimate thresholds for significance of feature differences
+  - [ ] Calculate correlation times within trajectories
+  - [ ] modify p-value of KS test using correlation time 
+  - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
 - [ ] Featurizers for other molecule types
   - [ ] ions
@@ -80,3 +76,22 @@
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
 
 ### Done  ✓
+- [x] Colab Tutorial
+  - [x] Put Notebook on Colab and get it to run.
+  - [x] Add visualizations.
+  - [x] Fix installation via pip.
+  - [x] Fix animations (they only show white canvas).
+  - [x] Add TICA to Colab tutorial.
+- [x] Include TICA in unit tests
+- [x] Write "getting started" for documentation
+- [x] Refactoring and fixes for release 0.2
+  - [x] Restructure modules to subpackages
+  - [x] Adapt README
+  - [x] Adapt API documentation
+  - [x] Include SSI to comparison example script
+  - [x] Numbering of principal component trajectories starts with 0, should start with 1
+  - [x] Axis labels and legend name for distance matrix plot
+  - [x] Function pca_features() does not have labels
+  - [x] Function compare_projections() does not have labels or legend
+- [x] Slack channel for all developers and testers, and to provide support for the user community.
+

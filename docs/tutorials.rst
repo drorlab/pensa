@@ -1,20 +1,17 @@
 Tutorials
 ===============
 
-We have prepared a tutorial for the Python library and one for the example analysis scripts.
-To access them, see the `tutorial <https://github.com/drorlab/pensa/tree/master/tutorial>`_ section of the GitHub repo.
+*The tutorial on this site is not yet complete!*
+We are still working on unifying and integrating tutorials for new functionality.
 
-Python Library
-**************
+For now, to access the tutorials, see the `tutorial <https://github.com/drorlab/pensa/tree/master/tutorial>`_ section of the GitHub repo.
 
-The tutorial folder contains an example `Jupyter notebook <https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd_MOR.ipynb>`_.
+The tutorial folder contains 
 
-An animated version is on `Google Colab <https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa>`_.
+- examples to run the pre-defined python scripts
+- an example `Jupyter notebook <https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd_MOR.ipynb>`_ that demonstrates all library functionality from version 0.1.
+- two python scripts that demonstrate density-based features and state-specific information, respectively.
 
-Example Scripts
-***************
+An animated version of the notebook is on `Google Colab <https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa>`_.
 
-The GitHub repository folder also contains `example Python scripts <https://github.com/drorlab/pensa/tree/master/scripts>`_.
-We describe their usage `here <https://github.com/drorlab/pensa/tree/master/tutorial#usage-ready-scripts>`_.
-
-
+Feel free to get in touch or `open an issue <https://github.com/drorlab/pensa/issues>`_ if you have questions!

@@ -14,6 +14,14 @@ pensa.preprocessing.coordinates
    :undoc-members:
    :show-inheritance:
 
+pensa.preprocessing.density
+----------------------------------
+
+.. automodule:: pensa.preprocessing.density
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.preprocessing.download
 -----------------------------------
 

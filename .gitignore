@@ -15,6 +15,7 @@ tests/test_data/results/
 tests/test_data/plots/
 tests/test_data/vispdb/
 tests/test_data/pca/
+tests/test_data/tica/
 tests/test_data/clusters/
 tests/test_data/mor-data/
 tests/test_data/MOR-*/.*.npz

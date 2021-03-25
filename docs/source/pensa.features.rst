@@ -14,14 +14,6 @@ pensa.features.atom\_features
    :undoc-members:
    :show-inheritance:
 
-pensa.features.density\_preprocessing
---------------------------------------------
-
-.. automodule:: pensa.features.density_preprocessing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pensa.features.processing
 --------------------------------
 
