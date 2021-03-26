@@ -5,7 +5,7 @@ from pensa.statesinfo import *
 
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_occupancy=None, pbc=True, 
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions='bb', wat_occupancy=None, pbc=True, 
                           verbose=True, write_plots=None, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -43,20 +43,24 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
 
     """
     
+    # Get the multivariate timeseries data
+    mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+    mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
-        assert len(features_a) == len(features_b)
+        assert len(mv_res_feat_a[torsions+'-torsions']) == len(mv_res_feat_b[torsions+'-torsions'])
     else:
-        assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
+        assert mv_res_feat_a[torsions+'-torsions'] == mv_res_feat_b[torsions+'-torsions']
+    assert mv_res_data_a[torsions+'-torsions'].shape[0] == mv_res_data_b[torsions+'-torsions'].shape[0] 
     # Extract the names of the features
-    data_names = features_a
+    data_names = mv_res_feat_a[torsions+'-torsions']
     # Initialize relative entropy and average value
     data_ssi = np.zeros(len(data_names))
     # Loop over all features    
-    for residue in range(len(all_data_a)):
-        data_a = all_data_a[residue]
-        data_b = all_data_b[residue]
+    for residue in range(len(mv_res_data_a[torsions+'-torsions'])):
+        data_a = mv_res_data_a[torsions+'-torsions'][residue]
+        data_b = mv_res_data_b[torsions+'-torsions'][residue]
 
         combined_dist=[]
         for dist_no in range(len(data_a)):
@@ -91,7 +95,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, wat_oc
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsions='bb', verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -122,40 +126,42 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, verbose
 
     """
     
+    # Get the multivariate timeseries data
+    mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+    mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+
+    
+        
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
-        assert len(features_a) == len(features_b)
+        assert len(mv_res_feat_a[torsions+'-torsions']) == len(mv_res_feat_b[torsions+'-torsions'])
     else:
-        assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
+        assert mv_res_feat_a[torsions+'-torsions'] == mv_res_feat_b[torsions+'-torsions']
+    assert mv_res_data_a[torsions+'-torsions'].shape[0] == mv_res_data_b[torsions+'-torsions'].shape[0] 
     # Extract the names of the features
-    data_names = features_a
+    data_names = mv_res_feat_a[torsions+'-torsions']
     # Initialize relative entropy and average value
     data_ssi = np.zeros((len(data_names),len(data_names)))
     # Loop over all features
     
-    for res1 in range(len(all_data_a)):
+    for res1 in range(len(mv_res_data_a[torsions+'-torsions'])):
 
-        res1_data_ens1 = all_data_a[res1]
-        res1_data_ens2 = all_data_b[res1]
+        res1_data_ens1 = mv_res_data_a[torsions+'-torsions'][res1]
+        res1_data_ens2 = mv_res_data_b[torsions+'-torsions'][res1]
         res1_combined_dist=[]
         for dist_no in range(len(res1_data_ens1)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
             # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = sim1+sim2      
+            res1_data_both = list(res1_data_ens1[dist_no]) + list(res1_data_ens2[dist_no])     
             res1_combined_dist.append(res1_data_both)
                 
-        for res2 in range(res1, len(all_data_a)):
+        for res2 in range(res1, len(mv_res_data_a[torsions+'-torsions'])):
                 
-            res2_data_ens1 = all_data_a[res2]
-            res2_data_ens2 = all_data_b[res2]     
+            res2_data_ens1 = mv_res_data_a[torsions+'-torsions'][res2]
+            res2_data_ens2 = mv_res_data_b[torsions+'-torsions'][res2]     
             res2_combined_dist=[]
             for dist_no in range(len(res2_data_ens1)):
-                # # # Make sure the ensembles have the same length of trajectory
-                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
                 # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = sim1 + sim2      
+                res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])
                 res2_combined_dist.append(res2_data_both)            
             
             ## Saving distribution length
@@ -178,7 +184,7 @@ def cossi_featens_analysis(features_a, features_b,
                            all_data_a, all_data_b, 
                            cossi_features_a, cossi_features_b, 
                            cossi_all_data_a, cossi_all_data_b, 
-                           verbose=True, override_name_check=False):
+                           torsions='bb', verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information CoSSI statistic between
@@ -224,57 +230,59 @@ def cossi_featens_analysis(features_a, features_b,
         State Specific Information Co-SSI statistics for each feature.
 
     """
-
+    
+    # Get the multivariate timeseries data
+    mv1_res_feat_a, mv1_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+    mv1_res_feat_b, mv1_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
-        assert len(features_a) == len(features_b)
+        assert len(mv1_res_feat_a[torsions+'-torsions']) == len(mv1_res_feat_b[torsions+'-torsions'])
     else:
-        assert features_a == features_b
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
+        assert mv1_res_feat_a[torsions+'-torsions'] == mv1_res_feat_b[torsions+'-torsions']
+    assert mv1_res_data_a[torsions+'-torsions'].shape[0] == mv1_res_data_b[torsions+'-torsions'].shape[0] 
     # Extract the names of the features
-    data_names = features_a
+    data_names = mv1_res_feat_a[torsions+'-torsions']
 
+
+    mv2_res_feat_a, mv2_res_data_a = get_multivar_res_timeseries(cossi_features_a,cossi_all_data_a,torsions+'-torsions',write=False,out_name='')
+    mv2_res_feat_b, mv2_res_data_b = get_multivar_res_timeseries(cossi_features_b,cossi_all_data_b,torsions+'-torsions',write=False,out_name='')
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
-        assert len(cossi_features_a) == len(cossi_features_b)
+        assert len(mv2_res_feat_a[torsions+'-torsions']) == len(mv2_res_feat_b[torsions+'-torsions'])
     else:
-        assert cossi_features_a == cossi_features_b
-    assert cossi_all_data_a.shape[0] == cossi_all_data_b.shape[0] 
+        assert mv2_res_feat_a[torsions+'-torsions'] == mv2_res_feat_b[torsions+'-torsions']
+    assert mv2_res_data_a[torsions+'-torsions'].shape[0] == mv2_res_data_b[torsions+'-torsions'].shape[0] 
     # Extract the names of the features
-    cossi_data_names = cossi_features_a
+    cossi_data_names = mv2_res_feat_a[torsions+'-torsions']
     
     # Initialize relative entropy and average value
     data_ssi = np.zeros((len(data_names),len(cossi_data_names)))
     data_cossi = np.zeros((len(data_names),len(cossi_data_names)))
-    for res1 in range(len(all_data_a)):
+    for res1 in range(len(mv1_res_data_a[torsions+'-torsions'])):
 
-        res1_data_ens1 = all_data_a[res1]
-        res1_data_ens2 = all_data_b[res1]
+        res1_data_ens1 = mv1_res_data_a[torsions+'-torsions'][res1]
+        res1_data_ens2 = mv1_res_data_b[torsions+'-torsions'][res1]
         res1_combined_dist=[]
         for dist_no in range(len(res1_data_ens1)):
-            # # # Make sure the ensembles have the same length of trajectory
-            sim1,sim2=match_sim_lengths(list(res1_data_ens1[dist_no]),list(res1_data_ens2[dist_no]))
             # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = sim1+sim2      
+            res1_data_both = list(res1_data_ens1[dist_no]) + list(res1_data_ens2[dist_no])  
             res1_combined_dist.append(res1_data_both)
                 
-        for res2 in range(len(cossi_all_data_a)):
+        for res2 in range(len(mv2_res_data_a[torsions+'-torsions'])):
                 
-            res2_data_ens1 = cossi_all_data_a[res2]
-            res2_data_ens2 = cossi_all_data_b[res2]     
+            res2_data_ens1 = mv2_res_data_a[torsions+'-torsions'][res2]
+            res2_data_ens2 = mv2_res_data_b[torsions+'-torsions'][res2]     
             res2_combined_dist=[]
             for dist_no in range(len(res2_data_ens1)):
-                # # # Make sure the ensembles have the same length of trajectory
-                sim1,sim2=match_sim_lengths(list(res2_data_ens1[dist_no]),list(res2_data_ens2[dist_no]))
                 # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = sim1+sim2      
+                res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])   
                 res2_combined_dist.append(res2_data_both)
                 
             ## Saving distribution length
             traj1_len = len(res2_data_ens1[dist_no])        
             
             data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
-                                                                           # traj1_len,
+                                                                           traj1_len,
                                                                            res2_combined_dist)
                 
             if verbose is True:
