@@ -96,17 +96,11 @@ def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
     else:
         select_a = np.arange(len(feat_a[tors+'-torsions']))
         select_b = np.arange(len(feat_b[tors+'-torsions']))
-        
+    
     # SSI analysis with BB torsions
-    bb_res_feat_a, bb_res_data_a = get_multivar_res_timeseries({tors+'-torsions': list(np.array(feat_a[tors+'-torsions'])[select_a])}, 
-                                                               {tors+'-torsions': data_a[tors+'-torsions'][:,select_a]}, 
-                                                               tors+'-torsions', write=False, out_name='')
-    bb_res_feat_b, bb_res_data_b = get_multivar_res_timeseries({tors+'-torsions': list(np.array(feat_b[tors+'-torsions'])[select_b])}, 
-                                                               {tors+'-torsions': data_b[tors+'-torsions'][:,select_b]}, 
-                                                               tors+'-torsions', write=False, out_name='')
     ana = ssi_ensemble_analysis(bb_res_feat_a[tors+'-torsions'], bb_res_feat_b[tors+'-torsions'],
                                 bb_res_data_a[tors+'-torsions'], bb_res_data_b[tors+'-torsions'],
-                                verbose=False, override_name_check=args.override_name_check)
+                                torsions = tors, verbose=False, override_name_check=args.override_name_check)
     resnames, ssi = ana
 
     # Save all results (per feature) in CSV files 
