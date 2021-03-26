@@ -2,7 +2,7 @@ import numpy as np
 import math
 import os
 from pensa.features import *
-from .discrete_states import *
+from pensa.statesinfo.discrete_states import *
 
 
 # -- Functions to calculate State Specific Information quantities --
@@ -53,28 +53,43 @@ def calculate_entropy(state_limits,distribution_list):
         The Shannon entropy value 
 
     """
-    ## subtract 1 since number of states = number of partitions - 1
-    mut_prob=np.zeros(([len(state_limits[i])-1 for i in range(len(state_limits))]))     
-    entropy=0
-    ##iterating over every multidimensional index in the array
-    it = np.nditer(mut_prob, flags=['multi_index'])
 
-    while not it.finished:
-        arrayindices=list(it.multi_index)
-        limit_occupancy_checks=np.zeros((len(arrayindices), len(distribution_list[0])))
+    state_lims = state_limits.copy()
+    dist_list = distribution_list.copy()
+    ## Ignore singular states and corresponding distributions
+    state_no = 0 
+    while state_no < len(state_lims):
         
-        for dist_num in range(len(arrayindices)):
-            limits=[state_limits[dist_num][arrayindices[dist_num]], state_limits[dist_num][arrayindices[dist_num]+1]]
-            distribution=distribution_list[dist_num]
-        
-            for frame_num in range(len(distribution)):
-                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
-        mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
-        ##calculating the entropy as the summation of all -p*log(p) 
-        
-        if mut_prob[it.multi_index] != 0:
-            entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index],2)
-        it.iternext()
+        if len(state_lims[state_no])==2:
+            del dist_list[state_no]
+            del state_lims[state_no]
+            
+        else:
+            state_no +=1
+            
+    entropy=0.0
+    if len(state_lims)!=0:
+        ## subtract 1 since number of states = number of partitions - 1
+        mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
+        ##iterating over every multidimensional index in the array
+        it = np.nditer(mut_prob, flags=['multi_index'])
+    
+        while not it.finished:
+            arrayindices=list(it.multi_index)
+            limit_occupancy_checks=np.zeros((len(arrayindices), len(dist_list[0])))
+            
+            for dist_num in range(len(arrayindices)):
+                limits=[state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num]+1]]
+                distribution=dist_list[dist_num]
+            
+                for frame_num in range(len(distribution)):
+                    limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
+            mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+            ##calculating the entropy as the summation of all -p*log(p) 
+            
+            if mut_prob[it.multi_index] != 0:
+                entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index],2)
+            it.iternext()
     return entropy
 
 
@@ -150,7 +165,6 @@ def calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, b
         ##calculating the entropy for set_distr_b
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_b_input is None:       
-            H_b=1
             set_distr_b=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
             set_b_states= [[0,1,2]]  
             
@@ -177,12 +191,12 @@ def calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, b
                 
             else:
                 set_b_states = b_states 
-            H_b=calculate_entropy(set_b_states,set_distr_b)
+        H_b=calculate_entropy(set_b_states,set_distr_b)
     
         ab_joint_states= set_a_states + set_b_states
         ab_joint_distributions= set_distr_a + set_distr_b
         H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
-    
+
         SSI = (H_a + H_b) - H_ab
     except:
         SSI = -1
@@ -310,7 +324,6 @@ def calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None,
         ##calculating the entropy for set_distr_c
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_c_input is None:
-            H_c=1
             set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
             set_c_states= [[0,1,2]]  
             
@@ -333,7 +346,7 @@ def calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None,
                         print('Distribution C not clustering properly.\nTry altering Gaussian parameters or input custom states.')
             else:
                 set_c_states = c_states
-            H_c=calculate_entropy(set_c_states,set_distr_c)
+        H_c=calculate_entropy(set_c_states,set_distr_c)
     
         ##----------------
         ab_joint_states = set_a_states + set_b_states
