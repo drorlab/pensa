@@ -124,7 +124,45 @@ def project_on_pc(data, ev_idx, pca=None):
         projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
     # Return the value along the PC for each frame  
     return projection
+
+   
+def get_components_pca(data, num, pca=None, prefix=''):
+    """
+    Projects a trajectory onto the first num eigenvectors of its PCA.
     
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        num : int
+            Number of eigenvectors to project on. 
+        pca : PCA obj, optional
+            Information of pre-calculated PCA. Defaults to None.
+            Must be calculated for the same features (but not necessarily the same trajectory).
+    
+    Returns
+    -------
+        comp_names : list
+            Names/numbers of the components.
+        components : float array
+            Component data [frames,components]
+        
+    """
+    # Perform PCA if none is provided
+    if pca is None:
+        pca = pyemma.coordinates.pca(data) 
+    # Project the features onto the principal components
+    comp_names = []
+    components = []
+    for ev_idx in range(num):
+        projection = np.zeros(data.shape[0])
+        for ti in range(data.shape[0]):
+            projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
+        components.append(projection)
+        comp_names.append(prefix+'PC'+str(ev_idx+1))
+    # Return the names and data  
+    return comp_names, np.array(components).T
+     
 
 def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     """

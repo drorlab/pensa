@@ -123,6 +123,44 @@ def project_on_tic(data, ev_idx, tica=None):
     return projection
     
 
+def get_components_tica(data, num, tica=None, prefix=''):
+    """
+    Projects a trajectory onto the first num eigenvectors of its tICA.
+    
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        num : int
+            Number of eigenvectors to project on. 
+        tica : tICA obj, optional
+            Information of pre-calculated tICA. Defaults to None.
+            Must be calculated for the same features (but not necessarily the same trajectory).
+    
+    Returns
+    -------
+        comp_names : list
+            Names/numbers of the components.
+        components : float array
+            Component data [frames,components]
+        
+    """
+    # Perform tICA if none is provided
+    if pca is None:
+        pca = pyemma.coordinates.tica(data) 
+    # Project the features onto the principal components
+    comp_names = []
+    components = []
+    for ev_idx in range(num):
+        projection = np.zeros(data.shape[0])
+        for ti in range(data.shape[0]):
+            projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
+        components.append(projection)
+        comp_names.append(prefix+'IC'+str(ev_idx+1))
+    # Return the names and data
+    return comp_names, np.array(components).T
+    
+
 def sort_traj_along_tic(data, tica, start_frame, top, trj, out_name, num_tic=3):
     """
     Sort a trajectory along given time-lagged independent components.
