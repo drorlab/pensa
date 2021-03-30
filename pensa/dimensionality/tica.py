@@ -146,15 +146,15 @@ def get_components_tica(data, num, tica=None, prefix=''):
         
     """
     # Perform tICA if none is provided
-    if pca is None:
-        pca = pyemma.coordinates.tica(data) 
+    if tica is None:
+        tica = pyemma.coordinates.tica(data) 
     # Project the features onto the principal components
     comp_names = []
     components = []
     for ev_idx in range(num):
         projection = np.zeros(data.shape[0])
         for ti in range(data.shape[0]):
-            projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
+            projection[ti] = np.dot(data[ti],tica.eigenvectors[:,ev_idx])
         components.append(projection)
         comp_names.append(prefix+'IC'+str(ev_idx+1))
     # Return the names and data
