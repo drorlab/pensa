@@ -148,14 +148,14 @@ to have the exactly same atoms.
 Densities
 *********
 
-To work with the protein densities, we first need to the standard density generation
+To work with the protein densities, we need to follow the standard density generation
 procedures for the input trajectory. Namely, centering on the protein of interest, 
-making all molecules whole, mapping the solvent molecules to be closest to the solute.
-To visualize the density featurization, the trajectories must be fit onto a reference structure,
-by default this is the first frame of the trajectory. Note that the density 
-featurization performs best for protein systems that are relatively rigid with 
-sites that are spatially static, for example internal water cavities in membrane proteins. 
-Here we demonstrate the preprocessing for water density featurization, however   
+making all molecules whole, and mapping the solvent molecules to be closest to the solute.
+To visualize the density featurization, the trajectories must be fit onto a reference structure. 
+Note that the density featurization performs best for protein systems that are 
+relatively rigid with sites that are spatially static, for example internal 
+water cavities in membrane proteins. Here we demonstrate the preprocessing for 
+water density, however the same procedure would be used for ions.   
 
 
 
@@ -163,8 +163,8 @@ Files and Directories
 ---------------------
 
 Again, we define the necessary files, and furthermore, we define a selection 
-including the water residue name for the density. To featurize the waters, we 
-must include the hydrogens again.
+including the water residue name for the density. To obtain the orientation of 
+the waters, we must include the hydrogens.
 
 
 .. code:: python
@@ -184,9 +184,8 @@ must include the hydrogens again.
     trj_file_b = [root_dir+'/11576_trj_169.xtc',
                   root_dir+'/11577_trj_169.xtc',
                   root_dir+'/11578_trj_169.xtc']
-    # Base for the selection string for each simulation protein and all waters
-    sel_base_a = "protein or byres name OH2"
-    sel_base_b = "protein or byres name OH2"
+    # Base for the selection string for each simulation protein and all waters (OH2)
+    sel_base = "protein or byres name OH2"
     # # # # Names of the output files
     out_name_a = "traj/cond-a_water"
     out_name_b = "traj/cond-b_water"
@@ -199,14 +198,15 @@ must include the hydrogens again.
 Extracting Coordinates
 ----------------------
 
-To featurize the density for comparative analysis across both protein ensembles, 
+As waters are not "attached" to the protein, water sites are defined spatially. 
+Therefore to locate the same sites for comparative analysis across both protein ensembles, 
 we have to ensure that the protein is aligned across both simulations. 
 
 .. code:: python
     
     # # # Extract the coordinates of the receptor from the trajectory
-    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
-    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)    
+    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base)
+    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base)    
     
     # # # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
     extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
