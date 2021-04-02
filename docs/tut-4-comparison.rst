@@ -78,9 +78,9 @@ residue.
                np.array(vis).T, fmt='%s', delimiter=',', 
                header='Residue, max. JSD(A,B)')
 
-To investigate differences in discrete conformational microstates within the 
-torsion distributions, rather than the continuous distributions, 
-the State Specific Information (SSI) analysis can be employed in the same manner. 
+In addition to the above metrics, we can investigate differences in discrete 
+conformational microstates within the torsion distributions by employing the 
+State Specific Information (SSI) analysis in the same manner. 
 
 
 .. code:: python
