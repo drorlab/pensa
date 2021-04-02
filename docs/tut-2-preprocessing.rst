@@ -163,8 +163,11 @@ Files and Directories
 ---------------------
 
 Again, we define the necessary files, and furthermore, we define a selection 
-including the water residue name for the density. To obtain the orientation of 
-the waters, we must include the hydrogens.
+including the water residue name for the density. To featurize the water density, 
+we must use a trajectory that includes hydrogens, however the density itself 
+does not need hydrogens. It can therefore be useful to preprocess a trajectory 
+including the entire solvent for featurization, and generate the individual 
+densities from a smaller selection.
 
 
 .. code:: python
