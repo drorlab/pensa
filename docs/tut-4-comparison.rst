@@ -82,6 +82,7 @@ To investigate differences in discrete conformational microstates within the
 torsion distributions, rather than the continuous distributions, 
 the State Specific Information (SSI) analysis can be employed in the same manner. 
 
+
 .. code:: python
 
     names_bbtors, ssi_bbtors = ssi_ensemble_analysis(a_rec_feat, b_rec_feat,
@@ -95,7 +96,12 @@ the State Specific Information (SSI) analysis can be employed in the same manner
                                 "vispdb/"+out_filename+"_ssi.pdb",
                                 y_label='max. SSI of SC torsions')    
 
-
+Conformational microstates of each residue are multidimensional, incorporating 
+all sc-torsion or bb-torsion angles in the definition of a residue's conformational space. 
+The distributions are decomposed into the individual Gaussians which fit the
+distribution, and conformational microstates are based on the Gaussian intersects. 
+It is therefore necessary that each state is sampled sufficiently in order to 
+accurately define the conformational states. 
 
 
 Backbone C-alpha Distances
