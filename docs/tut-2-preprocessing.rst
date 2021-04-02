@@ -198,7 +198,7 @@ densities from a smaller selection.
             os.makedirs(subdir)
  
  
-Extracting Coordinates
+Extracting Coordinates 
 ----------------------
 
 As waters are not "attached" to the protein, water sites are defined spatially. 
@@ -215,6 +215,9 @@ we have to ensure that the protein is aligned across both simulations.
     extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
                            out_name_b+".gro", out_name_b+".xtc")
        
+Extracting the Density 
+----------------------
+
     
 The density is then extracted from the combined ensemble, in which the solvent 
 cavities are aligned.     
