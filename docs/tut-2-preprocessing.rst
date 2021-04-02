@@ -148,6 +148,83 @@ to have the exactly same atoms.
 Densities
 *********
 
-[under construction]
+To work with the protein densities, we first need to the standard density generation
+procedures for the input trajectory. Namely, centering on the protein of interest, 
+making all molecules whole, mapping the solvent molecules to be closest to the solute.
+To visualize the density featurization, the trajectories must be fit onto a reference structure,
+by default this is the first frame of the trajectory. Note that the density 
+featurization performs best for protein systems that are relatively rigid with 
+sites that are spatially static, for example internal water cavities in membrane proteins. 
+Here we demonstrate the preprocessing for water density featurization, however   
 
 
+
+Files and Directories
+---------------------
+
+Again, we define the necessary files, and furthermore, we define a selection 
+including the water residue name for the density. To featurize the waters, we 
+must include the hydrogens again.
+
+
+.. code:: python
+
+    # # # First we preprocess the trajectories to extract coordinates for protein 
+    # # # and waters.
+    root_dir = './mor-data'
+    # Simulation A
+    ref_file_a =  root_dir+'/11427_dyn_151.psf'
+    pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
+    trj_file_a = [root_dir+'/11423_trj_151.xtc',
+                  root_dir+'/11424_trj_151.xtc',
+                  root_dir+'/11425_trj_151.xtc']
+    # Simulation B
+    ref_file_b =  root_dir+'/11580_dyn_169.psf'
+    pdb_file_b =  root_dir+'/11579_dyn_169.pdb'
+    trj_file_b = [root_dir+'/11576_trj_169.xtc',
+                  root_dir+'/11577_trj_169.xtc',
+                  root_dir+'/11578_trj_169.xtc']
+    # Base for the selection string for each simulation protein and all waters
+    sel_base_a = "protein or byres name OH2"
+    sel_base_b = "protein or byres name OH2"
+    # # # # Names of the output files
+    out_name_a = "traj/cond-a_water"
+    out_name_b = "traj/cond-b_water"
+    
+    for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+        if not os.path.exists(subdir):
+            os.makedirs(subdir)
+ 
+ 
+Extracting Coordinates
+----------------------
+
+To featurize the density for comparative analysis across both protein ensembles, 
+we have to ensure that the protein is aligned across both simulations. 
+
+.. code:: python
+    
+    # # # Extract the coordinates of the receptor from the trajectory
+    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
+    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)    
+    
+    # # # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
+    extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
+                           out_name_b+".gro", out_name_b+".xtc")
+       
+    
+The density is then extracted from the combined ensemble, in which the solvent 
+cavities are aligned.     
+    
+.. code:: python
+    
+    # # # Extract the combined density of the waters in both ensembles a and b 
+    extract_combined_grid(out_name_a+".gro", "dens/cond-a_wateraligned.xtc", 
+                          out_name_b+".gro", out_name_b+".xtc",
+                          atomgroup="OH2",
+                          write_grid_as="TIP3P",
+                          out_name= "ab_grid_")
+                          
+This density can now be used to locate and featurize the same water pockets in 
+both individual simulations, even if a water site only exists in one simulation. 
+                          
