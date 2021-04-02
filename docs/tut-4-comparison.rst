@@ -78,6 +78,26 @@ residue.
                np.array(vis).T, fmt='%s', delimiter=',', 
                header='Residue, max. JSD(A,B)')
 
+The same method can be used to investigate differences in conformational 
+states of the torsion distributions, rather than the entire continuous distributions, 
+and the data is plotted in the same manner. 
+
+.. code:: python
+
+    names_bbtors, ssi_bbtors = ssi_ensemble_analysis(a_rec_feat, b_rec_feat,
+                                                     a_rec_data, b_rec_data,
+                                                     torsions='sc', verbose=True)
+                                             
+    ref_filename = "traj/condition-a_receptor.gro"
+    out_filename = "receptor_sctors-deviations_ssi"
+    vis = residue_visualization(data_names, data_ssi, ref_filename,
+                                "plots/"+out_filename+"_ssi.pdf",
+                                "vispdb/"+out_filename+"_ssi.pdb",
+                                y_label='max. SSI of SC torsions')    
+
+
+
+
 Backbone C-alpha Distances
 --------------------------
 
