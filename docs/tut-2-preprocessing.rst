@@ -198,8 +198,8 @@ densities from a smaller selection.
             os.makedirs(subdir)
  
  
-Extracting Coordinates 
-----------------------
+Aligning Coordinates 
+--------------------
 
 As waters are not "attached" to the protein, water sites are defined spatially. 
 Therefore to locate the same sites for comparative analysis across both protein ensembles, 
