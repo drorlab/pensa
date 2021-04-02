@@ -48,11 +48,11 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
          mv_res_feat_a, mv_res_data_a = features_a,all_data_a
          mv_res_feat_b, mv_res_data_b = features_b,all_data_b
     else:
-        mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
-        mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+         mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+         mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
     
-        mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
-        mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
+         mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
+         mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
     
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
@@ -153,6 +153,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
     data_ssi = np.zeros((len(data_names),len(data_names)))
     # Loop over all features
     
+    
+    ##CALCULATE STATES AND DISTS WITHIN ITERATION TO STOP DOING IT REPEATEDLY
+    ##SPLIT CALCULATE SSI INTO TWO FUNCTIONS, ONE FOR ENSEBLE, ONE FOR FEATURES
     for res1 in range(len(mv_res_data_a)):
 
         res1_data_ens1 = mv_res_data_a[res1]
@@ -162,30 +165,54 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             res1_data_both = list(res1_data_ens1[dist_no]) + list(res1_data_ens2[dist_no])     
             res1_combined_dist.append(res1_data_both)
-                
-        for res2 in range(res1, len(mv_res_data_a)):
-                
-            res2_data_ens1 = mv_res_data_a[res2]
-            res2_data_ens2 = mv_res_data_b[res2]     
-            res2_combined_dist=[]
-            for dist_no in range(len(res2_data_ens1)):
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])
-                res2_combined_dist.append(res2_data_both)            
+
+        ## Saving distribution length
+        traj1_len = len(data_a[dist_no])   
             
+        if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
+
+            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in distr_a_input]
+        
+            if a_states is None:    
+                set_a_states=[]
+                for dim_num in range(len(set_distr_a)):
+                    if write_name is not None:
+                        plot_name = write_name + '_dist' + str(dim_num)
+                    else:
+                        plot_name = None
+                    try:
+                        set_a_states.append(determine_state_limits(set_distr_a[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
+                    except:
+                        print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+            else:
+                set_a_states = a_states
+                
+            H_a=calculate_entropy(set_a_states,set_distr_a) 
             ## Saving distribution length
-            traj1_len = len(res2_data_ens1[dist_no])               
+            traj1_len = len(res1_data_ens1[dist_no])               
             
-            data_ssi[res1][res2] = calculate_ssi(distr_a_input = res1_combined_dist,
-                                                 traj1_len = traj1_len,
-                                                 distr_b_input = res2_combined_dist)
-            
-            data_ssi[res2][res1] = data_ssi[res1][res2]    
-                
-                
+            for res2 in range(res1, len(mv_res_data_a)):
+                res2_data_ens1 = mv_res_data_a[res2]
+                res2_data_ens2 = mv_res_data_b[res2]     
+                res2_combined_dist=[]
+                for dist_no in range(len(res2_data_ens1)):
+                    # # # combine the ensembles into one distribution (condition_a + condition_b)
+                    res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])
+                    res2_combined_dist.append(res2_data_both)            
+                data_ssi[res1][res2] = calculate_ssi(distr_a_input = res1_combined_dist,
+                                                     traj1_len = traj1_len,
+                                                     distr_b_input = res2_combined_dist)
+                data_ssi[res2][res1] = data_ssi[res1][res2]    
+                if verbose is True:
+                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])
+                    
+        else:
+            for res2 in range(res1, len(mv_res_data_a)):
+                data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
             if verbose is True:
-                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])
-    
+                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
+                
+                
     return data_names, data_ssi
 
 
