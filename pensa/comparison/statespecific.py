@@ -153,65 +153,64 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
     data_ssi = np.zeros((len(data_names),len(data_names)))
     # Loop over all features
     
-    
-    ##CALCULATE STATES AND DISTS WITHIN ITERATION TO STOP DOING IT REPEATEDLY
-    ##SPLIT CALCULATE SSI INTO TWO FUNCTIONS, ONE FOR ENSEBLE, ONE FOR FEATURES
     for res1 in range(len(mv_res_data_a)):
-
+        # print(res1)
         res1_data_ens1 = mv_res_data_a[res1]
         res1_data_ens2 = mv_res_data_b[res1]
         res1_combined_dist=[]
-        for dist_no in range(len(res1_data_ens1)):
+        for dist_no_a in range(len(res1_data_ens1)):
             # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = list(res1_data_ens1[dist_no]) + list(res1_data_ens2[dist_no])     
+            res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
             res1_combined_dist.append(res1_data_both)
 
         ## Saving distribution length
-        traj1_len = len(data_a[dist_no])   
+        traj1_len = len(res1_data_ens1[dist_no_a])   
             
-        if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
-
-            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in distr_a_input]
-        
-            if a_states is None:    
-                set_a_states=[]
-                for dim_num in range(len(set_distr_a)):
-                    if write_name is not None:
-                        plot_name = write_name + '_dist' + str(dim_num)
-                    else:
-                        plot_name = None
-                    try:
-                        set_a_states.append(determine_state_limits(set_distr_a[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
-                    except:
-                        print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
-            else:
-                set_a_states = a_states
-                
-            H_a=calculate_entropy(set_a_states,set_distr_a) 
-            ## Saving distribution length
-            traj1_len = len(res1_data_ens1[dist_no])               
-            
-            for res2 in range(res1, len(mv_res_data_a)):
+        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
+        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
+    
+        set_a_states=[]
+        for dim_num_a in range(len(set_distr_a)):
+                set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
+        H_a=calculate_entropy(set_a_states,set_distr_a) 
+        for res2 in range(res1+1, len(mv_res_data_a)):
+            # Only run SSI if entropy is non-zero
+            if H_a != 0:
                 res2_data_ens1 = mv_res_data_a[res2]
                 res2_data_ens2 = mv_res_data_b[res2]     
                 res2_combined_dist=[]
-                for dist_no in range(len(res2_data_ens1)):
+                for dist_no_b in range(len(res2_data_ens1)):
                     # # # combine the ensembles into one distribution (condition_a + condition_b)
-                    res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])
+                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
                     res2_combined_dist.append(res2_data_both)            
-                data_ssi[res1][res2] = calculate_ssi(distr_a_input = res1_combined_dist,
-                                                     traj1_len = traj1_len,
-                                                     distr_b_input = res2_combined_dist)
-                data_ssi[res2][res1] = data_ssi[res1][res2]    
-                if verbose is True:
-                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])
+             
+            set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                
+            set_b_states=[]
+            for dim_num_b in range(len(set_distr_b)):
+                    set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
+            H_b=calculate_entropy(set_b_states,set_distr_b)
+        
+            ab_joint_states= set_a_states + set_b_states
+            ab_joint_distributions= set_distr_a + set_distr_b
+            H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+    
+            traj_1_fraction = traj1_len/len(set_distr_a[0])
+            traj_2_fraction = 1 - traj_1_fraction
+            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+    
+            SSI = ((H_a + H_b) - H_ab)/norm_factor
+                            
+            data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
                     
+            if verbose is True:
+                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])        
+                        
         else:
             for res2 in range(res1, len(mv_res_data_a)):
                 data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
             if verbose is True:
                 print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
-                
                 
     return data_names, data_ssi
 
