@@ -84,17 +84,17 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
             
         if write_plots is True:
             write_name = data_names[residue]
-            data_ssi[residue] = calculate_ssi(combined_dist,
-                                              traj1_len = dist_a_len,
-                                              a_states = wat_occupancy,
-                                              write_plots=write_plots,
-                                              write_name=write_name,
-                                              pbc=pbc)
+            data_ssi[residue] = ens_ssi(combined_dist,
+                                        traj1_len = dist_a_len,
+                                        a_states = wat_occupancy,
+                                        write_plots=write_plots,
+                                        write_name=write_name,
+                                        pbc=pbc)
         else:
-            data_ssi[residue] = calculate_ssi(combined_dist,
-                                              traj1_len = dist_a_len,
-                                              a_states = wat_occupancy,
-                                              pbc=pbc)
+            data_ssi[residue] = ens_ssi(combined_dist,
+                                        traj1_len = dist_a_len,
+                                        a_states = wat_occupancy,
+                                        pbc=pbc)
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -173,9 +173,11 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
         for dim_num_a in range(len(set_distr_a)):
                 set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
         H_a=calculate_entropy(set_a_states,set_distr_a) 
-        for res2 in range(res1+1, len(mv_res_data_a)):
-            # Only run SSI if entropy is non-zero
-            if H_a != 0:
+        if H_a != 0:
+
+        
+            for res2 in range(res1, len(mv_res_data_a)):
+                # Only run SSI if entropy is non-zero
                 res2_data_ens1 = mv_res_data_a[res2]
                 res2_data_ens2 = mv_res_data_b[res2]     
                 res2_combined_dist=[]
@@ -183,149 +185,208 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
                     # # # combine the ensembles into one distribution (condition_a + condition_b)
                     res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
                     res2_combined_dist.append(res2_data_both)            
-             
-            set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
-                
-            set_b_states=[]
-            for dim_num_b in range(len(set_distr_b)):
-                    set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
-            H_b=calculate_entropy(set_b_states,set_distr_b)
-        
-            ab_joint_states= set_a_states + set_b_states
-            ab_joint_distributions= set_distr_a + set_distr_b
-            H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
-    
-            traj_1_fraction = traj1_len/len(set_distr_a[0])
-            traj_2_fraction = 1 - traj_1_fraction
-            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-    
-            SSI = ((H_a + H_b) - H_ab)/norm_factor
-                            
-            data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
+                 
+                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
                     
-            if verbose is True:
-                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])        
-                        
+                set_b_states=[]
+                for dim_num_b in range(len(set_distr_b)):
+                        set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
+                H_b=calculate_entropy(set_b_states,set_distr_b)
+                
+                if H_b!=0:
+                
+                    ab_joint_states= set_a_states + set_b_states
+                    ab_joint_distributions= set_distr_a + set_distr_b
+                    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+            
+                    traj_1_fraction = traj1_len/len(set_distr_a[0])
+                    traj_2_fraction = 1 - traj_1_fraction
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+            
+                    SSI = ((H_a + H_b) - H_ab)/norm_factor
+                                    
+                    data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
+                            
+                    if verbose is True:
+                        print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])        
+                else:
+                    data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
+                    if verbose is True:
+                        print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
+                    
         else:
-            for res2 in range(res1, len(mv_res_data_a)):
+            for res2 in range(res1+1, len(mv_res_data_a)):
                 data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
-            if verbose is True:
-                print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
+                if verbose is True:
+                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
                 
     return data_names, data_ssi
 
 
-def cossi_featens_analysis(features_a, features_b, 
-                           all_data_a, all_data_b, 
-                           cossi_features_a, cossi_features_b, 
-                           cossi_all_data_a, cossi_all_data_b, 
-                           torsions='bb', verbose=True, override_name_check=False):
+
+def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, verbose=True, override_name_check=False):
 
     """
-    Calculates State Specific Information CoSSI statistic between
-    two features and the binary ensemble change.
+    Calculates State Specific Information statistic between two features across two ensembles.
     
-
     Parameters
     ----------
-    
     features_a : list of str
         Feature names of the first ensemble. 
     features_b : list of str
         Feature names of the first ensemble. 
         Must be the same as features_a. Provided as a sanity check. 
     all_data_a : float array
-        Trajectory data from the first ensemble.
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. 
-    cossi_features_a : list of str
-        Feature names of the first ensemble. 
-    cossi_features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    cossi_all_data_a : float array
-        Trajectory data from the first ensemble. 
-    cossi_all_data_b : float array
-        Trajectory data from the second ensemble. 
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
     verbose : bool, default=True
         Print intermediate results.
     override_name_check : bool, default=False
         Only check number of features, not their names.
-
-
+        
+        
     Returns
     -------
-    data_names : list of str
-        Feature names.
-    data_ssi : float array
-        State Specific Information SSI statistics for each feature.
-    cossi_data_names : list of str
-        Feature names of stabilizing feature.
-    data_cossi : float array
-        State Specific Information Co-SSI statistics for each feature.
+        data_names : list of str
+            Feature names.
+        data_ssi : float array
+            State Specific Information statistics for each feature.
 
     """
     
     # Get the multivariate timeseries data
-    mv1_res_feat_a, mv1_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
-    mv1_res_feat_b, mv1_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
-    
-    mv2_res_feat_a, mv2_res_data_a = get_multivar_res_timeseries(cossi_features_a,cossi_all_data_a,torsions+'-torsions',write=False,out_name='')
-    mv2_res_feat_b, mv2_res_data_b = get_multivar_res_timeseries(cossi_features_b,cossi_all_data_b,torsions+'-torsions',write=False,out_name='')
+    mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+    mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
 
+    mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
+    mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
+   
+        
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
-        assert len(mv1_res_feat_a) == len(mv1_res_feat_b)
+        assert len(mv_res_feat_a) == len(mv_res_feat_b)
     else:
-        assert mv1_res_feat_a == mv1_res_feat_b
-    assert mv1_res_data_a.shape[0] == mv1_res_data_b.shape[0] 
+        assert mv_res_feat_a == mv_res_feat_b
+    assert mv_res_data_a.shape[0] == mv_res_data_b.shape[0] 
     # Extract the names of the features
-    data_names = mv1_res_feat_a
-
-    # Assert that the features are the same and data sets have same number of features
-    if override_name_check:
-        assert len(mv2_res_feat_a) == len(mv2_res_feat_b)
-    else:
-        assert mv2_res_feat_a == mv2_res_feat_b
-    assert mv2_res_data_a.shape[0] == mv2_res_data_b.shape[0] 
-    # Extract the names of the features
-    cossi_data_names = mv2_res_feat_a
-    
+    data_names = mv_res_feat_a
     # Initialize relative entropy and average value
-    data_ssi = np.zeros((len(data_names),len(cossi_data_names)))
-    data_cossi = np.zeros((len(data_names),len(cossi_data_names)))
-    for res1 in range(len(mv1_res_data_a)):
-
-        res1_data_ens1 = mv1_res_data_a[res1]
-        res1_data_ens2 = mv1_res_data_b[res1]
-        res1_combined_dist=[]
-        for dist_no in range(len(res1_data_ens1)):
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = list(res1_data_ens1[dist_no]) + list(res1_data_ens2[dist_no])  
-            res1_combined_dist.append(res1_data_both)
-                
-        for res2 in range(len(mv2_res_data_a)):
-                
-            res2_data_ens1 = mv2_res_data_a[res2]
-            res2_data_ens2 = mv2_res_data_b[res2]     
-            res2_combined_dist=[]
-            for dist_no in range(len(res2_data_ens1)):
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
-                res2_data_both = list(res2_data_ens1[dist_no]) + list(res2_data_ens2[dist_no])   
-                res2_combined_dist.append(res2_data_both)
-                
-            ## Saving distribution length
-            traj1_len = len(res2_data_ens1[dist_no])        
-            
-            data_ssi[res1][res2], data_cossi[res1][res2] = calculate_cossi(res1_combined_dist,
-                                                                           traj1_len,
-                                                                           res2_combined_dist)
-                
-            if verbose is True:
-                print('\nFeature Pair: ', data_names[res1], cossi_data_names[res2],
-                      '\nSSI[bits]: ', data_ssi[res1][res2],
-                      '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+    data_ssi = np.zeros((len(data_names),len(data_names)))
+    data_cossi = np.zeros((len(data_names),len(data_names)))
+    # Loop over all features
     
-    return data_names, cossi_data_names, data_ssi, data_cossi
+    for res1 in range(len(mv_res_data_a)):
+        # print(res1)
+        res1_data_ens1 = mv_res_data_a[res1]
+        res1_data_ens2 = mv_res_data_b[res1]
+        res1_combined_dist=[]
+        for dist_no_a in range(len(res1_data_ens1)):
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
+            res1_combined_dist.append(res1_data_both)
 
+        ## Saving distribution length
+        traj1_len = len(res1_data_ens1[dist_no_a])   
+            
+        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
+        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
+    
+        set_a_states=[]
+        for dim_num_a in range(len(set_distr_a)):
+                set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
+        H_a=calculate_entropy(set_a_states,set_distr_a) 
+        if H_a != 0:
 
+        
+            for res2 in range(res1, len(mv_res_data_a)):
+                # Only run SSI if entropy is non-zero
+                res2_data_ens1 = mv_res_data_a[res2]
+                res2_data_ens2 = mv_res_data_b[res2]     
+                res2_combined_dist=[]
+                for dist_no_b in range(len(res2_data_ens1)):
+                    # # # combine the ensembles into one distribution (condition_a + condition_b)
+                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
+                    res2_combined_dist.append(res2_data_both)            
+                 
+                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                    
+                set_b_states=[]
+                for dim_num_b in range(len(set_distr_b)):
+                        set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
+                H_b=calculate_entropy(set_b_states,set_distr_b)
+                
+                if H_b!=0:
+                
+                    ab_joint_states= set_a_states + set_b_states
+                    ab_joint_distributions= set_distr_a + set_distr_b
+                    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+            
+                    traj_1_fraction = traj1_len/len(set_distr_a[0])
+                    traj_2_fraction = 1 - traj_1_fraction
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    
+                    set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
+                    set_c_states= [[0,1,2]]                      
+             
+                    traj_1_fraction = traj1_len/len(set_distr_a[0])
+                    traj_2_fraction = 1 - traj_1_fraction                    
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    H_c = norm_factor       
+                    
+                    ##----------------
+                    ab_joint_states = set_a_states + set_b_states
+                    ab_joint_distributions = set_distr_a + set_distr_b
+                    
+                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
+                    ##----------------
+                    ac_joint_states =  set_a_states + set_c_states 
+                    ac_joint_distributions = set_distr_a + set_distr_c
+                    
+                    H_ac = calculate_entropy(ac_joint_states, ac_joint_distributions)
+                    ##----------------
+                    bc_joint_states = set_b_states + set_c_states 
+                    bc_joint_distributions = set_distr_b + set_distr_c
+                    
+                    H_bc = calculate_entropy(bc_joint_states, bc_joint_distributions)
+                    ##----------------
+                    abc_joint_states = set_a_states + set_b_states + set_c_states 
+                    abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
+                    
+                    H_abc = calculate_entropy(abc_joint_states, abc_joint_distributions)    
+            
+                    SSI = ((H_a + H_b) - H_ab)/norm_factor
+                    coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
+                    
+                    data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
+                    data_cossi[res1][res2], data_cossi[res2][res1] = coSSI, coSSI       
+                    
+                    
+                            
+                    if verbose is True:
+                        print('\nFeature Pair: ', data_names[res1], data_names[res2],
+                              '\nSSI[bits]: ', data_ssi[res1][res2],
+                              '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+         
+                else:
+                    data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
+                    data_cossi[res1][res2], data_cossi[res2][res1] = 0, 0     
+                    if verbose is True:
+                        print('\nFeature Pair: ', data_names[res1], data_names[res2],
+                              '\nSSI[bits]: ', data_ssi[res1][res2],
+                              '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+    
+                    
+        else:
+            for res2 in range(res1+1, len(mv_res_data_a)):
+                data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
+                data_cossi[res1][res2], data_cossi[res2][res1] = 0, 0     
+                if verbose is True:
+                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
+                if verbose is True:
+                    print('\nFeature Pair: ', data_names[res1], data_names[res2],
+                          '\nSSI[bits]: ', data_ssi[res1][res2],
+                          '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+    
+    return data_names, data_ssi, data_cossi
+                
