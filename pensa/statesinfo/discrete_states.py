@@ -481,3 +481,92 @@ def determine_state_limits(distr, traj1_len, gauss_bins=180, gauss_smooth=None, 
     
     order_intersect=np.sort(intersection_of_states)  
     return list(order_intersect)
+
+# -- Functions to operate on discrete states --
+
+def _check(value,x,y):
+    """
+    Check if a value is between x and y
+
+    Parameters
+    ----------
+    value : float
+        Value of interest.
+    x : float
+        Limit x.
+    y : float
+        Limit y.
+
+    Returns
+    -------
+    int
+        Numerical bool if value is between limits x and y.
+
+    """
+    if x <= value <= y:
+        return 1
+    else:
+        return 0
+
+
+def calculate_entropy(state_limits,distribution_list):
+    """
+    Calculate the Shannon entropy of a distribution as the summation of all 
+    -p*log(p) where p refers to the probability of a conformational state. 
+    
+    Parameters
+    ----------
+    state_limits : list of lists
+        A list of values that represent the limits of each state for each
+        distribution.
+    distribution_list : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+
+    Returns
+    -------
+    entropy : float
+        The Shannon entropy value 
+
+    """
+
+    state_lims = state_limits.copy()
+    dist_list = distribution_list.copy()
+    ## Ignore singular states and corresponding distributions
+    state_no = 0 
+    while state_no < len(state_lims):
+        
+        if len(state_lims[state_no])==2:
+            del dist_list[state_no]
+            del state_lims[state_no]
+            
+        else:
+            state_no +=1
+            
+    entropy=0.0
+    if len(state_lims)!=0:
+        ## subtract 1 since number of states = number of partitions - 1
+        mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
+        ##iterating over every multidimensional index in the array
+        it = np.nditer(mut_prob, flags=['multi_index'])
+    
+        while not it.finished:
+            arrayindices=list(it.multi_index)
+            limit_occupancy_checks=np.zeros((len(arrayindices), len(dist_list[0])))
+            
+            for dist_num in range(len(arrayindices)):
+                limits=[state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num]+1]]
+                distribution=dist_list[dist_num]
+            
+                for frame_num in range(len(distribution)):
+                    limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
+            mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+            ##calculating the entropy as the summation of all -p*log(p) 
+            
+            if mut_prob[it.multi_index] != 0:
+                entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index],2)
+            it.iternext()
+    return entropy
+
+
+
