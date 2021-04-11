@@ -193,7 +193,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
     data_names = []
     for feat1 in range(len(mv_res_feat_a)):
         for feat2 in range(feat1, len(mv_res_feat_a)):
-            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' ' + torsions + ' ' + mv_res_feat_a[feat2])
+            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' & ' + torsions + ' ' + mv_res_feat_a[feat2])
     # Initialize SSI
     data_ssi = np.zeros(len(data_names))
     # Loop over all features
@@ -328,7 +328,7 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
     data_names = []
     for feat1 in range(len(mv_res_feat_a)):
         for feat2 in range(feat1, len(mv_res_feat_a)):
-            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' ' + torsions + ' ' + mv_res_feat_a[feat2])
+            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' & ' + torsions + ' ' + mv_res_feat_a[feat2])
     # Initialize SSI and Co-SSI
     data_ssi = np.zeros(len(data_names))
     data_cossi = np.zeros(len(data_names))
