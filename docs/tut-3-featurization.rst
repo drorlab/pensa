@@ -89,8 +89,8 @@ water
 
 .. code:: python
     
-    struc = "mor-data/11426_dyn_151.pdb"
-    xtc = "mor-data/11423_trj_151.xtc"
+    struc = "traj/cond-a_water.gro"
+    xtc = "traj/cond-a_water.gro"
     water_feat, water_data = get_water_features(structure_input = struc, 
                                                 xtc_input = xtc,
                                                 top_waters = 1,
@@ -101,14 +101,14 @@ water
 
 To featurize sites common to both ensembles, we obtain the density grid 
 following the preprocessing steps in the density tutorial. This is then input 
-and waters are featurizedaccording to the combined ensemble density. Sites are 
+and waters are featurized according to the combined ensemble density. Sites are 
 therefore conserved across both ensembles and can be compared.
 
 .. code:: python
 
-    struc = "mor-data/11426_dyn_151.pdb"
-    xtc = "mor-data/11423_trj_151.xtc"
-    grid = "dens/cond-a_wateraligned.xtc"
+    struc = "traj/cond-a_water.gro"
+    xtc = "dens/cond-a_wateraligned.xtc"
+    grid = "dens/ab_grid_OH2_density.xtc"
     water_feat, water_data = get_water_features(structure_input = struc, 
                                                 xtc_input = xtc,
                                                 top_waters = 5,

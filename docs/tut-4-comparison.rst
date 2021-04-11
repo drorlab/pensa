@@ -103,7 +103,6 @@ distribution, and conformational microstates are based on the Gaussian intersect
 It is therefore necessary that each state is sampled sufficiently in order to 
 accurately define the conformational states. 
 
-
 Backbone C-alpha Distances
 --------------------------
 
@@ -139,5 +138,3 @@ divergence, Kolmogorov-Smirnov statistic etc. instead).
                                      "plots/receptor_jsd-bbdist.pdf",
                                      vmin = 0.0, vmax = 1.0,
                                      cbar_label='JSD')
-
-

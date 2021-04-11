@@ -48,7 +48,7 @@ using ``distances_visualization()``
                             vmin = 0.0, vmax = max(ssi_featfeat_bbtors),
                             cbar_label='SSI')
 
-The Co-SSI feature-feature-ensemble analysis is done in the same manner.
+The Co-SSI feature-feature-ensemble analysis is done in the same manner. 
 
 .. code:: python
 
@@ -57,6 +57,71 @@ The Co-SSI feature-feature-ensemble analysis is done in the same manner.
                                                                              torsions='bb', verbose=True)
                                              
 The output of ``cossi_featens_analysis()`` produces an array for the SSI and the 
-Co-SSI between all features , with the names_bbtors producing the same output as 
-the feature-feature SSI. These results can again be visualized in a 2D representation.
+Co-SSI between all features, with the names_bbtors producing the same output as 
+the feature-feature SSI. These results can again be visualized in a 2D representation. 
+It is worth noting, as ``cossi_featens_analysis()`` also computes SSI, you need not 
+run ``ssi_feature_analysis()`` in addition.
+
+Water pocket information transfer
+---------------------------------
+
+Internal water pockets and ion/atom pockets can also receive information about 
+the ensemble condition. The State Specific Information (SSI) analysis can be 
+applied to investigate these distributions in the same manner. First we need 
+to featurize the water pockets using the combined ensemble water density explained 
+in the featurization tutorial. 
+
+.. code:: python
+
+    struc = "traj/cond-a_water.gro"
+    xtc = "dens/cond-a_wateraligned.xtc"
+    grid = "dens/ab_grid_OH2_density.xtc"
+    water_feat_a, water_data_a = get_water_features(structure_input = struc, 
+                                                xtc_input = xtc,
+                                                top_waters = 5,
+                                                atomgroup = "OH2",
+                                                grid_input = grid)
+
+    struc = "traj/cond-b_water.gro"
+    xtc = "traj/cond-b_water.xtc"
+    grid = "dens/ab_grid_OH2_density.xtc"
+    water_feat_b, water_data_b = get_water_features(structure_input = struc, 
+                                                xtc_input = xtc,
+                                                top_waters = 5,
+                                                atomgroup = "OH2",
+                                                grid_input = grid)
+                                                
+    
+Information shared between water pockets and the ensemble condition is then 
+quantified using ``ssi_ensemble_analysis()``. We set ``torsions = None`` for 
+waters. 
+
+.. code:: python
+
+    data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
+                                                 water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
+                                                 torsions = None,
+                                                 verbose=True)                                                
+ 
+
+Additionally, we can see if the pocket occupancy (i.e. the presence/absence of 
+water at the site) shares SSI. Currently this is only enabled with 
+``ssi_ensemble_analysis``. We need to turn off the periodic boundary conditions
+as the distributions are no longer periodic.
+
+.. code:: python
+
+    data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_feat_b['WaterPocket_OccupDistr'],
+                                                 water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
+                                                 wat_occupancy=True, pbc=False, verbose=True)
+
+
+
+
+
+
+
+
+
+
 
