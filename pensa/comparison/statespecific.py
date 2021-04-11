@@ -21,6 +21,9 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    torsions : str
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        Default is None.
     wat_occupancy : bool, optional
         Set to 'True' if the data input is water pocket occupancy distribution.
         The default is None.
@@ -76,25 +79,56 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
             combined_dist.append(data_both)
             
         ## Saving distribution length
-        dist_a_len = len(data_a[dist_no])   
+        traj1_len = len(data_a[dist_no])   
          
         if wat_occupancy is True: 
             ## Define states for water occupancy 
-            wat_occupancy = [[-0.5,0.5,1.5]]
-            
-        if write_plots is True:
-            write_name = data_names[residue]
-            data_ssi[residue] = ens_ssi(combined_dist,
-                                        traj1_len = dist_a_len,
-                                        a_states = wat_occupancy,
-                                        write_plots=write_plots,
-                                        write_name=write_name,
-                                        pbc=pbc)
+            wat_occupancy = [[-0.5,0.5,1.5]]            
+
+        if pbc is True:
+            feat_distr = [correct_angle_periodicity(distr) for distr in combined_dist]
         else:
-            data_ssi[residue] = ens_ssi(combined_dist,
-                                        traj1_len = dist_a_len,
-                                        a_states = wat_occupancy,
-                                        pbc=pbc)
+            feat_distr = combined_dist        
+    
+        feat_states=[]
+        for dim_num in range(len(feat_distr)):
+            if write_plots is True:
+                plot_name = data_names[residue]
+            else:
+                plot_name = None
+            try:
+                feat_states.append(determine_state_limits(feat_distr[dim_num], 
+                                                          traj1_len, 
+                                                          write_plots=write_plots, 
+                                                          write_name=plot_name))
+            except:
+                print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+
+            
+        H_feat=calculate_entropy(feat_states,feat_distr) 
+                
+        if H_feat != 0:
+            ##calculating the entropy for set_distr_b
+            ## if no dist (None) then apply the binary dist for two simulations
+            ens_distr=[[0.5]*traj1_len + [1.5]*int(len(feat_distr[0])-traj1_len)]
+            ens_states= [[0,1,2]]  
+                
+            traj_1_fraction = traj1_len/len(feat_distr[0])
+            traj_2_fraction = 1 - traj_1_fraction
+            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+            H_ens = norm_factor
+            
+            featens_joint_states= feat_states + ens_states
+            featens_joint_distr= feat_distr + ens_distr
+            H_featens=calculate_entropy(featens_joint_states,featens_joint_distr)
+    
+            SSI = ((H_feat + H_ens) - H_featens)/norm_factor
+        
+        else: 
+            
+            SSI = 0
+        
+        data_ssi[residue] = SSI
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -118,6 +152,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    torsions : str
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        Default is None.
     verbose : bool, default=True
         Print intermediate results.
     override_name_check : bool, default=False
@@ -134,11 +171,15 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
     """
     
     # Get the multivariate timeseries data
-    mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
-    mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
-
-    mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
-    mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
+    if torsions is None:
+         mv_res_feat_a, mv_res_data_a = features_a,all_data_a
+         mv_res_feat_b, mv_res_data_b = features_b,all_data_b
+    else:
+         mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+         mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+    
+         mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
+         mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
    
         
     # Assert that the features are the same and data sets have same number of features
@@ -227,7 +268,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
 def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, verbose=True, override_name_check=False):
 
     """
-    Calculates State Specific Information statistic between two features across two ensembles.
+    Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
     
     Parameters
     ----------
@@ -240,6 +281,9 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    torsions : str
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        Default is None.
     verbose : bool, default=True
         Print intermediate results.
     override_name_check : bool, default=False
@@ -251,16 +295,22 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
         data_names : list of str
             Feature names.
         data_ssi : float array
-            State Specific Information statistics for each feature.
+            State Specific Information SSI statistics for each feature.
+        data_cossi : float array
+            State Specific Information Co-SSI statistics for each feature.
 
     """
     
     # Get the multivariate timeseries data
-    mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
-    mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
-
-    mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
-    mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
+    if torsions is None:
+         mv_res_feat_a, mv_res_data_a = features_a,all_data_a
+         mv_res_feat_b, mv_res_data_b = features_b,all_data_b
+    else:
+         mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
+         mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+    
+         mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
+         mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
    
         
     # Assert that the features are the same and data sets have same number of features
