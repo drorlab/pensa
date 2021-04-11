@@ -13,8 +13,8 @@ the function ``ssi_feature_analysis()``.
 The Co-SSI statistic, which tells how much the communication between two features 
 depends on the ensemble condition, can be calculated using ``cossi_featens_analysis()``.
 
-Feature - Feature SSI
----------------------
+Feature - Feature Communication
+-------------------------------
 First, load the structural features as described in the previous tutorial:
 
 .. code:: python
