@@ -85,8 +85,8 @@ State Specific Information (SSI) analysis in the same manner.
 
 .. code:: python
 
-    names_bbtors, ssi_bbtors = ssi_ensemble_analysis(a_rec_feat, b_rec_feat,
-                                                     a_rec_data, b_rec_data,
+    names_bbtors, ssi_bbtors = ssi_ensemble_analysis(sim_a_rec_feat, sim_b_rec_feat,
+                                                     sim_a_rec_data, sim_b_rec_data,
                                                      torsions='sc', verbose=True)
                                              
     ref_filename = "traj/condition-a_receptor.gro"
