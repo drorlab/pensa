@@ -386,10 +386,6 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     
                     set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
                     set_c_states= [[0,1,2]]                      
-             
-                    traj_1_fraction = traj1_len/len(set_distr_a[0])
-                    traj_2_fraction = 1 - traj_1_fraction                    
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
                     H_c = norm_factor       
                     
                     ##----------------
@@ -416,8 +412,8 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
                     
-                    data_ssi[res1] = SSI       
-                    data_cossi[res1] = coSSI       
+                    data_ssi[count] = SSI       
+                    data_cossi[count] = coSSI       
                     if verbose is True:
                         print('\nFeature Pair: ', data_names[count],
                               '\nSSI[bits]: ', data_ssi[count],
@@ -425,8 +421,6 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     count+=1                
          
                 else:
-                    data_ssi[count] = 0
-                    data_cossi[count] = 0     
                     if verbose is True:
                         print('\nFeature Pair: ', data_names[count],
                               '\nSSI[bits]: ', data_ssi[count],
@@ -435,8 +429,6 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     
         else:
             for res2 in range(res1+1, len(mv_res_data_a)):
-                data_ssi[count] = 0
-                data_cossi[count] = 0   
                 if verbose is True:
                     print('\nFeature Pair: ', data_names[count],
                           '\nSSI[bits]: ', data_ssi[count],

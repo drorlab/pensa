@@ -115,8 +115,8 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
          
     """
     # Calculate the distance Matrix
-    firstres = int(dist_names[0].split(' ')[-1])
-    lastres  = int(dist_names[-1].split(' ')[-1])
+    firstres = int(dist_names[0].split(' ')[2])
+    lastres  = int(dist_names[-1].split(' ')[2])
     if verbose:
         print('Plotting distance matrix')
         print('first res:', firstres, ', last res:', lastres)
