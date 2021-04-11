@@ -93,7 +93,7 @@ in the featurization tutorial.
                                                 
     
 Information shared between water pockets and the ensemble condition is then 
-quantified using ``ssi_ensemble_analysis()``. We set ``torsions = None`` for 
+quantified using ``ssi_ensemble_analysis()``. We set ``torsions=None`` for 
 waters. 
 
 .. code:: python
@@ -105,19 +105,17 @@ waters.
  
 
 Additionally, we can see if the pocket occupancy (i.e. the presence/absence of 
-water at the site) shares SSI. Currently this is only enabled with 
+water at the site) shares SSI - ``pocket_occupancy=True``. Currently this is only enabled with 
 ``ssi_ensemble_analysis``. We need to turn off the periodic boundary conditions
-as the distributions are no longer periodic.
+as the distributions are no longer periodic - ``pbc=False``.
 
 .. code:: python
 
     data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_feat_b['WaterPocket_OccupDistr'],
                                                  water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
-                                                 wat_occupancy=True, pbc=False, verbose=True)
+                                                 pocket_occupancy=True, pbc=False, verbose=True)
 
-
-
-
+The same protocol applies for atom/ion pockets.
 
 
 
