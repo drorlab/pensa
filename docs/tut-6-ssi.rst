@@ -36,10 +36,19 @@ Then run the SSI feature-feature analysis in the same manner the other statistic
                                                              sim_a_rec_data, sim_b_rec_data,
                                                              torsions='sc', verbose=True)
                                              
-The output of ``ssi_feature_analysis()`` produces a 2D array for the SSI between
-all features, with the names_bbtors referring to the feature names on both x and y axes.
+The output of ``ssi_feature_analysis()`` produces an array for the SSI between
+all features, with the names_bbtors referring to both feature names. This result 
+can be visualized in a two-dimensional representation similar to the distances 
+using ``distances_visualization()``
 
-Then run the Co-SSI feature-feature-ensemble analysis.
+.. code:: python
+
+    distances_visualization(names_bbtors, ssi_featfeat_bbtors,
+                            "plots/receptor_ssi-bbdist.pdf",
+                            vmin = 0.0, vmax = max(ssi_featfeat_bbtors),
+                            cbar_label='SSI')
+
+The Co-SSI feature-feature-ensemble analysis is done in the same manner.
 
 .. code:: python
 
@@ -47,7 +56,7 @@ Then run the Co-SSI feature-feature-ensemble analysis.
                                                                              sim_a_rec_data, sim_b_rec_data,
                                                                              torsions='sc', verbose=True)
                                              
-The output of ``cossi_featens_analysis()`` produces a 2D array for the SSI and 
-a 2D array for the Co-SSI between all features , with the names_bbtors referring 
-to the feature names on both x and y axes.
+The output of ``cossi_featens_analysis()`` produces an array for the SSI and the 
+Co-SSI between all features , with the names_bbtors producing the same output as 
+the feature-feature SSI. These results can again be visualized in a 2D representation.
 
