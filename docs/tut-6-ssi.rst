@@ -34,7 +34,7 @@ Then run the SSI feature-feature analysis in the same manner the other statistic
 
     names_bbtors, ssi_featfeat_bbtors = ssi_feature_analysis(sim_a_rec_feat, sim_b_rec_feat,
                                                              sim_a_rec_data, sim_b_rec_data,
-                                                             torsions='sc', verbose=True)
+                                                             torsions='bb', verbose=True)
                                              
 The output of ``ssi_feature_analysis()`` produces an array for the SSI between
 all features, with the names_bbtors referring to both feature names. This result 
@@ -54,7 +54,7 @@ The Co-SSI feature-feature-ensemble analysis is done in the same manner.
 
     names_bbtors, ssi_featfeat_bbtors, cossi_bbtors = cossi_featens_analysis(sim_a_rec_feat, sim_b_rec_feat,
                                                                              sim_a_rec_data, sim_b_rec_data,
-                                                                             torsions='sc', verbose=True)
+                                                                             torsions='bb', verbose=True)
                                              
 The output of ``cossi_featens_analysis()`` produces an array for the SSI and the 
 Co-SSI between all features , with the names_bbtors producing the same output as 
