@@ -34,7 +34,11 @@
 - [ ] More example tcl scripts for VMD 
 - [ ] Implement clustering in principal component space
 - [ ] Facilitate calculation of JSD etc. on principal components
-- [ ] Facilitate calculation of SSI on results of joint clustering. 
+- [ ] Facilitate calculation of SSI on results of joint clustering.
+- [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
+- [ ] Feature comparison of more than two ensembles
+  - [ ] with respect to the joint ensemble (all metrics)
+  - [ ] with respect to a reference ensemble (will not always work for KLD)
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE) ----------------
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
@@ -60,6 +64,7 @@
   - [ ] modify p-value of KS test using correlation time 
   - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
+- [ ] Add options to save and load calculated features
 - [ ] Featurizers for other molecule types
   - [ ] ions
   - [ ] ligands

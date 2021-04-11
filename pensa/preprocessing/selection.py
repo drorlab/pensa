@@ -37,7 +37,7 @@ def load_selection(sel_file, sel_base=''):
     
     Parameters
     ----------
-        sel_file : int
+        sel_file : str
             Name of the file with selections.
             Must contain two numbers on each line (first and last residue of this part).
         sel_base : str
