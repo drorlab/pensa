@@ -6,7 +6,7 @@ from pensa.statesinfo import *
 # -- Functions to calculate SSI statistics across paired ensembles --
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, wat_occupancy=None, pbc=True, 
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, 
                           verbose=True, write_plots=None, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -25,8 +25,8 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
     torsions : str
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
-    wat_occupancy : bool, optional
-        Set to 'True' if the data input is water pocket occupancy distribution.
+    pocket_occupancy : bool, optional
+        Set to 'True' if the data input is pocket occupancy distribution.
         The default is None.
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
@@ -81,29 +81,29 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
             
         ## Saving distribution length
         traj1_len = len(data_a[dist_no])   
-         
-        if wat_occupancy is True: 
-            ## Define states for water occupancy 
-            wat_occupancy = [[-0.5,0.5,1.5]]            
 
         if pbc is True:
             feat_distr = [correct_angle_periodicity(distr) for distr in combined_dist]
         else:
             feat_distr = combined_dist        
     
-        feat_states=[]
-        for dim_num in range(len(feat_distr)):
-            if write_plots is True:
-                plot_name = data_names[residue]
-            else:
-                plot_name = None
-            try:
-                feat_states.append(determine_state_limits(feat_distr[dim_num], 
-                                                          traj1_len, 
-                                                          write_plots=write_plots, 
-                                                          write_name=plot_name))
-            except:
-                print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+        if pocket_occupancy is True: 
+            ## Define states for water occupancy 
+            feat_states = [[-0.5,0.5,1.5]]    
+        else:     
+            feat_states=[]
+            for dim_num in range(len(feat_distr)):
+                if write_plots is True:
+                    plot_name = data_names[residue]
+                else:
+                    plot_name = None
+                try:
+                    feat_states.append(determine_state_limits(feat_distr[dim_num], 
+                                                              traj1_len, 
+                                                              write_plots=write_plots, 
+                                                              write_name=plot_name))
+                except:
+                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
 
             
         H_feat=calculate_entropy(feat_states,feat_distr) 
