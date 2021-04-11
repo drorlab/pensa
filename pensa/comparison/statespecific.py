@@ -190,11 +190,14 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
         assert mv_res_feat_a == mv_res_feat_b
     assert mv_res_data_a.shape[0] == mv_res_data_b.shape[0] 
     # Extract the names of the features
-    data_names = mv_res_feat_a
-    # Initialize relative entropy and average value
-    data_ssi = np.zeros((len(data_names),len(data_names)))
+    data_names = []
+    for feat1 in range(len(mv_res_feat_a)):
+        for feat2 in range(feat1, len(mv_res_feat_a)):
+            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' ' + torsions + ' ' + mv_res_feat_a[feat2])
+    # Initialize SSI
+    data_ssi = np.zeros(len(data_names))
     # Loop over all features
-    
+    count=0
     for res1 in range(len(mv_res_data_a)):
         # print(res1)
         res1_data_ens1 = mv_res_data_a[res1]
@@ -247,20 +250,21 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
             
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                                     
-                    data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
-                            
-                    if verbose is True:
-                        print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])        
-                else:
-                    data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
-                    if verbose is True:
-                        print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
                     
+                    data_ssi[count] = SSI       
+                    if verbose is True:
+                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                    count+=1
+                else:
+                    if verbose is True:
+                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                    count+=1
+
         else:
             for res2 in range(res1+1, len(mv_res_data_a)):
-                data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
                 if verbose is True:
-                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
+                    print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                count+=1
                 
     return data_names, data_ssi
 
@@ -321,12 +325,15 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
         assert mv_res_feat_a == mv_res_feat_b
     assert mv_res_data_a.shape[0] == mv_res_data_b.shape[0] 
     # Extract the names of the features
-    data_names = mv_res_feat_a
-    # Initialize relative entropy and average value
-    data_ssi = np.zeros((len(data_names),len(data_names)))
-    data_cossi = np.zeros((len(data_names),len(data_names)))
+    data_names = []
+    for feat1 in range(len(mv_res_feat_a)):
+        for feat2 in range(feat1, len(mv_res_feat_a)):
+            data_names.append(torsions + ' ' + mv_res_feat_a[feat1] + ' ' + torsions + ' ' + mv_res_feat_a[feat2])
+    # Initialize SSI and Co-SSI
+    data_ssi = np.zeros(len(data_names))
+    data_cossi = np.zeros(len(data_names))
     # Loop over all features
-    
+    count=0    
     for res1 in range(len(mv_res_data_a)):
         # print(res1)
         res1_data_ens1 = mv_res_data_a[res1]
@@ -409,35 +416,33 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
                     
-                    data_ssi[res1][res2], data_ssi[res2][res1] = SSI, SSI       
-                    data_cossi[res1][res2], data_cossi[res2][res1] = coSSI, coSSI       
-                    
-                    
-                            
+                    data_ssi[res1] = SSI       
+                    data_cossi[res1] = coSSI       
                     if verbose is True:
-                        print('\nFeature Pair: ', data_names[res1], data_names[res2],
-                              '\nSSI[bits]: ', data_ssi[res1][res2],
-                              '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+                        print('\nFeature Pair: ', data_names[count],
+                              '\nSSI[bits]: ', data_ssi[count],
+                              '\nCo-SSI[bits]: ', data_cossi[count])
+                    count+=1                
          
                 else:
-                    data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
-                    data_cossi[res1][res2], data_cossi[res2][res1] = 0, 0     
+                    data_ssi[count] = 0
+                    data_cossi[count] = 0     
                     if verbose is True:
-                        print('\nFeature Pair: ', data_names[res1], data_names[res2],
-                              '\nSSI[bits]: ', data_ssi[res1][res2],
-                              '\nCo-SSI[bits]: ', data_cossi[res1][res2])
-    
+                        print('\nFeature Pair: ', data_names[count],
+                              '\nSSI[bits]: ', data_ssi[count],
+                              '\nCo-SSI[bits]: ', data_cossi[count])
+                    count+=1
                     
         else:
             for res2 in range(res1+1, len(mv_res_data_a)):
-                data_ssi[res1][res2], data_ssi[res2][res1] = 0, 0
-                data_cossi[res1][res2], data_cossi[res2][res1] = 0, 0     
+                data_ssi[count] = 0
+                data_cossi[count] = 0   
                 if verbose is True:
-                    print('SSI[bits]: ',data_names[res1],data_names[res2],data_ssi[res1][res2])    
-                if verbose is True:
-                    print('\nFeature Pair: ', data_names[res1], data_names[res2],
-                          '\nSSI[bits]: ', data_ssi[res1][res2],
-                          '\nCo-SSI[bits]: ', data_cossi[res1][res2])
+                    print('\nFeature Pair: ', data_names[count],
+                          '\nSSI[bits]: ', data_ssi[count],
+                          '\nCo-SSI[bits]: ', data_cossi[count])
+                count+=1
+
     
     return data_names, data_ssi, data_cossi
                 
