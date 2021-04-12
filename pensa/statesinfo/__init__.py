@@ -10,4 +10,3 @@ The methods here are based on the following paper:
     
 """
 from .discrete_states import * 
-from .ssi import *

@@ -78,6 +78,31 @@ residue.
                np.array(vis).T, fmt='%s', delimiter=',', 
                header='Residue, max. JSD(A,B)')
 
+In addition to the above metrics, we can investigate differences in discrete 
+conformational microstates within the torsion distributions by employing the 
+State Specific Information (SSI) analysis in the same manner. 
+
+
+.. code:: python
+
+    names_bbtors, ssi_bbtors = ssi_ensemble_analysis(sim_a_rec_feat, sim_b_rec_feat,
+                                                     sim_a_rec_data, sim_b_rec_data,
+                                                     torsions='sc', verbose=True)
+                                             
+    ref_filename = "traj/condition-a_receptor.gro"
+    out_filename = "receptor_sctors-deviations_ssi"
+    vis = residue_visualization(data_names, data_ssi, ref_filename,
+                                "plots/"+out_filename+"_ssi.pdf",
+                                "vispdb/"+out_filename+"_ssi.pdb",
+                                y_label='max. SSI of SC torsions')    
+
+Conformational microstates of each residue are multidimensional, incorporating 
+all sc-torsion or bb-torsion angles in the definition of a residue's conformational space. 
+The distributions are decomposed into the individual Gaussians which fit the
+distribution, and conformational microstates are based on the Gaussian intersects. 
+It is therefore necessary that each state is sampled sufficiently in order to 
+accurately define the conformational states. 
+
 Backbone C-alpha Distances
 --------------------------
 
@@ -113,5 +138,3 @@ divergence, Kolmogorov-Smirnov statistic etc. instead).
                                      "plots/receptor_jsd-bbdist.pdf",
                                      vmin = 0.0, vmax = 1.0,
                                      cbar_label='JSD')
-
-

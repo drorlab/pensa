@@ -42,9 +42,9 @@ sel_base_b = "(not name H*) and protein"
 out_name_a = "traj/condition-a"
 out_name_b = "traj/condition-b"
 
-# for subdir in ['traj','plots','vispdb','pca','clusters','results']:
-#     if not os.path.exists(subdir):
-#         os.makedirs(subdir)
+for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+    if not os.path.exists(subdir):
+        os.makedirs(subdir)
 
 # # # Extract the coordinates of the receptor from the trajectory
 extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
@@ -80,10 +80,10 @@ sc_multivar_res_feat_b, sc_multivar_res_data_b = get_multivar_res_timeseries(b_r
 # # # certainty from the state of the residue.
 # # # Set write_plots = True to generate a folder with all the clustered states for each residue.
 data_names, data_ssi = ssi_ensemble_analysis(sc_multivar_res_feat_a['sc-torsions'], sc_multivar_res_feat_b['sc-torsions'],
-                                             sc_multivar_res_data_a['sc-torsions'], sc_multivar_res_data_b['sc-torsions'],
-                                             verbose=False)
+                                              sc_multivar_res_data_a['sc-torsions'], sc_multivar_res_data_b['sc-torsions'],
+                                              verbose=True, write_plots=True)
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 # # # Featurizing waters and calculating SSI 
 
@@ -119,7 +119,7 @@ extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)
 
 # # # # Extract the coordinates of the ensemble a aligned to ensemble b 
 extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
-                       out_name_b+".gro", out_name_b+".xtc")
+                        out_name_b+".gro", out_name_b+".xtc")
 
 
 # # # Extract the combined density of the waters in both ensembles a and b 
@@ -154,15 +154,15 @@ water_feat_b, water_data_b  = get_water_features(structure_input = out_name_b+".
 
 # # # SSI shared between waters and the switch between ensemble conditions
 data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_Distr'],water_feat_b['WaterPocket_Distr'],
-                                             water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
-                                             verbose=True)
+                                              water_data_a['WaterPocket_Distr'],water_data_b['WaterPocket_Distr'], 
+                                              verbose=True)
 
 # # # Alternatively we can see if the pocket occupancy (the presence/absence of water at the site) shares SSI
 # # # Currently this is only enabled with ssi_ensemble_analysis. We need to turn off the periodic boundary conditions
 # # # as the distributions are no longer periodic.
 data_names, data_ssi = ssi_ensemble_analysis(water_feat_a['WaterPocket_OccupDistr'],water_feat_b['WaterPocket_OccupDistr'],
-                                             water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
-                                             wat_occupancy=True, pbc=False, verbose=True)
+                                              water_data_a['WaterPocket_OccupDistr'],water_data_b['WaterPocket_OccupDistr'],
+                                              wat_occupancy=True, pbc=False, verbose=True)
 
 # # # In this example we can see that the state of water 01 shares ~0.25 bits of
 # # # information with the ensembles, but the occupancy of water 1 pocket shares ~0.07 bits, 

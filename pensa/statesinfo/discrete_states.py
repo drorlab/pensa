@@ -211,7 +211,7 @@ def _integral(x, mu, sigma, A):
 
 
 
-def _gauss_fit(distribution, gauss_bin, gauss_smooth):    
+def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):    
     """
     Obtaining the gaussians to fit the distribution into a Gaussian mix.
     Bin number is chosen based on 3 degree resolution (120 bins for 360 degrees)
@@ -233,21 +233,28 @@ def _gauss_fit(distribution, gauss_bin, gauss_smooth):
         x-axis values for the Gaussian distribution.
 
     """
-    histo = np.histogram(distribution, bins=gauss_bin, density=True)
-    distributionx = _smooth(histo[1][0:-1], gauss_smooth)
-    ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
-    distributiony = _smooth(histo[0]-min(histo[0]), gauss_smooth)
-    ## Obtaining maxima below cutoff = 0.75% of global maximum
-    all_maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
-    corrected_extrema = [item for item in all_maxima if item > max(distributiony)*0.0075]
     
+    distr1 = distribution[:traj1_len]
+    distr2 = distribution[traj1_len:]
+    
+    histox = np.histogram(distribution, bins=gauss_bin, density=True)[1]
+    histo1 = np.histogram(distr1, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
+    histo2 = np.histogram(distr2, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
+    
+    combined_histo = [(height1 + height2)/2 for height1,height2 in zip(histo1,histo2)]    
+
+    distributionx = _smooth(histox[0:-1], gauss_smooth)
+    ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
+    distributiony = _smooth(combined_histo-min(combined_histo), gauss_smooth)
+    
+    maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
     ## Obtain Gaussian guess params
     mean_pop=[]
     sigma_pop=[]
     num_closest_neighb=28
     ## Locate sigma from FWHM for each maxima
     sig_vals=[]
-    for extrema in corrected_extrema:
+    for extrema in maxima:
         ## Finding closest values to half maximum
         closest_yvals = _printKclosest(distributiony, len(distributiony), extrema*0.5, num_closest_neighb)
         closest_xvals = [np.where(distributiony==float(closesty))[0][0] for closesty in closest_yvals]
@@ -260,8 +267,8 @@ def _gauss_fit(distribution, gauss_bin, gauss_smooth):
         sig_vals.append(sigma)        
         
     ##the mean x of the gaussian is the value of x at the peak of y
-    mean_vals=[distributionx[np.where(distributiony==extrema)[0][0]] for extrema in corrected_extrema]
-    for extr_num in range(len(corrected_extrema)):
+    mean_vals=[distributionx[np.where(distributiony==extrema)[0][0]] for extrema in maxima]
+    for extr_num in range(len(maxima)):
         mean_pop.append(mean_vals[extr_num])
         sigma_pop.append(sig_vals[extr_num])
         
@@ -275,7 +282,7 @@ def _gauss_fit(distribution, gauss_bin, gauss_smooth):
     for param_num in range(len(mean_pop)):
         expected.append(mean_pop[param_num])
         expected.append(sigma_pop[param_num])
-        expected.append(corrected_extrema[param_num])    
+        expected.append(maxima[param_num])    
 
     params, cov = curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)   
 
@@ -302,7 +309,7 @@ def _gauss_fit(distribution, gauss_bin, gauss_smooth):
     return gaussians, Gauss_xvals
 
 
-def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
+def smart_gauss_fit(distr, traj1_len, gauss_bins=180, gauss_smooth=None, write_name=None):
     """
     Obtaining the gaussians to fit the distribution into a Gaussian mix. 
     Bin number automatically adjusted if the Gaussian fit experiences errors.
@@ -312,10 +319,10 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     distr : list
         Distribution of interest for the fitting.
     gauss_bins : int, optional
-        Bin the distribution into gauss_bin bins. The default is 120.
+        Bin the distribution into gauss_bin bins. The default is 180.
     gauss_smooth : int, optional
         Smooth the distribution according to a Hanning window length of gauss_smooth.
-        The default is 10% of gauss_bins.
+        The default is ~10% of gauss_bins.
     write_name : str, optional
         Used in warning to notify which feature has had binning altered during clustering.
         The default is None.
@@ -332,7 +339,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     smooth_origin = gauss_smooth
     bin_origin = gauss_bins
     if gauss_smooth is None:
-        gauss_smooth = int(gauss_bins*0.1)
+        gauss_smooth = int(gauss_bins*0.10)
    
     trial = 0
     attempt_no = 0
@@ -345,7 +352,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
     ##if clustering does not work for a given bin number then adjust the bin number
     while trial < 1:
         try:
-            gaussians, Gauss_xvals = _gauss_fit(distr, gauss_bins, gauss_smooth)
+            gaussians, Gauss_xvals = _gauss_fit(distr, traj1_len, gauss_bins, gauss_smooth)
             trial += 1
         except:
             attempt_no += 1
@@ -353,7 +360,7 @@ def smart_gauss_fit(distr, gauss_bins=120, gauss_smooth=None, write_name=None):
             gauss_bins = bin_origin + bin_adjust[attempt_no]
     
     ##only warn about clustering changes if specific parameters were input
-    if bin_origin == 120 and smooth_origin is None:
+    if bin_origin != 180 or smooth_origin is not None:
         if attempt_no > 0.1*bin_origin:
             if write_name is None:
                 print('Warning: Altered gauss_bins by >10% for clustering.\nYou might want to check cluster plot.')
@@ -393,10 +400,10 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_
     mean_gauss_xval=[]
     for gauss_num in range(len(gaussians)):
         mean_gauss_xval.append(Gauss_xvals[list(gaussians[gauss_num]).index(max(gaussians[gauss_num]))])
-        
-    reorder_indices=[mean_gauss_xval.index(mean) for mean in sorted(mean_gauss_xval)]    
-    ##sort gaussians in order of their mean xval and ignore gaussians with maxima below 0.0001 (99% sig)
-    reorder_gaussians=[gaussians[gauss_num] for gauss_num in reorder_indices if max(gaussians[gauss_num])>0.0001]
+  
+    ##sort gaussians in order of their mean xval        
+    reorder_gaussians=[gaussians[mean_gauss_xval.index(mean)] for mean in sorted(mean_gauss_xval)]    
+    # reorder_gaussians=[gaussians[gauss_num] for gauss_num in reorder_indices]
         
     for gauss_index in range(len(reorder_gaussians)-1):    
         ##Find indices between neighbouring gaussians
@@ -404,12 +411,11 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_
         if len(idx)==1:
             all_intersects.append(float(Gauss_xvals[idx][0]) )
         elif len(idx)!=0:
-            ##selects the intersect with the maximum probability
-            ##to stop intersects occuring when the gaussians trail to zero further right on the plot
+            ## Select the intersect with the maximum probability
             intersect_ymax=max([reorder_gaussians[gauss_index][intersect] for intersect in idx])
             intersect_ymax_index=[item for item in idx if reorder_gaussians[gauss_index][item]==intersect_ymax]            
             all_intersects.append(float(Gauss_xvals[intersect_ymax_index]))
-        ##for gaussian neighbours that don't intersect, set state limit as center between maxima
+        ## For gaussian neighbours that don't intersect, set state limit as center between maxima
         elif len(idx)==0:            
             gauss_max1=list(reorder_gaussians[gauss_index]).index(max(reorder_gaussians[gauss_index]))
             gauss_max2=list(reorder_gaussians[gauss_index+1]).index(max(reorder_gaussians[gauss_index+1]))
@@ -436,7 +442,7 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_
     
     return all_intersects
     
-def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots=None, write_name=None):    
+def determine_state_limits(distr, traj1_len, gauss_bins=180, gauss_smooth=None, write_plots=None, write_name=None):    
     """
     Cluster a distribution into discrete states with well-defined limits.
     The function handles both residue angle distributions and water 
@@ -450,9 +456,9 @@ def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots
         Distribution for specific feature.
     gauss_bins : int, optional
         Number of histogram bins to assign for the clustering algorithm. 
-        The default is 120.
+        The default is 180.
     gauss_smooth : int, optional
-        Number of bins to perform smoothing over. The default is 10.
+        Number of bins to perform smoothing over. The default is ~10% of gauss_bins.
     write_plots : bool, optional
         If true, visualise the states over the raw distribution. The default is None.
     write_name : str, optional
@@ -467,8 +473,7 @@ def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots
     new_dist=distr.copy()
     distribution=[item for item in new_dist if item != 10000.0]
     ##obtaining the gaussian fit
-    gaussians, Gauss_xvals = smart_gauss_fit(distribution,gauss_bins, gauss_smooth, write_name)
-    # gaussians, xline = gauss_fit(distribution,gauss_bins,gauss_smooth)            
+    gaussians, Gauss_xvals = smart_gauss_fit(distribution, traj1_len, gauss_bins, gauss_smooth, write_name)
     ##discretising each state by gaussian intersects       
     intersection_of_states = get_intersects(gaussians, distribution, Gauss_xvals,  write_plots, write_name)   
     if distr.count(10000.0)>=1:
@@ -476,3 +481,92 @@ def determine_state_limits(distr, gauss_bins=120, gauss_smooth=None, write_plots
     
     order_intersect=np.sort(intersection_of_states)  
     return list(order_intersect)
+
+# -- Functions to operate on discrete states --
+
+def _check(value,x,y):
+    """
+    Check if a value is between x and y
+
+    Parameters
+    ----------
+    value : float
+        Value of interest.
+    x : float
+        Limit x.
+    y : float
+        Limit y.
+
+    Returns
+    -------
+    int
+        Numerical bool if value is between limits x and y.
+
+    """
+    if x <= value <= y:
+        return 1
+    else:
+        return 0
+
+
+def calculate_entropy(state_limits,distribution_list):
+    """
+    Calculate the Shannon entropy of a distribution as the summation of all 
+    -p*log(p) where p refers to the probability of a conformational state. 
+    
+    Parameters
+    ----------
+    state_limits : list of lists
+        A list of values that represent the limits of each state for each
+        distribution.
+    distribution_list : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+
+    Returns
+    -------
+    entropy : float
+        The Shannon entropy value 
+
+    """
+
+    state_lims = state_limits.copy()
+    dist_list = distribution_list.copy()
+    ## Ignore singular states and corresponding distributions
+    state_no = 0 
+    while state_no < len(state_lims):
+        
+        if len(state_lims[state_no])==2:
+            del dist_list[state_no]
+            del state_lims[state_no]
+            
+        else:
+            state_no +=1
+            
+    entropy=0.0
+    if len(state_lims)!=0:
+        ## subtract 1 since number of states = number of partitions - 1
+        mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
+        ##iterating over every multidimensional index in the array
+        it = np.nditer(mut_prob, flags=['multi_index'])
+    
+        while not it.finished:
+            arrayindices=list(it.multi_index)
+            limit_occupancy_checks=np.zeros((len(arrayindices), len(dist_list[0])))
+            
+            for dist_num in range(len(arrayindices)):
+                limits=[state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num]+1]]
+                distribution=dist_list[dist_num]
+            
+                for frame_num in range(len(distribution)):
+                    limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
+            mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+            ##calculating the entropy as the summation of all -p*log(p) 
+            
+            if mut_prob[it.multi_index] != 0:
+                entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index],2)
+            it.iternext()
+    return entropy
+
+
+
