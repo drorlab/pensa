@@ -86,23 +86,118 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     return vis_resids, vis_values        
         
 
-def distances_visualization(dist_names, dist_diff, plot_filename, 
-                            vmin=None, vmax=None, verbose=True, cbar_label=None):
+def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
+                          num_drop_char=0, sort_by_pos=None, numerical_sort=False,
+                          vmin=None, vmax=None, symmetric=True, cbar_label=None):
     """
-    Visualizes features per residue as plot and in PDB files, assuming values from 0 to 1. 
+    Visualizes data per feature pair in a heatmap. 
     
     Parameters
     ----------
-        dist_names : str array
-            Names of the features in PyEMMA nomenclaturre (contain residue IDs).
-        dist_diff : float array
-            Data for each distance feature.
+        feat_names : str array
+            Names of the features in PyEMMA nomenclature (contain residue IDs).
+        feat_diff : float array
+            Data to be plotted for each residue-pair feature.
         plot_filename : str
             Name of the file for the plot.
+        separator : str
+            String that separates the two parts of the pair-type feature.
+        num_drop_char : int
+            Number of characters to drop at the beginning of the feature name.
+            Defaults to 0.
+        sort_by_pos : int 
+            Position in the name of the feature part of the quantity by which it is to be sorted.
+            Assumes that the name is split by ' ' (single whitespace). Counting is 0-based.
+            If None, the entire name of the feature part is sorted by numpy.unique().
+            Defaults to None.
+        numerical_sort : bool
+            If true, the position defined by 'sort_by_pos' is assumed to be an integer.
+            Defaults to False.
         vmin : float, optional
-            Minimum value for the heat map.
+            Minimum value for the heatmap.
         vmax : float, optional
-            Maximum value for the heat map.
+            Maximum value for the heatmap.
+        symmetric : bool, optional
+            The matrix is symmetric and values provided only for the upper or lower triangle. 
+            Defaults to True.
+        cbar_label : str, optional
+            Label for the color bar.
+        
+    Returns
+    -------
+        diff : float array
+            Matrix with the values of the difference/divergence.
+         
+    """
+    # Create lists of all pairs of feature parts
+    part1_list = []
+    part2_list = []
+    for name in feat_names:
+        split_name = name[num_drop_char:].split(separator)
+        assert len(split_name) == 2 # TODO: add warning
+        part1, part2 = split_name
+        part1_list.append(part1)
+        part2_list.append(part2)
+    all_parts = np.unique(np.array(part1_list+part2_list))
+    # Sort the list if desired
+    if sort_by_pos is not None:
+        if numerical_sort:
+            sortpos = np.array([int(part.split(' ')[sort_by_pos]) for part in all_parts],dtype=int)
+        else:
+            sortpos = np.array([part.split(' ')[sort_by_pos] for part in all_parts])
+        all_parts = all_parts[np.argsort(sortpos)]
+    # Initialize the matrix to store the values
+    size = len(all_parts)
+    diff = np.zeros([size,size])
+    # Write the values into the matrix
+    for n,name in enumerate(feat_names):
+        part1, part2 = name[num_drop_char:].split(separator)
+        i = np.where(all_parts == part1)
+        j = np.where(all_parts == part2)
+        diff[i,j] = feat_diff[n]
+        if symmetric:
+            diff[j,i] = feat_diff[n]  
+    # Plot it as a heat map
+    fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
+    img = ax.imshow(diff, vmin=vmin, vmax=vmax)
+    ax.xaxis.set_ticks_position('top')
+    ax.xaxis.set_tick_params(length=0,width=0)
+    ax.yaxis.set_tick_params(length=0,width=0)
+    ax.set_xticks(np.arange(size))
+    ax.set_yticks(np.arange(size))
+    ax.set_xticklabels(all_parts)
+    ax.set_yticklabels(all_parts)
+    ax.xaxis.set_label_position('top')
+    fig.colorbar(img, ax=ax, label=cbar_label)
+    fig.tight_layout()
+    fig.savefig(plot_filename,dpi=300)  
+    return diff
+    
+    
+def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
+                   vmin=None, vmax=None, symmetric=True, verbose=True, cbar_label=None):
+    """
+    Visualizes data per residue pair in a heatmap. 
+    
+    Parameters
+    ----------
+        feat_names : str array
+            Names of the features in PyEMMA nomenclature (contain residue IDs).
+        feat_diff : float array
+            Data to be plotted for each residue-pair feature.
+        plot_filename : str
+            Name of the file for the plot.
+        res1_pos : int
+            Position of the 1st residue ID in the feature name when separated by ' '.
+        res2_pos : int
+            Position of the 2nd residue ID in the feature name when separated by ' '.
+        vmin : float, optional
+            Minimum value for the heatmap.
+        vmax : float, optional
+            Maximum value for the heatmap.
+        symmetric : bool, optional
+            The matrix is symmetric and values provided only for the upper or lower triangle. 
+            Defaults to True.
         verbose : bool, optional
             Print numbers of first and last residue. Defaults to True.
         cbar_label : str, optional
@@ -111,24 +206,23 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
     Returns
     -------
         diff : float array
-            Distance matrix.
+            Matrix with the values of the difference/divergence.
          
     """
-    # Calculate the distance Matrix
-    firstres = int(dist_names[0].split(' ')[2])
-    lastres  = int(dist_names[-1].split(' ')[2])
+    firstres = int(feat_names[0].split(' ')[res1_pos])
+    lastres  = int(feat_names[-1].split(' ')[res1_pos])
     if verbose:
-        print('Plotting distance matrix')
         print('first res:', firstres, ', last res:', lastres)
     size = lastres-firstres+2
     diff = np.zeros([size,size])
     for n,name in enumerate(dist_names):
         splitname = name.split(' ')
-        resi,resj = int(splitname[2]),int(splitname[6])
+        resi,resj = int(splitname[res1_pos]),int(splitname[res2_pos])
         i = resi - firstres
         j = resj - firstres
-        diff[i,j] = dist_diff[n]
-        diff[j,i] = dist_diff[n]  
+        diff[i,j] = feat_diff[n]
+        if symmetric:
+            diff[j,i] = feat_diff[n]  
     # Plot it as a heat map
     fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
     img = ax.imshow(diff, vmin=vmin, vmax=vmax)
@@ -143,6 +237,42 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
     fig.colorbar(img, ax=ax, label=cbar_label)
     fig.tight_layout()
     fig.savefig(plot_filename,dpi=300)  
+    return diff
+    
+    
+def distances_visualization(dist_names, dist_diff, plot_filename, 
+                            vmin=None, vmax=None, verbose=True, cbar_label=None):
+    """
+    Visualizes distance features for pairs of residues in a heatmap. 
+    
+    Parameters
+    ----------
+        dist_names : str array
+            Names of the distances in PyEMMA nomenclature 
+            (contain residue IDs at position [2] and [6] when separated by ' ').
+        dist_diff : float array
+            Data for each distance feature.
+        plot_filename : str
+            Name of the file for the plot.
+        vmin : float, optional
+            Minimum value for the heatmap.
+        vmax : float, optional
+            Maximum value for the heatmap.
+        verbose : bool, optional
+            Print numbers of first and last residue. Defaults to True.
+        cbar_label : str, optional
+            Label for the color bar.
+        
+    Returns
+    -------
+        diff : float array
+            Distance matrix.
+         
+    """
+    if verbose:
+        print('Plotting heatmap for distance features.')
+    diff = resnum_heatmap(dist_names, dist_diff, plot_filename, res1_pos=2, res2_pos=6,
+                          vmin=vmin, vmax=vmax, verbose=verbose, cbar_label=cbar_label)
     return diff
 
 
