@@ -38,7 +38,7 @@ We demonstrate how to use the PENSA library in an interactive and animated examp
 
 General citation, representing the "concept" of the software:
 ```
-Martin Vögele. (2021). PENSA. Zenodo. http://doi.org/10.5281/zenodo.4362136
+Martin Vögele, Neil Thomson, Sang Truong. (2021). PENSA. Zenodo. http://doi.org/10.5281/zenodo.4362136
 ```
 To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136).
 
