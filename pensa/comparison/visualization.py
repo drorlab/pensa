@@ -215,7 +215,7 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
         print('first res:', firstres, ', last res:', lastres)
     size = lastres-firstres+2
     diff = np.zeros([size,size])
-    for n,name in enumerate(dist_names):
+    for n,name in enumerate(feat_names):
         splitname = name.split(' ')
         resi,resj = int(splitname[res1_pos]),int(splitname[res2_pos])
         i = resi - firstres
