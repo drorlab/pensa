@@ -12,5 +12,5 @@ With PENSA, you can (currently):
 
 All functionality is available as a python package. For the most common applications, example `python scripts <https://github.com/drorlab/pensa/tree/master/scripts>`_ are provided. 
 
-To make yourself familiar with PENSA's functionality, see the `tutorial <https://github.com/drorlab/pensa/tree/master/tutorial>`_.
+To make yourself familiar with PENSA's functionality, see the `tutorial <https://pensa.readthedocs.io/en/latest/tut-1-intro.html>`_.
 
