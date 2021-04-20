@@ -9,7 +9,6 @@ Welcome to PENSA's documentation!
 
    about
    installation 
-   tutorials
    examples
    contribute
 

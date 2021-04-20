@@ -13,11 +13,3 @@ pensa.statesinfo.discrete\_states
    :members:
    :undoc-members:
    :show-inheritance:
-
-pensa.statesinfo.ssi
----------------------------
-
-.. automodule:: pensa.statesinfo.ssi
-   :members:
-   :undoc-members:
-   :show-inheritance:
