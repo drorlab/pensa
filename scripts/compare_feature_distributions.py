@@ -98,9 +98,8 @@ def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
         select_b = np.arange(len(feat_b[tors+'-torsions']))
     
     # SSI analysis with BB torsions
-    ana = ssi_ensemble_analysis(bb_res_feat_a[tors+'-torsions'], bb_res_feat_b[tors+'-torsions'],
-                                bb_res_data_a[tors+'-torsions'], bb_res_data_b[tors+'-torsions'],
-                                torsions = tors, verbose=False, override_name_check=args.override_name_check)
+    ana = ssi_ensemble_analysis(feat_a, feat_b, data_a, data_b, torsions = tors, 
+                                verbose=False, override_name_check=args.override_name_check)
     resnames, ssi = ana
 
     # Save all results (per feature) in CSV files 
