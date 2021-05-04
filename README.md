@@ -28,7 +28,7 @@ Trajectories are processed and written using [MDAnalysis](https://www.mdanalysis
 PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/), where you find installation instructions, API documentation, and a tutorial.
 
 #### Example Scripts
-For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. We show how to run the example scripts [here](https://github.com/drorlab/pensa/tree/master/tutorial).
+For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. We show how to run the example scripts in a short separate [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
 
 #### Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
