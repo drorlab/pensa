@@ -72,8 +72,8 @@
   - [ ] nucleic acids
 - [ ] Simplify adding hand-crafted features 
 - [ ] Implement conformational entropy calculations
-  - [ ] Read papers, e.g, [1](https://www.pnas.org/content/111/43/15396), [2](https://www.mdpi.com/2079-3197/6/1/21/htm)
-  - [ ] Test to find the best way to do it.
+  - [ ] Read papers, e.g, [1](https://www.pnas.org/content/111/43/15396), [2](https://www.mdpi.com/2079-3197/6/1/21/htm), [3](https://pubs.acs.org/doi/10.1021/acs.jcim.0c01375)
+  - [ ] Test implementations, e.g., [Xentropy](https://github.com/liedllab/X-Entropy) to find the best way to do it.
 - [ ] Implement [multi-dimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling)
 - [ ] Try to integrate [functional mode analysis](http://www3.mpibpc.mpg.de/groups/de_groot/fma.html).
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
