@@ -89,6 +89,11 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
         Data for all C-alpha distances [Å]
 
     """
-    return get_atom_self_distances(top, trj, selection='name CA')
+    names, data =  get_atom_self_distances(pdb, xtc, 
+                                           selection='name CA', 
+                                           first_frame=first_frame, 
+                                           last_frame=last_frame,                                                 
+                                           step=step)
+    return names, data
 
 
