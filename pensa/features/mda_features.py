@@ -34,7 +34,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
 
     """
 
-    u = mda.Universe(top,trj)
+    u = mda.Universe(pdb, xtc)
     a = u.select_atoms(selection)
     num_at = len(a)
 
