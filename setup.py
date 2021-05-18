@@ -18,7 +18,7 @@ setup(name='pensa',
         'MDAnalysis',
         'matplotlib',
         'biotite',
-        'gpcrmining'
+        'gpcr-mining'
       ],
       classifiers=[
         # How mature is this project? Common values are
