@@ -66,7 +66,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
 
 def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
     """
-    Load distances between all selected atoms.
+    Load distances between all C-alpha atoms.
 
     Parameters
     ----------
