@@ -98,12 +98,28 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
 
 
 def select_gpcr_residues(gpcr_name, res_dbnum):
+    """
+    Gets sequential residue numbers for residues provided as GPCRdb numbers. 
 
+    Parameters
+    ----------
+    gpcr_name : str
+        Name of the GPCR as in the GPCRdb.
+    res_dbnum : list of str
+        Relative GPCR residue numbers.
+
+    Returns
+    -------
+    sel_resnum : list of int
+        Sequential residue numbers.
+    sel_labels : list of str
+        Labels containing GPCRdb numbering of the residues.
+
+    """
     res_array = db.get_residue_info(gpcr_name)
     sel_array = db.select_by_gpcrdbnum(res_array, res_dbnum)
     sel_resnum = [item[1] for item in sel_array]
     sel_labels = [item[3] for item in sel_array]
-
     return sel_resnum, sel_labels
 
 
