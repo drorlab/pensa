@@ -97,3 +97,68 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
     return names, data
 
 
+def select_gpcr_residues(gpcr_name, res_dbnum):
+
+    res_array = db.get_residue_info(gpcr_name)
+    sel_array = db.select_by_gpcrdbnum(res_array, res_dbnum)
+    sel_resnum = [item[1] for item in sel_array]
+    sel_labels = [item[3] for item in sel_array]
+
+    return sel_resnum, sel_labels
+
+
+def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
+                              first_frame=0, last_frame=-1, step=1):
+    """
+    Load distances between all selected atoms.
+
+    Parameters
+    ----------
+    pdb : str
+        File name for the reference file (PDB or GRO format).
+    xtc : str
+        File name for the trajectory (xtc format).
+    gpcr_name : str
+        Name of the GPCR as in the GPCRdb.
+    res_dbnum : list
+        Relative GPCR residue numbers.
+    first_frame : int, default=0
+        First frame to return of the features. Zero-based.
+    last_frame : int, default=-1
+        Last frame to return of the features. Zero-based.
+    step : int, default=1
+        Subsampling step width when reading the frames.
+
+    Returns
+    -------
+    feature_names : list of str
+        Names of all C-alpha distances.
+    feature_labels : list of str
+        Labels containing GPCRdb numbering of the residues.
+    features_data : numpy array
+        Data for all C-alpha distances [Å].
+
+    """
+    # Select residues from relative residue numbers
+    resnums, reslabels = select_gpcr_residues(gpcr_name, res_dbnum)
+    # Create the selection string
+    selection = 'name CA and resid'
+    for rn in resnums:
+        selection += ' %i'%rn
+    # Create the GPCRdb distance labels
+    distlabels = []
+    k = -1
+    for i in range(len(reslabels)):
+        for j in range(i + 1, len(reslabels)):
+            k += 1
+            _dl = 'CA DIST: %s - %s'%(reslabels[i], reslabels[j])
+            distlabels.append(_dl)
+    # Calculate the distances and get the sequential names
+    names, data =  get_atom_self_distances(pdb, xtc,
+                                           selection=selection,
+                                           first_frame=first_frame,
+                                           last_frame=last_frame,
+                                           step=step)
+    return names, distlabels, data
+
+
