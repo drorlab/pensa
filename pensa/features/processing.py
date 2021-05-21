@@ -16,9 +16,35 @@ import warnings
 # -- Utilities to extract time series --
 
 
-def get_feature_timeseries(feat, data, feature_type, feature_name):
+def get_feature_data(feat, data, feature_name):
     """
     Returns the timeseries of one particular feature.
+    
+    Parameters
+    ----------
+        feat : list of str
+            List with all feature names.
+        data : float array
+            Feature values data from the simulation.
+        feature_name : str
+           Name of the selected feature.
+    
+    Returns
+    -------
+        timeseries : float array
+            Value of the feature for each frame.
+    
+    """
+    # Select the feature and get its index.
+    index = np.where( np.array( feat ) == feature_name )[0][0]
+    # Extract the timeseries.
+    timeseries = data[:,index]
+    return timeseries
+
+
+def get_feature_timeseries(feat, data, feature_type, feature_name):
+    """
+    Returns the timeseries of one particular feature from a set with several feature types.
     
     Parameters
     ----------
@@ -38,10 +64,7 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
             Value of the feature for each frame.
     
     """
-    # Select the feature and get its index.
-    index = np.where( np.array( feat[feature_type] ) == feature_name )[0][0]
-    # Extract the timeseries.
-    timeseries = data[feature_type][:,index]
+    timeseries = get_feature_data(feat[feature_type], data[feature_type], feature_name)
     return timeseries
 
 
