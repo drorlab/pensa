@@ -53,7 +53,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
     # Calculate the distances
     num_at = len(a)
     num_dist = int(num_at*(num_at-1)/2)
-    len_traj = len(u.trajectory)
+    len_traj = len(u.trajectory[first_frame:last_frame:step])
     template = np.zeros([num_dist,])
     data_arr = np.zeros([len_traj,num_dist])
     frame = 0
