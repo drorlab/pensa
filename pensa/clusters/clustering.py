@@ -179,8 +179,8 @@ def obtain_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B
     if plot:
         fig,ax = plt.subplots(1,1,figsize=[4,3],sharex=True,dpi=300)
         c, nc   = np.unique(cidx,return_counts=True)
-        ca, nca = np.unique(cidx[cond==1],return_counts=True)
-        cb, ncb = np.unique(cidx[cond==0],return_counts=True)
+        ca, nca = np.unique(cidx[cond==0],return_counts=True)
+        cb, ncb = np.unique(cidx[cond==1],return_counts=True)
         ax.bar(ca-0.15,nca,0.3,label=label_a)
         ax.bar(cb+0.15,ncb,0.3,label=label_b)
         ax.legend()
