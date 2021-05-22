@@ -386,7 +386,7 @@ def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, l
     return val
     
     
-def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
+def compare_mult_projections(data, pca, num=3, saveas=None, labels=None, colors=None):
     """
     Compare two datasets along a given principal component.
     
@@ -408,6 +408,10 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
         assert len(labels) == len(data)
     else:
         labels = [None for _ in range(len(data))]
+    if colors is not None:
+        assert len(colors) == len(data)
+    else:
+        colors = ['C%i'%num for num in range(len(data))]
     # Start the figure    
     fig,ax = plt.subplots(num, 2, figsize=[9,3*num], dpi=300)
     # Loop over PCs
@@ -416,9 +420,11 @@ def compare_mult_projections(data, pca, num=3, saveas=None, labels=None):
             # Calculate values along PC for each frame
             proj = project_on_pc(d, evi, pca=pca)
             # Plot the time series in the left panel
-            ax[evi,0].plot(proj, alpha=0.5, label=labels[j])
+            ax[evi,0].plot(proj, alpha=0.5, 
+                           label=labels[j], color=colors[j])
             # Plot the histograms in the right panel
-            ax[evi,1].hist(proj, bins=30, alpha=0.5, density=True, label=labels[j])
+            ax[evi,1].hist(proj, bins=30, alpha=0.5, density=True, 
+                           label=labels[j], color=colors[j])
         # Axis labels
         ax[evi,0].set_xlabel('frame number')
         ax[evi,0].set_ylabel('PC %i'%(evi+1))            
