@@ -307,4 +307,35 @@ def obtain_mult_combined_clusters(data, start_frame = 0, algorithm='kmeans',
     return cidx, cond, oidx, total_wss, centroids
 
 
-
+def find_closest_frames(data, points):
+    """
+    Finds the frames in a timeseries that are closest to given points.
+    
+    The timeseries can be multidimensional and there can be an arbitrary number of points.
+    Usually used to identify the frames closest to a cluster centroid, but can be used for any feature value.
+    
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data]
+        points : list of float arrays
+            Points to which the closest frames shall be found.
+            Dimension must be that of frame_data.
+        
+    Returns
+    -------
+        frames : list of int
+            Indices of the frames closest to each point.
+        distances : list of float
+            Distances to each point of the closest frame.
+           
+    """
+    frames, distances = [], []
+    for p in points:
+        diff = data-p
+        squd = np.square(diff)
+        dist = np.sqrt(np.sum(squd,axis=1))
+        frames.append(np.argmin(dist))
+        distances.append(np.min(dist))
+    return frames, distances
+    
