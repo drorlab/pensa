@@ -198,7 +198,7 @@ def obtain_mult_combined_clusters(data, start_frame = 0, algorithm='kmeans',
                                   num_clusters=2, min_dist=12, max_iter=100,
                                   plot=True, saveas=None, labels=None, colors=None):
     """
-    Clusters a combination of two data sets.
+    Clusters a combination of multiple data sets.
     
     Parameters
     ----------
