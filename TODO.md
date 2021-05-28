@@ -53,6 +53,7 @@
   - [ ] write unit tests
 - [ ] Put shared functionality of PCA and TICA into shared functions.
 - [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
+- [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis)
 
 ### Ideas
 - [ ] Logo
