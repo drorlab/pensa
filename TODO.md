@@ -66,6 +66,7 @@
   - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
 - [ ] Add options to save and load calculated features
+- [ ] Add option to whiten features
 - [ ] Featurizers for other molecule types
   - [ ] ions
   - [ ] ligands
