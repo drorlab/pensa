@@ -1,13 +1,21 @@
 from setuptools import setup
 
 setup(name='pensa',
-      version='0.2.1',
+      version='0.2.2',
       description='PENSA - protein ensemble analysis',
       url='http://github.com/drorlab/pensa',
       author='Martin Voegele, Neil Thomson, Sang Truong',
       author_email='mvoegele@stanford.edu',
       license='MIT',
-      packages=['pensa'],
+      packages=find_packages(include=[
+        'pensa',
+        'pensa.preprocessing',
+        'pensa.features',
+        'pensa.comparison',
+        'pensa.dimensionality',
+        'pensa.clusters',
+        'pensa.statesinfo',
+      ]),
       zip_safe=False,
       install_requires=[
         'numpy',
