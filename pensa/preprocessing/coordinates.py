@@ -7,6 +7,33 @@ from MDAnalysis.analysis import align
 
 
 # -- Functions to preprocess trajectories --
+def align_coordinates(ref, pdb, trj_list, out_name, sel_string='all', start_frame=0):
+    """
+    Aligns selected coordinates from a trajectory file.
+
+    Parameters
+    ----------
+	ref : str
+	    File name for reference topology.
+	    Can read all MDAnalysis-compatible topology formats.
+	pdb : str
+	    File name for reference PDB file.
+	trj_list : list of str
+	    File names for the input trajectory.
+	    Can read all MDAnalysis-compatible trajectory formats.
+	out_name : str
+	    Core of the file names for the output files
+	start_frame : int, optional
+	    First frame to read from the trajectory. 
+    """
+    # Read the reference+PDB files and align selected parts.
+    u = mda.Universe(ref, pdb)
+    for trj in trj_list:
+        mobile = mda.Universe(ref, trj)
+        #mobile.trajectory = mobile.trajectory[start_frame:]
+        alignment = align.AlignTraj(mobile, u, select=sel_string, filename=f'{out_name}.xtc')
+        alignment.run()   
+ 
 
 
 def extract_coordinates(ref, pdb, trj_list, out_name, sel_string, start_frame=0,
