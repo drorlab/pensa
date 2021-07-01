@@ -39,7 +39,7 @@
 - [ ] Feature comparison of more than two ensembles
   - [ ] with respect to the joint ensemble (all metrics)
   - [ ] with respect to a reference ensemble (will not always work for KLD)
-- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE) ----------------
+- [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
   - [ ] First tests with (regular) t-SNE
@@ -52,7 +52,7 @@
   - [ ] write module
   - [ ] write unit tests
 - [ ] Put shared functionality of PCA and TICA into shared functions.
-- [ ] Make file format (png/pdf?) for matplotlib optional. ----------------
+- [ ] Make file format (png/pdf?) for matplotlib optional.
 - [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis)
 
 ### Ideas
