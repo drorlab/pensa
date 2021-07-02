@@ -15,24 +15,23 @@
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
 - [ ] Unified tutorial in documentation. Make one page for each subpackage
-  - [ ] preprocessing
+  - [x] preprocessing
     - [x] coordinates
-    - [ ] densities
-  - [ ] featurization
+    - [x] densities
+  - [x] featurization
     - [x] structure features
-    - [ ] water features
-    - [ ] atom features
+    - [x] water features
+    - [x] atom features
   - [x] comparison
   - [x] dimensionality reduction
-  - [ ] clusters (leave out until we can cluster on PCs)
-  - [ ] SSI
+  - [ ] clusters (show how to cluster on PCs)
+  - [x] SSI
 
 ### Plans
 
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
-- [ ] Implement clustering in principal component space
 - [ ] Facilitate calculation of JSD etc. on principal components
 - [ ] Facilitate calculation of SSI on results of joint clustering.
 - [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
@@ -101,4 +100,4 @@
   - [x] Function pca_features() does not have labels
   - [x] Function compare_projections() does not have labels or legend
 - [x] Slack channel for all developers and testers, and to provide support for the user community.
-
+- [x] Implement clustering in principal component space
