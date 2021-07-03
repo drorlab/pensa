@@ -5,13 +5,13 @@
   - [ ] Trivial examples for each function
   - [ ] Unit tests for SSI 
   - [ ] Unit tests for density features
-- [ ] Frame classification via CNN on features
-  - [x] Prototype to classify simulation frames
-  - [ ] Interpret weights as relevance of features
-  - [ ] Write module
-  - [ ] Write unit tests
+- [ ] Integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
+  - [ ] Lay out module structure in separate branch.
+  - [ ] Copy core network from DiffNets repo.
+  - [ ] Try to use existing featurization.
+  - [ ] Include existing DiffNets featurization and compare.
 - [ ] exploratory analysis via correlation coefficients of the features
-  - [x] First tests (not very promising).
+  - [x] First tests --> not very promising.
   - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
   - [ ] Find useful application or leave it out.
 - [ ] Unified tutorial in documentation. Make one page for each subpackage
@@ -67,7 +67,6 @@
 - [ ] Add options to save and load calculated features
 - [ ] Add option to whiten features
 - [ ] Featurizers for other molecule types
-  - [ ] ions
   - [ ] ligands
   - [ ] lipids
   - [ ] nucleic acids
@@ -78,7 +77,6 @@
 - [ ] Implement [multi-dimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling)
 - [ ] Try to integrate [functional mode analysis](http://www3.mpibpc.mpg.de/groups/de_groot/fma.html).
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
-- [ ] Try to integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
 
 ### Done  ✓
@@ -101,3 +99,12 @@
   - [x] Function compare_projections() does not have labels or legend
 - [x] Slack channel for all developers and testers, and to provide support for the user community.
 - [x] Implement clustering in principal component space
+
+
+### Abandoned
+
+- [ ] Frame classification via CNN on features
+  - [x] Prototype to classify simulation frames --> Diffnets probably more powerful.
+  - [ ] Interpret weights as relevance of features
+  - [ ] Write module
+  - [ ] Write unit tests
