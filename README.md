@@ -12,6 +12,8 @@ All functionality is available as a Python package.
 
 To get started, see the [__documentation__](https://pensa.readthedocs.io/en/latest/) which includes a tutorial for the PENSA library.
 
+If you would like to contribute, check out our [__contribution guidelines__](https://github.com/drorlab/pensa/blob/master/CONTRIBUTING.md) and our [__to-do list__](https://github.com/drorlab/pensa/blob/master/TODO.md).
+
 ## Functionality
 
 With PENSA, you can (currently):
