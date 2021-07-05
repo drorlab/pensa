@@ -12,7 +12,7 @@ License of **PENSA** project to is MIT license. By contributing, you understand 
 
 * Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/cbeleites/PENSA/issues).
 * If you're unable to find an open issue addressing the problem, open a new one. Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
-* Refer to the [Bug Reporting in R article](https://www.r-project.org/bugs.html) for guidance.
+* Refer to the [Bug Reporting in Python article]() for guidance.
 * The ideal minimal working example is a unit test.
 
 ## Color Use (Vignettes & Perhaps Examples)
@@ -39,7 +39,7 @@ License of **PENSA** project to is MIT license. By contributing, you understand 
   This way, we'll be reminded that the test is switched off whenever the unit tests are run.
  -->
 
-## Vignette Style and Standards
+## Documentation Style and Standards
 <!-- 
 * No multi-line sentences (enter/return after each sentence, extra return starts a new paragraph).  This facilitates comparison via version control.
 * Package names in text are written in **bold**.
