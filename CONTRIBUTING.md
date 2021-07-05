@@ -6,8 +6,7 @@ The following is a set of guidelines for contributing to the `Python` package `P
 
 ## Code Licensing
 
-We are in the (slow) process of transitioning the license of the **PENSA** project to [MIT] (see https://github.com/r-PENSA/hySpc.skeleton/issues/8).
-By contributing, you understand and agree that your work becomes the part of the **PENSA** project and you grant permission to the **PENSA** project to  license your contribution under the [GNU GPL v3](https://github.com/cbeleites/PENSA/blob/master/LICENSE) or a compatible license and/or under the [MIT license](https://opensource.org/licenses/MIT) or a compatible license.
+License of **PENSA** project to is MIT license. By contributing, you understand and agree that your work becomes the part of the **PENSA** project and you grant permission to the **PENSA** project to  license your contribution under the [MIT license](https://opensource.org/licenses/MIT) or a compatible license.
 
 ## Reporting Bugs and Submitting Suggestions
 
@@ -119,7 +118,7 @@ Every commit should be related to one feature only, but the commit should group 
 
 ## Versioning
 
-The project adheres to the semantic versioning guidelines, as outlined at https://semver.org/ (Work in progress, see [#123](https://github.com/cbeleites/PENSA/issues/123)).
+The project adheres to the semantic versioning guidelines, as outlined at https://semver.org/ (Work in progress, see *an example issues*).
 
 Briefly, the version string has the form `x.y.z` (or `major.minor.patch`), where the major number gets incremeted if a release introduces breaking changes, the minor one after any changes in functionality (new features of bugfixes), and the patch number is increased after any trivial change. If a major or minor number is incremented, all subsequent ones are set to zero.
 
@@ -130,14 +129,15 @@ The version numbers refer only to commits in the `master` branch, and get increm
   This is important since **pkgdown** uses the `.9000` to distinguish between documentation for the released version vs. the development version.
 
 ### Release Process
-The process starts when the package is in a stable state that can be released to CRAN (release candidate). First, decide on a new version number `x.y.z` based on the severity of changes. Then:
+The process starts when the package is in a stable state that can be released to PyPI (release candidate). First, decide on a new version number `x.y.z` based on the severity of changes. Then:
 
 * Create a `release/x.y.z` branch using `git flow release start <x.y.z>` and push it with `git flow publish`
 * Open a pull request that merges into `master`
 * Update the version number in the `DESCRIPTION` file
 * Verify that the changes are listed in `NEWS.md`
 * Confirm that the package can be built for each plaftorm
-* Ensure that all check are passed on the tarballs you build (either on your machine or using CI) with `R CMD check --as-cran <package.tar.gz>`. The checks must pass for `R` versions `R-oldrel`, `R-release`, `R-patched`, and `R-devel`.
+<!-- * Check for our workflow
+* Ensure that all check are passed on the tarballs you build (either on your machine or using CI) with `R CMD check --as-cran <package.tar.gz>`. The checks must pass for `R` versions `R-oldrel`, `R-release`, `R-patched`, and `R-devel`. -->
 * If any bugs are found, they must be fixed in the very same branch (see [here](https://stackoverflow.com/a/57507373/6029703) for details)
 * Once everything works use `git flow release finish <x.y.z>`. It will merge the release branch into both `master` and `develop`, and will assign a tag to the newly created commit in the `master` branch.
 
