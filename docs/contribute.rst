@@ -28,5 +28,5 @@ First think about whether your new function belongs into an existing class of me
 Want to help but not sure how?
 ***********************************
 
-Check our `to do list <https://github.com/drorlab/pensa/blob/master/TODO.md>`_ for inspiration. We have much more ideas than time to implement them all. Just pick something from the list and let us know that you work on it. Feel free to reach out for questions!
+Check our `to do list <https://github.com/drorlab/pensa/blob/master/TODO.md>`_ for inspiration. We have much more ideas than time to implement them all. Just pick something from the list and let us know that you work on it. For guidance, see our `contribution guidelines <https://github.com/drorlab/pensa/blob/master/CONTRIBUTING.md>`_. Feel free to reach out for questions!
 
