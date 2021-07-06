@@ -50,10 +50,10 @@ To get the citation and DOI for a particular version, see [Zenodo](https://zenod
 ## Acknowledgments
 
 #### Contributors
-Martin Vögele, Neil Thomson, Sang Truong
+Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity
 
 #### Beta-Testers
-Alex Powers, Lukas Stelzl, Nicole Ong, Eleanore Ocana, Callum Ives, Jasper McAvity
+Alex Powers, Lukas Stelzl, Nicole Ong, Eleanore Ocana, Callum Ives
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152).
