@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(name='pensa',
-      version='0.2.2',
+      version='0.2.3',
       description='PENSA - protein ensemble analysis',
       url='http://github.com/drorlab/pensa',
-      author='Martin Voegele, Neil Thomson, Sang Truong',
+      author='Martin Voegele, Neil Thomson, Sang Truong, Jasper McAvity',
       author_email='mvoegele@stanford.edu',
       license='MIT',
       packages=find_packages(include=[
