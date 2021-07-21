@@ -15,6 +15,7 @@ setup(name='pensa',
         'pensa.dimensionality',
         'pensa.clusters',
         'pensa.statesinfo',
+        'pensa.diffnets'
       ]),
       zip_safe=False,
       install_requires=[
@@ -26,7 +27,10 @@ setup(name='pensa',
         'MDAnalysis',
         'matplotlib',
         'biotite',
-        'gpcrmining'
+        'gpcrmining', 
+        'torch',
+        'torchvision',
+        'torchaudio'
       ],
       classifiers=[
         # How mature is this project? Common values are
