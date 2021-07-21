@@ -28,9 +28,6 @@ setup(name='pensa',
         'matplotlib',
         'biotite',
         'gpcrmining', 
-        'torch',
-        'torchvision',
-        'torchaudio'
       ],
       classifiers=[
         # How mature is this project? Common values are
