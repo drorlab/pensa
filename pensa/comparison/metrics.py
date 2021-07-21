@@ -66,7 +66,7 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
 
 
 """
-    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of four functions uses the kolmogorov_smirnov_analysis function with the same parameters. 
+    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of five functions uses the kolmogorov_smirnov_analysis function with the same parameters. 
 
     Parameters
     ----------
@@ -98,6 +98,8 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
             Average Kolmogorov-Smirnov p-value for two distributions.
         max_ksp : float
             Maximum Kolmogorov-Smirnov statistic for two distributions.
+        min_ksp : float
+            Minimum Kolmogorov-Smirnov statistic for two distributions.
 """
 
 
@@ -118,6 +120,10 @@ def average_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, ov
 def max_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_ksp)
+
+def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+    _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
+    return np.min(data_ksp)
 
 """
     Calculates average and maximum State Specific Information statistic for a feature across two ensembles. Each of two functions uses the ssi_ensemble_analysis function with the same parameters. 
