@@ -15,7 +15,6 @@ setup(name='pensa',
         'pensa.dimensionality',
         'pensa.clusters',
         'pensa.statesinfo',
-        'pensa.diffnets'
       ]),
       zip_safe=False,
       install_requires=[
