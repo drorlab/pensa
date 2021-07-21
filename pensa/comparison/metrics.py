@@ -1,8 +1,9 @@
 import numpy as np
 from pensa import *
+from pensa.comparison import *
 
 
-    """
+"""
     Calculates the average and maximum Jensen-Shannon distance and the Kullback-Leibler divergences for each feature from two ensembles. Each of four functions uses the relative_entropy_analysis function with the same parameters.
 
     Parameters
@@ -42,7 +43,7 @@ from pensa import *
             Average Kullback-Leibler divergence from two ensembles.
         max_kld : float
             Maximum Kullback-Leibler divergence from two ensembles.
-    """
+"""
 
 def average_jsd(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False):
     _, data_jsdist, _, _ = relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=bin_width, bin_num=bin_num, verbose=verbose, override_name_check=override_name_check)
@@ -64,8 +65,8 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
     return np.max(data_kld_ab)
 
 
-    """
-    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of two functions uses the kolmogorov_smirnov_analysis function with the same parameters. 
+"""
+    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of four functions uses the kolmogorov_smirnov_analysis function with the same parameters. 
 
     Parameters
     ----------
@@ -93,7 +94,11 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
             Average Kolmogorov-Smirnov statistic for two distributions.
         max_kss : float
             Maximum Kolmogorov-Smirnov statistic for two distributions.
-    """
+        average_ksp : float
+            Average Kolmogorov-Smirnov p-value for two distributions.
+        max_ksp : float
+            Maximum Kolmogorov-Smirnov statistic for two distributions.
+"""
 
 
 def average_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
@@ -101,12 +106,20 @@ def average_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, ov
     return np.mean(data_kss)
 
 
-def max_kss(): 
+def max_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
     _, data_kss, _ = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_kss)
 
+def average_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+    _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
+    return np.mean(data_ksp)
 
-    """
+
+def max_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+    _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
+    return np.max(data_ksp)
+
+"""
     Calculates average and maximum State Specific Information statistic for a feature across two ensembles. Each of two functions uses the ssi_ensemble_analysis function with the same parameters. 
     
     Parameters
@@ -144,7 +157,7 @@ def max_kss():
             Average of State Specific Information for a feature across two ensembles.
         max_ssi : float
             Maximum of State Specific Information for a feature across two ensembles.
-    """
+"""
 
 def average_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, verbose=True, write_plots=None, override_name_check=False):
     _, data_ssi = ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=torsions, pocket_occupancy=pocket_occupancy, pbc=pbc, verbose=verbose, write_plots=write_plots, override_name_check=override_name_check)
