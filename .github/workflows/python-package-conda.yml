@@ -32,4 +32,4 @@ jobs:
       run: |
         conda install pytest
         pip install -e .
-        pytest --ignore pensa/diffnets/tests/test_api.py --ignore pensa/diffnets/tests/test_cli.py --ignore pensa/diffnets/tests/test_diffnets.py
+        pytest --ignore tests/test_diffnets_api.py --ignore tests/test_diffnets_cli.py --ignore tests/test_diffnets.py

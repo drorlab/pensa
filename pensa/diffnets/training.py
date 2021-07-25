@@ -4,9 +4,10 @@ import sys
 import multiprocessing as mp
 import mdtraj as md
 import numpy as np
-from . import exmax, nnutils, utils, data_processing
+from . import exmax, nnutils 
 import copy
 import pickle
+from pensa.preprocessing import utils
 
 import torch
 import torch.nn as nn

@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(name='pensa',
-      version='0.2.3',
+      version='0.2.x',
       description='PENSA - protein ensemble analysis',
       url='http://github.com/drorlab/pensa',
-      author='Martin Voegele, Neil Thomson, Sang Truong, Jasper McAvity',
+      author='Martin Voegele, Neil Thomson, Sang Truong, Michael Ward, Jasper McAvity',
       author_email='mvoegele@stanford.edu',
       license='MIT',
       packages=find_packages(include=[
@@ -15,6 +15,7 @@ setup(name='pensa',
         'pensa.dimensionality',
         'pensa.clusters',
         'pensa.statesinfo',
+        'pensa.diffnets',
       ]),
       zip_safe=False,
       install_requires=[
@@ -27,6 +28,7 @@ setup(name='pensa',
         'matplotlib',
         'biotite',
         'gpcrmining', 
+        'torch',
       ],
       classifiers=[
         # How mature is this project? Common values are
