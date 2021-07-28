@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 # mark tutorials for language statistics
 tutorial/* linguist-documentation
 *.ipynb linguist-documentation
-=======
-# mark tutorial for language statistics
-tutorial/* linguist-documentation
->>>>>>> 32f40aa0af6038bd7ca92d99e31f3ae2f262438f
 
 # mark documentation for language statistics
 docs/* linguist-documentation

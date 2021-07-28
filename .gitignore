@@ -151,3 +151,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+pensa/diffnets/practice_dir/data/beta-peptide1.pdb
+pensa/diffnets/practice_dir/data/beta-peptide2.pdb
+pensa/diffnets/practice_dir/data/var1/beta-peptide1.xtc
+pensa/diffnets/practice_dir/pdb_fns.npy
+pensa/diffnets/practice_dir/data/var2/beta-peptide2.xtc
+pensa/diffnets/practice_dir/traj_dirs.npy
