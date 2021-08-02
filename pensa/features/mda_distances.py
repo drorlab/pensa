@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import gpcrmining.gpcrdb as db
 
 
-def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame=-1, step=1):
+def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame=None, step=1):
     """
     Load distances between all selected atoms.
 
@@ -20,7 +20,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
         Selection string to choose which atoms to include. Default: all.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
-    last_frame : int, default=-1
+    last_frame : int, default=None
         Last frame to return of the features. Zero-based.
     step : int, default=1
         Subsampling step width when reading the frames.
@@ -64,7 +64,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
     return d_labels, data_arr
 
 
-def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
+def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
     """
     Load distances between all C-alpha atoms.
 
@@ -76,7 +76,7 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=-1, step=1):
         File name for the trajectory (xtc format).
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
-    last_frame : int, default=-1
+    last_frame : int, default=None
         Last frame to return of the features. Zero-based.
     step : int, default=1
         Subsampling step width when reading the frames.
@@ -124,7 +124,7 @@ def select_gpcr_residues(gpcr_name, res_dbnum):
 
 
 def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
-                              first_frame=0, last_frame=-1, step=1):
+                              first_frame=0, last_frame=None, step=1):
     """
     Load distances between all selected atoms.
 
@@ -140,7 +140,7 @@ def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
         Relative GPCR residue numbers.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
-    last_frame : int, default=-1
+    last_frame : int, default=None
         Last frame to return of the features. Zero-based.
     step : int, default=1
         Subsampling step width when reading the frames.
