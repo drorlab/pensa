@@ -8,4 +8,5 @@ from .pyemma_features import *
 from .mda_distances import *
 from .processing import *
 from .atom_features import *  
-from .water_features import *  
+from .water_features import * 
+from .txt_features import *
