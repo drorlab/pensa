@@ -1,6 +1,8 @@
 import numpy as np
 from pensa import *
 from pensa.comparison import *
+import random
+import math
 
 
 """
@@ -173,3 +175,47 @@ def average_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, p
 def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbs=True, verbose=True, write_plots=None, override_name_check=False):
     _, data_ssi = ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=torsions, pocket_occupancy=pocket_occupancy, pbc=pbc, verbose=verbose, write_plots=write_plots, override_name_check=override_name_check)
     return np.max(data_ssi)
+
+
+"""
+    Calculates the relative sampling efficiency of test data based on reference data.
+    
+    Parameters
+    ----------
+    ref_data : float array
+        Trajectory data from the reference ensemble. Format: [frames,frame_data].
+    test_data : float array
+        Trajectory data from the test ensemble. Format: [frames,frame_data].
+    num_pc : int
+        Number of principal components used.
+        
+    Returns
+    -------
+        pca_se : float
+            Sampling efficiency of test data based on reference data.
+        
+"""
+
+def pca_sampling_efficiency(ref_data, test_data, num_pc=2):
+    pca = calculate_pca(ref_data)
+
+    _, ref_components = get_components_pca(ref_data, num_pc, pca=pca)
+    _, test_components = get_components_pca(test_data, num_pc, pca=pca)
+
+    ref_var = np.var(ref_components, axis=0)
+    test_var = np.var(test_components, axis=0)
+
+    ref_vol = np.prod(ref_var)
+    test_vol = np.prod(test_var)
+
+    pca_se = test_vol / ref_vol
+
+    return pca_se
+
+
+
+
+
+            
+
+
