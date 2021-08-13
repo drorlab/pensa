@@ -439,6 +439,7 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_
         plt.title(write_name)        
         plt.ioff()
         plt.savefig('ssi_plots/'+write_name+".png")
+        plt.close()
     
     return all_intersects
     
