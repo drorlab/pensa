@@ -218,6 +218,48 @@ def sort_sincos_torsions_by_resnum(tors, data):
     new_data = data[:,new_order]
     return new_tors, new_data
 
+def sort_torsions_by_resnum(tors, data):
+    """
+    Sort torsion features by the residue number..
+    Parameters
+    ----------
+    tors : list of str
+        The list of torsion features.
+    Returns
+    -------
+    new_tors : list of str
+        The sorted list of torsion features.
+    """
+    renamed = []
+    for t in tors:
+        rn = t.split(' ')[-1]
+        ft = t.split(' ')[0]
+        renamed.append('%09i %s'%(int(rn),ft))
+    new_order = np.argsort(renamed)
+    new_tors = np.array(tors)[new_order].tolist()
+    new_data = data[:,new_order]
+    return new_tors, new_data
+
+def sort_features_alphabetically(tors, data):
+    """
+    Sort torsion features alphabetically.
+    Parameters
+    ----------
+    tors : list of str
+        The list of torsion features.
+    Returns
+    -------
+    new_tors : list of str
+        The sorted list of torsion features.
+    """
+    renamed = []
+    for t in tors:
+        renamed.append(t)
+    new_order = np.argsort(renamed)
+    new_tors = np.array(tors)[new_order].tolist()
+    new_data = data[:,new_order]
+    return new_tors, new_data
+
 
 def sort_distances_by_resnum(dist, data):
     """
@@ -241,12 +283,23 @@ def sort_distances_by_resnum(dist, data):
     return new_dist, new_data
 
 
-def select_common_features(features_a, features_b):
+def select_common_features(features_a, features_b, boolean=True):
     intersect = set(features_a).intersection(features_b)
-    is_common_a = [f in intersect for f in features_a]
-    is_common_b = [f in intersect for f in features_b]
+    if boolean:
+        is_common_a = [f in intersect for f in features_a]
+        is_common_b = [f in intersect for f in features_b]
+    else:
+        is_common_a = [f for f in features_a if f in intersect]
+        is_common_b = [f for f in features_b if f in intersect]
     return np.array(is_common_a), np.array(is_common_b)
     
+
+def get_common_features_data(features_a, features_b, data_a, data_b):
+    is_common_a, is_common_b = select_common_features(features_a, features_b)
+    new_data_a = data_a[:,is_common_a]
+    new_data_b = data_b[:, is_common_b]
+    new_features_a, new_features_b = select_common_features(features_a, features_b, boolean=False)
+    return new_features_a, new_features_b, new_data_a, new_data_b
 
 
 # -- Utilities to process feature data --
