@@ -178,3 +178,36 @@ def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
     return names, distlabels, data
 
 
+def sort_traj_along_mda_feature(feat, data, feature_name, ref_name, trj_name, out_name, start_frame=0):
+    """
+    Sort a trajectory along a feature.
+
+    Parameters
+    ----------
+        feat : list of str
+            List with all feature names.
+        data : float array
+            Feature values data from the simulation.
+        feature_name : str
+            Name of the selected feature.
+        ref_name: string
+            Reference topology for the trajectory.
+        trj_name: string
+            Trajetory from which the frames are picked.
+            Usually the same as the values are from.
+        out_name: string.
+            Name of the output files.
+        start_frame: int
+            Offset of the data with respect to the trajectories.
+
+    Returns
+    -------
+        d_sorted: float array
+            Sorted data of the selected feature.
+
+    """
+    d = pensa.get_feature_data(feat, data, feature_name)
+    sort_idx, oidx_sort = pensa.sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
+    d_sorted = d[sort_idx]
+    return d_sorted
+
