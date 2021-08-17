@@ -163,7 +163,7 @@ def align_coordinates(ref, pdb, trj_list, out_name, sel_string='all', start_fram
         alignment.run()
 
 
-def sort_coordinates(values, ref_name, trj_name, out_name, start_frame=0):
+def sort_coordinates(values, ref_name, trj_name, out_name, start_frame=0, verbose=False):
     """
     Sort coordinate frames along an array of values.
     
@@ -189,10 +189,15 @@ def sort_coordinates(values, ref_name, trj_name, out_name, start_frame=0):
             Sorted indices of the trajectory.
             
     """
-    # Remember the index in the simulation (taking into account cutoff)
+    # Remember the index in the simulation (taking into account offset)
     oidx = np.arange(len(values))+start_frame
     # Define the MDAnalysis trajectory from where the frames come
+    if verbose: print('Loading:', ref_name, trj_name)
     u = mda.Universe(ref_name, trj_name)
+    if verbose: 
+        print('Trajectory length:', len(u.trajectory))
+        print('Number of values: ', len(values))
+        print('Trajectory offset:', start_frame)
     a = u.select_atoms('all')
     # Sort everything along the projection on the values
     sort_idx  = np.argsort(values)
