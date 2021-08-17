@@ -3,7 +3,7 @@ import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
-
+from pensa.preprocessing import sort_coordinates
 
 
 # --- METHODS FOR PRINCIPAL COMPONENT ANALYSIS ---
@@ -186,30 +186,24 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
         out_name : str
             Core part of the name of the output files
     
+    Returns
+    -------
+        all_proj : list
+            All projections on the principal components 
     """    
     # Remember the index in the simulation (taking into account cutoff)
     oidx = np.arange(len(data))+start_frame
-    # Define the MDAnalysis trajectories from where the frames come
-    u = mda.Universe(top,trj)
-    a = u.select_atoms('all')
-    return_str = []
-    all_proj = []
+    # Initialize output
+    all_sort = []
     # Loop through the principal components
     for evi in range(num_pc):
         # Project the combined data on the principal component
         proj = project_on_pc(data,evi,pca=pca)
-        all_proj.append(proj)
         # Sort everything along the projection onto the PC
-        sort_idx  = np.argsort(proj)
-        proj_sort = proj[sort_idx] 
-        oidx_sort = oidx[sort_idx]
-        # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", a.n_atoms) as W:
-            for i in range(data.shape[0]):
-                ts = u.trajectory[oidx_sort[i]]
-                W.write(a)     
-                return_str.append(a)
-    return return_str, all_proj
+        out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
+        sort_idx, oidx_sort = sort_coordinates(proj, top, trj, out_xtc, start_frame=start_frame)
+        all_sort.append(oidx_sort)
+    return all_sort
 
 
 def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_pc=3):

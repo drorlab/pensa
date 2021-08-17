@@ -94,10 +94,10 @@ class Test_pensa(unittest.TestCase):
     pca_a = calculate_pca(self.sim_a_tmr_data['bb-torsions'])
     pca_features(pca_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
     plt.close()
-    self.sort_traj, self.all_proj = sort_traj_along_pc(self.sim_a_tmr_data['bb-torsions'], pca_a, 0,
-                                                      test_data_path + "/traj/condition-a_receptor.gro",
-                                                      test_data_path + "/traj/condition-a_receptor.xtc",
-                                                      test_data_path + "/pca/condition-a_receptor_by_tmr", num_pc=3)
+    self.all_sort = sort_traj_along_pc(self.sim_a_tmr_data['bb-torsions'], pca_a, 0,
+                                       test_data_path + "/traj/condition-a_receptor.gro",
+                                       test_data_path + "/traj/condition-a_receptor.xtc",
+                                       test_data_path + "/pca/condition-a_receptor_by_tmr", num_pc=3)
 
     # -- Compare projections
     self.val = compare_projections(self.sim_a_tmr_data['bb-torsions'],
@@ -277,11 +277,7 @@ class Test_pensa(unittest.TestCase):
     for ele in self.sort_common_traj:
       self.assertEqual(ele.n_atoms, 2322)
 
-    self.assertEqual(len(self.sort_traj), 90)
-    for ele in self.sort_traj:
-      self.assertEqual(ele.n_atoms, 2322)
-
-    self.assertEqual(len(self.all_proj), 3)
+    self.assertEqual(len(self.all_sort), 3)
 
   # -- sort_trajs_along_common_tic()
   def test_sort_trajs_along_common_tic(self):
@@ -298,11 +294,11 @@ class Test_pensa(unittest.TestCase):
 
   # -- sort_traj_along_tic()
   def test_sort_traj_along_tic(self):
-    oidx = sort_traj_along_tic(self.sim_a_tmr_data['bb-torsions'], self.tica_combined, 0,
+    all_sort = sort_traj_along_tic(self.sim_a_tmr_data['bb-torsions'], self.tica_combined, 0,
                                test_data_path + "/traj/condition-a_receptor.gro",
                                test_data_path + "/traj/condition-a_receptor.xtc",
                                test_data_path + "/pca/condition-a_receptor_by_tmr", num_tic=3)
-    self.assertEqual(len(oidx), 30)
+    self.assertEqual(len(all_sort), 3)
 
 
   # -- compare_projections()
