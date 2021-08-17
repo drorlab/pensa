@@ -188,22 +188,25 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
     
     Returns
     -------
-        all_proj : list
-            All projections on the principal components 
-    """    
-    # Remember the index in the simulation (taking into account cutoff)
-    oidx = np.arange(len(data))+start_frame
+        sorted_indices_data : list
+            Sorted indices of the data array for each principal component
+        sorted_indices_traj : list
+            Sorted indices of the coordinate frames for each principal component
+
+    """
     # Initialize output
-    all_sort = []
-    # Loop through the principal components
+    sorted_indices_data = []
+    sorted_indices_traj = []
+    # Loop through the time-lagged independent components
     for evi in range(num_pc):
-        # Project the combined data on the principal component
-        proj = project_on_pc(data,evi,pca=pca)
-        # Sort everything along the projection onto the PC
+        # Project the combined data on the time-lagged independent component
+        proj = project_on_pc(data, evi, pca=pca)
+        # Sort everything along the projection onto the TIC
         out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
         sort_idx, oidx_sort = sort_coordinates(proj, top, trj, out_xtc, start_frame=start_frame)
-        all_sort.append(oidx_sort)
-    return all_sort
+        sorted_indices_data.append(sort_idx)
+        sorted_indices_traj.append(oidx_sort)
+    return sorted_indices_data, sorted_indices_traj
 
 
 def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_pc=3):

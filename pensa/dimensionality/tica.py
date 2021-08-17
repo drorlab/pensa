@@ -182,21 +182,28 @@ def sort_traj_along_tic(data, tica, start_frame, top, trj, out_name, num_tic=3):
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files.
+
+    Returns
+    -------
+        sorted_indices_data : list
+            Sorted indices of the data array for each independent components
+        sorted_indices_traj : list
+            Sorted indices of the coordinate frames for each independent components
     
     """    
-    # Remember the index in the simulation (taking into account cutoff)
-    oidx = np.arange(len(data))+start_frame
     # Initialize output
-    all_sort = []
-    # Loop through the time-lagged independent components
+    sorted_indices_data = []
+    sorted_indices_traj = []
+    # Loop through the independent components
     for evi in range(num_tic):
-        # Project the combined data on the time-lagged independent component
+        # Project the combined data on the independent component
         proj = project_on_tic(data,evi,tica=tica)
         # Sort everything along the projection onto the TIC
         out_xtc = out_name+"_tic"+str(evi+1)+".xtc"
         sort_idx, oidx_sort = sort_coordinates(proj, top, trj, out_xtc, start_frame=start_frame)
-        all_sort.append(oidx_sort)
-    return all_sort
+        sorted_indices_data.append(sort_idx)
+        sorted_indices_traj.append(oidx_sort)
+    return sorted_indices_data, sorted_indices_traj
 
 
 def sort_trajs_along_common_tic(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_tic=3):
