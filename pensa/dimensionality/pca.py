@@ -12,7 +12,7 @@ from .visualization import project_on_eigenvector, sort_traj_along_projection
 # http://www.emma-project.org/latest/api/generated/pyemma.coordinates.pca.html
 
 
-def calculate_pca(data):
+def calculate_pca(data, dim=-1):
     """
     Performs a PyEMMA PCA on the provided data.
     
@@ -20,6 +20,9 @@ def calculate_pca(data):
     ----------
         data : float array
             Trajectory data [frames,frame_data].
+        dim : int, optional, default -1
+            The number of dimensions (principal components) to project onto. 
+            -1 means all numerically available dimensions will be used.
         
     Returns
     -------
@@ -27,7 +30,7 @@ def calculate_pca(data):
             Principal components information.
         
     """
-    pca = pyemma.coordinates.pca(data)
+    pca = pyemma.coordinates.pca(data, dim=dim)
     return pca
 
 
@@ -98,7 +101,7 @@ def pca_features(pca, features, num, threshold, plot_file=None):
     return test_graph, test_corr
     
     
-def project_on_pc(data, ev_idx, pca=None):
+def project_on_pc(data, ev_idx, pca=None, dim=-1):
     """
     Projects a trajectory onto an eigenvector of its PCA.
     
@@ -111,7 +114,9 @@ def project_on_pc(data, ev_idx, pca=None):
         pca : PCA obj, optional
             Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
-    
+        dim : int, optional, default -1
+            The number of dimensions (principal components) to project onto.
+            Only used if tica is not provided.
     Returns
     -------
         projection : float array
@@ -119,14 +124,13 @@ def project_on_pc(data, ev_idx, pca=None):
         
     """
     # Perform PCA if none is provided.
-    if pca is None:
-        pca = pyemma.coordinates.pca(data)
+    if pca is None: pca = calculate_pca(data)
     # Project the features onto the principal components.
     projection = project_on_eigenvector(data, ev_idx, pca)  
     return projection
 
    
-def get_components_pca(data, num, pca=None, prefix=''):
+def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its PCA.
     
@@ -139,6 +143,11 @@ def get_components_pca(data, num, pca=None, prefix=''):
         pca : PCA obj, optional
             Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
+        dim : int, optional, default = -1
+            The number of dimensions (principal components) to project onto.
+            Only used if tica is not provided.
+        prefix : str, optional, default = ''
+            First part of the component names. Second part is "PC"+<PC number>
     
     Returns
     -------
@@ -149,8 +158,7 @@ def get_components_pca(data, num, pca=None, prefix=''):
         
     """
     # Perform PCA if none is provided
-    if pca is None:
-        pca = pyemma.coordinates.pca(data) 
+    if pca is None: calculate_pca(data) 
     # Project the features onto the principal components
     comp_names = []
     components = []
@@ -201,8 +209,7 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
 
     """
     # Calculate the principal components if they are not given.
-    if pca is None: 
-        pca = pyemma.coordinates.pca(all_data, dim=3)
+    if pca is None: calculate_pca(data, dim=num_pc)
     # Sort the trajectory along them.
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
         data, pca, top, trj, out_name, num_comp=num_pc, start_frame = start_frame
@@ -250,7 +257,7 @@ def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_n
                 
     """
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_mult_trajs_along_common_pc(
-        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_pc=3, start_frame = start_frame
+        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_pc=num_pc, start_frame = start_frame
         )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
@@ -295,7 +302,7 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
     # Combine the input data
     all_data = np.concatenate(data,0)
     # Calculate the principal component
-    pca = pyemma.coordinates.pca(all_data, dim=3)
+    pca = calculate_pca(all_data)
     # Initialize output
     sorted_proj = []
     sorted_indices_data = []

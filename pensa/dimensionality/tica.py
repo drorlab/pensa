@@ -12,7 +12,7 @@ from .visualization import project_on_eigenvector, sort_traj_along_projection
 # http://emma-project.org/latest/api/generated/pyemma.coordinates.tica.html
 
 
-def calculate_tica(data):
+def calculate_tica(data, dim=-1, lag=10):
     """
     Performs a PyEMMA TICA on the provided data.
     
@@ -20,6 +20,11 @@ def calculate_tica(data):
     ----------
         data : float array
             Trajectory data. Format: [frames,frame_data].
+        dim : int, optional, default -1
+            The number of dimensions (independent components) to project onto. 
+            -1 means all numerically available dimensions will be used.
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
         
     Returns
     -------
@@ -27,13 +32,13 @@ def calculate_tica(data):
             Time-lagged independent component information.
         
     """
-    tica = pyemma.coordinates.tica(data)
+    tica = pyemma.coordinates.tica(data, lag=lag)
     return tica
 
 
 def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     """
-    Plots the highest eigenvalues over the numberr of the time-lagged independent components.
+    Plots the highest eigenvalues over the number of the time-lagged independent components.
     
     Parameters
     ----------
@@ -94,7 +99,7 @@ def tica_features(tica, features, num, threshold, plot_file=None):
     return test_feature
     
     
-def project_on_tic(data, ev_idx, tica=None):
+def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     """
     Projects a trajectory onto an eigenvector of its TICA.
     
@@ -107,22 +112,27 @@ def project_on_tic(data, ev_idx, tica=None):
         tica : TICA obj, optional
             Information of pre-calculated TICA.
             Must be calculated for the same features (but not necessarily the same trajectory).
-    
+        dim : int, optional, default -1
+            The number of dimensions (independent components) to project onto.
+            Only used if tica is not provided.
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
+            Only used if tica is not provided.
+                
     Returns
     -------
         projection : float array
             Value along the TIC for each frame.
         
     """
-    # Perform TICA if none is provided.
-    if tica is None:
-        tica = pyemma.coordinates.tica(data)
+    # Perform standard TICA if none is provided.
+    if tica is None: calculate_tica(data, dim=dim, lag=lag)
     # Project the features onto the time-lagged independent components.
     projection = project_on_eigenvector(data, ev_idx, tica) 
     return projection
     
 
-def get_components_tica(data, num, tica=None, prefix=''):
+def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its tICA.
     
@@ -135,6 +145,14 @@ def get_components_tica(data, num, tica=None, prefix=''):
         tica : tICA obj, optional
             Information of pre-calculated tICA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
+        dim : int, optional, default -1
+            The number of dimensions (independent components) to project onto.
+            Only used if tica is not provided.
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
+            Only used if tica is not provided.
+        prefix : str, optional, default = ''
+            First part of the component names. Second part is "IC"+<IC number>
     
     Returns
     -------
@@ -145,8 +163,7 @@ def get_components_tica(data, num, tica=None, prefix=''):
         
     """
     # Perform tICA if none is provided.
-    if tica is None:
-        tica = pyemma.coordinates.tica(data) 
+    if tica is None: calculate_tica(data, lag=lag)
     # Project the features onto the principal components.
     comp_names = []
     components = []
@@ -160,7 +177,7 @@ def get_components_tica(data, num, tica=None, prefix=''):
     return comp_names, np.array(components).T
     
 
-def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, start_frame=0):
+def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, start_frame=0):
     """
     Sort a trajectory along independent components.
     
@@ -179,12 +196,13 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, start_fra
             Time-lagged independent components information.
             If none is provided, it will be calculated.
             Defaults to None.
-        num_ic : int, optional
+        num_ic : int, optional, default = 3
             Sort along the first num_ic independent components.
-            Defaults to 3.
-        start_frame : int, optional
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
+            Only used if tica is not provided.
+        start_frame : int, optional, default = 0
             Offset of the data with respect to the trajectories (defined below).
-            Defaults to 0.
     
     Returns
     -------
@@ -197,8 +215,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, start_fra
 
     """
     # Calculate the principal components if they are not given.
-    if tica is None: 
-        tica = pyemma.coordinates.tica(all_data, dim=3)
+    if tica is None: tica = calculate_tica(all_data, dim=num_ic, lag=lag)
     # Sort the trajectory along them.
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
         data, tica, top, trj, out_name, num_comp=num_ic, start_frame=start_frame
@@ -206,7 +223,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, start_fra
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
-def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_ic=3, start_frame=0):
+def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_ic=3, lag=10, start_frame=0):
     """
     Sort two trajectories along their most important common time-lagged independent components.
     
@@ -228,12 +245,13 @@ def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_
             Should be the same as data_b was from.
         out_name : str
             Core part of the name of the output files.
-        num_ic : int, optional
+        num_ic : int, optional, default = 3
             Sort along the first num_ic independent components.
-            Defaults to 3.
-        start_frame : int, optional
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
+            Only used if tica is not provided.
+        start_frame : int, optional, default = 0
             Offset of the data with respect to the trajectories (defined below).
-            Defaults to 0.
 
     Returns
     -------
@@ -246,12 +264,12 @@ def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_
     
     """
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_mult_trajs_along_common_tic(
-        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_ic=3, start_frame = start_frame
+        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_ic=num_ic, lag=lag, start_frame = start_frame
         )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
-def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, start_frame=0):
+def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10, start_frame=0):
     """
     Sort multiple trajectories along their most important independent components.
 
@@ -266,12 +284,13 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, start_f
             trj[i] should be the same as data[i] was from.
         out_name : str
             Core part of the name of the output files.
-        num_ic : int, optional
+        num_ic : int, optional, default = 3
             Sort along the first num_ic independent components.
-            Defaults to 3.
-        start_frame : int or list of int
+        lag : int, optional, default = 10
+            The lag time, in multiples of the input time step.
+            Only used if tica is not provided.
+        start_frame : int or list of int, default = 0
             Offset of the data with respect to the trajectories.
-            Defaults to 0.
             
     Returns
     -------
@@ -291,7 +310,7 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, start_f
     # Combine the input data
     all_data = np.concatenate(data,0)
     # Calculate the independent components
-    tica = pyemma.coordinates.tica(all_data, dim=3)
+    tica = pyemma.coordinates.tica(all_data, lag=lag)
     # Initialize output
     sorted_proj = []
     sorted_indices_data = []
