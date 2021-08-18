@@ -215,11 +215,11 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
 
     """
     # Calculate the principal components if they are not given.
-    if tica is None: tica = calculate_tica(all_data, dim=num_ic, lag=lag)
+    if tica is None: tica = calculate_tica(data, dim=num_ic, lag=lag)
     # Sort the trajectory along them.
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
         data, tica, top, trj, out_name, num_comp=num_ic, start_frame=start_frame
-        )
+    )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
