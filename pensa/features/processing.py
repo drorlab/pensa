@@ -314,6 +314,5 @@ def sort_traj_along_feature(feat, data, feature_name, ref_name, trj_name, out_na
     """
     if verbose: print('Sorting along feature '+feature_name)
     d = get_feature_data(feat, data, feature_name)
-    sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
-    d_sorted = d[sort_idx]
+    d_sorted, sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
     return d_sorted
