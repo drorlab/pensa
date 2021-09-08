@@ -263,7 +263,7 @@ def sort_features_alphabetically(tors, data):
 
 def sort_distances_by_resnum(dist, data):
     """
-    Sort distance features by the residue number..
+    Sort distance features by the residue number.
     Parameters
     ----------
     dist : list of str
@@ -284,6 +284,24 @@ def sort_distances_by_resnum(dist, data):
 
 
 def select_common_features(features_a, features_b, boolean=True):
+    """
+    Finds features in common between two trajectories.
+
+    Parameters
+    ----------
+    features_a : list of str
+        First set of features.
+    features_b : list of str
+        Second set of features.
+    boolean : bool
+        Determines if returned array contains booleans or features.
+    Returns
+    -------
+    common_a : np array of bool or str
+        Common features taken from features_a.
+    common_b : np array of bool or str
+        Common features taken from features_b.
+    """
     intersect = set(features_a).intersection(features_b)
     if boolean:
         is_common_a = [f in intersect for f in features_a]
@@ -291,10 +309,32 @@ def select_common_features(features_a, features_b, boolean=True):
     else:
         is_common_a = [f for f in features_a if f in intersect]
         is_common_b = [f for f in features_b if f in intersect]
-    return np.array(is_common_a), np.array(is_common_b)
+    common_a = np.array(is_common_a)
+    common_b = n.array(is_common_b)
+    return common_a, common_b
     
 
 def get_common_features_data(features_a, features_b, data_a, data_b):
+    """
+    Finds common features and corresponding data from two trajectories.
+
+    Parameters
+    ----------
+    features_a : list of str
+        First set of features.
+    features_b : list of str
+        Second set of features.
+    data_a : float array
+        Data from first trajectory.
+    data_b : float array
+        Data from second trajectory.
+    Returns
+    -------
+    new_features_a, new_features_b : np array of str
+        Common features between the two trajectories.
+    new_data_a, new_data_b : float array
+        Data corresponding to common features between the two trajectories.
+    """
     is_common_a, is_common_b = select_common_features(features_a, features_b)
     new_data_a = data_a[:,is_common_a]
     new_data_b = data_b[:, is_common_b]

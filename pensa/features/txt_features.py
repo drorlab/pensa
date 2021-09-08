@@ -6,9 +6,29 @@ import math
 
 
 def get_txt_features_ala2(filename, num_frames, cossin=False):
+    """
+    Parses features for ala2 from a text file. 
+    The text file must be formatted with "phi", followed by all phi angles, a blank line,
+    followed by "psi" and all psi angles, with one angle per line.
+
+    Parameters
+    ----------
+    filename : str
+        File name of the text file.
+    num_frames : int
+        Maximum number of trajectory frames used in features array.
+    cossin : bool
+        Determines if the features array contains torsion angles or the sin and cos of torsion angles.
+
+    Returns
+    -------
+        features : numpy array
+            Data for all features
+
+    """
     phi = []
     psi = []
-
+    curr = 'phi'
     with open(filename) as f:
         for s in f.readlines():
             if s == 'phi\n' or s == 'psi\n':
