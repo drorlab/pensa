@@ -310,7 +310,7 @@ def select_common_features(features_a, features_b, boolean=True):
         is_common_a = [f for f in features_a if f in intersect]
         is_common_b = [f for f in features_b if f in intersect]
     common_a = np.array(is_common_a)
-    common_b = n.array(is_common_b)
+    common_b = np.array(is_common_b)
     return common_a, common_b
     
 
