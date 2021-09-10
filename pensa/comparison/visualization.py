@@ -175,7 +175,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
     
     
 def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
-                   vmin=None, vmax=None, symmetric=True, verbose=True, cbar_label=None):
+                   vmin=None, vmax=None, symmetric=True, verbose=False, cbar_label=None, tick_step=50):
     """
     Visualizes data per residue pair in a heatmap. 
     
@@ -187,21 +187,23 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
             Data to be plotted for each residue-pair feature.
         plot_filename : str
             Name of the file for the plot.
-        res1_pos : int
+        res1_pos : int, optional, default = 2
             Position of the 1st residue ID in the feature name when separated by ' '.
-        res2_pos : int
+        res2_pos : int, optional, default = 6
             Position of the 2nd residue ID in the feature name when separated by ' '.
-        vmin : float, optional
+        vmin : float, optional, default = None
             Minimum value for the heatmap.
-        vmax : float, optional
+        vmax : float, optional, default = None
             Maximum value for the heatmap.
-        symmetric : bool, optional
+        symmetric : bool, optional, default = True
             The matrix is symmetric and values provided only for the upper or lower triangle. 
             Defaults to True.
-        verbose : bool, optional
+        verbose : bool, optional, default = False
             Print numbers of first and last residue. Defaults to True.
-        cbar_label : str, optional
+        cbar_label : str, optional, default = None
             Label for the color bar.
+        tick_step : int, optional, default = 50
+            Step between two ticks on the plot axes.
         
     Returns
     -------
@@ -209,17 +211,21 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
             Matrix with the values of the difference/divergence.
          
     """
-    firstres = int(feat_names[0].split(' ')[res1_pos])
-    lastres  = int(feat_names[-1].split(' ')[res1_pos])
-    if verbose:
-        print('first res:', firstres, ', last res:', lastres)
-    size = lastres-firstres+2
+    # Find first and last residue
+    rn1 = [int(fn.split(' ')[res1_pos]) for fn in feat_names]
+    rn2 = [int(fn.split(' ')[res2_pos]) for fn in feat_names]
+    resnums = np.concatenate([np.array(rn1,dtype=int),np.array(rn2,dtype=int)])
+    first_res = resnums.min()
+    last_res  = resnums.max()
+    if verbose: print('first res:', first_res, ', last res:', last_res)
+    # Create a 2D array with the values 
+    size = last_res - first_res + 1
     diff = np.zeros([size,size])
-    for n,name in enumerate(feat_names):
+    for n, name in enumerate(feat_names):
         splitname = name.split(' ')
-        resi,resj = int(splitname[res1_pos]),int(splitname[res2_pos])
-        i = resi - firstres
-        j = resj - firstres
+        resi,resj = int(splitname[res1_pos]), int(splitname[res2_pos])
+        i = resi - first_res
+        j = resj - first_res
         diff[i,j] = feat_diff[n]
         if symmetric:
             diff[j,i] = feat_diff[n]  
@@ -227,10 +233,15 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
     fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
     img = ax.imshow(diff, vmin=vmin, vmax=vmax)
     ax.xaxis.set_ticks_position('top')
-    ax.set_xticks(np.arange(50-firstres,lastres-firstres+1,50))
-    ax.set_yticks(np.arange(50-firstres,lastres-firstres+1,50))
-    ax.set_xticklabels(np.arange(50,lastres+1,50))
-    ax.set_yticklabels(np.arange(50,lastres+1,50))
+    # Find position for the first tick
+    first_tick = 0
+    while first_res > first_tick:
+        first_tick += tick_step 
+    # Ticks and labels
+    ax.set_xticks(np.arange(first_tick-first_res, size, tick_step))
+    ax.set_yticks(np.arange(first_tick-first_res, size, tick_step))
+    ax.set_xticklabels(np.arange(first_tick, last_res+1, tick_step))
+    ax.set_yticklabels(np.arange(first_tick, last_res+1, tick_step))
     ax.xaxis.set_label_position('top')
     ax.set_xlabel('residue number')
     ax.set_ylabel('residue number')
@@ -241,7 +252,8 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
     
     
 def distances_visualization(dist_names, dist_diff, plot_filename, 
-                            vmin=None, vmax=None, verbose=True, cbar_label=None):
+                            vmin=None, vmax=None, verbose=True, 
+                            cbar_label=None, tick_step=50):
     """
     Visualizes distance features for pairs of residues in a heatmap. 
     
@@ -254,25 +266,27 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
             Data for each distance feature.
         plot_filename : str
             Name of the file for the plot.
-        vmin : float, optional
+        vmin : float, optional, default = None
             Minimum value for the heatmap.
-        vmax : float, optional
+        vmax : float, optional, default = None
             Maximum value for the heatmap.
-        verbose : bool, optional
+        verbose : bool, optional, default = False
             Print numbers of first and last residue. Defaults to True.
-        cbar_label : str, optional
+        cbar_label : str, optional, default = None
             Label for the color bar.
-        
+        tick_step : int, optional, default = 50
+            Step between two ticks on the plot axes.
+
     Returns
     -------
         diff : float array
             Distance matrix.
          
     """
-    if verbose:
-        print('Plotting heatmap for distance features.')
+    if verbose: print('Plotting heatmap for distance features.')
     diff = resnum_heatmap(dist_names, dist_diff, plot_filename, res1_pos=2, res2_pos=6,
-                          vmin=vmin, vmax=vmax, verbose=verbose, cbar_label=cbar_label)
+                          vmin=vmin, vmax=vmax, verbose=verbose, cbar_label=cbar_label,
+                          tick_step=tick_step)
     return diff
 
 

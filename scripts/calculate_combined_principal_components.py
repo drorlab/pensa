@@ -68,9 +68,9 @@ if __name__ == "__main__":
                  args.num_components, args.feat_threshold,
                  plot_file=args.out_plots+"_"+ftype+"_feature_correlation.pdf")
     # Sort each of the trajectories along the top components of combined data
-    sort_trajs_along_common_pc(data_a[ftype], data_b[ftype], args.start_frame,
+    sort_trajs_along_common_pc(data_a[ftype], data_b[ftype],
                                args.ref_file_a, args.ref_file_b, args.trj_file_a, args.trj_file_b,
-                               args.out_pc, num_pc=args.num_components)
+                               args.out_pc, num_pc=args.num_components, start_frame=args.start_frame)
     # Plot histograms of both simulations along the common PCs
     compare_projections(data_a[ftype], data_b[ftype], pca,
                         num=args.num_components, saveas=args.out_plots+"_"+ftype+"_pc-comparison.pdf")

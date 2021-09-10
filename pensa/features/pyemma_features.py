@@ -10,7 +10,8 @@ import warnings
 import numpy as np
 import pyemma
 from pyemma.util.contexts import settings
-
+from pensa.features.processing import get_feature_timeseries 
+from pensa.preprocessing.coordinates import sort_coordinates
 
 
 # -- Loading the Features --
@@ -41,9 +42,9 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         
     Returns
     -------
-    feature_names : list of str
+    feature_names : dict of lists of str
         Names of all features
-    features_data : numpy array
+    features_data : dict of numpy arrays
         Data for all features
     
     """
@@ -169,4 +170,38 @@ def _remove_resnum_offset(features, offset):
     return new_features
     
     
+def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_name, trj_name, out_name, start_frame=0):
+    """
+    Sort a trajectory along a PyEMMA feature.
+
+    Parameters
+    ----------
+        feat : list of str
+            List with all feature names.
+        data : float array
+            Feature values data from the simulation.
+        feature_name : str
+            Name of the selected feature.
+        feature_type : str
+            Type of the selected feature.
+        ref_name: string
+            Reference topology for the trajectory.
+        trj_name: string
+            Trajetory from which the frames are picked.
+            Usually the same as the values are from.
+        out_name: string.
+            Name of the output files.
+        start_frame: int
+            Offset of the data with respect to the trajectories.
+
+    Returns
+    -------
+        d_sorted: float array
+            Sorted data of the selected feature.
+
+    """
+    d = get_feature_timeseries(feat, data, feature_type, feature_name)
+    sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
+    d_sorted = d[sort_idx]
+    return d_sorted
 

@@ -89,13 +89,12 @@ entire receptor, sorted by the PCs of the transmembrane region.
 
     _ = sort_trajs_along_common_pc(sim_a_tmr_data['bb-torsions'],
                                    sim_b_tmr_data['bb-torsions'],
-                                   feature_start_frame,
                                    "traj/condition-a_receptor.gro",
                                    "traj/condition-b_receptor.gro",
                                    "traj/condition-a_receptor.xtc",
                                    "traj/condition-b_receptor.xtc",
                                    "pca/receptor_by_tmr",
-                                   num_pc=3)
+                                   num_pc=3, start_frame=feature_start_frame)
 
 The above function deals with the special case of two input
 trajectories. We also provide the functions for a single one (see
@@ -121,8 +120,9 @@ Here are the major steps of a PCA demonstrated for a single simulation.
 
 .. code:: python
 
-    _, __ = sort_traj_along_pc(sim_a_tmr_data['bb-torsions'], 
-                               pca_a, feature_start_frame, 
-                               "traj/condition-a_receptor.gro", 
-                               "traj/condition-a_receptor.xtc", 
-                               "pca/condition-a_receptor_by_tmr", num_pc=3)
+    _, __, ___ = sort_traj_along_pc(sim_a_tmr_data['bb-torsions'],
+                                    "traj/condition-a_receptor.gro", 
+                                    "traj/condition-a_receptor.xtc", 
+                                    "pca/condition-a_receptor_by_tmr", 
+                                    start_frame = feature_start_frame, 
+                                    pca=pca_a, num_pc=3)

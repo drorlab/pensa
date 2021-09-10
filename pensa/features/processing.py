@@ -9,8 +9,7 @@ import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
 import warnings
-#from pensa.features import *
-
+from pensa.preprocessing import sort_coordinates
 
 
 # -- Utilities to extract time series --
@@ -218,10 +217,52 @@ def sort_sincos_torsions_by_resnum(tors, data):
     new_data = data[:,new_order]
     return new_tors, new_data
 
+def sort_torsions_by_resnum(tors, data):
+    """
+    Sort torsion features by the residue number..
+    Parameters
+    ----------
+    tors : list of str
+        The list of torsion features.
+    Returns
+    -------
+    new_tors : list of str
+        The sorted list of torsion features.
+    """
+    renamed = []
+    for t in tors:
+        rn = t.split(' ')[-1]
+        ft = t.split(' ')[0]
+        renamed.append('%09i %s'%(int(rn),ft))
+    new_order = np.argsort(renamed)
+    new_tors = np.array(tors)[new_order].tolist()
+    new_data = data[:,new_order]
+    return new_tors, new_data
+
+def sort_features_alphabetically(tors, data):
+    """
+    Sort torsion features alphabetically.
+    Parameters
+    ----------
+    tors : list of str
+        The list of torsion features.
+    Returns
+    -------
+    new_tors : list of str
+        The sorted list of torsion features.
+    """
+    renamed = []
+    for t in tors:
+        renamed.append(t)
+    new_order = np.argsort(renamed)
+    new_tors = np.array(tors)[new_order].tolist()
+    new_data = data[:,new_order]
+    return new_tors, new_data
+
 
 def sort_distances_by_resnum(dist, data):
     """
-    Sort distance features by the residue number..
+    Sort distance features by the residue number.
     Parameters
     ----------
     dist : list of str
@@ -241,12 +282,63 @@ def sort_distances_by_resnum(dist, data):
     return new_dist, new_data
 
 
-def select_common_features(features_a, features_b):
+def select_common_features(features_a, features_b, boolean=True):
+    """
+    Finds features in common between two trajectories.
+
+    Parameters
+    ----------
+    features_a : list of str
+        First set of features.
+    features_b : list of str
+        Second set of features.
+    boolean : bool
+        Determines if returned array contains booleans or features.
+    Returns
+    -------
+    common_a : np array of bool or str
+        Common features taken from features_a.
+    common_b : np array of bool or str
+        Common features taken from features_b.
+    """
     intersect = set(features_a).intersection(features_b)
-    is_common_a = [f in intersect for f in features_a]
-    is_common_b = [f in intersect for f in features_b]
-    return np.array(is_common_a), np.array(is_common_b)
+    if boolean:
+        is_common_a = [f in intersect for f in features_a]
+        is_common_b = [f in intersect for f in features_b]
+    else:
+        is_common_a = [f for f in features_a if f in intersect]
+        is_common_b = [f for f in features_b if f in intersect]
+    common_a = np.array(is_common_a)
+    common_b = np.array(is_common_b)
+    return common_a, common_b
     
+
+def get_common_features_data(features_a, features_b, data_a, data_b):
+    """
+    Finds common features and corresponding data from two trajectories.
+
+    Parameters
+    ----------
+    features_a : list of str
+        First set of features.
+    features_b : list of str
+        Second set of features.
+    data_a : float array
+        Data from first trajectory.
+    data_b : float array
+        Data from second trajectory.
+    Returns
+    -------
+    new_features_a, new_features_b : np array of str
+        Common features between the two trajectories.
+    new_data_a, new_data_b : float array
+        Data corresponding to common features between the two trajectories.
+    """
+    is_common_a, is_common_b = select_common_features(features_a, features_b)
+    new_data_a = data_a[:,is_common_a]
+    new_data_b = data_b[:, is_common_b]
+    new_features_a, new_features_b = select_common_features(features_a, features_b, boolean=False)
+    return new_features_a, new_features_b, new_data_a, new_data_b
 
 
 # -- Utilities to process feature data --
@@ -283,3 +375,37 @@ def correct_angle_periodicity(angle):
     return new_angle
 
 
+# Process trajectories according to feature data
+
+def sort_traj_along_feature(feat, data, feature_name, ref_name, trj_name, out_name, start_frame=0, verbose=False):
+    """
+    Sort a trajectory along a feature.
+
+    Parameters
+    ----------
+        feat : list of str
+            List with all feature names.
+        data : float array
+            Feature values data from the simulation.
+        feature_name : str
+            Name of the selected feature.
+        ref_name: string
+            Reference topology for the trajectory.
+        trj_name: string
+            Trajetory from which the frames are picked.
+            Usually the same as the values are from.
+        out_name: string.
+            Name of the output files.
+        start_frame: int
+            Offset of the data with respect to the trajectories.
+
+    Returns
+    -------
+        d_sorted: float array
+            Sorted data of the selected feature.
+
+    """
+    if verbose: print('Sorting along feature '+feature_name)
+    d = get_feature_data(feat, data, feature_name)
+    d_sorted, sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
+    return d_sorted
