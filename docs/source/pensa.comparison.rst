@@ -6,6 +6,14 @@ pensa.comparison
    :undoc-members:
    :show-inheritance:
 
+pensa.comparison.metrics
+-------------------------------
+
+.. automodule:: pensa.comparison.metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.comparison.relative\_entropy
 -----------------------------------------
 

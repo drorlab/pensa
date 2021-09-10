@@ -88,10 +88,10 @@ In many cases, you probably have several runs of the same simulation
 that you want to combine to one structural ensemble. This is why the
 trajectory argument takes a list as arguments, e.g.
 
-::
+.. code:: python
 
-   extract_coordinates(system.psf, system.pdb, ['run1.nc','run2.nc','run3.nc'], 
-                       'rho_receptor', 'protein', start_frame=1000)
+   extract_coordinates('system.psf', 'system.pdb', ['run1.nc','run2.nc','run3.nc'], 
+                       'receptor', 'protein', start_frame=1000)
                                 
 
 With the option ``start_frame``, you can exclude the equilibrium phase
@@ -105,23 +105,17 @@ Selecting Subsets of Coordinates
 For some analysis types, we only want to use the part of the receptor
 that is inside the membrane. In this way, very flexible loops outside
 the membrane cannot distort the analysis result. We can manually
-construct a selection string in MDAnalysis format or load the selections
-from a file. We call this file ``mor_tm.txt`` and generate it on the fly
-so we can demonstrate the loader function. We use selections based on
+construct a selection string in MDAnalysis format We use selections based on
 the definitions of transmembrane helices in the
 `GPCRdb <https://gpcrdb.org/protein/oprm_human/>`__.
 
 .. code:: python
 
-    ! echo "76 98\n105 133\n138 173\n182 208\n226 264\n270 308\n315 354" > mor_tm.txt
-    ! cat mor_tm.txt
-
-.. code:: python
-
-    # Load the selection and generate the strings
-    sel_string_a = load_selection("mor_tm.txt", sel_base_a+" and ")
+    resnums = "76:98 105:133 138:173 182:208 226:264 270:308 315:354"
+    # Generate the selection strings
+    sel_string_a = sel_base_a+" and resnum "+resnums
     print('Selection A:\n', sel_string_a, '\n')
-    sel_string_b = load_selection("mor_tm.txt", sel_base_b+" and ")
+    sel_string_b = sel_base_b+" and resnum "+resnums
     print('Selection B:\n', sel_string_b, '\n')
     # Extract the coordinates of the transmembrane region from the trajectory
     extract_coordinates(ref_file_a, pdb_file_a, [trj_file_a], out_name_a+"_tm", sel_string_a)
@@ -172,8 +166,8 @@ densities from a smaller selection.
 
 .. code:: python
 
-    # # # First we preprocess the trajectories to extract coordinates for protein 
-    # # # and waters.
+    # First we preprocess the trajectories to extract coordinates for protein 
+    # and waters.
     root_dir = './mor-data'
     # Simulation A
     ref_file_a =  root_dir+'/11427_dyn_151.psf'
@@ -189,7 +183,7 @@ densities from a smaller selection.
                   root_dir+'/11578_trj_169.xtc']
     # Base for the selection string for each simulation protein and all waters (OH2)
     sel_base = "protein or byres name OH2"
-    # # # # Names of the output files
+    # Names of the output files
     out_name_a = "traj/cond-a_water"
     out_name_b = "traj/cond-b_water"
     
@@ -207,11 +201,11 @@ we have to ensure that the protein is aligned across both simulations.
 
 .. code:: python
     
-    # # # Extract the coordinates of the receptor from the trajectory
+    # Extract the coordinates of the receptor from the trajectory
     extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base)
     extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base)    
     
-    # # # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
+    # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
     extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
                            out_name_b+".gro", out_name_b+".xtc")
        
@@ -224,7 +218,7 @@ cavities are aligned.
     
 .. code:: python
     
-    # # # Extract the combined density of the waters in both ensembles a and b 
+    # Extract the combined density of the waters in both ensembles a and b 
     extract_combined_grid(out_name_a+".gro", "dens/cond-a_wateraligned.xtc", 
                           out_name_b+".gro", out_name_b+".xtc",
                           atomgroup="OH2",

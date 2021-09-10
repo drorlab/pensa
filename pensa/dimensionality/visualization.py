@@ -55,8 +55,8 @@ def compare_projections(data_a, data_b, ana, num=3, saveas=None, label_a=None, l
         label_b : str, optional
             Label for the second dataset.
 
-    Returns:
-    --------
+    Returns
+    -------
         projections : list of float arrays
             Projections of the trajectory on each component.
                     
@@ -86,8 +86,8 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
         labels : list of str, optional
             Labels for the datasets. If provided, it must have the same length as data.
             
-    Returns:
-    --------
+    Returns
+    -------
         projections : list of float arrays
             Projections of the trajectory on each principal component.
         

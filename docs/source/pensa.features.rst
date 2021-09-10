@@ -14,6 +14,14 @@ pensa.features.atom\_features
    :undoc-members:
    :show-inheritance:
 
+pensa.features.mda\_distances
+------------------------------------
+
+.. automodule:: pensa.features.mda_distances
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.features.processing
 --------------------------------
 
@@ -26,6 +34,14 @@ pensa.features.pyemma\_features
 --------------------------------------
 
 .. automodule:: pensa.features.pyemma_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pensa.features.txt\_features
+-----------------------------------
+
+.. automodule:: pensa.features.txt_features
    :members:
    :undoc-members:
    :show-inheritance:
