@@ -41,9 +41,9 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         
     Returns
     -------
-    feature_names : list of str
+    feature_names : dict of lists of str
         Names of all features
-    features_data : numpy array
+    features_data : dict of numpy arrays
         Data for all features
     
     """
