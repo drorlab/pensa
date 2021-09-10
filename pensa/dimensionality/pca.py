@@ -3,13 +3,16 @@ import pyemma
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
-
+from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
+from .visualization import project_on_eigenvector, sort_traj_along_projection
 
 
 # --- METHODS FOR PRINCIPAL COMPONENT ANALYSIS ---
 
+# http://www.emma-project.org/latest/api/generated/pyemma.coordinates.pca.html
 
-def calculate_pca(data):
+
+def calculate_pca(data, dim=-1):
     """
     Performs a PyEMMA PCA on the provided data.
     
@@ -17,6 +20,9 @@ def calculate_pca(data):
     ----------
         data : float array
             Trajectory data [frames,frame_data].
+        dim : int, optional, default -1
+            The number of dimensions (principal components) to project onto. 
+            -1 means all numerically available dimensions will be used.
         
     Returns
     -------
@@ -24,7 +30,7 @@ def calculate_pca(data):
             Principal components information.
         
     """
-    pca = pyemma.coordinates.pca(data)
+    pca = pyemma.coordinates.pca(data, dim=dim)
     return pca
 
 
@@ -95,7 +101,7 @@ def pca_features(pca, features, num, threshold, plot_file=None):
     return test_graph, test_corr
     
     
-def project_on_pc(data, ev_idx, pca=None):
+def project_on_pc(data, ev_idx, pca=None, dim=-1):
     """
     Projects a trajectory onto an eigenvector of its PCA.
     
@@ -108,25 +114,23 @@ def project_on_pc(data, ev_idx, pca=None):
         pca : PCA obj, optional
             Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
-    
+        dim : int, optional, default -1
+            The number of dimensions (principal components) to project onto.
+            Only used if tica is not provided.
     Returns
     -------
         projection : float array
             Value along the PC for each frame.
         
     """
-    # Perform PCA if none is provided
-    if pca is None:
-        pca = pyemma.coordinates.pca(data) #,dim=3)
-    # Project the features onto the principal components
-    projection = np.zeros(data.shape[0])
-    for ti in range(data.shape[0]):
-        projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
-    # Return the value along the PC for each frame  
+    # Perform PCA if none is provided.
+    if pca is None: pca = calculate_pca(data)
+    # Project the features onto the principal components.
+    projection = project_on_eigenvector(data, ev_idx, pca)  
     return projection
 
    
-def get_components_pca(data, num, pca=None, prefix=''):
+def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its PCA.
     
@@ -139,6 +143,11 @@ def get_components_pca(data, num, pca=None, prefix=''):
         pca : PCA obj, optional
             Information of pre-calculated PCA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
+        dim : int, optional, default = -1
+            The number of dimensions (principal components) to project onto.
+            Only used if tica is not provided.
+        prefix : str, optional, default = ''
+            First part of the component names. Second part is "PC"+<PC number>
     
     Returns
     -------
@@ -149,8 +158,7 @@ def get_components_pca(data, num, pca=None, prefix=''):
         
     """
     # Perform PCA if none is provided
-    if pca is None:
-        pca = pyemma.coordinates.pca(data) 
+    if pca is None: calculate_pca(data) 
     # Project the features onto the principal components
     comp_names = []
     components = []
@@ -164,20 +172,14 @@ def get_components_pca(data, num, pca=None, prefix=''):
     return comp_names, np.array(components).T
      
 
-def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
+def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame=0):
     """
-    Sort a trajectory along given principal components.
+    Sort a trajectory along principal components.
     
     Parameters
     ----------
         data : float array
             Trajectory data [frames,frame_data].
-        pca : PCA obj
-            Principal components information.
-        num_pc : int
-            Sort along the first num_pc principal components.
-        start_frame : int
-            Offset of the data with respect to the trajectories (defined below).
         top : str
             File name of the reference topology for the trajectory. 
         trj : str
@@ -185,34 +187,37 @@ def sort_traj_along_pc(data, pca, start_frame, top, trj, out_name, num_pc=3):
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files
+        pca : PCA obj, optional
+            Principal components information.
+            If none is provided, it will be calculated.
+            Defaults to None.
+        num_pc : int, optional
+            Sort along the first num_pc principal components.
+            Defaults to 3.
+        start_frame : int, optional
+            Offset of the data with respect to the trajectories (defined below).
+            Defaults to 0.
     
-    """    
-    # Remember the index in the simulation (taking into account cutoff)
-    oidx = np.arange(len(data))+start_frame
-    # Define the MDAnalysis trajectories from where the frames come
-    u = mda.Universe(top,trj)
-    a = u.select_atoms('all')
-    return_str = []
-    all_proj = []
-    # Loop through the principal components
-    for evi in range(num_pc):
-        # Project the combined data on the principal component
-        proj = project_on_pc(data,evi,pca=pca)
-        all_proj.append(proj)
-        # Sort everything along the projection onto the PC
-        sort_idx  = np.argsort(proj)
-        proj_sort = proj[sort_idx] 
-        oidx_sort = oidx[sort_idx]
-        # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", a.n_atoms) as W:
-            for i in range(data.shape[0]):
-                ts = u.trajectory[oidx_sort[i]]
-                W.write(a)     
-                return_str.append(a)
-    return return_str, all_proj
+    Returns
+    -------
+        sorted_proj: list
+            sorted projections on each principal component
+        sorted_indices_data : list
+            Sorted indices of the data array for each principal component
+        sorted_indices_traj : list
+            Sorted indices of the coordinate frames for each principal component
+
+    """
+    # Calculate the principal components if they are not given.
+    if pca is None: calculate_pca(data, dim=num_pc)
+    # Sort the trajectory along them.
+    sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
+        data, pca, top, trj, out_name, num_comp=num_pc, start_frame = start_frame
+        )
+    return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
-def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a, trj_b, out_name, num_pc=3):
+def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_pc=3, start_frame=0):
     """
     Sort two trajectories along their most important common principal components.
     
@@ -222,8 +227,6 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
             Trajectory data [frames,frame_data].
         data_b : float array
             Trajectory data [frames,frame_data].
-        start_frame : int
-            Offset of the data with respect to the trajectories (defined below).
         top_a : str
             Reference topology for the first trajectory. 
         top_b : str
@@ -236,48 +239,30 @@ def sort_trajs_along_common_pc(data_a, data_b, start_frame, top_a, top_b, trj_a,
             Should be the same as data_b was from.
         out_name : str
             Core part of the name of the output files.
-    
+        num_pc : int, optional
+            Sort along the first num_pc principal components.
+            Defaults to 3.
+        start_frame : int or list of int
+            Offset of the data with respect to the trajectories.
+            Defaults to 0.
+
+    Returns
+    -------
+        sorted_proj: list
+            sorted projections on each principal component
+        sorted_indices_data : list
+            Sorted indices of the data array for each principal component
+        sorted_indices_traj : list
+            Sorted indices of the coordinate frames for each principal component
+                
     """
-    # Combine the input data
-    data = np.concatenate([data_a,data_b],0)
-    # Remember which simulation the data came frome
-    cond = np.concatenate([np.ones(len(data_a)), np.zeros(len(data_b))])
-    # Remember the index in the respective simulation (taking into account cutoff)
-    oidx = np.concatenate([np.arange(len(data_a))+start_frame, 
-                           np.arange(len(data_b))+start_frame])
-    # Calculate the principal components
-    pca = pyemma.coordinates.pca(data,dim=3)
-    # Define the MDAnalysis trajectories from where the frames come
-    ua = mda.Universe(top_a,trj_a)
-    ub = mda.Universe(top_b,trj_b)
-    # ... and select all atoms
-    aa = ua.select_atoms('all')
-    ab = ub.select_atoms('all')
-    return_str = []
-    # Loop over principal components.
-    for evi in range(num_pc):
-        # Project the combined data on the principal component
-        proj = project_on_pc(data,evi,pca=pca)
-        # Sort everything along the projection on th resp. PC
-        sort_idx  = np.argsort(proj)
-        proj_sort = proj[sort_idx] 
-        cond_sort = cond[sort_idx]
-        oidx_sort = oidx[sort_idx]
-        # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", aa.n_atoms) as W:
-            for i in range(data.shape[0]):
-                if cond_sort[i] == 1: # G-protein bound
-                    ts = ua.trajectory[oidx_sort[i]]
-                    W.write(aa)
-                    return_str.append(aa)
-                elif cond_sort[i] == 0: # arrestin bound
-                    ts = ub.trajectory[oidx_sort[i]]
-                    W.write(ab)
-                    return_str.append(ab)
-    return return_str
+    sorted_proj, sorted_indices_data, sorted_indices_traj = sort_mult_trajs_along_common_pc(
+        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_pc=num_pc, start_frame = start_frame
+        )
+    return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
-def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_pc=3):
+def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_frame=0):
     """
     Sort multiple trajectories along their most important common principal components.
 
@@ -285,8 +270,6 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
     ----------
         data : list of float arrays
             List of trajectory data arrays, each [frames,frame_data].
-        start_frame : int
-            Offset of the data with respect to the trajectories (defined below).
         top : list of str
             Reference topology files.
         trj : list of str
@@ -294,148 +277,47 @@ def sort_mult_trajs_along_common_pc(data, start_frame, top, trj, out_name, num_p
             trj[i] should be the same as data[i] was from.
         out_name : str
             Core part of the name of the output files.
+        num_pc : int, optional
+            Sort along the first num_pc principal components.
+            Defaults to 3.
+        start_frame : int or list of int
+            Offset of the data with respect to the trajectories.
+            Defaults to 0.
+
+    Returns
+    -------
+        sorted_proj: list
+            sorted projections on each principal component
+        sorted_indices_data : list
+            Sorted indices of the data array for each principal component
+        sorted_indices_traj : list
+            Sorted indices of the coordinate frames for each principal component
 
     """
     num_frames = [len(d) for d in data]
     num_traj = len(data)
+    if type(start_frame) == int:
+        start_frame *= np.ones(num_traj)
+        start_frame = start_frame.tolist()
     # Combine the input data
-    data = np.concatenate(data,0)
-    # Remember which simulation the data came frome
-    cond = np.concatenate([i*np.ones(num_frames[i],dtype=int) for i in range(num_traj)])
-    # Remember the index in the respective simulation (taking into account cutoff)
-    oidx = np.concatenate([np.arange(num_frames[i])+start_frame for i in range(num_traj)])
-    # Calculate the principal components
-    pca = pyemma.coordinates.pca(data,dim=3)
-    # Define the MDAnalysis trajectories from where the frames come
-    univs = []
-    atoms = []
-    for j in range(num_traj):
-        u = mda.Universe(top[j],trj[j])
-        print('Length of trajectory',len(u.trajectory))
-        univs.append(u)
-        atoms.append(u.select_atoms('all'))
+    all_data = np.concatenate(data,0)
+    # Calculate the principal component
+    pca = calculate_pca(all_data)
+    # Initialize output
+    sorted_proj = []
+    sorted_indices_data = []
+    sorted_indices_traj = []    
     # Loop over principal components.
     for evi in range(num_pc):
         # Project the combined data on the principal component
-        proj = project_on_pc(data,evi,pca=pca)
-        # Sort everything along the projection on th resp. PC
-        sort_idx  = np.argsort(proj)
-        proj_sort = proj[sort_idx]
-        cond_sort = cond[sort_idx]
-        oidx_sort = oidx[sort_idx]
-        # Write the trajectory, ordered along the PC
-        with mda.Writer(out_name+"_pc"+str(evi+1)+".xtc", atoms[0].n_atoms) as W:
-            for i in range(data.shape[0]):
-                j = cond_sort[i]
-                o = oidx_sort[i]
-                uj = univs[j] 
-                ts = uj.trajectory[o]
-                W.write(atoms[j])
-    return
-
-
-def compare_projections(data_a, data_b, pca, num=3, saveas=None, label_a=None, label_b=None):
-    """
-    Compare two datasets along a given principal component.
-    
-    Parameters
-    ----------
-        data_a : float array
-            Trajectory data [frames,frame_data]
-        data_b : float array
-            Trajectory data [frames,frame_data]
-        pca : PCA object
-            Principal components information.
-        num : int
-            Number of principal components to plot. 
-        saveas : str, optional
-            Name of the output file.
-        label_a : str, optional
-            Label for the first dataset.
-        label_b : str, optional
-            Label for the second dataset.
-        
-    """
-    # Start the figure    
-    fig,ax = plt.subplots(num, 2, figsize=[8,3*num], dpi=300)
-    val = []
-    # Loop over PCs
-    for evi in range(num):
-        # Calculate values along PC for each frame
-        proj_a = project_on_pc(data_a, evi, pca=pca)
-        proj_b = project_on_pc(data_b, evi, pca=pca)
-        # Plot the time series in the left panel
-        ax[evi,0].plot(proj_a, alpha=0.5, label=label_a)
-        ax[evi,0].plot(proj_b, alpha=0.5, label=label_b)
-        ax[evi,0].set_xlabel('frame number')
-        ax[evi,0].set_ylabel('PC %i'%(evi+1))
-        # Plot the histograms in the right panel
-        ax[evi,1].hist(proj_a, bins=30, alpha=0.5, density=True, label=label_a)
-        ax[evi,1].hist(proj_b, bins=30, alpha=0.5, density=True, label=label_b)
-        ax[evi,1].set_xlabel('PC %i'%(evi+1))
-        ax[evi,1].set_ylabel('frequency')
-        # Legend
-        if label_a and label_b:
-            ax[evi,0].legend()
-            ax[evi,1].legend()
-        val.append([proj_a, proj_b])
-    fig.tight_layout()
-    # Save the figure
-    if saveas is not None:
-        fig.savefig(saveas, dpi=300)
-    return val
-    
-    
-def compare_mult_projections(data, pca, num=3, saveas=None, labels=None, colors=None):
-    """
-    Compare two datasets along a given principal component.
-    
-    Parameters
-    ----------
-        data : list of float arrays
-            Data from multiple trajectories [frames,frame_data]
-        pca : PCA object
-            Principal components information.
-        num : int
-            Number of principal components to plot. 
-        saveas : str, optional
-            Name of the output file.
-        labels : list of str, optional
-            Labels for the datasets. If provided, it must have the same length as data.
-        
-    """
-    if labels is not None:
-        assert len(labels) == len(data)
-    else:
-        labels = [None for _ in range(len(data))]
-    if colors is not None:
-        assert len(colors) == len(data)
-    else:
-        colors = ['C%i'%num for num in range(len(data))]
-    # Start the figure    
-    fig,ax = plt.subplots(num, 2, figsize=[9,3*num], dpi=300)
-    # Loop over PCs
-    for evi in range(num):
-        for j,d in enumerate(data):
-            # Calculate values along PC for each frame
-            proj = project_on_pc(d, evi, pca=pca)
-            # Plot the time series in the left panel
-            ax[evi,0].plot(proj, alpha=0.5, 
-                           label=labels[j], color=colors[j])
-            # Plot the histograms in the right panel
-            ax[evi,1].hist(proj, bins=30, alpha=0.5, density=True, 
-                           label=labels[j], color=colors[j])
-        # Axis labels
-        ax[evi,0].set_xlabel('frame number')
-        ax[evi,0].set_ylabel('PC %i'%(evi+1))            
-        ax[evi,1].set_xlabel('PC %i'%(evi+1))
-        ax[evi,1].set_ylabel('frequency')
-        # Legend
-        if labels[0] is not None:
-            ax[evi,0].legend()
-            ax[evi,1].legend()
-    fig.tight_layout()
-    # Save the figure
-    if saveas is not None:
-        fig.savefig(saveas, dpi=300)
-    return
+        proj = [project_on_pc(d, evi, pca=pca) for d in data]
+        # Sort everything along the projection on the respective PC
+        out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
+        proj_sort, sort_idx, oidx_sort = merge_and_sort_coordinates(
+            proj, top, trj, out_xtc, start_frame=start_frame, verbose=False
+            )
+        sorted_proj.append(proj_sort)
+        sorted_indices_data.append(sort_idx)
+        sorted_indices_traj.append(oidx_sort)        
+    return sorted_proj, sorted_indices_data, sorted_indices_traj
+   
