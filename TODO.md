@@ -53,6 +53,7 @@
 - [ ] Put shared functionality of PCA and TICA into shared functions.
 - [ ] Make file format (png/pdf?) for matplotlib optional.
 - [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis)
+- [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
 
 ### Ideas
 - [ ] Logo
