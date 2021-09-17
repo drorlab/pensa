@@ -1,5 +1,6 @@
 name: pensa
 channels:
+  - pytorch
   - conda-forge
   - defaults
 dependencies:
@@ -14,3 +15,7 @@ dependencies:
   - cython
   - pip 
   - biotite
+  - cudatoolkit
+  - pytorch
+  - torchvision
+  - torchaudio
