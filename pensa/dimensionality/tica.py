@@ -44,9 +44,9 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     ----------
         tica : TICA obj
             Time-lagged independent components information.
-        num : int, default=12
+        num : int, default = 12
             Number of eigenvalues to plot.
-        plot_file : str, optional
+        plot_file : str, optional, default = None
             Path and name of the file to save the plot.
         
     """
@@ -63,7 +63,7 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     return componentnr, eigenvalues
 
 
-def tica_features(tica, features, num, threshold, plot_file=None):
+def tica_features(tica, features, num, threshold, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
     
@@ -78,8 +78,10 @@ def tica_features(tica, features, num, threshold, plot_file=None):
             Number of feature correlations to plot.
         threshold : float
             Features with a correlation above this will be printed.
-        plot_file : str, optional
+        plot_file : str, optional, default = None
             Path and name of the file to save the plot.
+        add_labels : bool, optional, default = False
+            Add labels of the features to the x axis.
         
     """
     # Plot the highest TIC correlations and print relevant features.
@@ -114,10 +116,10 @@ def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
             Trajectory data [frames,frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero).
-        tica : TICA obj, optional
+        tica : TICA obj, optional, default = None
             Information of pre-calculated TICA.
             Must be calculated for the same features (but not necessarily the same trajectory).
-        dim : int, optional, default -1
+        dim : int, optional, default = -1
             The number of dimensions (independent components) to project onto.
             Only used if tica is not provided.
         lag : int, optional, default = 10
@@ -147,10 +149,10 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
             Trajectory data [frames,frame_data].
         num : int
             Number of eigenvectors to project on. 
-        tica : tICA obj, optional
+        tica : tICA obj, optional, default = None
             Information of pre-calculated tICA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
-        dim : int, optional, default -1
+        dim : int, optional, default = -1
             The number of dimensions (independent components) to project onto.
             Only used if tica is not provided.
         lag : int, optional, default = 10
@@ -197,7 +199,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files
-        tica : tICA obj, optional
+        tica : tICA obj, optional, default = None
             Time-lagged independent components information.
             If none is provided, it will be calculated.
             Defaults to None.

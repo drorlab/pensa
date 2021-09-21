@@ -20,7 +20,7 @@ def calculate_pca(data, dim=-1):
     ----------
         data : float array
             Trajectory data [frames,frame_data].
-        dim : int, optional, default -1
+        dim : int, optional, default = -1
             The number of dimensions (principal components) to project onto. 
             -1 means all numerically available dimensions will be used.
         
@@ -42,9 +42,9 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     ----------
         pca : PCA obj
             Principal components information.
-        num : int, optional
-            Number of eigenvalues to plot. Defaults to 12.
-        plot_file : str, optional
+        num : int, optional, default = 12
+            Number of eigenvalues to plot.
+        plot_file : str, optional, default = None
             Path and name of the file to save the plot.
         
     """
@@ -76,8 +76,11 @@ def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False
             Number of feature correlations to plot.
         threshold : float
             Features with a correlation above this will be printed.
-        plot_file : str, optional
+        plot_file : str, optional, default = None
             Path and name of the file to save the plot.
+        add_labels : bool, optional, default = False
+            Add labels of the features to the x axis.
+            
         
     """
     # Plot the highest PC correlations and print relevant features
@@ -116,10 +119,10 @@ def project_on_pc(data, ev_idx, pca=None, dim=-1):
             Trajectory data [frames,frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero). 
-        pca : PCA obj, optional
-            Information of pre-calculated PCA. Defaults to None.
+        pca : PCA obj, optional, default = None
+            Information of pre-calculated PCA.
             Must be calculated for the same features (but not necessarily the same trajectory).
-        dim : int, optional, default -1
+        dim : int, optional, default = -1
             The number of dimensions (principal components) to project onto.
             Only used if tica is not provided.
     Returns
@@ -145,8 +148,8 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
             Trajectory data [frames,frame_data].
         num : int
             Number of eigenvectors to project on. 
-        pca : PCA obj, optional
-            Information of pre-calculated PCA. Defaults to None.
+        pca : PCA obj, optional, default = None
+            Information of pre-calculated PCA.
             Must be calculated for the same features (but not necessarily the same trajectory).
         dim : int, optional, default = -1
             The number of dimensions (principal components) to project onto.
@@ -192,16 +195,14 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files
-        pca : PCA obj, optional
+        pca : PCA obj, optional, default = None
             Principal components information.
             If none is provided, it will be calculated.
             Defaults to None.
-        num_pc : int, optional
+        num_pc : int, optional, default = 3
             Sort along the first num_pc principal components.
-            Defaults to 3.
-        start_frame : int, optional
+        start_frame : int, optional, default = 0
             Offset of the data with respect to the trajectories (defined below).
-            Defaults to 0.
     
     Returns
     -------
@@ -244,12 +245,10 @@ def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_n
             Should be the same as data_b was from.
         out_name : str
             Core part of the name of the output files.
-        num_pc : int, optional
+        num_pc : int, optional, default = 3
             Sort along the first num_pc principal components.
-            Defaults to 3.
-        start_frame : int or list of int
+        start_frame : int or list of int, default = 0
             Offset of the data with respect to the trajectories.
-            Defaults to 0.
 
     Returns
     -------
@@ -282,12 +281,10 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
             trj[i] should be the same as data[i] was from.
         out_name : str
             Core part of the name of the output files.
-        num_pc : int, optional
+        num_pc : int, optional, default = 3
             Sort along the first num_pc principal components.
-            Defaults to 3.
-        start_frame : int or list of int
+        start_frame : int or list of int, default = 0
             Offset of the data with respect to the trajectories.
-            Defaults to 0.
 
     Returns
     -------
