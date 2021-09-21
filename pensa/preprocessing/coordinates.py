@@ -189,7 +189,6 @@ def sort_coordinates(values, top_name, trj_name, out_name, start_frame=0, verbos
             Sorted indices of the values.
         oidx_sort: float array
             Sorted indices of the trajectory.
-        data_sort: float array
             
     """
     # Remember the index in the simulation (taking into account offset)
