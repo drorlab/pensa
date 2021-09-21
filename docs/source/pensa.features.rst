@@ -14,6 +14,14 @@ pensa.features.atom\_features
    :undoc-members:
    :show-inheritance:
 
+pensa.features.csv\_features
+-----------------------------------
+
+.. automodule:: pensa.features.csv_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.features.mda\_distances
 ------------------------------------
 
