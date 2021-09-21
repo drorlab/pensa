@@ -6,8 +6,8 @@
   - [ ] Unit tests for SSI 
   - [ ] Unit tests for density features
 - [ ] Integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
-  - [ ] Lay out module structure in separate branch.
-  - [ ] Copy core network from DiffNets repo.
+  - [x] Lay out module structure in separate branch.
+  - [x] Copy core network from DiffNets repo.
   - [ ] Try to use existing featurization.
   - [ ] Include existing DiffNets featurization and compare.
 - [ ] exploratory analysis via correlation coefficients of the features
