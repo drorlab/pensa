@@ -28,7 +28,7 @@
   - [x] SSI
 
 ### Plans
-
+- [ ] Option to write and load features as CSV file.
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
