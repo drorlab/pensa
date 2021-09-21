@@ -54,7 +54,7 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
     componentnr = np.arange(num)+1 
     eigenvalues = tica.eigenvalues[:num]
-    ax.plot(componentnr, eigenvalues, 'o')
+    ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
@@ -83,7 +83,8 @@ def tica_features(tica, features, num, threshold, plot_file=None):
         
     """
     # Plot the highest TIC correlations and print relevant features.
-    fig,ax = plt.subplots(num,1,figsize=[4,num*3],dpi=300,sharex=True)
+    height = num*2+2 if add_labels else num*2
+    fig,ax = plt.subplots(num,1,figsize=[4,height],dpi=300,sharex=True)
     for i in range(num):
         relevant = tica.feature_TIC_correlation[:,i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for TIC %i:"%(threshold, i+1))
@@ -91,14 +92,18 @@ def tica_features(tica, features, num, threshold, plot_file=None):
             if relevant[j]: print(ft, "%6.3f"%(tica.feature_TIC_correlation[j,i]))
         ax[i].plot(tica.feature_TIC_correlation[:,i])
         test_feature = tica.feature_TIC_correlation[:,i]
-        ax[i].set_xlabel('feature index')
-        ax[i].set_ylabel('correlation with TIC%i'%(i+1))
+        ax[i].set_ylabel('corr. with TIC%i'%(i+1))
+    if add_labels:
+        ax[-1].set_xticks(np.arange(len(features)))
+        ax[-1].set_xticklabels(features,rotation=90)
+    else:
+        ax[-1].set_xlabel('feature index')
     fig.tight_layout()
     # Save the figure to a file.
     if plot_file: fig.savefig(plot_file,dpi=300)
     return test_feature
     
-    
+   
 def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     """
     Projects a trajectory onto an eigenvector of its TICA.

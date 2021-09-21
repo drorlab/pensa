@@ -52,7 +52,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
     componentnr = np.arange(num)+1 
     eigenvalues = pca.eigenvalues[:num]
-    ax.plot(componentnr, eigenvalues, 'o')
+    ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
@@ -61,7 +61,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     return componentnr, eigenvalues
 
 
-def pca_features(pca, features, num, threshold, plot_file=None):
+def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
     
@@ -83,7 +83,8 @@ def pca_features(pca, features, num, threshold, plot_file=None):
     # Plot the highest PC correlations and print relevant features
     test_graph = []
     test_corr = []
-    fig,ax = plt.subplots(num,1,figsize=[4,num*3],dpi=300,sharex=True)
+    height = num*2+2 if add_labels else num*2
+    fig,ax = plt.subplots(num,1,figsize=[4,height],dpi=300,sharex=True)
     for i in range(num):
         relevant = pca.feature_PC_correlation[:,i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for PC %i:"%(threshold, i+1))
@@ -91,10 +92,14 @@ def pca_features(pca, features, num, threshold, plot_file=None):
             if relevant[j]:
                 print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
                 test_corr.append(pca.feature_PC_correlation[j,i])
-        ax[i].plot(pca.feature_PC_correlation[:,i])
-        ax[i].set_xlabel('feature index')
-        ax[i].set_ylabel('correlation with PC%i'%(i+1))
+        ax[i].bar(np.arange(len(features)), pca.feature_PC_correlation[:,i])
+        ax[i].set_ylabel('corr. with PC%i'%(i+1))
         test_graph.append(pca.feature_PC_correlation[:,i])
+    if add_labels:
+        ax[-1].set_xticks(np.arange(len(features)))
+        ax[-1].set_xticklabels(features,rotation=90)
+    else:
+        ax[-1].set_xlabel('feature index')
     fig.tight_layout()
     # Save the figure to a file
     if plot_file: fig.savefig(plot_file,dpi=300)
