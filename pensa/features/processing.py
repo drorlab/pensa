@@ -12,6 +12,37 @@ import warnings
 from pensa.preprocessing import sort_coordinates
 
 
+def get_feature_subset(feat, data, selection):
+    """
+    Returns a subset of selected features. 
+    Does not check whether the selected features are actually present in the input.
+    
+    Parameters
+    ----------
+        feat : list of str
+            List with all feature names.
+        data : float array
+            Feature values data from the simulation.
+        selection : list of str
+           Names of the selected features.
+    
+    Returns
+    -------
+        sub_feat : list of str
+            List with all feature names of the subset.
+        sub_data : float array
+            Feature values data of the subset.
+    
+    """
+    # Select the feature and get its index.
+    indices = np.where( [f in selection for f in feat] )[0]
+    # Extract the new names.
+    sub_feat = list(np.array(feat)[indices])
+    # Extract the timeseries.
+    sub_data = data[:,indices]
+    return sub_feat, sub_data
+
+
 # -- Utilities to extract time series --
 
 
