@@ -28,7 +28,6 @@
   - [x] SSI
 
 ### Plans
-- [ ] Option to write and load features as CSV file.
 - [ ] Try using MDAnalysis instead of biotite for water featurization
 - [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
@@ -65,13 +64,11 @@
   - [ ] modify p-value of KS test using correlation time 
   - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
-- [ ] Add options to save and load calculated features
 - [ ] Add option to whiten features
 - [ ] Featurizers for other molecule types
   - [ ] ligands
   - [ ] lipids
   - [ ] nucleic acids
-- [ ] Simplify adding hand-crafted features 
 - [ ] Account for [Bonferroni correction](https://en.wikipedia.org/wiki/Bonferroni_correction) in comparison.
 - [ ] Implement conformational entropy calculations
   - [ ] Read papers, e.g, [1](https://www.pnas.org/content/111/43/15396), [2](https://www.mdpi.com/2079-3197/6/1/21/htm), [3](https://pubs.acs.org/doi/10.1021/acs.jcim.0c01375)
@@ -101,7 +98,7 @@
   - [x] Function compare_projections() does not have labels or legend
 - [x] Slack channel for all developers and testers, and to provide support for the user community.
 - [x] Implement clustering in principal component space
-
+- [x] Option to write and load features as CSV file.
 
 ### Abandoned
 
