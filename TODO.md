@@ -57,7 +57,9 @@
 ### Ideas
 - [ ] Logo
 - [ ] Hydrogen bonds as features
-- [ ] Contacts as features (can PyEMMA do this?)
+- [ ] Contacts as features 
+  - [ ] can PyEMMA do this?
+  - [ ] Think about a [GetContacts](https://getcontacts.github.io/) reader
 - [ ] Position deviations as features (similar to components of RMSD)
 - [ ] Estimate thresholds for significance of feature differences
   - [ ] Calculate correlation times within trajectories
