@@ -80,6 +80,7 @@
 - [ ] Try to integrate [VAMPnets](https://www.nature.com/articles/s41467-017-02388-1).
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
 - [ ] Try to integrate [Deep learning the slow modes for rare events sampling](https://www.pnas.org/content/118/44/e2113533118)
+- [ ] Check out [correlationplus](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00742)
 
 ### Done  ✓
 - [x] Colab Tutorial
