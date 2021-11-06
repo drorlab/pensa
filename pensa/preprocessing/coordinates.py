@@ -26,6 +26,8 @@ def extract_coordinates(top, pdb, trj_list, out_name, sel_string, start_frame=0,
             Can read all MDAnalysis-compatible trajectory formats.
         out_name : str
             Core of the file names for the output files.
+        sel_string : str
+            Selection string in MDAnalysis format. Defines which atoms to extract.
         start_frame : int, optional
             First frame to read from the trajectory.
     
@@ -63,6 +65,8 @@ def extract_coordinates_combined(top, trj, sel_string, out_name, start_frame=0, 
         trj : list of str
             File names for the input trajectories.
             Can read all MDAnalysis-compatible trajectory formats.
+        sel_string : str
+            Selection string in MDAnalysis format. Defines which atoms to extract.
         out_name : str
             Core of the file names for the output files.
         start_frame : int, optional
@@ -151,6 +155,8 @@ def align_coordinates(top, pdb, trj_list, out_name, sel_string='all', start_fram
             Can read all MDAnalysis-compatible trajectory formats.
         out_name : str
             Core of the file names for the output files
+        sel_string : str
+            Selection string in MDAnalysis format. Defines on which atoms to align.
         start_frame : int, optional
             First frame to read from the trajectory. 
     """
