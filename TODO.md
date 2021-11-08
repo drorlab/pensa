@@ -53,7 +53,7 @@
 - [ ] Make file format (png/pdf?) for matplotlib optional.
 - [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis).
 - [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
-- [ ] Implement nucleic acid torsions and pseudo-torsions, as reviewed [Keating et al.](https://www.cambridge.org/core/journals/quarterly-reviews-of-biophysics/article/new-way-to-see-rna/2A2D428A5FAB150D2488A5A1D87007BD) and as used in [x3DNA](https://x3dna.org/highlights/pseudo-torsions-to-simplify-the-representation-of-dna-rna-backbone-conformation).
+- [ ] Implement nucleic acid torsions and pseudo-torsions, as reviewed [Keating et al.](https://www.cambridge.org/core/journals/quarterly-reviews-of-biophysics/article/new-way-to-see-rna/2A2D428A5FAB150D2488A5A1D87007BD) and as used in [x3DNA](https://x3dna.org/highlights/pseudo-torsions-to-simplify-the-representation-of-dna-rna-backbone-conformation) or [Barnaba](https://rnajournal.cshlp.org/content/25/2/219) ([Barnaba code on GitHub](https://github.com/srnas/barnaba)).
 
 ### Ideas
 - [ ] Logo
