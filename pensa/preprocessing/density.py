@@ -18,6 +18,7 @@ The methods here are based on the following paper:
 import numpy as np
 from scipy import ndimage as ndi
 import os
+from tqdm import tqdm
 # from gridData import Grid
 import MDAnalysis as mda
 from MDAnalysis.analysis.density import DensityAnalysis
@@ -155,8 +156,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Combined_conditions.load_new(merged_coords, format=MemoryReader)    
         
         # # # Creating universe with correct timesteps
-        for frameno in range(smallest_traj_len):
-            print('\n Stacking frame: ', frameno,'\n')
+        for frameno in tqdm(range(smallest_traj_len)):
             condition_a.trajectory[frameno]
             condition_b.trajectory[frameno]
             # # # Extract trajectory coordinates at frame [frameno]
