@@ -19,6 +19,44 @@ from pensa.features import *
 
 def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False, block_length=None, cumdist=True):
     """
+    
+
+    Parameters
+    ----------
+    features_a : TYPE
+        DESCRIPTION.
+    features_b : TYPE
+        DESCRIPTION.
+    all_data_a : TYPE
+        DESCRIPTION.
+    all_data_b : TYPE
+        DESCRIPTION.
+    bin_width : TYPE, optional
+        DESCRIPTION. The default is None.
+    bin_num : TYPE, optional
+        DESCRIPTION. The default is 10.
+    verbose : TYPE, optional
+        DESCRIPTION. The default is True.
+    override_name_check : TYPE, optional
+        DESCRIPTION. The default is False.
+    block_length : TYPE, optional
+        DESCRIPTION. The default is None.
+    cumdist : TYPE, optional
+        DESCRIPTION. The default is True.
+
+    Returns
+    -------
+    data_names : TYPE
+        DESCRIPTION.
+    data_jsdist : TYPE
+        DESCRIPTION.
+    data_kld_ab : TYPE
+        DESCRIPTION.
+    data_kld_ba : TYPE
+        DESCRIPTION.
+
+    """
+    """
     Calculates the Jensen-Shannon distance and the Kullback-Leibler divergences for each feature from two ensembles.
     
     Parameters
@@ -43,7 +81,11 @@ def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b
             Print intermediate results.
         override_name_check : bool, default=False
             Only check number of features, not their names.
-    
+        block_length : int, optional
+            The length of frames to include in each block. The default is None.
+        cumdist : bool, optional
+            If a cumulative block analysis is desired, set to True. The default is False.   
+        
     Returns
     -------
         data_names : list of str
@@ -114,7 +156,8 @@ def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b
 
 
 def unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, 
-                          verbose=True, write_plots=None, override_name_check=False, block_length=None, bin_no=180, cumdist=True):
+                          verbose=True, write_plots=None, override_name_check=False, block_length=None, bin_no=180, cumdist=False):
+
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -144,7 +187,14 @@ def unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, to
         If true, visualise the states over the raw distribution. The default is None.
     override_name_check : bool, default=False
         Only check number of features, not their names.   
+    block_length : int, optional
+        The length of frames to include in each block. The default is None.
+    bin_no : int, optional
+        The number of bins to use in state clustering. The default is 180.
+    cumdist : bool, optional
+        If a cumulative block analysis is desired, set to True. The default is False.       
         
+            
     Returns
     -------
         data_names : list of str
