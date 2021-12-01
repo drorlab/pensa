@@ -140,7 +140,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     condition_b = mda.Universe(struc_b, xtc_b)
    
     
-   if use_memmap is True:
+    if use_memmap is True:
         # # # Combine both ensembles' atoms into one universe
         Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
         # # # The density needs to be formed from an even contribution of both conditions
