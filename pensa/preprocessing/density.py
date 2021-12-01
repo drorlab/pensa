@@ -102,7 +102,7 @@ def local_maxima_3D(data, order=3):
 
     return coords, values
     
-def new_extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name):
+def extract_large_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name):
     """
     Writes out combined atomgroup density for both input simulations. Uses
     numpy memmap to create pseudo-trajectory for combined MDAnalysis Universe
