@@ -104,35 +104,41 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
                                                               write_name=plot_name))
                 except:
                     print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                    cluster=0
+                    
+        if cluster==0:
+            SSI = -1
+            data_ssi[residue] = SSI
+            if verbose is True:
+                print(data_names[residue],data_ssi[residue])
+        else:
+            H_feat=calculate_entropy(feat_states,feat_distr) 
 
-            
-        H_feat=calculate_entropy(feat_states,feat_distr) 
+            if H_feat != 0:
+                ##calculating the entropy for set_distr_b
+                ## if no dist (None) then apply the binary dist for two simulations
+                ens_distr=[[0.5]*traj1_len + [1.5]*int(len(feat_distr[0])-traj1_len)]
+                ens_states= [[0,1,2]]  
+                    
+                traj_1_fraction = traj1_len/len(feat_distr[0])
+                traj_2_fraction = 1 - traj_1_fraction
+                norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                H_ens = norm_factor
                 
-        if H_feat != 0:
-            ##calculating the entropy for set_distr_b
-            ## if no dist (None) then apply the binary dist for two simulations
-            ens_distr=[[0.5]*traj1_len + [1.5]*int(len(feat_distr[0])-traj1_len)]
-            ens_states= [[0,1,2]]  
+                featens_joint_states= feat_states + ens_states
+                featens_joint_distr= feat_distr + ens_distr
+                H_featens=calculate_entropy(featens_joint_states,featens_joint_distr)
+        
+                SSI = ((H_feat + H_ens) - H_featens)/norm_factor
+            
+            else: 
                 
-            traj_1_fraction = traj1_len/len(feat_distr[0])
-            traj_2_fraction = 1 - traj_1_fraction
-            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-            H_ens = norm_factor
+                SSI = 0
             
-            featens_joint_states= feat_states + ens_states
-            featens_joint_distr= feat_distr + ens_distr
-            H_featens=calculate_entropy(featens_joint_states,featens_joint_distr)
-    
-            SSI = ((H_feat + H_ens) - H_featens)/norm_factor
-        
-        else: 
-            
-            SSI = 0
-        
-        data_ssi[residue] = SSI
-            
-        if verbose is True:
-            print(data_names[residue],data_ssi[residue])
+            data_ssi[residue] = SSI
+                
+            if verbose is True:
+                print(data_names[residue],data_ssi[residue])
         
     return data_names, data_ssi
 
