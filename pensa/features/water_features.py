@@ -194,7 +194,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
         water_pocket_occupation_frequency = round(water_pocket_occupation_frequency,4)
-        atom_location = point_str
+        atom_location = shifted_coords
 
         water_information.append([water_ID,list(atom_location),water_pocket_occupation_frequency])
         
