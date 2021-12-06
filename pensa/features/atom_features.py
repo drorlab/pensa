@@ -115,13 +115,15 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         print('Atom no: ',atom_no+1)
         print('\n')
 
-        counting=[]
+        counting=[]            
+        shifted_coords=coords[wat_no]+g.origin
+        point_str = str(shifted_coords)[1:-1]
         ## Find all water atoms within 2.5 Angstroms of density maxima
         for i in tqdm(range(len(u.trajectory))):       
-        # for i in tqdm(range(100)):       
+        # for i in tqdm(range(100)):     
             u.trajectory[i]
             radius= ' 2.5'
-            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[atom_no] +radius).indices)
+            atomgroup_IDS=list(u.select_atoms('name ' + atomgroup + ' and point ' + point_str +radius).indices)
             if len(atomgroup_IDS)==0:
                 atomgroup_IDS=[-1]
             counting.append(atomgroup_IDS)
@@ -130,7 +132,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         flat_list = [item for sublist in counting for item in sublist]
 
         atom_ID = 'a' + str(atom_no+1)
-        atom_location = coords[atom_no] + g.origin
+        atom_location = shifted_coords
         pocket_occupation_frequency = 1 - flat_list.count(-1)/len(flat_list)   
         pocket_occupation_frequency = round(pocket_occupation_frequency,4)
         atom_information.append([atom_ID,list(atom_location),pocket_occupation_frequency])
