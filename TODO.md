@@ -82,6 +82,7 @@
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
 - [ ] Try to integrate [Deep learning the slow modes for rare events sampling](https://www.pnas.org/content/118/44/e2113533118)
 - [ ] Check out [correlationplus](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00742)
+- [ ] Improve clusering using [Gaussian Mixture Models](https://arxiv.org/abs/2112.11424)
 
 ### Done  ✓
 - [x] Colab Tutorial
