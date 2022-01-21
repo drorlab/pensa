@@ -38,8 +38,9 @@ def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b
         If bin_width is None, bin_num (see below) bins are used and the width is determined from the common histogram.
     bin_num : int, default=10
         Number of bins for the axis to compare the distributions on (only if bin_width=None).
-    block_length : TYPE, optional
-        DESCRIPTION. The default is None.
+    block_length : int, optional
+        Length of block to be used in the block analysis. Trajectory is then
+        segmented into X equal size blocks. The default is None.
     verbose : bool, default=True
         Print intermediate results.
     override_name_check : bool, default=False
@@ -141,8 +142,9 @@ def unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, to
     bin_no : int, default=10
         Number of bins for the distribution histogram when performing clustering.
         The default is 180.
-    block_length : TYPE, optional
-        DESCRIPTION. The default is None.
+    block_length : int, optional
+        Length of block to be used in the block analysis. Trajectory is then
+        segmented into X equal size blocks. The default is None.
     verbose : bool, default=True
         Print intermediate results.
     write_plots : bool, optional
@@ -267,8 +269,8 @@ def unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, to
 
 
 
-def ssi_block_analysis(a_rec_feat, b_rec_feat,
-                       a_rec_data, b_rec_data,
+def ssi_block_analysis(features_a, features_b,
+                       all_data_a, all_data_b,
                        torsions='sc', blockanlen=10000,
                        cumdist=False, verbose=True):
     
@@ -278,34 +280,40 @@ def ssi_block_analysis(a_rec_feat, b_rec_feat,
 
     Parameters
     ----------
-    a_rec_feat : TYPE
-        DESCRIPTION.
-    b_rec_feat : TYPE
-        DESCRIPTION.
-    a_rec_data : TYPE
-        DESCRIPTION.
-    b_rec_data : TYPE
-        DESCRIPTION.
-    torsions : TYPE, optional
-        DESCRIPTION. The default is 'sc'.
-    blockanlen : TYPE, optional
-        DESCRIPTION. The default is 10000.
-    cumdist : TYPE, optional
-        DESCRIPTION. The default is False.
-    verbose : TYPE, optional
-        DESCRIPTION. The default is True.
+    features_a : list of str
+        Feature names of the first ensemble. 
+    features_b : list of str
+        Feature names of the first ensemble. 
+        Must be the same as features_a. Provided as a sanity check. 
+    all_data_a : float array
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
+    all_data_b : float array
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
+    torsions : str
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        The default is 'sc'.
+    blockanlen : int, optional
+        Length of block to be used in the block analysis. Trajectory is then
+        segmented into X equal size blocks. The default is None.
+    cumdist : bool, optional
+        If True, set the block analysis to a cumulative segmentation, increasing
+        in length by the block length. The default is False.
+    verbose : bool, default=True
+        Print intermediate results.
         
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    ssi_names : list 
+        Feature names of the ensembles.
+    ssi_blocks : list of lists
+        State Specific Information statistics for each feature, for each block.
 
     """
     
     ssi_blocks=[]
     block_lengths=[]
     frameno=0
-    while frameno <= len(len(a_rec_data[torsions+'-torsions'])):
+    while frameno <= len(len(all_data_a[torsions+'-torsions'])):
         if cumdist is True:
             block_lengths.append([0,frameno+blockanlen])
         else:
@@ -315,8 +323,8 @@ def ssi_block_analysis(a_rec_feat, b_rec_feat,
 
     for bl in block_lengths:
         print('block length = ', bl)
-        ssi_names, data_ssi = unc_ssi_ensemble_analysis(a_rec_feat, b_rec_feat,
-                                                        a_rec_data, b_rec_data,
+        ssi_names, data_ssi = unc_ssi_ensemble_analysis(features_a, features_b,
+                                                        all_data_a, all_data_b,
                                                         torsions=torsions, 
                                                         block_length=bl, 
                                                         verbose=True)
@@ -324,13 +332,13 @@ def ssi_block_analysis(a_rec_feat, b_rec_feat,
         ssi_blocks.append(data_ssi)
 
     np.save('ssi_bl'+str(blockanlen),np.transpose(np.array(ssi_blocks)))
-    
-    return np.transpose(ssi_names), np.transpose(ssi_blocks)
+    ssi_names, ssi_blocks =  np.transpose(ssi_names), np.transpose(ssi_blocks)
+    return ssi_names, ssi_blocks
 
 
 
-def relen_block_analysis(a_rec_feat, b_rec_feat,
-                         a_rec_data, b_rec_data, 
+def relen_block_analysis(features_a, features_b,
+                         all_data_a, all_data_b, 
                          blockanlen=10000, cumdist=False, verbose=True):
     """
     Block analysis on the relative entropy metrics for each feature from two ensembles.
@@ -338,25 +346,30 @@ def relen_block_analysis(a_rec_feat, b_rec_feat,
 
     Parameters
     ----------
-    a_rec_feat : TYPE
-        DESCRIPTION.
-    b_rec_feat : TYPE
-        DESCRIPTION.
-    a_rec_data : TYPE
-        DESCRIPTION.
-    b_rec_data : TYPE
-        DESCRIPTION.
-    blockanlen : TYPE, optional
-        DESCRIPTION. The default is 10000.
-    cumdist : TYPE, optional
-        DESCRIPTION. The default is False.
-    verbose : TYPE, optional
-        DESCRIPTION. The default is True.
+    features_a : list of str
+        Feature names of the first ensemble. 
+        Can be obtained from features object via .describe().
+    features_b : list of str
+        Feature names of the first ensemble. 
+        Can be obtained from features object via .describe().
+        Must be the same as features_a. Provided as a sanity check. 
+    all_data_a : float array
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
+    all_data_b : float array
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
+    blockanlen : int, optional
+        Length of block to be used in the block analysis. Trajectory is then
+        segmented into X equal size blocks. The default is None.
+    cumdist : bool, optional
+        If True, set the block analysis to a cumulative segmentation, increasing
+        in length by the block length. The default is False.
+    verbose : bool, default=True
+        Print intermediate results.
 
     Returns
     -------
-    relen_blocks : TYPE
-        DESCRIPTION.
+    relen_blocks : list of lists
+        List of relative entropy analysis outputs for each block.
 
     """
     
@@ -364,7 +377,7 @@ def relen_block_analysis(a_rec_feat, b_rec_feat,
     relen_blocks=[]        
     block_lengths=[]
     frameno=0
-    while frameno <= len(a_rec_data['sc-torsions']):
+    while frameno <= len(all_data_a['sc-torsions']):
         if cumdist is True:
             block_lengths.append([0,frameno+blockanlen])
         else:
@@ -374,8 +387,8 @@ def relen_block_analysis(a_rec_feat, b_rec_feat,
     for bl in block_lengths:
         print('block length = ', bl)       
         
-        relen = unc_relative_entropy_analysis(a_rec_feat, b_rec_feat,
-                                              a_rec_data, b_rec_data,
+        relen = unc_relative_entropy_analysis(features_a, features_b,
+                                              all_data_a, all_data_b,
                                               block_length=bl, verbose=True)        
         relen_blocks.append(relen)
             
@@ -385,45 +398,23 @@ def relen_block_analysis(a_rec_feat, b_rec_feat,
     return relen_blocks
 
 
-def gradient(x,y):
-    """
-    
-
-    Parameters
-    ----------
-    x : TYPE
-        DESCRIPTION.
-    y : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    grad : TYPE
-        DESCRIPTION.
-
-    """
-    x=np.array(x)
-    y=np.array(y)
-    dx=x[1:]-x[:-1]
-    dy=y[1:]-y[:-1]
-    grad=dy/dx
-    return grad
-
 def pop_arr_val(listid, pop_val):
     """
-    
+    Remove value from list. Necessary for SEM calculations which include an 
+    error value of -1 for SSI. 
 
     Parameters
     ----------
-    listid : TYPE
-        DESCRIPTION.
-    pop_val : TYPE
-        DESCRIPTION.
+    listid : list of lists
+        State Specific Information statistics for each feature, for each block.
+    pop_val : int
+        Value to delete from list.
 
     Returns
     -------
-    arr : TYPE
-        DESCRIPTION.
+    arr : list
+        State Specific Information statistics for each feature, for each block
+        with the pop_val removed.
 
     """
     arr = []
@@ -439,23 +430,23 @@ def pop_arr_val(listid, pop_val):
 
 def expfunc(x, a, b, c):
     """
-    Create an exponential fit for an array.
+    Create an exponential for an x-range and exponential coefficients.
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    a : TYPE
-        DESCRIPTION.
-    b : TYPE
-        DESCRIPTION.
-    c : TYPE
-        DESCRIPTION.
+    x : list
+        Range of values on the x-axis.
+    a : int
+        Coefficient for exponential function.
+    b : int
+        Coefficient for exponential function.
+    c : int
+        Coefficient for exponential function.
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    list
+        Exponential y-axis values.
 
     """
     return np.exp(a + b * np.array(x)) + c
@@ -463,7 +454,7 @@ def expfunc(x, a, b, c):
 
 def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
     """
-    
+    Standard error analysis for the block averages.
 
     Parameters
     ----------
@@ -471,19 +462,20 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
         DESCRIPTION.
     ssi_blocks : TYPE
         DESCRIPTION.
-    write_plot : TYPE, optional
-        DESCRIPTION. The default is True.
-    expfit : TYPE, optional
-        DESCRIPTION. The default is False.
+    write_plots : bool, optional
+        If true, visualise the SEM analysis. Default is True.
+    expfit : bool, optional
+        If True, apply an exponential fit to the SEM plot to predict the SEM
+        value upon full convergence. Not yet fully accurate. The default is False.
 
     Returns
     -------
-    avsemvals : TYPE
-        DESCRIPTION.
-    avresssivals : TYPE
-        DESCRIPTION.
-    resssivals : TYPE
-        DESCRIPTION.
+    avsemvals : list of lists
+        SEM values averaged across each residue type.
+    avresssivals : list of lists
+        SSI values for each block, averaged by residue type.
+    resssivals : list of lists
+        SSI values for each block, for each residue type.
 
     """
     
@@ -541,25 +533,27 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
   
 def relen_sem_analysis(relen_blocks, write_plot=True, expfit=False):
     """
-    
+    Standard error analysis for the block averages.
+
 
     Parameters
     ----------
-    relen_blocks : TYPE
-        DESCRIPTION.
-    write_plot : TYPE, optional
-        DESCRIPTION. The default is True.
-    expfit : TYPE, optional
-        DESCRIPTION. The default is False.
+    relen_blocks : list of lists
+        List of relative entropy analysis outputs for each block.
+    write_plots : bool, optional
+        If true, visualise the SEM analysis. Default is True.
+    expfit : bool, optional
+        If True, apply an exponential fit to the SEM plot to predict the SEM
+        value upon full convergence. Not yet fully accurate. The default is False.
 
     Returns
     -------
-    resrelenvals : TYPE
-        DESCRIPTION.
-    avresrelenvals : TYPE
-        DESCRIPTION.
-    avsemvals : TYPE
-        DESCRIPTION.
+    resrelenvals : list of lists
+        JSD values for each block, for each residue type.
+    avresrelenvals : list of lists
+        JSD values for each block, averaged by residue type.
+    avsemvals : list of lists
+        SEM values averaged across each residue type.
 
     """
 
