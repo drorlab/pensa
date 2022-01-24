@@ -313,13 +313,21 @@ def ssi_block_analysis(features_a, features_b,
     ssi_blocks=[]
     block_lengths=[]
     frameno=0
-    while frameno <= len(len(all_data_a[torsions+'-torsions'])):
-        if cumdist is True:
-            block_lengths.append([0,frameno+blockanlen])
-        else:
-            block_lengths.append([frameno+1,frameno+blockanlen])
-        frameno+=blockanlen
-       
+    ## add if statement for no sc-torsions
+    if torsions is None:
+        while frameno <= min(len(all_data_a),len(all_data_b)):
+            if cumdist is True:
+                block_lengths.append([0,frameno+blockanlen])
+            else:
+                block_lengths.append([frameno+1,frameno+blockanlen])
+            frameno+=blockanlen
+    else:
+        while frameno <= min(len(all_data_a[torsions+'-torsions']),len(all_data_b[torsions+'-torsions'])):
+            if cumdist is True:
+                block_lengths.append([0,frameno+blockanlen])
+            else:
+                block_lengths.append([frameno+1,frameno+blockanlen])
+            frameno+=blockanlen
 
     for bl in block_lengths:
         print('block length = ', bl)
@@ -377,7 +385,7 @@ def relen_block_analysis(features_a, features_b,
     relen_blocks=[]        
     block_lengths=[]
     frameno=0
-    while frameno <= len(all_data_a['sc-torsions']):
+    while frameno <= min(len(all_data_a),len(all_data_b)):
         if cumdist is True:
             block_lengths.append([0,frameno+blockanlen])
         else:
@@ -393,9 +401,9 @@ def relen_block_analysis(features_a, features_b,
         relen_blocks.append(relen)
             
             
-    np.save('relen_bl'+str(blockanlen),np.array(relen_blocks))
+    np.save('relen_bl'+str(blockanlen),np.transpose(np.array(relen_blocks)))
     
-    return relen_blocks
+    return np.transpose(relen_blocks)
 
 
 def pop_arr_val(listid, pop_val):
@@ -499,6 +507,9 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
         avsemvals.append([scipy.stats.sem(avresssivals[-1][:seg]) for seg in range(len(avresssivals[-1]))])
 
     if write_plot is True:    
+        if not os.path.exists('SEM_plots/'):
+            os.makedirs('SEM_plots/')
+            
         for i in range(len(resnames)):
             
             x=list(range(len(avsemvals[i][2:])))
@@ -506,6 +517,7 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
             
             
             plt.figure()
+            plt.ion()
             plt.scatter(x, y,label='raw data',marker='x',color='r')
             plt.title(resnames[i])
             plt.xlabel('Block # (in steps of 10,000 frames per simulation)')
@@ -526,6 +538,8 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()
+            plt.ioff()                
+            plt.savefig(resnames[i] + 'standarderrorSSI.png')
         
             
     return avsemvals, avresssivals, resssivals
@@ -581,22 +595,23 @@ def relen_sem_analysis(relen_blocks, write_plot=True, expfit=False):
     
     ## Plotting the sem over each block to see the convergence
     if write_plot is True:
-        for i in range(len(matching_indices)):
+        if not os.path.exists('SEM_plots/'):
+            os.makedirs('SEM_plots/')
+        for i in range(len(namesnodups)):
+            print("plotting res", i,  namesnodups[i])
             
             x=list(range(len(avsemvals[i][2:])))
             y=avsemvals[i][2:]
             
-            plt.figure()
+            plt.figure()      
+            plt.ion()
             plt.scatter(x, y,label='raw data',marker='x',color='r')
             plt.title(namesnodups[i])
             plt.xlabel('Block # (in steps of 10,000 frames per simulation)')
             plt.ylabel('JSD average standard error for residue type')
-            plt.savefig(namesnodups[i] + 'standarderrorrelen.png')
-
             if expfit is True:
                 expofit=np.polyfit(x, np.log(y), 1)
                 expy=[np.exp(expofit[0]*xval+expofit[1]) for xval in x]
-                Wednesday, Jan
                 a=expofit[1]
                 b=expofit[0]
                 c=min(expy)
@@ -606,7 +621,9 @@ def relen_sem_analysis(relen_blocks, write_plot=True, expfit=False):
                 y1 = func(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
-                plt.legend()                
+                plt.legend()   
+            plt.ioff()
+            plt.savefig(namesnodups[i] + 'standarderrorJSD.png')
 
     return resrelenvals, avresrelenvals, avsemvals
 
@@ -632,26 +649,20 @@ b_rec = get_structure_features(groin,
                                 start_frame, features=['sc-torsions'])
 b_rec_feat, b_rec_data = b_rec
 
-
 relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
-                                 b_rec_feat['sc-torsions'],
-                                 a_rec_data['sc-torsions'],
-                                 b_rec_data['sc-torsions'], 
-                                 blockanlen=10000, cumdist=False, verbose=True)
-    
+                                  b_rec_feat['sc-torsions'],
+                                  a_rec_data['sc-torsions'],
+                                  b_rec_data['sc-torsions'], 
+                                  blockanlen=10000, cumdist=False, verbose=True)
+ 
 resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
 
 ssi_dat = ssi_block_analysis(a_rec_feat, b_rec_feat,
-                             a_rec_data, b_rec_data,
-                             torsions='sc', verbose=True, 
-                             blockanlen=10000, cumdist=False)
-
+                              a_rec_data, b_rec_data,
+                              torsions='sc', verbose=True, 
+                              blockanlen=10000, cumdist=False)
 
 avsemvals, avresssivals, resssivals = ssi_sem_analysis(ssi_names, ssi_dat)
-
-# relen_dat = np.transpose(np.load("relen_bl10000_br10.npy"))
-# ssi_dat = np.transpose(np.load("ssi_bl10000_br180.npy"))
-# ssi_names = np.transpose(np.load("ssi_datanames.npy"))
 
 
 
