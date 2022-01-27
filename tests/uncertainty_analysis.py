@@ -1,19 +1,15 @@
 import numpy as np
-from tqdm import tqdm
 from pensa.features import *
 from pensa.statesinfo import *
 import scipy as sp
 import scipy.stats
 import scipy.spatial
 import scipy.spatial.distance
-import pyemma
-from pyemma.util.contexts import settings
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
 
-# -- Functions to calculate SSI statistics across paired ensembles --
+# -- Functions to uncertainty analysis on statistics across paired ensembles --
 
 
 def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, block_length=None, verbose=True, override_name_check=False):
@@ -487,7 +483,6 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
 
     """
     
-    ssi_dat = ssi_blocks
     ssi_names = [string[:3] for string in ssi_namelist] 
     resnames = list(set(ssi_names))
     resids = []
@@ -534,25 +529,25 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
                 p0=[a,b,c]
                 popt, pcov = curve_fit(expfunc, x, y,p0=p0)
                 x1 = np.linspace(min(x),200,num =1700)
-                y1 = func(x1, *popt)
+                y1 = expfunc(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()
             plt.ioff()                
-            plt.savefig(resnames[i] + 'standarderrorSSI.png')
+            plt.savefig('SEM_plots/' + resnames[i] + 'standarderrorSSI.png')
         
             
     return avsemvals, avresssivals, resssivals
 
   
-def relen_sem_analysis(relen_blocks, write_plot=True, expfit=False):
+def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
     """
     Standard error analysis for the block averages.
 
 
     Parameters
     ----------
-    relen_blocks : list of lists
+    relen_dat : list of lists
         List of relative entropy analysis outputs for each block.
     write_plots : bool, optional
         If true, visualise the SEM analysis. Default is True.
@@ -618,51 +613,11 @@ def relen_sem_analysis(relen_blocks, write_plot=True, expfit=False):
                 p0=[a,b,c]
                 popt, pcov = curve_fit(expfunc, x, y,p0=p0)
                 x1 = np.linspace(min(x),200,num =1700)
-                y1 = func(x1, *popt)
+                y1 = expfunc(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()   
             plt.ioff()
-            plt.savefig(namesnodups[i] + 'standarderrorJSD.png')
+            plt.savefig('SEM_plots/' + namesnodups[i] + 'standarderrorJSD.png')
 
     return resrelenvals, avresrelenvals, avsemvals
-
-
-"----------------------------------------------------------------------------"
-"----------------------------------------------------------------------------"
-"----------------------------------------------------------------------------"
-
-
-xtc1 = '../MOR_simulation/6ddf/prodmd/traj_gpcrnoh_noskip_pensa.xtc'
-xtc2 = '../MOR_simulation/5c1m/prodmd/traj_gpcrnoh_noskip_pensa.xtc'
-
-groin = '../MOR_simulation/5c1m/prodmd/gpcrnoh.gro'
-
-start_frame=0  
-a_rec = get_structure_features(groin, 
-                                xtc1,
-                                start_frame, features=['sc-torsions'])
-a_rec_feat, a_rec_data = a_rec
-
-b_rec = get_structure_features(groin, 
-                                xtc2,
-                                start_frame, features=['sc-torsions'])
-b_rec_feat, b_rec_data = b_rec
-
-relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
-                                  b_rec_feat['sc-torsions'],
-                                  a_rec_data['sc-torsions'],
-                                  b_rec_data['sc-torsions'], 
-                                  blockanlen=10000, cumdist=False, verbose=True)
- 
-resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
-
-ssi_dat = ssi_block_analysis(a_rec_feat, b_rec_feat,
-                              a_rec_data, b_rec_data,
-                              torsions='sc', verbose=True, 
-                              blockanlen=10000, cumdist=False)
-
-avsemvals, avresssivals, resssivals = ssi_sem_analysis(ssi_names, ssi_dat)
-
-
-
