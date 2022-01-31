@@ -6,7 +6,7 @@ from pensa.statesinfo import *
 # -- Functions to calculate SSI statistics across paired ensembles --
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, pocket_occupancy=None, pbc=True, 
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, pocket_occupancy=None, pbc=True, create_states=False,
                           verbose=True, write_plots=None, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -33,6 +33,8 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
+    create_states : bool, optional
+        Create states as the partitions between all values in the data. The default is False.
     verbose : bool, default=True
         Print intermediate results.
     write_plots : bool, optional
@@ -92,6 +94,11 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
         if pocket_occupancy is True: 
             ## Define states for water occupancy 
             feat_states = [[-0.5,0.5,1.5]]    
+        elif create_states is True:
+            feat_states=[]
+            for dim_num in range(len(feat_distr)):
+                feat_states.append(create_states(feat_distr[dim_num]))
+                
         else:     
             feat_states=[]
             for dim_num in range(len(feat_distr)):

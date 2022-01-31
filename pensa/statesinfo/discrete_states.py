@@ -512,6 +512,33 @@ def _check(value,x,y):
         return 0
 
 
+
+def create_states(data):
+    """
+    Create states as the partitions between all values in the data.
+
+    Parameters
+    ----------
+    data : List
+        input data.
+
+    Returns
+    -------
+    partitions : list
+        values that partition all the data.
+
+    """
+    # Removing all duplicate resid's from the data and sorting numerically
+    no_dups = sorted(list(dict.fromkeys(data)))
+    # Creating partitions between all the data
+    partitions = [num-0.5 for num in no_dups]
+    # Adding the final limit
+    partitions.append(no_dups[-1]+0.5)
+
+    return partitions
+
+
+
 def calculate_entropy(state_limits,distribution_list):
     """
     Calculate the Shannon entropy of a distribution as the summation of all 
