@@ -1,0 +1,26 @@
+Three files: sc.pdb, bb.pdb, and h2o.pdb - representing the side-chain, backbone, and h2o SSI, respectively.
+
+# Visualize the b-factors in cartoon putty mode
+PyMOL>cartoon putty
+
+# Set the b-factor heatmap color
+PyMOL>spectrum b, white_blue_green_yellow, minimum=0, maximum=1
+
+# Show sticks for side chains with b-factor value above b=0.3
+PyMOL>show sticks, sc & b>0.3
+
+# To aid with visual clarity, turn on side-chain helper (i.e. hide backbone sticks)
+PyMOL>set cartoon_side_chain_helper, on, sc
+
+# Hide spheres for h2o pockets with b-factor value below b=0.3
+PyMOL>hide spheres, h2o & b<0.3
+
+# Hide the cartoon putty for side-chain SSI
+PyMOL>set cartoon_transparency, 1, sc
+
+# Ray trace the image
+PyMOL>ray
+
+# Save ray traced image as .png
+PyMOL>png /path/to/directory/filename.png
+
