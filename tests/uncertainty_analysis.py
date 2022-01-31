@@ -621,3 +621,39 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
             plt.savefig('SEM_plots/' + namesnodups[i] + 'standarderrorJSD.png')
 
     return resrelenvals, avresrelenvals, avsemvals
+
+
+
+## EXAMPLE USAGE
+
+
+# xtc1 = 'xtc1.xtc'
+# xtc2 = 'xtc2xtc'
+
+# groin = 'gro12.gro'
+
+# start_frame=0  
+# a_rec = get_structure_features(gro1, 
+#                                xtc1,
+#                                start_frame, features=['sc-torsions'])
+# a_rec_feat, a_rec_data = a_rec
+
+# b_rec = get_structure_features(gro2, 
+#                                xtc2,
+#                                start_frame, features=['sc-torsions'])
+# b_rec_feat, b_rec_data = b_rec
+
+# relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
+#                                  b_rec_feat['sc-torsions'],
+#                                  a_rec_data['sc-torsions'],
+#                                  b_rec_data['sc-torsions'], 
+#                                  blockanlen=1000, cumdist=False, verbose=True)
+ 
+# resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
+
+# ssi_names, ssi_dat = ssi_block_analysis(a_rec_feat, b_rec_feat,
+#                                         a_rec_data, b_rec_data,
+#                                         torsions='sc', verbose=True, 
+#                                         blockanlen=1000, cumdist=False)
+
+# avsemvals, avresssivals, resssivals = ssi_sem_analysis(ssi_names, ssi_dat)
