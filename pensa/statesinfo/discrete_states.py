@@ -7,7 +7,8 @@ from scipy.signal import argrelextrema
 import os
 from pensa.features import *
 import itertools
-
+from multiprocessing import Pool, freeze_support
+from functools import partial
 
 # -- Functions to cluster feature distributions into discrete states --
 
@@ -624,6 +625,30 @@ def _lim_occ_par(idx, params):
         
     return entropy
 
+def _divisorGenerator(n):
+    """
+    Find largest whole number divisors.
+
+    Parameters
+    ----------
+    n : int
+        Value to find whole number divisors of.
+
+    Yields
+    ------
+    generator object
+        All whole number divisors of the number n.
+
+    """
+    large_divisors = []
+    for i in range(1, int(math.sqrt(n) + 1)):
+        if n % i == 0:
+            yield i
+            if i*i != n:
+                large_divisors.append(n / i)
+    for divisor in reversed(large_divisors):
+        yield divisor
+
 def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
     """
     Calculate the Shannon entropy of a distribution as the summation of all 
@@ -661,27 +686,33 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
         else:
             state_no +=1
             
-    entropy=0.0
     if len(state_lims)!=0:
-
+        # Initialize array for multidimensional discrete state phase space
         mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
-     
+        # Extract sizes of each dimension in the mut_prob
         dimension_lists = [list(range(mut_prob.shape[i])) for i in range(len(dist_list))]
-        
+        # Obtain indices to iterate over multivariate array
         iterprod = itertools.product(*dimension_lists) 
-        
+        # Length of iterations for full array
         multiidx_loopno = len(list( iterprod ))
-        threadno = [num for num in list(divisorGenerator(multiidx_loopno)) if num < max_thread_no]
-        parallel = threadno[-1]
-        poolprocs1 = list(range(0,multiidx_loopno,int(parallel)))[:-1]
-        poolprocs2 = list(range(0,multiidx_loopno,int(parallel)))[1:]
         
+        # Largest possible multi-threading option for array 
+        threadno = [num for num in list(_divisorGenerator(multiidx_loopno)) if num < max_thread_no]
+        multthr = threadno[-1]
+        
+        # Start and stop indices for state subsets
+        poolprocs1 = list(range(0,multiidx_loopno,int(multthr)))[:-1]
+        poolprocs2 = list(range(0,multiidx_loopno,int(multthr)))[1:]
         poolproc = [[i,j] for i,j in zip(poolprocs1,poolprocs2)]
         
         param = [state_lims, dist_list]
 
+        # Multi-threading entropy calculations
         with Pool() as pool:
             all_entropy = pool.map(partial(lim_occ_par, params=param), poolproc)
         
+    # Total entropy is sum of all subset entropies
+    entropy=sum(all_entropy)
+   
 
-    return sum(all_entropy)
+    return entropy
