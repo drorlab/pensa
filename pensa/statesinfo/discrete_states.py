@@ -6,6 +6,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
 from pensa.features import *
+import itertools
 
 
 # -- Functions to cluster feature distributions into discrete states --
@@ -570,4 +571,117 @@ def calculate_entropy(state_limits,distribution_list):
     return entropy
 
 
+def _lim_occ_par(idx, params):
+    """
+    Calculate the entropy of each state for a subset of the states.
 
+    Parameters
+    ----------
+    idx : list
+        Start and stop indices to define subset of states for calculations.
+    params : list of lists
+        List of state limits and feature multivariate timeseries distribution.
+
+    Returns
+    -------
+    entropy : float
+        Entropy of each state for a subset of the states.
+
+    """
+    
+    
+    state_lims, dist_list = params[0], params[1]
+    
+    # Initialize entropy value
+    entropy=0
+    
+    # Initialize array for multidimensional discrete state phase space 
+    mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))   
+    # Extract sizes of each dimension in the mut_prob
+    dimension_lists = [list(range(mut_prob.shape[i])) for i in range(len(dist_list))]
+    
+    # Obtain indices to iterate over multivariate array
+    iterprod = itertools.product(*dimension_lists) 
+    multiidx_loopno = list( iterprod )
+
+    # Iterate over subset of multivariate array for entropy calculation
+    for loopno in multiidx_loopno[idx[0]:idx[1]]:
+        arrayindices=list(loopno)
+        limit_occupancy_checks=np.zeros((len(arrayindices), len(dist_list[0])))
+        
+        for dist_num in range(len(arrayindices)):
+            limits=[state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num]+1]]
+            distribution=dist_list[dist_num]
+        
+            for frame_num in range(len(distribution)):
+                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
+                
+        mut_prob[loopno]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+        ##calculating the entropy as the summation of all -p*log(p) 
+        
+        if mut_prob[loopno] != 0:
+            entropy+=-1*mut_prob[loopno]*math.log(mut_prob[loopno],2)
+        
+    return entropy
+
+def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
+    """
+    Calculate the Shannon entropy of a distribution as the summation of all 
+    -p*log(p) where p refers to the probability of a conformational state. 
+    
+    Parameters
+    ----------
+    state_limits : list of lists
+        A list of values that represent the limits of each state for each
+        distribution.
+    distribution_list : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+    max_thread_no : int
+        Maximum number of threads to use in the multi-threading.
+
+    Returns
+    -------
+    entropy : float
+        The Shannon entropy value 
+
+    """
+
+    state_lims = state_limits.copy()
+    dist_list = distribution_list.copy()
+    
+    ## Ignore singular states and corresponding distributions
+    state_no = 0 
+    while state_no < len(state_lims):
+        
+        if len(state_lims[state_no])==2:
+            del dist_list[state_no]
+            del state_lims[state_no]
+            
+        else:
+            state_no +=1
+            
+    entropy=0.0
+    if len(state_lims)!=0:
+
+        mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
+     
+        dimension_lists = [list(range(mut_prob.shape[i])) for i in range(len(dist_list))]
+        
+        iterprod = itertools.product(*dimension_lists) 
+        
+        multiidx_loopno = len(list( iterprod ))
+        threadno = [num for num in list(divisorGenerator(multiidx_loopno)) if num < max_thread_no]
+        parallel = threadno[-1]
+        poolprocs1 = list(range(0,multiidx_loopno,int(parallel)))[:-1]
+        poolprocs2 = list(range(0,multiidx_loopno,int(parallel)))[1:]
+        
+        poolproc = [[i,j] for i,j in zip(poolprocs1,poolprocs2)]
+        
+        param = [state_lims, dist_list]
+
+        with Pool() as pool:
+            all_entropy = pool.map(partial(lim_occ_par, params=param), poolproc)
+        
+
+    return sum(all_entropy)

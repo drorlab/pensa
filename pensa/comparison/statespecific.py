@@ -6,7 +6,7 @@ from pensa.statesinfo import *
 # -- Functions to calculate SSI statistics across paired ensembles --
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, 
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, pocket_occupancy=None, pbc=True, 
                           verbose=True, write_plots=None, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -22,6 +22,8 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    max_thread_no : int
+        Maximum number of threads to use in the multi-threading.      
     torsions : str
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
@@ -106,7 +108,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
                     print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
 
             
-        H_feat=calculate_entropy(feat_states,feat_distr) 
+        H_feat=calculate_entropy_multthread(feat_states,feat_distr, max_thread_no) 
                 
         if H_feat != 0:
             ##calculating the entropy for set_distr_b
@@ -121,7 +123,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
             
             featens_joint_states= feat_states + ens_states
             featens_joint_distr= feat_distr + ens_distr
-            H_featens=calculate_entropy(featens_joint_states,featens_joint_distr)
+            H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
     
             SSI = ((H_feat + H_ens) - H_featens)/norm_factor
         
@@ -137,7 +139,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsio
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, verbose=True, override_name_check=False):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -153,6 +155,8 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    max_thread_no : int
+        Maximum number of threads to use in the multi-threading.        
     torsions : str
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
@@ -217,7 +221,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
         set_a_states=[]
         for dim_num_a in range(len(set_distr_a)):
                 set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
-        H_a=calculate_entropy(set_a_states,set_distr_a) 
+        H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
         if H_a != 0:
 
         
@@ -236,13 +240,13 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
                 set_b_states=[]
                 for dim_num_b in range(len(set_distr_b)):
                         set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
-                H_b=calculate_entropy(set_b_states,set_distr_b)
+                H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
                 
                 if H_b!=0:
                 
                     ab_joint_states= set_a_states + set_b_states
                     ab_joint_distributions= set_distr_a + set_distr_b
-                    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+                    H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
             
                     traj_1_fraction = traj1_len/len(set_distr_a[0])
                     traj_2_fraction = 1 - traj_1_fraction
@@ -270,7 +274,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, torsion
 
 
 
-def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, verbose=True, override_name_check=False):
+def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -286,6 +290,8 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    max_thread_no : int
+        Maximum number of threads to use in the multi-threading.
     torsions : str
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
@@ -375,10 +381,6 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                 H_b=calculate_entropy(set_b_states,set_distr_b)
                 
                 if H_b!=0:
-                
-                    ab_joint_states= set_a_states + set_b_states
-                    ab_joint_distributions= set_distr_a + set_distr_b
-                    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
             
                     traj_1_fraction = traj1_len/len(set_distr_a[0])
                     traj_2_fraction = 1 - traj_1_fraction
@@ -392,22 +394,22 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, torsi
                     ab_joint_states = set_a_states + set_b_states
                     ab_joint_distributions = set_distr_a + set_distr_b
                     
-                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
+                    H_ab = calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
                     ##----------------
                     ac_joint_states =  set_a_states + set_c_states 
                     ac_joint_distributions = set_distr_a + set_distr_c
                     
-                    H_ac = calculate_entropy(ac_joint_states, ac_joint_distributions)
+                    H_ac = calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
                     ##----------------
                     bc_joint_states = set_b_states + set_c_states 
                     bc_joint_distributions = set_distr_b + set_distr_c
                     
-                    H_bc = calculate_entropy(bc_joint_states, bc_joint_distributions)
+                    H_bc = calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
                     ##----------------
                     abc_joint_states = set_a_states + set_b_states + set_c_states 
                     abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
                     
-                    H_abc = calculate_entropy(abc_joint_states, abc_joint_distributions)    
+                    H_abc = calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)    
             
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
