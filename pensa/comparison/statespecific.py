@@ -22,9 +22,9 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
-    max_thread_no : int
-        Maximum number of threads to use in the multi-threading.      
-    torsions : str
+    max_thread_no : int, optional
+        Maximum number of threads to use in the multi-threading. Default is 1. 
+    torsions : str, optional
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
     pocket_occupancy : bool, optional
@@ -35,12 +35,12 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
         The input for periodic correction must be radians. The default is True.
     create_states : bool, optional
         Create states as the partitions between all values in the data. The default is False.
-    verbose : bool, default=True
-        Print intermediate results.
+    verbose : bool, optional
+        Print intermediate results. Default is True.
     write_plots : bool, optional
         If true, visualise the states over the raw distribution. The default is None.
-    override_name_check : bool, default=False
-        Only check number of features, not their names.   
+    override_name_check : bool, optional
+        Only check number of features, not their names. Default is False.
         
     Returns
     -------
@@ -85,6 +85,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
             
         ## Saving distribution length
         traj1_len = len(data_a[dist_no])   
+        cluster=1
 
         if pbc is True:
             feat_distr = [correct_angle_periodicity(distr) for distr in combined_dist]
@@ -112,36 +113,44 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, max_th
                                                               write_plots=write_plots, 
                                                               write_name=plot_name))
                 except:
-                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                    if verbose is True:
+                        print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                    cluster=0
 
-            
-        H_feat=calculate_entropy_multthread(feat_states,feat_distr, max_thread_no) 
+        if cluster==0:
+            SSI = -1
+            data_ssi[residue] = SSI
+            if verbose is True:
+                print(data_names[residue],data_ssi[residue])
                 
-        if H_feat != 0:
-            ##calculating the entropy for set_distr_b
-            ## if no dist (None) then apply the binary dist for two simulations
-            ens_distr=[[0.5]*traj1_len + [1.5]*int(len(feat_distr[0])-traj1_len)]
-            ens_states= [[0,1,2]]  
+        else:
+            H_feat=calculate_entropy_multthread(feat_states,feat_distr, max_thread_no) 
+                    
+            if H_feat != 0:
+                ##calculating the entropy for set_distr_b
+                ## if no dist (None) then apply the binary dist for two simulations
+                ens_distr=[[0.5]*traj1_len + [1.5]*int(len(feat_distr[0])-traj1_len)]
+                ens_states= [[0,1,2]]  
+                    
+                traj_1_fraction = traj1_len/len(feat_distr[0])
+                traj_2_fraction = 1 - traj_1_fraction
+                norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                H_ens = norm_factor
                 
-            traj_1_fraction = traj1_len/len(feat_distr[0])
-            traj_2_fraction = 1 - traj_1_fraction
-            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-            H_ens = norm_factor
-            
-            featens_joint_states= feat_states + ens_states
-            featens_joint_distr= feat_distr + ens_distr
-            H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
-    
-            SSI = ((H_feat + H_ens) - H_featens)/norm_factor
+                featens_joint_states= feat_states + ens_states
+                featens_joint_distr= feat_distr + ens_distr
+                H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
         
-        else: 
+                SSI = ((H_feat + H_ens) - H_featens)/norm_factor
             
-            SSI = 0
-        
-        data_ssi[residue] = SSI
+            else: 
+                
+                SSI = 0
             
-        if verbose is True:
-            print(data_names[residue],data_ssi[residue])
+            data_ssi[residue] = SSI
+                
+            if verbose is True:
+                print(data_names[residue],data_ssi[residue])
         
     return data_names, data_ssi
 
@@ -162,15 +171,15 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, max_thr
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
-    max_thread_no : int
-        Maximum number of threads to use in the multi-threading.        
-    torsions : str
+    max_thread_no : int, optional
+        Maximum number of threads to use in the multi-threading. Default is 1. 
+    torsions : str, optional
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
-    verbose : bool, default=True
-        Print intermediate results.
-    override_name_check : bool, default=False
-        Only check number of features, not their names.
+    verbose : bool, optional
+        Print intermediate results. Default is True.
+    override_name_check : bool, optional
+        Only check number of features, not their names. Default is False.
         
         
     Returns
@@ -226,56 +235,86 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, max_thr
         set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
     
         set_a_states=[]
+        cluster=1
         for dim_num_a in range(len(set_distr_a)):
+            try:
                 set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
-        H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
-        if H_a != 0:
-
-        
-            for res2 in range(res1, len(mv_res_data_a)):
-                # Only run SSI if entropy is non-zero
-                res2_data_ens1 = mv_res_data_a[res2]
-                res2_data_ens2 = mv_res_data_b[res2]     
-                res2_combined_dist=[]
-                for dist_no_b in range(len(res2_data_ens1)):
-                    # # # combine the ensembles into one distribution (condition_a + condition_b)
-                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
-                 
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
-                    
-                set_b_states=[]
-                for dim_num_b in range(len(set_distr_b)):
-                        set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
-                H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
-                
-                if H_b!=0:
-                
-                    ab_joint_states= set_a_states + set_b_states
-                    ab_joint_distributions= set_distr_a + set_distr_b
-                    H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
-            
-                    traj_1_fraction = traj1_len/len(set_distr_a[0])
-                    traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-            
-                    SSI = ((H_a + H_b) - H_ab)/norm_factor
-                                    
-                    
-                    data_ssi[count] = SSI       
-                    if verbose is True:
-                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
-                    count+=1
-                else:
-                    if verbose is True:
-                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
-                    count+=1
-
-        else:
-            for res2 in range(res1+1, len(mv_res_data_a)):
+            except:
                 if verbose is True:
-                    print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
-                count+=1
+                    print('Feature A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                cluster=0
+        
+        if cluster==0:
+            SSI = -1
+            data_ssi[residue] = SSI
+            if verbose is True:
+                print(data_names[residue],data_ssi[residue])
+            count+=1
+        else:         
+            H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
+            
+            if H_a != 0:
+    
+            
+                for res2 in range(res1, len(mv_res_data_a)):
+                    # Only run SSI if entropy is non-zero
+                    res2_data_ens1 = mv_res_data_a[res2]
+                    res2_data_ens2 = mv_res_data_b[res2]     
+                    res2_combined_dist=[]
+                    for dist_no_b in range(len(res2_data_ens1)):
+                        # # # combine the ensembles into one distribution (condition_a + condition_b)
+                        res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
+                        res2_combined_dist.append(res2_data_both)            
+                     
+                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                        
+                    set_b_states=[]
+                    for dim_num_b in range(len(set_distr_b)):
+                        try:
+                            set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
+                        except:
+                            if verbose is True:
+                                print('Feature B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                            cluster=0                            
+                            
+                    if cluster==0:
+                        SSI = -1
+                        data_ssi[count] = SSI
+                        if verbose is True:
+                            print(data_names[count],data_ssi[count])    
+                        count+=1   
+                            
+                    else:            
+                        H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
+                        
+                        if H_b!=0:
+                        
+                            ab_joint_states= set_a_states + set_b_states
+                            ab_joint_distributions= set_distr_a + set_distr_b
+                            H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                    
+                            traj_1_fraction = traj1_len/len(set_distr_a[0])
+                            traj_2_fraction = 1 - traj_1_fraction
+                            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    
+                            SSI = ((H_a + H_b) - H_ab)/norm_factor
+                                            
+                            
+                            data_ssi[count] = SSI   
+                            
+                            if verbose is True:
+                                print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                            count+=1
+                        else:
+                            if verbose is True:
+                                print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                            count+=1
+        
+            else:
+                for res2 in range(res1+1, len(mv_res_data_a)):
+                    if verbose is True:
+                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])    
+                    count+=1
                 
     return data_names, data_ssi
 
@@ -297,15 +336,15 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_t
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
-    max_thread_no : int
-        Maximum number of threads to use in the multi-threading.
-    torsions : str
+    max_thread_no : int, optional
+        Maximum number of threads to use in the multi-threading. Default is 1.
+    torsions : str, optional
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
         Default is None.
-    verbose : bool, default=True
-        Print intermediate results.
-    override_name_check : bool, default=False
-        Only check number of features, not their names.
+    verbose : bool, optional
+        Print intermediate results. Default is True.
+    override_name_check : bool, optional
+        Only check number of features, not their names. Default is False.
         
         
     Returns
@@ -346,7 +385,8 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_t
     data_ssi = np.zeros(len(data_names))
     data_cossi = np.zeros(len(data_names))
     # Loop over all features
-    count=0    
+    count=0   
+    cluster=1
     for res1 in range(len(mv_res_data_a)):
         # print(res1)
         res1_data_ens1 = mv_res_data_a[res1]
@@ -365,84 +405,112 @@ def cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_t
     
         set_a_states=[]
         for dim_num_a in range(len(set_distr_a)):
+            try:
                 set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
-        H_a=calculate_entropy(set_a_states,set_distr_a) 
-        if H_a != 0:
-
-        
-            for res2 in range(res1, len(mv_res_data_a)):
-                # Only run SSI if entropy is non-zero
-                res2_data_ens1 = mv_res_data_a[res2]
-                res2_data_ens2 = mv_res_data_b[res2]     
-                res2_combined_dist=[]
-                for dist_no_b in range(len(res2_data_ens1)):
-                    # # # combine the ensembles into one distribution (condition_a + condition_b)
-                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
-                 
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
-                    
-                set_b_states=[]
-                for dim_num_b in range(len(set_distr_b)):
-                        set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
-                H_b=calculate_entropy(set_b_states,set_distr_b)
+            except:
+                if verbose is True:
+                    print('Feature A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                cluster=0                     
                 
-                if H_b!=0:
+        if cluster==0:
+                SSI = -1
+                data_ssi[count] = SSI
+                if verbose is True:
+                    print(data_names[count],data_ssi[count])                
+                count+=1
+                
+        else:            
+            H_a=calculate_entropy(set_a_states,set_distr_a) 
+            if H_a != 0:
+    
             
-                    traj_1_fraction = traj1_len/len(set_distr_a[0])
-                    traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                for res2 in range(res1, len(mv_res_data_a)):
+                    # Only run SSI if entropy is non-zero
+                    res2_data_ens1 = mv_res_data_a[res2]
+                    res2_data_ens2 = mv_res_data_b[res2]     
+                    res2_combined_dist=[]
+                    for dist_no_b in range(len(res2_data_ens1)):
+                        # # # combine the ensembles into one distribution (condition_a + condition_b)
+                        res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
+                        res2_combined_dist.append(res2_data_both)            
+                     
+                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                        
+                    set_b_states=[]
+                    for dim_num_b in range(len(set_distr_b)):
+                        try:
+                            set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
+                        except:
+                            if verbose is True:
+                                print('Feature B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                            cluster=0                     
+                
+                    if cluster==0:
+                        SSI = -1
+                        data_ssi[count] = SSI
+                        if verbose is True:
+                            print(data_names[count],data_ssi[count])                
+                        count+=1       
+                        
+                    else:        
+                        H_b=calculate_entropy(set_b_states,set_distr_b)
+                        
+                        if H_b!=0:
                     
-                    set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
-                    set_c_states= [[0,1,2]]                      
-                    H_c = norm_factor       
+                            traj_1_fraction = traj1_len/len(set_distr_a[0])
+                            traj_2_fraction = 1 - traj_1_fraction
+                            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                            
+                            set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
+                            set_c_states= [[0,1,2]]                      
+                            H_c = norm_factor       
+                            
+                            ##----------------
+                            ab_joint_states = set_a_states + set_b_states
+                            ab_joint_distributions = set_distr_a + set_distr_b
+                            
+                            H_ab = calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
+                            ##----------------
+                            ac_joint_states =  set_a_states + set_c_states 
+                            ac_joint_distributions = set_distr_a + set_distr_c
+                            
+                            H_ac = calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
+                            ##----------------
+                            bc_joint_states = set_b_states + set_c_states 
+                            bc_joint_distributions = set_distr_b + set_distr_c
+                            
+                            H_bc = calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
+                            ##----------------
+                            abc_joint_states = set_a_states + set_b_states + set_c_states 
+                            abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
+                            
+                            H_abc = calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)    
                     
-                    ##----------------
-                    ab_joint_states = set_a_states + set_b_states
-                    ab_joint_distributions = set_distr_a + set_distr_b
-                    
-                    H_ab = calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
-                    ##----------------
-                    ac_joint_states =  set_a_states + set_c_states 
-                    ac_joint_distributions = set_distr_a + set_distr_c
-                    
-                    H_ac = calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
-                    ##----------------
-                    bc_joint_states = set_b_states + set_c_states 
-                    bc_joint_distributions = set_distr_b + set_distr_c
-                    
-                    H_bc = calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
-                    ##----------------
-                    abc_joint_states = set_a_states + set_b_states + set_c_states 
-                    abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
-                    
-                    H_abc = calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)    
-            
-                    SSI = ((H_a + H_b) - H_ab)/norm_factor
-                    coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
-                    
-                    data_ssi[count] = SSI       
-                    data_cossi[count] = coSSI       
-                    if verbose is True:
-                        print('\nFeature Pair: ', data_names[count],
-                              '\nSSI[bits]: ', data_ssi[count],
-                              '\nCo-SSI[bits]: ', data_cossi[count])
-                    count+=1                
-         
-                else:
+                            SSI = ((H_a + H_b) - H_ab)/norm_factor
+                            coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
+                            
+                            data_ssi[count] = SSI       
+                            data_cossi[count] = coSSI       
+                            if verbose is True:
+                                print('\nFeature Pair: ', data_names[count],
+                                      '\nSSI[bits]: ', data_ssi[count],
+                                      '\nCo-SSI[bits]: ', data_cossi[count])
+                            count+=1                
+                 
+                        else:
+                            if verbose is True:
+                                print('\nFeature Pair: ', data_names[count],
+                                      '\nSSI[bits]: ', data_ssi[count],
+                                      '\nCo-SSI[bits]: ', data_cossi[count])
+                            count+=1
+                            
+            else:
+                for res2 in range(res1+1, len(mv_res_data_a)):
                     if verbose is True:
                         print('\nFeature Pair: ', data_names[count],
                               '\nSSI[bits]: ', data_ssi[count],
                               '\nCo-SSI[bits]: ', data_cossi[count])
                     count+=1
-                    
-        else:
-            for res2 in range(res1+1, len(mv_res_data_a)):
-                if verbose is True:
-                    print('\nFeature Pair: ', data_names[count],
-                          '\nSSI[bits]: ', data_ssi[count],
-                          '\nCo-SSI[bits]: ', data_cossi[count])
-                count+=1
 
     
     return data_names, data_ssi, data_cossi
