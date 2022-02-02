@@ -86,7 +86,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water distributions, water data summary. The default is None.
     write_grid_as : str, optional
         If you choose to write out the grid, you must specify the water model 
-        to convert the density into. The default is None. Options are suggested if default.
+        to convert the density into. The default is None. 
     out_name : str, optional
         Prefix for all written filenames. The default is None.
 
