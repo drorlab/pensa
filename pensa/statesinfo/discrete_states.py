@@ -649,7 +649,6 @@ def _lim_occ_par(idx, params):
         
         if mut_prob[loopno] != 0:
             entropy+=-1*mut_prob[loopno]*math.log(mut_prob[loopno],2)
-        
     return entropy
 
 def _divisorGenerator(n):
@@ -713,6 +712,7 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
         else:
             state_no +=1
             
+    entropy=0        
     if len(state_lims)!=0:
         # Initialize array for multidimensional discrete state phase space
         mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
@@ -722,24 +722,21 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
         iterprod = itertools.product(*dimension_lists) 
         # Length of iterations for full array
         multiidx_loopno = len(list( iterprod ))
-        
         # Largest possible multi-threading option for array 
-        threadno = [num for num in list(_divisorGenerator(multiidx_loopno)) if num < max_thread_no]
+        threadno = [num for num in list(_divisorGenerator(multiidx_loopno)) if num < max_thread_no+1]
         multthr = threadno[-1]
-        
         # Start and stop indices for state subsets
-        poolprocs1 = list(range(0,multiidx_loopno,int(multthr)))[:-1]
-        poolprocs2 = list(range(0,multiidx_loopno,int(multthr)))[1:]
+        poolprocs1 = list(range(0,multiidx_loopno+1,int(multthr)))[:-1]
+        poolprocs2 = list(range(0,multiidx_loopno+1,int(multthr)))[1:]
         poolproc = [[i,j] for i,j in zip(poolprocs1,poolprocs2)]
-        
+
         param = [state_lims, dist_list]
 
         # Multi-threading entropy calculations
         with Pool() as pool:
-            all_entropy = pool.map(partial(lim_occ_par, params=param), poolproc)
+            all_entropy = pool.map(partial(_lim_occ_par, params=param), poolproc)
         
-    # Total entropy is sum of all subset entropies
-    entropy=sum(all_entropy)
-   
-
+        # Total entropy is sum of all subset entropies
+        entropy+=sum(all_entropy)
+        
     return entropy
