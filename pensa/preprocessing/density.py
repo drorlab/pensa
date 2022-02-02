@@ -18,7 +18,7 @@ The methods here are based on the following paper:
 import numpy as np
 from scipy import ndimage as ndi
 import os
-# from gridData import Grid
+from gridData import Grid
 import MDAnalysis as mda
 from MDAnalysis.analysis.density import DensityAnalysis
 from MDAnalysis.analysis.base import AnalysisFromFunction
@@ -236,6 +236,110 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
 
     return g
         
+def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=10, 
+                  grid_input=None, write=None, write_grid_as=None, out_name=None):
+    
+    """
+    Write out atom pockets for the top X most probable atom sites.
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (PDB or GRO format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    top_atoms : int, optional
+        Number of atoms to featurize. The default is 10.
+    grid_input : str, optional
+        File name for the density grid input. The default is None, and a grid is automatically generated.
+    write : bool, optional
+        If true, the following data will be written out: reference pdb with occupancies,
+        water distributions, water data summary. The default is None.
+    write_grid_as : str, optional
+        If you choose to write out the grid, you must specify the water model 
+        to convert the density into. The default is None. Options are suggested if default.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all features
+        features_data : numpy array
+            Data for all features
+
+    """
+
+    if write is not None:
+        if out_name is None:
+            print('WARNING: You are writing results without providing out_name.')
+        
+    u = mda.Universe(structure_input, xtc_input)
+    
+    if write is True:
+        if not os.path.exists('atom_features/'):
+            os.makedirs('atom_features/')
+        protein = u.select_atoms("protein")
+        pdb_outname = 'atom_features/' + out_name + "_AtomSites_densvals.pdb"
+        u.trajectory[0]
+        protein.write(pdb_outname)
+        if grid_input is None:
+            g = get_grid(u, atomgroup, write_grid_as,  out_name)           
+        else:
+            g = Grid(grid_input)  
+    elif grid_input is None:
+        g = get_grid(u, atomgroup)              
+    else:
+        g = Grid(grid_input)  
+
+    xyz, val = local_maxima_3D(g.grid)
+    ## Negate the array to get probabilities in descending order
+    val_sort = np.argsort(-1*val.copy())
+    newvals = [val[max_val] for max_val in val_sort]  
+    coords = [xyz[max_val] for max_val in val_sort]    
+    at_information=[]
+
+    if top_atoms > len(coords):
+        top_atoms = len(coords)  
+
+
+    print('\n')
+    print('Featurizing ',top_atoms,' Atom Sites')
+    for at_no in range(top_atoms):
+        print('\n')
+        print('Atom no: ',at_no+1)
+        print('\n')
+
+        ## Find all water atoms within 3.5 Angstroms of density maxima
+        # Shifting the coordinates of the maxima by the grid origin to match 
+        # the simulation box coordinates
+        shifted_coords=coords[at_no]+g.origin
+        point_str = str(shifted_coords)[1:-1]
+        densval = newvals[at_no]
+
+        at_ID = "O" + str(at_no+1)
+        atom_location = point_str
+
+        at_information.append([at_ID,list(atom_location),densval])
+        
+        ## Write data out and visualize water sites in pdb           
+        if write is True:    
+            write_atom_to_pdb(pdb_outname, atom_location, at_ID, atomgroup)
+            u_pdb = mda.Universe(pdb_outname)
+            u_pdb.add_TopologyAttr('tempfactors')
+            # Write values as beta-factors ("tempfactors") to a PDB file
+            for res in range(len(at_information)):
+                #scale the water resid by the starting resid
+                at_resid = len(u_pdb.residues) - at_no-1 + res
+                u_pdb.residues[at_resid].atoms.tempfactors = at_information[res][-1]
+            u_pdb.atoms.write(pdb_outname)
+    
+    # Return the dictionaries.
+    return print('Pdb file completed.')
+
+
 def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
     """
     Write a new atom to a reference structure to visualise conserved non-protein atom sites.
