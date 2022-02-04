@@ -566,7 +566,7 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
 
     """
 
-    relen_names = [relen_dat[i][0][0][-7:-4] for i in range(len(relen_dat))]
+    relen_names = [relen_i[0][0].split(' ')[2] for relen_i in relen_dat]
     namesnodups = list(set(relen_names))
     
     matching_indices = []
