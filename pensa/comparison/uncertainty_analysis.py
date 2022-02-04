@@ -456,7 +456,7 @@ def expfunc(x, a, b, c):
     return np.exp(a + b * np.array(x)) + c
 
 
-def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
+def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, plot_dir='./SEM_plots'):
     """
     Standard error analysis for the block averages.
 
@@ -471,7 +471,9 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
     expfit : bool, optional
         If True, apply an exponential fit to the SEM plot to predict the SEM
         value upon full convergence. Not yet fully accurate. The default is False.
-
+    plot_dir : str, optional
+        Directory in which to save the plots (if write_plots == True)
+        
     Returns
     -------
     avsemvals : list of lists
@@ -502,8 +504,8 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
         avsemvals.append([scipy.stats.sem(avresssivals[-1][:seg]) for seg in range(len(avresssivals[-1]))])
 
     if write_plot is True:    
-        if not os.path.exists('SEM_plots/'):
-            os.makedirs('SEM_plots/')
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
             
         for i in range(len(resnames)):
             
@@ -534,13 +536,13 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False):
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()
             plt.ioff()                
-            plt.savefig('SEM_plots/' + resnames[i] + 'standarderrorSSI.png')
+            plt.savefig(plot_dir+'/' + resnames[i] + 'standarderrorSSI.png')
         
             
     return avsemvals, avresssivals, resssivals
 
   
-def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
+def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM_plots'):
     """
     Standard error analysis for the block averages.
 
@@ -554,6 +556,8 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
     expfit : bool, optional
         If True, apply an exponential fit to the SEM plot to predict the SEM
         value upon full convergence. Not yet fully accurate. The default is False.
+    plot_dir : str, optional
+        Directory in which to save the plots (if write_plots == True)
 
     Returns
     -------
@@ -590,8 +594,8 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
     
     ## Plotting the sem over each block to see the convergence
     if write_plot is True:
-        if not os.path.exists('SEM_plots/'):
-            os.makedirs('SEM_plots/')
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
         for i in range(len(namesnodups)):
             print("plotting res", i,  namesnodups[i])
             
@@ -618,7 +622,7 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False):
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()   
             plt.ioff()
-            plt.savefig('SEM_plots/' + namesnodups[i] + 'standarderrorJSD.png')
+            plt.savefig(plot_dir+'/' + namesnodups[i] + 'standarderrorJSD.png')
 
     return resrelenvals, avresrelenvals, avsemvals
 
