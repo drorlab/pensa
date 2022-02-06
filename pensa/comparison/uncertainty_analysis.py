@@ -12,7 +12,9 @@ from scipy.optimize import curve_fit
 # -- Functions to uncertainty analysis on statistics across paired ensembles --
 
 
-def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, block_length=None, verbose=True, override_name_check=False):
+def _unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, 
+                                   bin_width=None, bin_num=10, block_length=None, 
+                                   verbose=True, override_name_check=False):
     """
     Relative entropy metrics for truncated data on each feature from two ensembles.
 
@@ -109,8 +111,8 @@ def unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b
 
 
 
-def unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, 
-                              bin_no=180, block_length=None, verbose=True, write_plots=None, override_name_check=False):
+def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, 
+                               bin_no=180, block_length=None, verbose=True, write_plots=None, override_name_check=False):
     """
     State Specific Information statistic for truncated data on each feature across two ensembles.
 
@@ -327,11 +329,10 @@ def ssi_block_analysis(features_a, features_b,
 
     for bl in block_lengths:
         print('block length = ', bl)
-        ssi_names, data_ssi = unc_ssi_ensemble_analysis(features_a, features_b,
-                                                        all_data_a, all_data_b,
-                                                        torsions=torsions, 
-                                                        block_length=bl, 
-                                                        verbose=True)
+        ssi_names, data_ssi = _unc_ssi_ensemble_analysis(
+            features_a, features_b, all_data_a, all_data_b,
+            torsions=torsions, block_length=bl, verbose=True
+            )
         
         ssi_blocks.append(data_ssi)
 
@@ -391,9 +392,10 @@ def relen_block_analysis(features_a, features_b,
     for bl in block_lengths:
         print('block length = ', bl)       
         
-        relen = unc_relative_entropy_analysis(features_a, features_b,
-                                              all_data_a, all_data_b,
-                                              block_length=bl, verbose=True)        
+        relen = _unc_relative_entropy_analysis(
+            features_a, features_b, all_data_a, all_data_b,
+            block_length=bl, verbose=True
+            )        
         relen_blocks.append(relen)
             
             
@@ -402,7 +404,7 @@ def relen_block_analysis(features_a, features_b,
     return np.transpose(relen_blocks)
 
 
-def pop_arr_val(listid, pop_val):
+def _pop_arr_val(listid, pop_val):
     """
     Remove value from list. Necessary for SEM calculations which include an 
     error value of -1 for SSI. 
@@ -432,7 +434,7 @@ def pop_arr_val(listid, pop_val):
     return arr
 
 
-def expfunc(x, a, b, c):
+def _expfunc(x, a, b, c):
     """
     Create an exponential for an x-range and exponential coefficients.
 
@@ -496,7 +498,7 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
     avresssivals=[]
     avsemvals=[]
     
-    arr = pop_arr_val(ssi_blocks, -1)
+    arr = _pop_arr_val(ssi_blocks, -1)
     
     for i in range(len(resids)):
         resssivals.append([arr[index] for index in resids[i]])
@@ -529,9 +531,9 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
                 b=expofit[0]
                 c=min(expy)
                 p0=[a,b,c]
-                popt, pcov = curve_fit(expfunc, x, y,p0=p0)
+                popt, pcov = curve_fit(_expfunc, x, y,p0=p0)
                 x1 = np.linspace(min(x),200,num =1700)
-                y1 = expfunc(x1, *popt)
+                y1 = _expfunc(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()
@@ -615,9 +617,9 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
                 b=expofit[0]
                 c=min(expy)
                 p0=[a,b,c]
-                popt, pcov = curve_fit(expfunc, x, y,p0=p0)
+                popt, pcov = curve_fit(_expfunc, x, y,p0=p0)
                 x1 = np.linspace(min(x),200,num =1700)
-                y1 = expfunc(x1, *popt)
+                y1 = _expfunc(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()   
