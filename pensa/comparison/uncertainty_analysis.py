@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
 
+
 # -- Functions to uncertainty analysis on statistics across paired ensembles --
 
 
@@ -58,19 +59,23 @@ def _unc_relative_entropy_analysis(features_a, features_b, all_data_a, all_data_
     """
 
     all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
         assert len(features_a) == len(features_b)
     else:
         assert features_a == features_b
     assert all_data_a.shape[0] == all_data_b.shape[0] 
+    
     # Extract the names of the features
     data_names = features_a
+    
     # Initialize relative entropy and average value
     data_jsdist = np.zeros(len(data_names))
     data_kld_ab = np.zeros(len(data_names))
     data_kld_ba = np.zeros(len(data_names))
     data_avg    = np.zeros(len(data_names))
+    
     # Loop over all features
     for i in range(len(all_data_a)):
         if block_length is not None:
@@ -159,7 +164,6 @@ def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, t
 
     """
 
-    
     # Get the multivariate timeseries data
     if torsions is None:
          mv_res_feat_a, mv_res_data_a = features_a,all_data_a
@@ -177,35 +181,36 @@ def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, t
     else:
         assert mv_res_feat_a == mv_res_feat_b
     assert mv_res_data_a.shape[0] == mv_res_data_b.shape[0] 
+    
     # Extract the names of the features
     data_names = mv_res_feat_a
+    
     # Initialize relative entropy and average value
     data_ssi = np.zeros(len(data_names))
+    
     # Loop over all features    
     for residue in range(len(mv_res_data_a)):
         data_a = mv_res_data_a[residue]
         data_b = mv_res_data_b[residue]
 
-        combined_dist=[]
-        
+        combined_dist=[]    
         if block_length is not None:
             BL1 = block_length[0]
             BL2 = block_length[1]
             for dist_no in range(len(data_a)):
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
+                # Combine the ensembles into one distribution (condition_a + condition_b)
                 data_both = list(data_a[dist_no][BL1:BL2]) + list(data_b[dist_no][BL1:BL2])      
                 combined_dist.append(data_both)
-            ## Saving distribution length
+            # Save distribution length
             traj1_len = len(data_a[dist_no][BL1:BL2])       
-                
         else:
             for dist_no in range(len(data_a)):
-                # # # combine the ensembles into one distribution (condition_a + condition_b)
+                # Combine the ensembles into one distribution (condition_a + condition_b)
                 data_both = list(data_a[dist_no]) + list(data_b[dist_no])      
                 combined_dist.append(data_both)
             traj1_len = len(data_a[dist_no]) 
 
-
+        # Correct for the periodicity of angles
         if pbc is True:
             feat_distr = [correct_angle_periodicity(distr) for distr in combined_dist]
         else:
@@ -223,13 +228,14 @@ def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, t
                 else:
                     plot_name = None
                 try:
-                    feat_states.append(determine_state_limits(feat_distr[dim_num], 
-                                                              traj1_len, 
-                                                              write_plots=write_plots, 
-                                                              write_name=plot_name,
-                                                              gauss_bins=bin_no))
+                    state_limits = determine_state_limits(
+                        feat_distr[dim_num], traj1_len, gauss_bins=bin_no,
+                        write_plots=write_plots, write_name=plot_name
+                    )
+                    feat_states.append(state_limits)
                 except:
-                    print('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
+                    print('Distribution A not clustering properly.')
+                    print('Try altering Gaussian parameters or input custom states.')
                     cluster=0
                     
         if cluster==0:
@@ -267,10 +273,8 @@ def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, t
 
 
 
-def ssi_block_analysis(features_a, features_b,
-                       all_data_a, all_data_b,
-                       torsions='sc', blockanlen=10000,
-                       cumdist=False, verbose=True):
+def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
+                       torsions='sc', blockanlen=10000, cumdist=False, verbose=True):
     
     """
     Block analysis on the State Specific Information statistic for each feature across two ensembles.
@@ -332,7 +336,7 @@ def ssi_block_analysis(features_a, features_b,
         ssi_names, data_ssi = _unc_ssi_ensemble_analysis(
             features_a, features_b, all_data_a, all_data_b,
             torsions=torsions, block_length=bl, verbose=True
-            )
+        )
         
         ssi_blocks.append(data_ssi)
 
@@ -342,8 +346,7 @@ def ssi_block_analysis(features_a, features_b,
 
 
 
-def relen_block_analysis(features_a, features_b,
-                         all_data_a, all_data_b, 
+def relen_block_analysis(features_a, features_b, all_data_a, all_data_b, 
                          blockanlen=10000, cumdist=False, verbose=True):
     """
     Block analysis on the relative entropy metrics for each feature from two ensembles.
@@ -378,7 +381,6 @@ def relen_block_analysis(features_a, features_b,
 
     """
     
-    
     relen_blocks=[]        
     block_lengths=[]
     frameno=0
@@ -391,15 +393,13 @@ def relen_block_analysis(features_a, features_b,
     
     for bl in block_lengths:
         print('block length = ', bl)       
-        
         relen = _unc_relative_entropy_analysis(
             features_a, features_b, all_data_a, all_data_b,
             block_length=bl, verbose=True
-            )        
+        )        
         relen_blocks.append(relen)
-            
-            
-    np.save('relen_bl'+str(blockanlen),np.transpose(np.array(relen_blocks)))
+                    
+    np.save('relen_bl'+str(blockanlen), np.transpose(np.array(relen_blocks)))
     
     return np.transpose(relen_blocks)
 
