@@ -21,6 +21,7 @@ tests/test_data/mor-data/
 tests/test_data/MOR-*/.*.npz
 *.ipynb
 .DS_Store
+*.npy
 
 # Files from workload manager
 slurm*.out
