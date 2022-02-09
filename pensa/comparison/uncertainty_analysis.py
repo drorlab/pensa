@@ -166,8 +166,8 @@ def _unc_ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, t
 
     # Get the multivariate timeseries data
     if torsions is None:
-         mv_res_feat_a, mv_res_data_a = features_a,all_data_a
-         mv_res_feat_b, mv_res_data_b = features_b,all_data_b
+         mv_res_feat_a, mv_res_data_a = features_a, all_data_a
+         mv_res_feat_b, mv_res_data_b = features_b, all_data_b
     else:
          mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
          mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
@@ -312,35 +312,35 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
 
     """
     
-    ssi_blocks=[]
-    block_lengths=[]
-    frameno=0
-    ## add if statement for no sc-torsions
+    # Determine the length of the trajectories
     if torsions is None:
-        while frameno <= min(len(all_data_a),len(all_data_b)):
-            if cumdist is True:
-                block_lengths.append([0,frameno+blockanlen])
-            else:
-                block_lengths.append([frameno+1,frameno+blockanlen])
-            frameno+=blockanlen
+        length_a = len(all_data_a[0][0])
+        length_b = len(all_data_a[0][0])
     else:
-        while frameno <= min(len(all_data_a[torsions+'-torsions']),len(all_data_b[torsions+'-torsions'])):
-            if cumdist is True:
-                block_lengths.append([0,frameno+blockanlen])
-            else:
-                block_lengths.append([frameno+1,frameno+blockanlen])
-            frameno+=blockanlen
+        length_a = len(all_data_a[torsions+'-torsions'])
+        length_b = len(all_data_b[torsions+'-torsions'])
+    print('Trajectory lengths:', length_a, length_b)
+        
+    # Define the block limits
+    ssi_blocks = []
+    block_lengths = []
+    frameno = 0
+    while frameno <= min(length_a, length_b):
+        if cumdist:
+            block_lengths.append([0, frameno+blockanlen])
+        else:
+            block_lengths.append([frameno+1, frameno+blockanlen])
+        frameno += blockanlen
 
+    # Run the SSI analysis on each block
     for bl in block_lengths:
         print('block length = ', bl)
         ssi_names, data_ssi = _unc_ssi_ensemble_analysis(
             features_a, features_b, all_data_a, all_data_b,
             torsions=torsions, block_length=bl, verbose=True
         )
-        
         ssi_blocks.append(data_ssi)
 
-    np.save('ssi_bl'+str(blockanlen),np.transpose(np.array(ssi_blocks)))
     ssi_names, ssi_blocks =  np.transpose(ssi_names), np.transpose(ssi_blocks)
     return ssi_names, ssi_blocks
 
@@ -384,7 +384,7 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
     relen_blocks=[]        
     block_lengths=[]
     frameno=0
-    while frameno <= min(len(all_data_a),len(all_data_b)):
+    while frameno <= min(len(all_data_a.T),len(all_data_b.T)):
         if cumdist is True:
             block_lengths.append([0,frameno+blockanlen])
         else:
