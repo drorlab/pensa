@@ -326,7 +326,7 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
     block_lengths = []
     frameno = 0
     while frameno <= min(length_a, length_b):
-        if cumdist:
+        if cumdist is True:
             block_lengths.append([0, frameno+blockanlen])
         else:
             block_lengths.append([frameno+1, frameno+blockanlen])
@@ -384,7 +384,7 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
     relen_blocks=[]        
     block_lengths=[]
     frameno=0
-    while frameno <= min(len(all_data_a.T),len(all_data_b.T)):
+    while frameno <= min(len(all_data_a),len(all_data_b)):
         if cumdist is True:
             block_lengths.append([0,frameno+blockanlen])
         else:
