@@ -18,6 +18,7 @@ The methods here are based on the following paper:
 
 import MDAnalysis as mda
 import numpy as np
+import itertools as it
 from gridData import Grid
 from tqdm import tqdm
 import os
@@ -147,12 +148,16 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         psilist=[]
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
+        # Shifting the coordinates of the maxima by the grid origin to match 
+        # the simulation box coordinates
+        shifted_coords=coords[wat_no]+g.origin
+        point_str = str(shifted_coords)[1:-1]
         counting=[]
         for frame_no in tqdm(range(len(u.trajectory))):       
         # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             radius = ' 3.5'
-            atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] + radius).indices
+            atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + point_str + radius).indices
             counting.append(atomgroup_IDS)
             
         ## Water atom indices that appear in the water site
@@ -189,7 +194,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
         water_pocket_occupation_frequency = round(water_pocket_occupation_frequency,4)
-        atom_location = coords[wat_no] + g.origin
+        atom_location = shifted_coords
 
         water_information.append([water_ID,list(atom_location),water_pocket_occupation_frequency])
         
