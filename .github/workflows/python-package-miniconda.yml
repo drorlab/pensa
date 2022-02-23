@@ -3,8 +3,7 @@ name: package-miniconda
 on: [push]
 
 jobs:
-  example-3:
-    name: Ex3 Linux
+  ex-miniconda:
     runs-on: "ubuntu-latest"
     defaults:
       run:
