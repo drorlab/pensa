@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v2
@@ -16,6 +19,9 @@ jobs:
         activate-environment: anaconda-client-env
         environment-file: environment.yml
         python-version: 3.7
+      run: |
+        conda info
+        conda list
     - name: Lint with flake8
       run: |
         conda install flake8
