@@ -8,4 +8,3 @@ dependencies:
   - mdshare 
   - pyemma 
   - MDAnalysis 
-  - pip 
