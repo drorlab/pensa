@@ -20,6 +20,7 @@ jobs:
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Activate conda environment
+      run: |
         conda activate anaconda-client-env
         conda info
         conda list
