@@ -1,6 +1,7 @@
 import numpy as np
 from pensa.features import *
 from pensa.statesinfo import *
+from pensa.comparison import relative_entropy_analysis
 import scipy as sp
 import scipy.stats
 import scipy.spatial
