@@ -743,30 +743,31 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
 
 
 
-def get_discrete_states(all_data_a, all_data_b, pbc=True, discretize='gaussian', write_plots=False):
+def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True, write_plots=False):
     """
-    
+    Obtain list of state limits for each feature.
 
     Parameters
     ----------
-    all_data_a : TYPE
-        DESCRIPTION.
-    all_data_b : TYPE
-        DESCRIPTION.
-    pbc : TYPE, optional
-        DESCRIPTION. The default is True.
+    all_data_a : float array
+        Trajectory data from the first ensemble. 
+    all_data_b : float array
+        Trajectory data from the second ensemble. 
     discretize : str, optional
         Method for state discretization. Options are 'gaussian', which defines 
         state limits by gaussian intersects, and 'partition_values', which defines
         state limits by partitioning all values in the data. The default is 'gaussian'.
-    write_plots : TYPE, optional
-        DESCRIPTION. The default is False.
+    pbc : bool, optional
+        If true, the apply periodic bounary corrections on angular distribution inputs.
+        The input for periodic correction must be radians. The default is True.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is False.
 
     Returns
     -------
-    ssi_states : TYPE
-        DESCRIPTION.
-
+    ssi_states : list of list
+        List of state limits for each feature.
+        
     """
     
     assert all_data_a.shape[0] == all_data_b.shape[0] 
@@ -803,7 +804,7 @@ def get_discrete_states(all_data_a, all_data_b, pbc=True, discretize='gaussian',
             feat_states = []
             for dim_num in range(len(combined_dist)):
                 if write_plots:
-                    plot_name = data_names[residue]
+                    plot_name = "Residue " + str(residue) + ", Dim. " + str(dim_num)
                 else:
                     plot_name = None
                 try:

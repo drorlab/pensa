@@ -98,7 +98,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, verbose=True, override_name_check=False):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -118,6 +118,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
         List of state limits for each feature.
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1. 
+    pbc : bool, optional
+        If true, the apply periodic bounary corrections on angular distribution inputs.
+        The input for periodic correction must be radians. The default is True.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -149,24 +152,22 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
     # Loop over all features
     count=0
     for res1 in range(len(features_a)):
-        # print(res1)
         res1_data_ens1 = all_data_a[res1]
         res1_data_ens2 = all_data_b[res1]
-        res1_combined_dist=[]
+        set_distr_a=[]
         for dist_no_a in range(len(res1_data_ens1)):
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
-            res1_combined_dist.append(res1_data_both)
+            set_distr_a.append(res1_data_both)
 
         ## Saving distribution length
         traj1_len = len(res1_data_ens1[dist_no_a])   
         traj2_len = len(res1_data_ens2[dist_no_a])   
             
-        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
-        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
-    
+        if pbc:
+            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
+        
         set_a_states = discrete_states_ab[res1]       
-      
       
         H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
         
@@ -176,13 +177,14 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
                 # Only run SSI if entropy is non-zero
                 res2_data_ens1 = all_data_a[res2]
                 res2_data_ens2 = all_data_b[res2]     
-                res2_combined_dist=[]
+                set_distr_b=[]
                 for dist_no_b in range(len(res2_data_ens1)):
                     # # # combine the ensembles into one distribution (condition_a + condition_b)
                     res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
+                    set_distr_b.append(res2_data_both)            
                  
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                if pbc:
+                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
                 set_b_states = discrete_states_ab[res2]       
             
                 H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
@@ -221,7 +223,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
 def cossi_featens_analysis(features_a, features_b, features_c, features_d, 
                            all_data_a, all_data_b, all_data_c, all_data_d, 
                            discrete_states_ab, discrete_states_cd, 
-                           max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
+                           max_thread_no=1, pbc=True, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -252,6 +254,9 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
         List of state limits for each feature.
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1.
+    pbc : bool, optional
+        If true, the apply periodic bounary corrections on angular distribution inputs.
+        The input for periodic correction must be radians. The default is True.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -291,18 +296,19 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
     for res1 in range(len(all_data_a)):
         res1_data_ens1 = all_data_a[res1]
         res1_data_ens2 = all_data_b[res1]
-        res1_combined_dist=[]
+        set_distr_a=[]
         for dist_no_a in range(len(res1_data_ens1)):
             # # # combine the ensembles into one distribution (condition_a + condition_b)
             res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
-            res1_combined_dist.append(res1_data_both)
+            set_distr_a.append(res1_data_both)
 
         ## Saving distribution length
         traj1_len = len(res1_data_ens1[dist_no_a])   
         traj2_len = len(res1_data_ens2[dist_no_a])   
             
-        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
-        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
+        if pbc:
+            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
+            
         set_a_states = discrete_states_ab[res1]       
         H_a=calculate_entropy(set_a_states,set_distr_a) 
         
@@ -311,14 +317,15 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                 # Only run SSI if entropy is non-zero
                 res2_data_ens1 = all_data_c[res2]
                 res2_data_ens2 = all_data_d[res2]     
-                res2_combined_dist=[]
-                
+                set_distr_b=[]
                 for dist_no_b in range(len(res2_data_ens1)):
                     # # # combine the ensembles into one distribution (condition_a + condition_b)
                     res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
-                 
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                    set_distr_b.append(res2_data_both)            
+ 
+                if pbc:
+                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
+                    
                 set_b_states = discrete_states_cd[res2]       
                 H_b=calculate_entropy(set_b_states,set_distr_b)
                 
