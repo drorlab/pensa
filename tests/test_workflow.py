@@ -29,6 +29,72 @@ class Test_pensa(unittest.TestCase):
   
     def setUp(self):
 
+        # - PREPROCESSING
+        
+        # Set root directory for each simulation
+        root_dir_a = test_data_path+'/MOR-apo'
+        root_dir_b = test_data_path+'/MOR-BU72'
+        # Simulation A
+        self.ref_file_a =  root_dir_a+'/mor-apo.psf'
+        self.pdb_file_a =  root_dir_a+'/mor-apo.pdb'
+        self.trj_file_a = [root_dir_a+'/mor-apo-1.xtc',
+                           root_dir_a+'/mor-apo-2.xtc',
+                           root_dir_a+'/mor-apo-3.xtc']
+        # Simulation B
+        self.ref_file_b =  root_dir_b+'/mor-bu72.psf'
+        self.pdb_file_b =  root_dir_b+'/mor-bu72.pdb'
+        self.trj_file_b = [root_dir_b+'/mor-bu72-1.xtc',    
+                           root_dir_b+'/mor-bu72-2.xtc',
+                           root_dir_b+'/mor-bu72-3.xtc']
+                      
+        # Names of the output files
+        self.trj_name_a = test_data_path + "/traj/condition-a"
+        self.trj_name_b = test_data_path + "/traj/condition-b"
+
+        # First test case: entire receptor.
+    
+        # Base for the selection string for each simulation
+        sel_base_a = "(not name H*) and protein"
+        sel_base_b = "(not name H*) and protein"
+        
+        # Extract the coordinates of the entire receptors
+        self.file_extr_a = extract_coordinates(
+            self.ref_file_a, self.pdb_file_a, self.trj_file_a, 
+            self.trj_name_a+"_receptor", sel_base_a
+            )
+        self.file_extr_b = extract_coordinates(
+            self.ref_file_b, self.pdb_file_b, self.trj_file_b, 
+            self.trj_name_b+"_receptor", sel_base_b
+            )
+
+        # Second test case: only transmembrane (TM) region.
+        
+        # Generate selection strings from the file
+        sel_string_a = load_selection(
+            test_data_path + "/mor_tm.txt", sel_base_a+" and "
+            )
+        sel_string_b = load_selection(
+            test_data_path + "/mor_tm.txt", sel_base_b+" and "
+            )      
+        
+        # Extract the coordinates of the TM region from the trajectory
+        self.file_tm_single_a = extract_coordinates(
+            self.ref_file_a, self.pdb_file_a, [self.trj_file_a], 
+            self.trj_name_a+"_tm", sel_string_a
+            )
+        self.file_tm_single_b = extract_coordinates(
+            self.ref_file_b, self.pdb_file_b, [self.trj_file_b], 
+            self.trj_name_b+"_tm", sel_string_b
+            )
+        self.file_tm_combined = extract_coordinates_combined(
+            [self.ref_file_a]*3 + [self.ref_file_b]*3,
+            self.trj_file_a + self.trj_file_b,
+            [sel_string_a]*3 + [sel_string_b]*3,
+            test_data_path + '/traj/combined_tm',
+            start_frame=0
+            )            
+
+
         # - FEATURES -
     
         start_frame = 0
@@ -462,74 +528,15 @@ class Test_pensa(unittest.TestCase):
     # -- extract_coordinates() and extract_coordinates_combined()
     def test_extract_coordinates(self):
     
-        # Set root directory for each simulation
-        root_dir_a = test_data_path+'/MOR-apo'
-        root_dir_b = test_data_path+'/MOR-BU72'
-        # Simulation A
-        ref_file_a =  root_dir_a+'/mor-apo.psf'
-        pdb_file_a =  root_dir_a+'/mor-apo.pdb'
-        trj_file_a = [root_dir_a+'/mor-apo-1.xtc',
-                      root_dir_a+'/mor-apo-2.xtc',
-                      root_dir_a+'/mor-apo-3.xtc']
-        # Simulation B
-        ref_file_b =  root_dir_b+'/mor-bu72.psf'
-        pdb_file_b =  root_dir_b+'/mor-bu72.pdb'
-        trj_file_b = [root_dir_b+'/mor-bu72-1.xtc',    
-                      root_dir_b+'/mor-bu72-2.xtc',
-                      root_dir_b+'/mor-bu72-3.xtc']
-                      
-        # Names of the output files
-        out_name_a = test_data_path + "/traj/condition-a"
-        out_name_b = test_data_path + "/traj/condition-b"
-        out_name_combined=test_data_path + "/traj/combined"
-    
-        # Base for the selection string for each simulation
-        sel_base_a = "(not name H*) and protein"
-        sel_base_b = "(not name H*) and protein"
-        # Generate selection strings from the file
-        sel_string_a = load_selection(
-            test_data_path + "/mor_tm.txt", sel_base_a+" and "
-            )
-        sel_string_b = load_selection(
-            test_data_path + "/mor_tm.txt", sel_base_b+" and "
-            )
-        
-        # First test case:
-        # Extract the coordinates of the entire receptors
-        file_a = extract_coordinates(
-            ref_file_a, pdb_file_a, trj_file_a, 
-            out_name_a+"_receptor", sel_base_a
-            )
-        file_b = extract_coordinates(
-            ref_file_b, pdb_file_b, trj_file_b, 
-            out_name_b+"_receptor", sel_base_b
-            )
-        # Number of atoms from selection
-        self.assertEqual(file_a, 2322)
-        self.assertEqual(file_b, 2322)
+        # Number of atoms from selection in first test case
+        self.assertEqual(self.file_extr_a, 2322)
+        self.assertEqual(self.file_extr_b, 2322)
 
-        # Second test case:
-        # Extract the coordinates of the TM region from the trajectory
-        file_a = extract_coordinates(
-            ref_file_a, pdb_file_a, [trj_file_a], 
-            out_name_a+"_tm", sel_string_a
-            )
-        file_b = extract_coordinates(
-            ref_file_b, pdb_file_b, [trj_file_b], 
-            out_name_b+"_tm", sel_string_b
-            )
-        file_combine = extract_coordinates_combined(
-            [ref_file_a]*3 + [ref_file_b]*3,
-            trj_file_a + trj_file_b,
-            [sel_string_a]*3 + [sel_string_b]*3,
-            test_data_path + '/traj/combined_tm.xtc',
-            start_frame=0
-            )
         # Number of Atom from the selction
-        self.assertEqual(file_a, 1877)
-        self.assertEqual(file_b, 1877)
+        self.assertEqual(self.file_tm_single_a, 1877)
+        self.assertEqual(self.file_tm_single_b, 1877)
         # Number of Atom from the selection - combined
-        self.assertEqual(file_a, 1877)
+        self.assertEqual(self.file_tm_combined, 1877)
 
 
     # -- load_selection()
