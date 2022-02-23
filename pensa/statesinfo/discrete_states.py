@@ -513,7 +513,7 @@ def _check(value,x,y):
 
 
 
-def create_states(data):
+def _create_states(data):
     """
     Create states as the partitions between all values in the data.
 
@@ -740,3 +740,81 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
         entropy+=sum(all_entropy)
         
     return entropy
+
+
+
+def get_discrete_states(all_data_a, all_data_b, pbc=True, discretize='gaussian', write_plots=False):
+    """
+    
+
+    Parameters
+    ----------
+    all_data_a : TYPE
+        DESCRIPTION.
+    all_data_b : TYPE
+        DESCRIPTION.
+    pbc : TYPE, optional
+        DESCRIPTION. The default is True.
+    discretize : str, optional
+        Method for state discretization. Options are 'gaussian', which defines 
+        state limits by gaussian intersects, and 'partition_values', which defines
+        state limits by partitioning all values in the data. The default is 'gaussian'.
+    write_plots : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    ssi_states : TYPE
+        DESCRIPTION.
+
+    """
+    
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+
+    # Initialize states list
+    ssi_states = []
+    # Loop over all features
+    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    
+    for residue in range(len(all_data_a)):
+        data_a = all_data_a[residue]
+        data_b = all_data_b[residue]
+        
+        combined_dist=[]
+        
+        for dist_no in range(len(data_a)):
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            data_both = list(data_a[dist_no]) + list(data_b[dist_no])      
+            combined_dist.append(data_both)
+
+        if pbc:
+            ## Correct the periodicity of angles (in radians)
+            combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
+
+        if discretize == 'partition_values': 
+            ## Define states as partition between data values
+            feat_states = []         
+            for dim_num in range(len(combined_dist)):
+                feat_states.append(_create_states(combined_dist[dim_num]))
+                
+        elif  discretize == 'gaussian':     
+            ## Saving distribution length
+            traj1_len = len(data_a[dist_no])   
+            feat_states = []
+            for dim_num in range(len(combined_dist)):
+                if write_plots:
+                    plot_name = data_names[residue]
+                else:
+                    plot_name = None
+                try:
+                    feat_states.append(determine_state_limits(combined_dist[dim_num], 
+                                                              traj1_len, 
+                                                              write_plots=write_plots, 
+                                                              write_name=plot_name))
+                except:
+                    print('Distribution ',residue,' not clustering properly.')
+                    
+        ssi_states.append(feat_states)
+
+    return ssi_states
+

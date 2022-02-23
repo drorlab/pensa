@@ -97,6 +97,48 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
     timeseries = get_feature_data(feat[feature_type], data[feature_type], feature_name)
     return timeseries
 
+def get_multivar_res(feat,data):
+    """
+    Groups each timeseries of all features for one particular residue.
+   
+
+    Parameters
+    ----------
+    feat : TYPE
+        DESCRIPTION.
+    data : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
+    
+    feat_name_list = feat
+    #obtaining the residue numbers 
+    res_numbers = [int(feat_name.split()[-1]) for feat_name in feat_name_list]
+    #grouping indices where feature refers to same residue
+    index_same_res = [list(np.where(np.array(res_numbers)==seq_num)[0])
+                      for seq_num in list(set(res_numbers))]   
+    
+    new_data = []
+    sorted_names = []
+        
+    transdata = data.T
+    for residue in index_same_res:
+        new_data.append( np.array( [transdata[residx] for residx in residue] ) )
+
+    sorted_names = []
+    for residue in range(len(index_same_res)):
+        for residue_dim in index_same_res[residue]:
+            feat_name_split = feat_name_list[residue].split()
+            resname = feat_name_split[-2] + ' ' + feat_name_split[-1] 
+        sorted_names.append(resname)
+
+    return sorted_names, np.array(new_data, dtype=object)
+ 
 
 def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None):
     """
