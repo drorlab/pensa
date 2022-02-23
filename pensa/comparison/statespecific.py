@@ -5,7 +5,7 @@ from pensa.statesinfo import *
 
 # -- Functions to calculate SSI statistics across paired ensembles --
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states, max_thread_no=1, pbc=True,
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True,
                           verbose=True, write_plots=False, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -21,19 +21,13 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    discrete_states_ab : list of list
+        List of state limits for each feature.
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1. 
-    torsions : str, optional
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
-        Default is None.
-    pocket_occupancy : bool, optional
-        Set to 'True' if the data input is pocket occupancy distribution.
-        The default is None.
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
-    create_states : bool, optional
-        Create states as the partitions between all values in the data. The default is False.
     verbose : bool, optional
         Print intermediate results. Default is True.
     write_plots : bool, optional
@@ -64,7 +58,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
     for residue in range(len(all_data_a)):
         data_a = all_data_a[residue]
         data_b = all_data_b[residue]
-        res_states = discrete_states[residue]       
+        res_states = discrete_states_ab[residue]       
         combined_dist=[]
         for dist_no in range(len(data_a)):
             # # # combine the ensembles into one distribution (condition_a + condition_b)
@@ -96,12 +90,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
             H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
     
             SSI = ((H_feat + H_ens) - H_featens)/norm_factor
-        
-        else: 
-            
-            SSI = 0
-        
-        data_ssi[residue] = SSI
+            data_ssi[residue] = SSI
             
         if verbose is True:
             print(data_names[residue],data_ssi[residue])
@@ -125,11 +114,10 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
+    discrete_states_ab : list of list
+        List of state limits for each feature.
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1. 
-    torsions : str, optional
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
-        Default is None.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -229,143 +217,6 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
             
     return data_names, data_ssi
 
-def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d, 
-                            all_data_a, all_data_b, all_data_c, all_data_d, 
-                            discrete_states_ab, discrete_states_cd, 
-                            max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
-
-    """
-    Calculates State Specific Information statistic between two features and the ensembles condition.
-    
-    Parameters
-    ----------
-    features_a : list of str
-        Feature names of the first ensemble. 
-    features_b : list of str
-        Feature names of the second ensemble. 
-        Must be the same as features_a. Provided as a sanity check.
-    features_c : list of str
-        Feature names of the third ensemble. 
-    features_d : list of str
-        Feature names of the fourth ensemble. 
-        Must be the same as features_c. Provided as a sanity check.    
-    all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
-    all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
-    all_data_c : float array
-        Trajectory data from the third ensemble. Format: [frames,frame_data].
-    all_data_d : float array
-        Trajectory data from the fourth ensemble. Format: [frames,frame_data].    
-    max_thread_no : int, optional
-        Maximum number of threads to use in the multi-threading. Default is 1.
-    torsions : str, optional
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
-        Default is None.
-    verbose : bool, optional
-        Print intermediate results. Default is True.
-    override_name_check : bool, optional
-        Only check number of features, not their names. Default is False.
-        
-        
-    Returns
-    -------
-        data_names : list of str
-            Feature names.
-        data_ssi : float array
-            State Specific Information SSI statistics for each feature.
-
-    """
-            
-    # Assert that the features are the same and data sets have same number of features
-    if override_name_check:
-        assert len(features_a) == len(features_b)
-        assert len(features_c) == len(features_d)
-    else:
-        assert features_a == features_b
-        assert features_c == features_d
-    assert all_data_a.shape[0] == all_data_b.shape[0] 
-    assert all_data_c.shape[0] == all_data_d.shape[0] 
-    
-    # Extract the names of the features
-    data_names = []
-    for feat1 in range(len(features_a)):
-        for feat2 in range(len(features_c)):
-            data_names.append(features_a[feat1] + ' & ' + features_c[feat2])
-            
-    # Initialize SSI and Co-SSI
-    data_ssi = np.zeros(len(data_names))
-    
-    # Loop over all features
-    count=0    
-    for res1 in range(len(all_data_a)):
-        res1_data_ens1 = all_data_a[res1]
-        res1_data_ens2 = all_data_b[res1]
-        res1_combined_dist=[]
-        for dist_no_a in range(len(res1_data_ens1)):
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
-            res1_combined_dist.append(res1_data_both)
-
-        ## Saving distribution length
-        traj1_len = len(res1_data_ens1[dist_no_a])   
-        traj2_len = len(res1_data_ens2[dist_no_a])   
-            
-        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
-        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
-        set_a_states = discrete_states_ab[res1]       
-        H_a=calculate_entropy(set_a_states,set_distr_a) 
-        
-        if H_a != 0:
-            for res2 in range(len(all_data_c)):
-                # Only run SSI if entropy is non-zero
-                res2_data_ens1 = all_data_c[res2]
-                res2_data_ens2 = all_data_d[res2]     
-                res2_combined_dist=[]
-                
-                for dist_no_b in range(len(res2_data_ens1)):
-                    # # # combine the ensembles into one distribution (condition_a + condition_b)
-                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
-                 
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
-                set_b_states = discrete_states_cd[res2]       
-                H_b=calculate_entropy(set_b_states,set_distr_b)
-                
-                if H_b!=0:
-                    traj_1_fraction = traj1_len/(traj1_len+traj2_len)
-                    traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-
-                    ##----------------
-                    ab_joint_states = set_a_states + set_b_states
-                    ab_joint_distributions = set_distr_a + set_distr_b
-                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
-                    
-                    SSI = ((H_a + H_b) - H_ab)/norm_factor
-                    
-                    data_ssi[count] = SSI       
-                    
-                    if verbose is True:
-                        print('\nFeature Pair: ', data_names[count],
-                              '\nSSI[bits]: ', data_ssi[count])
-                    count+=1                
-         
-                else:
-                    if verbose is True:
-                        print('\nFeature Pair: ', data_names[count],
-                              '\nSSI[bits]: ', data_ssi[count])
-                    count+=1
-                
-        else:
-            if verbose is True:
-                print('\nFeature Pair: ', data_names[count],
-                      '\nSSI[bits]: ', data_ssi[count])
-            count+=1
-
-    
-    return data_names, data_ssi
-
 
 def cossi_featens_analysis(features_a, features_b, features_c, features_d, 
                            all_data_a, all_data_b, all_data_c, all_data_d, 
@@ -395,11 +246,12 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
         Trajectory data from the third ensemble. Format: [frames,frame_data].
     all_data_d : float array
         Trajectory data from the fourth ensemble. Format: [frames,frame_data].    
+    discrete_states_ab : list of list
+        List of state limits for each feature.
+    discrete_states_cd : list of list
+        List of state limits for each feature.
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1.
-    torsions : str, optional
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
-        Default is None.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -530,6 +382,149 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
     return data_names, data_ssi, data_cossi
 
 # -- Functions with more customizable capabilities for users to adapt to their needs --
+
+
+def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d, 
+                            all_data_a, all_data_b, all_data_c, all_data_d, 
+                            discrete_states_ab, discrete_states_cd, 
+                            max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
+
+    """
+    Calculates State Specific Information statistic between two features and the ensembles condition.
+    
+    Parameters
+    ----------
+    features_a : list of str
+        Feature names of the first ensemble. 
+    features_b : list of str
+        Feature names of the second ensemble. 
+        Must be the same as features_a. Provided as a sanity check.
+    features_c : list of str
+        Feature names of the third ensemble. 
+    features_d : list of str
+        Feature names of the fourth ensemble. 
+        Must be the same as features_c. Provided as a sanity check.    
+    all_data_a : float array
+        Trajectory data from the first ensemble. Format: [frames,frame_data].
+    all_data_b : float array
+        Trajectory data from the second ensemble. Format: [frames,frame_data].
+    all_data_c : float array
+        Trajectory data from the third ensemble. Format: [frames,frame_data].
+    all_data_d : float array
+        Trajectory data from the fourth ensemble. Format: [frames,frame_data]. 
+    discrete_states_ab : list of list
+        List of state limits for each feature.
+    discrete_states_cd : list of list
+        List of state limits for each feature.
+    max_thread_no : int, optional
+        Maximum number of threads to use in the multi-threading. Default is 1.
+    torsions : str, optional
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        Default is None.
+    verbose : bool, optional
+        Print intermediate results. Default is True.
+    override_name_check : bool, optional
+        Only check number of features, not their names. Default is False.
+        
+        
+    Returns
+    -------
+        data_names : list of str
+            Feature names.
+        data_ssi : float array
+            State Specific Information SSI statistics for each feature.
+
+    """
+            
+    # Assert that the features are the same and data sets have same number of features
+    if override_name_check:
+        assert len(features_a) == len(features_b)
+        assert len(features_c) == len(features_d)
+    else:
+        assert features_a == features_b
+        assert features_c == features_d
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+    assert all_data_c.shape[0] == all_data_d.shape[0] 
+    
+    # Extract the names of the features
+    data_names = []
+    for feat1 in range(len(features_a)):
+        for feat2 in range(len(features_c)):
+            data_names.append(features_a[feat1] + ' & ' + features_c[feat2])
+            
+    # Initialize SSI and Co-SSI
+    data_ssi = np.zeros(len(data_names))
+    
+    # Loop over all features
+    count=0    
+    for res1 in range(len(all_data_a)):
+        res1_data_ens1 = all_data_a[res1]
+        res1_data_ens2 = all_data_b[res1]
+        res1_combined_dist=[]
+        for dist_no_a in range(len(res1_data_ens1)):
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
+            res1_combined_dist.append(res1_data_both)
+
+        ## Saving distribution length
+        traj1_len = len(res1_data_ens1[dist_no_a])   
+        traj2_len = len(res1_data_ens2[dist_no_a])   
+            
+        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
+        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
+        set_a_states = discrete_states_ab[res1]       
+        H_a=calculate_entropy(set_a_states,set_distr_a) 
+        
+        if H_a != 0:
+            for res2 in range(len(all_data_c)):
+                # Only run SSI if entropy is non-zero
+                res2_data_ens1 = all_data_c[res2]
+                res2_data_ens2 = all_data_d[res2]     
+                res2_combined_dist=[]
+                
+                for dist_no_b in range(len(res2_data_ens1)):
+                    # # # combine the ensembles into one distribution (condition_a + condition_b)
+                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
+                    res2_combined_dist.append(res2_data_both)            
+                 
+                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
+                set_b_states = discrete_states_cd[res2]       
+                H_b=calculate_entropy(set_b_states,set_distr_b)
+                
+                if H_b!=0:
+                    traj_1_fraction = traj1_len/(traj1_len+traj2_len)
+                    traj_2_fraction = 1 - traj_1_fraction
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+
+                    ##----------------
+                    ab_joint_states = set_a_states + set_b_states
+                    ab_joint_distributions = set_distr_a + set_distr_b
+                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
+                    
+                    SSI = ((H_a + H_b) - H_ab)/norm_factor
+                    
+                    data_ssi[count] = SSI       
+                    
+                    if verbose is True:
+                        print('\nFeature Pair: ', data_names[count],
+                              '\nSSI[bits]: ', data_ssi[count])
+                    count+=1                
+         
+                else:
+                    if verbose is True:
+                        print('\nFeature Pair: ', data_names[count],
+                              '\nSSI[bits]: ', data_ssi[count])
+                    count+=1
+                
+        else:
+            if verbose is True:
+                print('\nFeature Pair: ', data_names[count],
+                      '\nSSI[bits]: ', data_ssi[count])
+            count+=1
+
+    
+    return data_names, data_ssi
+
 
 def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, b_states=None,
                   gauss_bins=180, gauss_smooth=None, pbc=True, write_plots=None, write_name=None):
