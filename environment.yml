@@ -2,15 +2,6 @@ name: pensa
 channels:
   - conda-forge
   - defaults
-dependencies:
-  - python=3.8
-  - numpy 
-  - scipy 
-  - matplotlib 
-  - mdtraj==1.9.3 
-  - pyemma 
-  - mdshare 
-  - MDAnalysis 
-  - cython
+dependencies: 
   - pip 
-  - biotite
+
