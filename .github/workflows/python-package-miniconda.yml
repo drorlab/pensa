@@ -19,6 +19,8 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+    - name: Activate conda environment
+        conda activate anaconda-client-env
         conda info
         conda list
     - name: Lint with flake8
