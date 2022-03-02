@@ -71,9 +71,12 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
 
         if pbc:
             combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
-                
-        H_feat=calculate_entropy_multthread(res_states, combined_dist, max_thread_no) 
-                
+         
+        if max_thread_no>1:
+            H_feat=calculate_entropy_multthread(res_states, combined_dist, max_thread_no) 
+        else:
+            H_feat=calculate_entropy(res_states, combined_dist) 
+            
         if H_feat != 0:
             ##calculating the entropy for set_distr_b
             ## if no dist (None) then apply the binary dist for two simulations
@@ -87,8 +90,12 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
             
             featens_joint_states= res_states + ens_states
             featens_joint_distr= combined_dist + ens_distr
-            H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
-    
+            
+            if max_thread_no>1:            
+                H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
+            else:
+                H_featens=calculate_entropy(featens_joint_states, featens_joint_distr) 
+               
             SSI = ((H_feat + H_ens) - H_featens)/norm_factor
             data_ssi[residue] = SSI
             
@@ -168,8 +175,11 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
             set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
         
         set_a_states = discrete_states_ab[res1]       
-      
-        H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
+
+        if max_thread_no>1:
+            H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no) 
+        else: 
+            H_a=calculate_entropy(set_a_states,set_distr_a) 
         
         if H_a != 0:
 
@@ -186,14 +196,23 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
                 if pbc:
                     set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
                 set_b_states = discrete_states_ab[res2]       
-            
-                H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
+  
+                if max_thread_no>1:
+                    H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
+                else:
+                    H_b=calculate_entropy(set_b_states,set_distr_b)
+                
                 
                 if H_b!=0:
                 
                     ab_joint_states= set_a_states + set_b_states
                     ab_joint_distributions= set_distr_a + set_distr_b
-                    H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                    
+                    if max_thread_no>1:
+                        H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                    else:
+                        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+            
             
                     traj_1_fraction = traj1_len/(traj1_len+traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
@@ -341,23 +360,35 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     ##----------------
                     ab_joint_states = set_a_states + set_b_states
                     ab_joint_distributions = set_distr_a + set_distr_b
-                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
-                    
+                    if max_thread_no>1:
+                        H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                    else:
+                        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+                                
                     ##----------------
                     ac_joint_states =  set_a_states + set_c_states 
                     ac_joint_distributions = set_distr_a + set_distr_c
-                    H_ac = calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
-                    
+                    if max_thread_no>1:
+                        H_ac=calculate_entropy_multthread(ac_joint_states,ac_joint_distributions, max_thread_no)
+                    else:
+                        H_ac=calculate_entropy(ac_joint_states,ac_joint_distributions)
+                                
                     ##----------------
                     bc_joint_states = set_b_states + set_c_states 
                     bc_joint_distributions = set_distr_b + set_distr_c
-                    H_bc = calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
-                    
+                    if max_thread_no>1:
+                        H_bc=calculate_entropy_multthread(bc_joint_states,bc_joint_distributions, max_thread_no)
+                    else:
+                        H_bc=calculate_entropy(bc_joint_states,bc_joint_distributions)
+                                
                     ##----------------
                     abc_joint_states = set_a_states + set_b_states + set_c_states 
                     abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
-                    H_abc = calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)    
-            
+                    if max_thread_no>1:
+                        H_abc=calculate_entropy_multthread(abc_joint_states,abc_joint_distributions, max_thread_no)
+                    else:
+                        H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)
+                        
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
                     

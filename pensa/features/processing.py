@@ -104,15 +104,17 @@ def get_multivar_res(feat,data):
 
     Parameters
     ----------
-    feat : TYPE
-        DESCRIPTION.
-    data : TYPE
-        DESCRIPTION.
+    feat : list of str
+        List with all feature names.
+    data : float array
+        Feature values data from the simulation.
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    sorted_names : list of str
+        Names of all features
+    new_data : numpy array
+        Data for all features
 
     """
     
@@ -137,7 +139,9 @@ def get_multivar_res(feat,data):
             resname = feat_name_split[-2] + ' ' + feat_name_split[-1] 
         sorted_names.append(resname)
 
-    return sorted_names, np.array(new_data, dtype=object)
+    new_data = np.array(new_data, dtype=object)
+    
+    return sorted_names, new_data
  
 
 def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None):
