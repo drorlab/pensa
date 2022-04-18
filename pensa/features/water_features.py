@@ -63,7 +63,6 @@ def _convert_to_dipole(water_atom_positions):
 
     return psi, phi
 
-
 def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
     """
@@ -86,7 +85,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water distributions, water data summary. The default is None.
     write_grid_as : str, optional
         If you choose to write out the grid, you must specify the water model 
-        to convert the density into. The default is None. 
+        to convert the density into. The default is None. Options are suggested if default.
     out_name : str, optional
         Prefix for all written filenames. The default is None.
 
@@ -112,10 +111,20 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     if write is True:
         if not os.path.exists('water_features/'):
             os.makedirs('water_features/')
-        protein = u.select_atoms("protein")
+        p = u.select_atoms("protein")
         pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
-        u.trajectory[0]
-        protein.write(pdb_outname)
+        p_avg = np.zeros_like(p.positions)
+        # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+        for ts in u.trajectory:
+            p_avg += p.positions
+        p_avg /= len(u.trajectory)
+        # temporarily replace positions with the average
+        p.positions = p_avg
+        # write average protein coordinates
+        p.write(pdb_outname)
+        # just make sure that we have clean original coordinates again (start at the beginning)
+        u.trajectory.rewind()        
+        
         if grid_input is None:
             g = get_grid(u, atomgroup, write_grid_as,  out_name)           
         else:
@@ -147,12 +156,16 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         psilist=[]
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
+        # Shifting the coordinates of the maxima by the grid origin to match 
+        # the simulation box coordinates
+        shifted_coords=coords[wat_no]+g.origin
+        point_str = str(shifted_coords)[1:-1]
         counting=[]
         for frame_no in tqdm(range(len(u.trajectory))):       
         # for frame_no in tqdm(range(100)):       
             u.trajectory[frame_no]
             radius = ' 3.5'
-            atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + maxdens_coord_str[wat_no] + radius).indices
+            atomgroup_IDS = u.select_atoms('name ' + atomgroup + ' and point ' + point_str + radius).indices
             counting.append(atomgroup_IDS)
             
         ## Water atom indices that appear in the water site
@@ -189,7 +202,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
         water_pocket_occupation_frequency = round(water_pocket_occupation_frequency,4)
-        atom_location = coords[wat_no] + g.origin
+        atom_location = shifted_coords
 
         water_information.append([water_ID,list(atom_location),water_pocket_occupation_frequency])
         
@@ -228,4 +241,5 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     
     # Return the dictionaries.
     return feature_names, features_data
+            
             
