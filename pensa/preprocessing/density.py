@@ -28,6 +28,7 @@ import biotite.structure as struc
 import biotite.structure.io as strucio
 # from pensa import *
 # from pensa.features.processing import *
+from tqdm import tqdm
 
 # -- Processing trajectories for density analysis
 
@@ -102,10 +103,9 @@ def local_maxima_3D(data, order=3):
 
     return coords, values
     
-def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name):
+def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
     """
     Writes out combined atomgroup density for both input simulations.    
-
     Parameters
     ----------
     struc_a : str
@@ -123,8 +123,12 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Options are: SPC, TIP3P, TIP4P, water
     out_name : str
         Prefix for written filename. 
-
-
+    prot_prox : bool, optional
+        Select only waters within 3.5 Angstroms of the protein. The default is True.
+    use_memmap : bool, optional
+        Uses numpy memmap to write out a pseudo-trajectory coordinate array.
+        This is used for large trajectories to avoid memory errors with large
+        python arrays. The default is False.
     """        
     if not os.path.exists('dens/'):
         os.makedirs('dens/')
@@ -132,35 +136,64 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
    
-    # # # Combine both ensembles' atoms into one universe
-    Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
     
-    # # # Extract trajectory coordinates
-    aligned_coords_a = AnalysisFromFunction(_copy_coords,
-                                            condition_a.atoms).run().results
+    if use_memmap is True:
+        # # # Combine both ensembles' atoms into one universe
+        Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
+        # # # The density needs to be formed from an even contribution of both conditions
+        # # # otherwise it will be unevely biased towards one condition.
+        # # # So we iterate over the smallest simulation length
+        smallest_traj_len = min(len(condition_a.trajectory),len(condition_b.trajectory))
+        # # # The shape for memmap pseudo-trajetcory
+        array_shape=[smallest_traj_len,len(condition_a.atoms)+len(condition_b.atoms),3]
+        # # # Writing out pseudo-trajetcory
+        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0],array_shape[1],array_shape[2]))
+        # # # Creating universe with blank timesteps from pseudo-trajectory
+        Combined_conditions.load_new(merged_coords, format=MemoryReader)    
+        
+        # # # Creating universe with correct timesteps
+        for frameno in tqdm(range(smallest_traj_len)):
+            condition_a.trajectory[frameno]
+            condition_b.trajectory[frameno]
+            # # # Extract trajectory coordinates at frame [frameno]
+            coords_a = condition_a.atoms.positions
+            coords_b = condition_b.atoms.positions
+            # # # Then we merge the coordinates into one system
+            stacked = np.concatenate((coords_a,coords_b),axis=0)
+            # # # Write over blank trajectory with new coordinates 
+            Combined_conditions.trajectory[frameno].positions = stacked
+ 
     
-    aligned_coords_b = AnalysisFromFunction(_copy_coords,
-                                            condition_b.atoms).run().results
+    else:
+        # # # Combine both ensembles' atoms into one universe
+        Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
+        # # # Extract trajectory coordinates
+        aligned_coords_a = AnalysisFromFunction(_copy_coords,
+                                                condition_a.atoms).run().results
+        aligned_coords_b = AnalysisFromFunction(_copy_coords,
+                                                condition_b.atoms).run().results
+        # # # The density needs to be formed from an even contribution of both conditions
+        # # # otherwise it will be unevely biased towards one condition.
+        # # # So we match the simulation lengths first
+        sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a,aligned_coords_b)
     
-    # # # The density needs to be formed from an even contribution of both conditions
-    # # # otherwise it will be unevely biased towards one condition.
-    # # # So we match the simulation lengths first
-    sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a,aligned_coords_b)
-
-    # # # Then we merge the coordinates into one system
-    merged_coords = np.hstack([sim1_coords, sim2_coords])
-    # # # We load in the merged coordinated into our new universe that contains
-    # # # the receptor in both conditions
-    Combined_conditions.load_new(merged_coords, format=MemoryReader)    
-
-    # # # We extract the density grid from the combined condition universe
-    density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
+        # # # Then we merge the coordinates into one system
+        merged_coords = np.hstack([sim1_coords, sim2_coords])
+        # # # We load in the merged coordinated into our new universe that contains
+        # # # the receptor in both conditions
+        Combined_conditions.load_new(merged_coords, format=MemoryReader)    
+ 
+    # # # Grab the density for atomgroup proximal to protein only    
+    if prot_prox is True:
+        density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup + " and around 3.5 protein", updating=True)
+    # # # Grab the density for atomgroup anywhere in simulation box
+    else:
+        density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()
     D.density.convert_density(write_grid_as)
     D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
-    
     
     
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
