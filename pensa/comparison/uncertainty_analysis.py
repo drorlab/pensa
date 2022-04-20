@@ -203,7 +203,7 @@ def _expfunc(x, a, b, c):
     return np.exp(a + b * np.array(x)) + c
 
 
-def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, plot_dir='./SEM_plots', plot_prefix=None):
+def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, plot_dir='./SEM_plots', plot_prefix=''):
     """
     Standard error analysis for the block averages.
 
@@ -289,7 +289,7 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
     return avsemvals, avresssivals, resssivals
 
   
-def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM_plots', plot_prefix=None):
+def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM_plots', plot_prefix=''):
     """
     Standard error analysis for the block averages.
 
