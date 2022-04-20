@@ -102,7 +102,7 @@ def local_maxima_3D(data, order=3):
     values = data[mask_local_maxima]
 
     return coords, values
-    
+
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
     """
     Writes out combined atomgroup density for both input simulations.    
@@ -231,7 +231,7 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
                     match_atoms=True,  # whether to match atoms based on mass
                     ).run()    
     
-def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
+def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     """
     Obtain the grid for atomgroup density.
 
@@ -246,7 +246,8 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
         to convert the density into. The default is None.
     out_name : str, optional
         Prefix for all written filenames. The default is None.
-
+    prot_prox : bool, optional
+        Select only waters within 3.5 Angstroms of the protein. The default is True.
 
     Returns
     -------
@@ -255,7 +256,10 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None):
 
     """
  
-    density_atomgroup = u.select_atoms("name " + atomgroup)
+    if prot_prox is True:
+        density_atomgroup = u.select_atoms("name " + atomgroup + " and around 3.5 protein", updating=True)
+    else:
+        density_atomgroup = u.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()

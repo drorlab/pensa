@@ -18,6 +18,7 @@ The methods here are based on the following paper:
 
 import MDAnalysis as mda
 import numpy as np
+import itertools as it
 from gridData import Grid
 from tqdm import tqdm
 import os
