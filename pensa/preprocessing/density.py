@@ -273,11 +273,11 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
 
     return g
         
-def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_waters=35, 
+def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35, 
                   grid_input=None, write=None, write_grid_as=None, out_name=None):
     
     """
-    Write out water pockets for the top X most probable waters (top_waters).
+    Write out water pockets for the top X most probable atoms (top_atoms).
 
     Parameters
     ----------
@@ -287,13 +287,12 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_waters=35,
         File name for the trajectory (xtc format).
     atomgroup : str
         Atomgroup selection to calculate the density for (atom name in structure_input).
-    top_waters : int, optional
-        Number of waters to featurize. The default is 10.
+    top_atoms : int, optional
+        Number of atoms to featurize. The default is 35.
     grid_input : str, optional
         File name for the density grid input. The default is None, and a grid is automatically generated.
     write : bool, optional
-        If true, the following data will be written out: reference pdb with occupancies,
-        water distributions, water data summary. The default is None.
+        If true, a reference pdb will be written out. The default is None.
     write_grid_as : str, optional
         If you choose to write out the grid, you must specify the water model 
         to convert the density into. The default is None. Options are suggested if default.
@@ -347,42 +346,42 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_waters=35,
     newvals = [val[max_val] for max_val in val_sort]  
     coords = [xyz[max_val] for max_val in val_sort]    
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
-    water_information=[]
-    water_dists=[]
+    atom_information=[]
+    atom_dists=[]
 
-    if top_waters > len(coords):
-        top_waters = len(coords)  
+    if top_atoms > len(coords):
+        top_atoms = len(coords)  
 
 
     print('\n')
-    print('Featurizing ',top_waters,' Waters')
-    for wat_no in tqdm(range(top_waters)):
+    print('Featurizing ',top_atoms,' Waters')
+    for at_no in tqdm(range(top_atoms)):
         print('\n')
-        print('Water no: ',wat_no+1)
+        print('Atom no: ',at_no+1)
         print('\n')
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
         # Shifting the coordinates of the maxima by the grid origin to match 
         # the simulation box coordinates
-        shifted_coords=coords[wat_no]+g.origin
+        shifted_coords=coords[at_no]+g.origin
         point_str = str(shifted_coords)[1:-1]
-        densval = newvals[wat_no]
+        densval = newvals[at_no]
 
-        water_ID = "O" + str(wat_no+1)
+        atom_ID = "O" + str(at_no+1)
         atom_location = shifted_coords
 
-        water_information.append([water_ID,list(atom_location),densval])
+        atom_information.append([atom_ID,list(atom_location),densval])
         
         ## Write data out and visualize water sites in pdb           
         if write is True:    
-            write_atom_to_pdb(pdb_outname, atom_location, water_ID, atomgroup)
+            write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
             u_pdb = mda.Universe(pdb_outname)
             u_pdb.add_TopologyAttr('tempfactors')
             # Write values as beta-factors ("tempfactors") to a PDB file
-            for res in range(len(water_information)):
-                #scale the water resid by the starting resid
-                water_resid = len(u_pdb.residues) - wat_no-1 + res
-                u_pdb.residues[water_resid].atoms.tempfactors = water_information[res][-1]
+            for res in range(len(atom_information)):
+                #scale the atom resid by the starting resid
+                atom_resid = len(u_pdb.residues) - at_no-1 + res
+                u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
     
     # Return the dictionaries.
