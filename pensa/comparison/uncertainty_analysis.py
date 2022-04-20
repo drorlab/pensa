@@ -377,37 +377,37 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
 
 ## EXAMPLE USAGE
 
-xtc1 = '../../tutorial/mor-data/11423_trj_151.xtc'
-xtc2 = '../../tutorial/mor-data/11424_trj_151.xtc'
+# xtc1 = '../../tutorial/mor-data/11423_trj_151.xtc'
+# xtc2 = '../../tutorial/mor-data/11424_trj_151.xtc'
 
-gro1 = '../../tutorial/mor-data/11426_dyn_151.pdb'
-gro2 = '../../tutorial/mor-data/11426_dyn_151.pdb'
+# gro1 = '../../tutorial/mor-data/11426_dyn_151.pdb'
+# gro2 = '../../tutorial/mor-data/11426_dyn_151.pdb'
 
-start_frame=0  
-a_rec = get_structure_features(gro1, 
-                               xtc1,
-                               start_frame, features=['sc-torsions'])
-a_rec_feat, a_rec_data = a_rec
+# start_frame=0  
+# a_rec = get_structure_features(gro1, 
+#                                xtc1,
+#                                start_frame, features=['sc-torsions'])
+# a_rec_feat, a_rec_data = a_rec
 
-b_rec = get_structure_features(gro2, 
-                               xtc2,
-                               start_frame, features=['sc-torsions'])
-b_rec_feat, b_rec_data = b_rec
+# b_rec = get_structure_features(gro2, 
+#                                xtc2,
+#                                start_frame, features=['sc-torsions'])
+# b_rec_feat, b_rec_data = b_rec
 
-# relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
-#                                   b_rec_feat['sc-torsions'],
-#                                   a_rec_data['sc-torsions'],
-#                                   b_rec_data['sc-torsions'], 
-#                                   blockanlen=1000, cumdist=False, verbose=True)
+# # relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
+# #                                   b_rec_feat['sc-torsions'],
+# #                                   a_rec_data['sc-torsions'],
+# #                                   b_rec_data['sc-torsions'], 
+# #                                   blockanlen=1000, cumdist=False, verbose=True)
  
-# resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
+# # resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
 
-ssi_names, ssi_dat = ssi_block_analysis(a_rec_feat['sc-torsions'],
-                                        b_rec_feat['sc-torsions'],
-                                        a_rec_data['sc-torsions'],
-                                        b_rec_data['sc-torsions'], 
-                                        blockanlen=2500, pbc=True,
-                                        discretize='gaussian', group_feat=True,
-                                        cumdist=False, verbose=True)
+# ssi_names, ssi_dat = ssi_block_analysis(a_rec_feat['sc-torsions'],
+#                                         b_rec_feat['sc-torsions'],
+#                                         a_rec_data['sc-torsions'],
+#                                         b_rec_data['sc-torsions'], 
+#                                         blockanlen=2500, pbc=True,
+#                                         discretize='gaussian', group_feat=True,
+#                                         cumdist=False, verbose=True)
 
-avsemvals, avresssivals, resssivals = ssi_sem_analysis(ssi_names, ssi_dat)
+# avsemvals, avresssivals, resssivals = ssi_sem_analysis(ssi_names, ssi_dat)
