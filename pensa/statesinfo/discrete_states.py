@@ -6,7 +6,9 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 import os
 from pensa.features import *
-
+import itertools
+from multiprocessing import Pool, freeze_support
+from functools import partial
 
 # -- Functions to cluster feature distributions into discrete states --
 
@@ -510,6 +512,33 @@ def _check(value,x,y):
         return 0
 
 
+
+def _create_states(data):
+    """
+    Create states as the partitions between all values in the data.
+
+    Parameters
+    ----------
+    data : List
+        input data.
+
+    Returns
+    -------
+    partitions : list
+        values that partition all the data.
+
+    """
+    # Removing all duplicate resid's from the data and sorting numerically
+    no_dups = sorted(list(dict.fromkeys(data)))
+    # Creating partitions between all the data
+    partitions = [num-0.5 for num in no_dups]
+    # Adding the final limit
+    partitions.append(no_dups[-1]+0.5)
+
+    return partitions
+
+
+
 def calculate_entropy(state_limits,distribution_list):
     """
     Calculate the Shannon entropy of a distribution as the summation of all 
@@ -570,4 +599,223 @@ def calculate_entropy(state_limits,distribution_list):
     return entropy
 
 
+def _lim_occ_par(idx, params):
+    """
+    Calculate the entropy of each state for a subset of the states.
+
+    Parameters
+    ----------
+    idx : list
+        Start and stop indices to define subset of states for calculations.
+    params : list of lists
+        List of state limits and feature multivariate timeseries distribution.
+
+    Returns
+    -------
+    entropy : float
+        Entropy of each state for a subset of the states.
+
+    """
+    
+    
+    state_lims, dist_list = params[0], params[1]
+    
+    # Initialize entropy value
+    entropy=0
+    
+    # Initialize array for multidimensional discrete state phase space 
+    mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))   
+    # Extract sizes of each dimension in the mut_prob
+    dimension_lists = [list(range(mut_prob.shape[i])) for i in range(len(dist_list))]
+    
+    # Obtain indices to iterate over multivariate array
+    iterprod = itertools.product(*dimension_lists) 
+    multiidx_loopno = list( iterprod )
+
+    # Iterate over subset of multivariate array for entropy calculation
+    for loopno in multiidx_loopno[idx[0]:idx[1]]:
+        arrayindices=list(loopno)
+        limit_occupancy_checks=np.zeros((len(arrayindices), len(dist_list[0])))
+        
+        for dist_num in range(len(arrayindices)):
+            limits=[state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num]+1]]
+            distribution=dist_list[dist_num]
+        
+            for frame_num in range(len(distribution)):
+                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1]) 
+                
+        mut_prob[loopno]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+        ##calculating the entropy as the summation of all -p*log(p) 
+        
+        if mut_prob[loopno] != 0:
+            entropy+=-1*mut_prob[loopno]*math.log(mut_prob[loopno],2)
+    return entropy
+
+def _divisorGenerator(n):
+    """
+    Find largest whole number divisors.
+
+    Parameters
+    ----------
+    n : int
+        Value to find whole number divisors of.
+
+    Yields
+    ------
+    generator object
+        All whole number divisors of the number n.
+
+    """
+    large_divisors = []
+    for i in range(1, int(math.sqrt(n) + 1)):
+        if n % i == 0:
+            yield i
+            if i*i != n:
+                large_divisors.append(n / i)
+    for divisor in reversed(large_divisors):
+        yield divisor
+
+def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
+    """
+    Calculate the Shannon entropy of a distribution as the summation of all 
+    -p*log(p) where p refers to the probability of a conformational state. 
+    
+    Parameters
+    ----------
+    state_limits : list of lists
+        A list of values that represent the limits of each state for each
+        distribution.
+    distribution_list : list of lists
+        A list containing multivariate distributions (lists) for a particular
+        residue or water
+    max_thread_no : int
+        Maximum number of threads to use in the multi-threading.
+
+    Returns
+    -------
+    entropy : float
+        The Shannon entropy value 
+
+    """
+
+    state_lims = state_limits.copy()
+    dist_list = distribution_list.copy()
+    
+    ## Ignore singular states and corresponding distributions
+    state_no = 0 
+    while state_no < len(state_lims):
+        
+        if len(state_lims[state_no])==2:
+            del dist_list[state_no]
+            del state_lims[state_no]
+            
+        else:
+            state_no +=1
+            
+    entropy=0        
+    if len(state_lims)!=0:
+        # Initialize array for multidimensional discrete state phase space
+        mut_prob=np.zeros(([len(state_lims[i])-1 for i in range(len(state_lims))]))     
+        # Extract sizes of each dimension in the mut_prob
+        dimension_lists = [list(range(mut_prob.shape[i])) for i in range(len(dist_list))]
+        # Obtain indices to iterate over multivariate array
+        iterprod = itertools.product(*dimension_lists) 
+        # Length of iterations for full array
+        multiidx_loopno = len(list( iterprod ))
+        # Largest possible multi-threading option for array 
+        threadno = [num for num in list(_divisorGenerator(multiidx_loopno)) if num < max_thread_no+1]
+        multthr = threadno[-1]
+        # Start and stop indices for state subsets
+        poolprocs1 = list(range(0,multiidx_loopno+1,int(multthr)))[:-1]
+        poolprocs2 = list(range(0,multiidx_loopno+1,int(multthr)))[1:]
+        poolproc = [[i,j] for i,j in zip(poolprocs1,poolprocs2)]
+
+        param = [state_lims, dist_list]
+
+        # Multi-threading entropy calculations
+        with Pool() as pool:
+            all_entropy = pool.map(partial(_lim_occ_par, params=param), poolproc)
+        
+        # Total entropy is sum of all subset entropies
+        entropy+=sum(all_entropy)
+        
+    return entropy
+
+
+
+def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True, write_plots=False):
+    """
+    Obtain list of state limits for each feature.
+
+    Parameters
+    ----------
+    all_data_a : float array
+        Trajectory data from the first ensemble. 
+    all_data_b : float array
+        Trajectory data from the second ensemble. 
+    discretize : str, optional
+        Method for state discretization. Options are 'gaussian', which defines 
+        state limits by gaussian intersects, and 'partition_values', which defines
+        state limits by partitioning all values in the data. The default is 'gaussian'.
+    pbc : bool, optional
+        If true, the apply periodic bounary corrections on angular distribution inputs.
+        The input for periodic correction must be radians. The default is True.
+    write_plots : bool, optional
+        If true, visualise the states over the raw distribution. The default is False.
+
+    Returns
+    -------
+    ssi_states : list of list
+        List of state limits for each feature.
+        
+    """
+    
+    assert all_data_a.shape[0] == all_data_b.shape[0] 
+
+    # Initialize states list
+    ssi_states = []
+    # Loop over all features
+    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
+    
+    for residue in range(len(all_data_a)):
+        data_a = all_data_a[residue]
+        data_b = all_data_b[residue]
+        
+        combined_dist=[]
+        
+        for dist_no in range(len(data_a)):
+            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            data_both = list(data_a[dist_no]) + list(data_b[dist_no])      
+            combined_dist.append(data_both)
+
+        if pbc:
+            ## Correct the periodicity of angles (in radians)
+            combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
+
+        if discretize == 'partition_values': 
+            ## Define states as partition between data values
+            feat_states = []         
+            for dim_num in range(len(combined_dist)):
+                feat_states.append(_create_states(combined_dist[dim_num]))
+                
+        elif  discretize == 'gaussian':     
+            ## Saving distribution length
+            traj1_len = len(data_a[dist_no])   
+            feat_states = []
+            for dim_num in range(len(combined_dist)):
+                if write_plots:
+                    plot_name = "Residue " + str(residue) + ", Dim. " + str(dim_num)
+                else:
+                    plot_name = None
+                try:
+                    feat_states.append(determine_state_limits(combined_dist[dim_num], 
+                                                              traj1_len, 
+                                                              write_plots=write_plots, 
+                                                              write_name=plot_name))
+                except:
+                    print('Distribution ',residue,' not clustering properly.')
+                    
+        ssi_states.append(feat_states)
+
+    return ssi_states
 

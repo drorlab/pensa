@@ -18,8 +18,7 @@ The methods here are based on the following paper:
 import numpy as np
 from scipy import ndimage as ndi
 import os
-from tqdm import tqdm
-# from gridData import Grid
+from gridData import Grid
 import MDAnalysis as mda
 from MDAnalysis.analysis.density import DensityAnalysis
 from MDAnalysis.analysis.base import AnalysisFromFunction
@@ -29,6 +28,7 @@ import biotite.structure as struc
 import biotite.structure.io as strucio
 # from pensa import *
 # from pensa.features.processing import *
+from tqdm import tqdm
 
 # -- Processing trajectories for density analysis
 
@@ -103,11 +103,9 @@ def local_maxima_3D(data, order=3):
 
     return coords, values
 
-
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
     """
     Writes out combined atomgroup density for both input simulations.    
-
     Parameters
     ----------
     struc_a : str
@@ -131,8 +129,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Uses numpy memmap to write out a pseudo-trajectory coordinate array.
         This is used for large trajectories to avoid memory errors with large
         python arrays. The default is False.
-
-
     """        
     if not os.path.exists('dens/'):
         os.makedirs('dens/')
@@ -198,7 +194,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     D.run()
     D.density.convert_density(write_grid_as)
     D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
-    
     
     
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
@@ -278,6 +273,122 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
 
     return g
         
+def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35, 
+                  grid_input=None, write=None, write_grid_as=None, out_name=None):
+    
+    """
+    Write out water pockets for the top X most probable atoms (top_atoms).
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (PDB or GRO format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    atomgroup : str
+        Atomgroup selection to calculate the density for (atom name in structure_input).
+    top_atoms : int, optional
+        Number of atoms to featurize. The default is 35.
+    grid_input : str, optional
+        File name for the density grid input. The default is None, and a grid is automatically generated.
+    write : bool, optional
+        If true, a reference pdb will be written out. The default is None.
+    write_grid_as : str, optional
+        If you choose to write out the grid, you must specify the water model 
+        to convert the density into. The default is None. Options are suggested if default.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all features
+        features_data : numpy array
+            Data for all features
+
+    """
+
+    if write is not None:
+        if out_name is None:
+            print('WARNING: You are writing results without providing out_name.')
+        
+    u = mda.Universe(structure_input, xtc_input)
+    
+    if write is True:
+        if not os.path.exists('water_features/'):
+            os.makedirs('water_features/')
+        p = u.select_atoms("protein")
+        pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
+        p_avg = np.zeros_like(p.positions)
+        # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+        for ts in u.trajectory:
+            p_avg += p.positions
+        p_avg /= len(u.trajectory)
+        # temporarily replace positions with the average
+        # p.load_new(p_avg)
+        p.positions = p_avg
+        # write average protein coordinates
+        p.write(pdb_outname)
+        # just make sure that we have clean original coordinates again (start at the beginning)
+        u.trajectory.rewind()    
+        if grid_input is None:
+            g = get_grid(u, atomgroup, write_grid_as,  out_name)           
+        else:
+            g = Grid(grid_input)  
+    elif grid_input is None:
+        g = get_grid(u, atomgroup)              
+    else:
+        g = Grid(grid_input)  
+
+    xyz, val = local_maxima_3D(g.grid)
+    ## Negate the array to get probabilities in descending order
+    val_sort = np.argsort(-1*val.copy())
+    newvals = [val[max_val] for max_val in val_sort]  
+    coords = [xyz[max_val] for max_val in val_sort]    
+    maxdens_coord_str = [str(item)[1:-1] for item in coords]
+    atom_information=[]
+    atom_dists=[]
+
+    if top_atoms > len(coords):
+        top_atoms = len(coords)  
+
+
+    print('\n')
+    print('Featurizing ',top_atoms,' Waters')
+    for at_no in tqdm(range(top_atoms)):
+        print('\n')
+        print('Atom no: ',at_no+1)
+        print('\n')
+
+        ## Find all water atoms within 3.5 Angstroms of density maxima
+        # Shifting the coordinates of the maxima by the grid origin to match 
+        # the simulation box coordinates
+        shifted_coords=coords[at_no]+g.origin
+        point_str = str(shifted_coords)[1:-1]
+        densval = newvals[at_no]
+
+        atom_ID = "O" + str(at_no+1)
+        atom_location = shifted_coords
+
+        atom_information.append([atom_ID,list(atom_location),densval])
+        
+        ## Write data out and visualize water sites in pdb           
+        if write is True:    
+            write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
+            u_pdb = mda.Universe(pdb_outname)
+            u_pdb.add_TopologyAttr('tempfactors')
+            # Write values as beta-factors ("tempfactors") to a PDB file
+            for res in range(len(atom_information)):
+                #scale the atom resid by the starting resid
+                atom_resid = len(u_pdb.residues) - at_no-1 + res
+                u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
+            u_pdb.atoms.write(pdb_outname)
+    
+    # Return the dictionaries.
+    return print('Pdb file completed.')
+
+
+
 def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
     """
     Write a new atom to a reference structure to visualise conserved non-protein atom sites.

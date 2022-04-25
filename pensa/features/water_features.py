@@ -64,7 +64,6 @@ def _convert_to_dipole(water_atom_positions):
 
     return psi, phi
 
-
 def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
     """
@@ -113,10 +112,20 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     if write is True:
         if not os.path.exists('water_features/'):
             os.makedirs('water_features/')
-        protein = u.select_atoms("protein")
+        p = u.select_atoms("protein")
         pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
-        u.trajectory[0]
-        protein.write(pdb_outname)
+        p_avg = np.zeros_like(p.positions)
+        # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+        for ts in u.trajectory:
+            p_avg += p.positions
+        p_avg /= len(u.trajectory)
+        # temporarily replace positions with the average
+        p.positions = p_avg
+        # write average protein coordinates
+        p.write(pdb_outname)
+        # just make sure that we have clean original coordinates again (start at the beginning)
+        u.trajectory.rewind()        
+        
         if grid_input is None:
             g = get_grid(u, atomgroup, write_grid_as,  out_name)           
         else:
@@ -233,4 +242,5 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     
     # Return the dictionaries.
     return feature_names, features_data
+            
             
