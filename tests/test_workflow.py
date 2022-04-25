@@ -126,6 +126,25 @@ class Test_pensa(unittest.TestCase):
             )
         self.sim_a_tmr_feat, self.sim_a_tmr_data = sim_a_tmr
         self.sim_b_tmr_feat, self.sim_b_tmr_data = sim_b_tmr
+        
+        
+        # -- Discrete States --
+        
+        # --- Multivariate Features
+        out_name_a = "condition-a"
+        out_name_b = "condition-b"
+        self.sim_a_rec_multivar_feat, self.sim_a_rec_multivar_data = get_multivar_res_timeseries(
+            self.sim_a_rec_feat, self.sim_a_rec_data, 'sc-torsions', write=True, out_name=out_name_a
+            )
+        self.sim_b_rec_multivar_feat, self.sim_b_rec_multivar_data = get_multivar_res_timeseries(
+            self.sim_b_rec_feat, self.sim_b_rec_data, 'sc-torsions', write=True, out_name=out_name_a
+            )
+        
+        # --- Gaussian Discretization 
+        self.discrete_states_ab = get_discrete_states(
+            self.sim_a_rec_multivar_data['sc-torsions'], self.sim_b_rec_multivar_data['sc-torsions'],
+            discretize='gaussian', pbc=True
+            )
 
 
         # -- Relative Entropy --
@@ -275,28 +294,27 @@ class Test_pensa(unittest.TestCase):
 
     # -- ssi_ensemble_analysis()
     def test_03_ssi_ensemble_analysis(self):
-           
+    
         # --- Torsions
-        ssi_bbtor = ssi_ensemble_analysis(
-            self.sim_a_rec_feat, self.sim_b_rec_feat,
-            self.sim_a_rec_data, self.sim_b_rec_data,
-            torsions='sc', verbose=False
+        ssi_sctor = ssi_ensemble_analysis(
+            self.sim_a_rec_multivar_feat['sc-torsions'], self.sim_b_rec_multivar_feat['sc-torsions'],
+            self.sim_a_rec_multivar_data['sc-torsions'], self.sim_b_rec_multivar_data['sc-torsions'],
+            self.discrete_states_ab, verbose=False
             )
-        names_bbtors, ssi_bbtors = ssi_bbtor
+        names_sctors, ssi_sctors = ssi_sctor
 
 
     # -- ssi_sem_analysis()
     def test_04_ssi_sem_analysis(self):
     
         # --- Uncertainty for torsions
-        ssi_names, ssi_bbtor_blocks = ssi_block_analysis(
-            self.sim_a_rec_feat, self.sim_b_rec_feat,
-            self.sim_a_rec_data, self.sim_b_rec_data,
-            torsions='sc', verbose=False,
-            blockanlen=100, cumdist=False
+        ssi_names, ssi_sctor_blocks = ssi_block_analysis(
+            self.sim_a_rec_feat['sc-torsions'], self.sim_b_rec_feat['sc-torsions'],
+            self.sim_a_rec_data['sc-torsions'], self.sim_b_rec_data['sc-torsions'],
+            blockanlen=100, pbc=True, discretize='gaussian', group_feat=True, cumdist=False, verbose=True
             )
-        ssi_bbtor_sem = ssi_sem_analysis(
-            ssi_names, ssi_bbtor_blocks, write_plot=False
+        ssi_sctor_sem = ssi_sem_analysis(
+            ssi_names, ssi_sctor_blocks, write_plot=False
             )
 
 
