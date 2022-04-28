@@ -238,15 +238,20 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
     
     distr1 = distribution[:traj1_len]
     distr2 = distribution[traj1_len:]
-    
+
     histox = np.histogram(distribution, bins=gauss_bin, density=True)[1]
     histo1 = np.histogram(distr1, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
     histo2 = np.histogram(distr2, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
+    
+    # print('hx',histox)
+    # print('h1',histo1)
+    # print('h2',histo2)
     
     combined_histo = [(height1 + height2)/2 for height1,height2 in zip(histo1,histo2)]    
 
     distributionx = _smooth(histox[0:-1], gauss_smooth)
     ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
+    # print(min(combined_histo))
     distributiony = _smooth(combined_histo-min(combined_histo), gauss_smooth)
     
     maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
@@ -800,7 +805,8 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
                 
         elif  discretize == 'gaussian':     
             ## Saving distribution length
-            traj1_len = len(data_a[dist_no])   
+            
+            traj1_len = len([i for i in data_a[0] if i!=10000.0])   
             feat_states = []
             for dim_num in range(len(combined_dist)):
                 if write_plots:
