@@ -56,13 +56,15 @@ def _convert_to_dipole(water_atom_positions):
     
     ## Convert to spherical coordinates
     ## radians
+    # φ ∈ [0, 2π)
     psi=np.arctan2(y_axis,x_axis)
-    phi=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))    
+    # θ ∈ [0, π]
+    theta=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))    
     ## degrees
     # psi=math.degrees(np.arctan2(y_axis,x_axis))
-    # phi=math.degrees(np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2))))   
+    # theta=math.degrees(np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2))))   
 
-    return psi, phi
+    return psi, theta
 
 def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10, 
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
@@ -153,7 +155,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         print('\n')
         print('Water no: ',wat_no+1)
         print('\n')
-        philist=[]
+        thetalist=[]
         psilist=[]
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
@@ -180,9 +182,9 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             if len(waters_resid)==1:        
                 ## (x,y,z) positions for the water oxygen at trajectory frame_no
                 water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(waters_resid[0])).positions]
-                psi, phi = _convert_to_dipole(water_atom_positions)
+                psi, theta = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
-                philist.append(phi)
+                thetalist.append(theta)
             ## Featurize water with highest pocket occupation (if multiple waters in pocket)
             elif len(waters_resid)>1:
                 freq_count=[]
@@ -190,15 +192,15 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
                     freq_count.append([flat_list.count(ID),ID])
                 freq_count.sort(key = lambda x: x[0])
                 water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(freq_count[-1][1])).positions]
-                psi, phi = _convert_to_dipole(water_atom_positions)
+                psi, theta = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
-                philist.append(phi)
+                thetalist.append(theta)
             ## 10000.0 = no waters bound
             elif len(waters_resid)<1:
                 psilist.append(10000.0)
-                philist.append(10000.0)
+                thetalist.append(10000.0)
 
-        water_out = [psilist, philist]
+        water_out = [psilist, thetalist]
         water_dists.append(water_out)        
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)    
