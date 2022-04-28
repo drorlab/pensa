@@ -446,10 +446,11 @@ def correct_spher_angle_periodicity(two_angles):
     psi_heights = np.histogram(psi_continuous_angles, bins=90, density=True)
     ## Shift everything before bin with minimum height by periodic amount
     psi_shift = 2*np.pi
-    if psi_heights[0][0] > min(psi_heights[0]):   
+    if psi_heights[0][0] > min(psi_heights[0]):  
         perbound = psi_heights[1][np.where(psi_heights[0] == min(psi_heights[0]))[0][0]+1]
         for angle_index in range(len(psi_continuous_angles)):
             if psi_continuous_angles[angle_index] < perbound:
+
                 psi_continuous_angles[angle_index] += psi_shift
     for index in range(len(psi_index_cont_angles)):
         new_psi[psi_index_cont_angles[index]] = psi_continuous_angles[index]
@@ -464,7 +465,6 @@ def correct_spher_angle_periodicity(two_angles):
     theta_shift = 2*np.pi
     if theta_heights[0][0] > min(theta_heights[0]):   
         perbound = theta_heights[1][np.where(theta_heights[0] == min(theta_heights[0]))[0][0]+1]
-        print(perbound)
         for angle_index in range(len(theta_continuous_angles)):
             if theta_continuous_angles[angle_index] < perbound:
                 theta_continuous_angles[angle_index] = theta_shift - theta_continuous_angles[angle_index]
@@ -493,10 +493,11 @@ def correct_angle_periodicity(angle):
     ## Shift everything before bin with minimum height by periodic amount
     if heights[0][0] > min(heights[0]):   
         perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
+        # print(perbound)
         for angle_index in range(len(new_angle)):
             if new_angle[angle_index] < perbound:
                 new_angle[angle_index] += 2*np.pi
-                
+                           
     return new_angle
 
 
