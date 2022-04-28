@@ -238,20 +238,15 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
     
     distr1 = distribution[:traj1_len]
     distr2 = distribution[traj1_len:]
-
+    
     histox = np.histogram(distribution, bins=gauss_bin, density=True)[1]
     histo1 = np.histogram(distr1, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
     histo2 = np.histogram(distr2, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
-    
-    # print('hx',histox)
-    # print('h1',histo1)
-    # print('h2',histo2)
     
     combined_histo = [(height1 + height2)/2 for height1,height2 in zip(histo1,histo2)]    
 
     distributionx = _smooth(histox[0:-1], gauss_smooth)
     ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
-    # print(min(combined_histo))
     distributiony = _smooth(combined_histo-min(combined_histo), gauss_smooth)
     
     maxima = [distributiony[item] for item in argrelextrema(distributiony, np.greater)][0]
@@ -748,7 +743,7 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
 
 
 
-def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True, write_plots=False):
+def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True, h2o=False, write_plots=False):
     """
     Obtain list of state limits for each feature.
 
@@ -765,6 +760,9 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
+    h2o : bool, optional
+        If true, the apply periodic bounary corrections for spherical angles
+        with different periodicities. The default is False.
     write_plots : bool, optional
         If true, visualise the states over the raw distribution. The default is False.
 
@@ -794,8 +792,12 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
             combined_dist.append(data_both)
 
         if pbc:
-            ## Correct the periodicity of angles (in radians)
-            combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
+            if h2o:
+                combined_dist = correct_spher_angle_periodicity(combined_dist)
+            else:
+                ## Correct the periodicity of angles (in radians)
+                combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
+
 
         if discretize == 'partition_values': 
             ## Define states as partition between data values
@@ -805,7 +807,6 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
                 
         elif  discretize == 'gaussian':     
             ## Saving distribution length
-            
             traj1_len = len([i for i in data_a[0] if i!=10000.0])   
             feat_states = []
             for dim_num in range(len(combined_dist)):
