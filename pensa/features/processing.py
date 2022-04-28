@@ -421,10 +421,61 @@ def get_common_features_data(features_a, features_b, data_a, data_b):
 # -- Utilities to process feature data --
 
 
+def correct_spher_angle_periodicity(two_angles):
+    """
+    Correcting for the periodicity of spherical angles [radians].  
+    Waters featurized using PENSA and including discrete occupancy are handled.
+    
+    Parameters
+    ----------
+    angle : list of psi and theta angles
+        Bivariate data for spherical angles of water molecule.
+
+    Returns
+    -------
+    new_angle : list of psi and theta angles
+        Periodically corrected angle feature.
+
+    """
+    
+    # PSI    
+    new_psi = two_angles[0].copy()
+    psi_continuous_angles = [angle for angle in new_psi if angle != 10000.0]
+    psi_index_cont_angles = [index for index, angle in enumerate(new_psi) if angle != 10000.0]  
+    
+    psi_heights = np.histogram(psi_continuous_angles, bins=90, density=True)
+    ## Shift everything before bin with minimum height by periodic amount
+    psi_shift = 2*np.pi
+    if psi_heights[0][0] > min(psi_heights[0]):   
+        perbound = psi_heights[1][np.where(psi_heights[0] == min(psi_heights[0]))[0][0]+1]
+        for angle_index in range(len(psi_continuous_angles)):
+            if psi_continuous_angles[angle_index] < perbound:
+                psi_continuous_angles[angle_index] += psi_shift
+    for index in range(len(psi_index_cont_angles)):
+        new_psi[psi_index_cont_angles[index]] = psi_continuous_angles[index]
+
+    # THETA 
+    new_theta = two_angles[1].copy()
+    theta_continuous_angles = [angle for angle in new_theta if angle != 10000.0]
+    theta_index_cont_angles = [index for index, angle in enumerate(new_theta) if angle != 10000.0]  
+    
+    theta_heights = np.histogram(theta_continuous_angles, bins=90, density=True)
+    ## Shift everything before bin with minimum height by periodic amount
+    theta_shift = 2*np.pi
+    if theta_heights[0][0] > min(theta_heights[0]):   
+        perbound = theta_heights[1][np.where(theta_heights[0] == min(theta_heights[0]))[0][0]+1]
+        print(perbound)
+        for angle_index in range(len(theta_continuous_angles)):
+            if theta_continuous_angles[angle_index] < perbound:
+                theta_continuous_angles[angle_index] = theta_shift - theta_continuous_angles[angle_index]
+    for index in range(len(theta_index_cont_angles)):
+        new_theta[theta_index_cont_angles[index]] = theta_continuous_angles[index]
+        
+    return [new_psi, new_theta]
+
 def correct_angle_periodicity(angle):
     """
     Correcting for the periodicity of angles [radians].  
-    Waters featurized using PENSA and including discrete occupancy are handled.
     
     Parameters
     ----------
@@ -438,17 +489,14 @@ def correct_angle_periodicity(angle):
 
     """
     new_angle = angle.copy()
-    continuous_angles = [angle for angle in new_angle if angle != 10000.0]
-    index_cont_angles = [index for index, angle in enumerate(new_angle) if angle != 10000.0]      
-    heights = np.histogram(continuous_angles, bins=90, density=True)
+    heights = np.histogram(new_angle, bins=90, density=True)
     ## Shift everything before bin with minimum height by periodic amount
     if heights[0][0] > min(heights[0]):   
         perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
-        for angle_index in range(len(continuous_angles)):
-            if continuous_angles[angle_index] < perbound:
-                continuous_angles[angle_index] += 2*np.pi
-    for index in range(len(index_cont_angles)):
-        new_angle[index_cont_angles[index]] = continuous_angles[index]
+        for angle_index in range(len(new_angle)):
+            if new_angle[angle_index] < perbound:
+                new_angle[angle_index] += 2*np.pi
+                
     return new_angle
 
 
