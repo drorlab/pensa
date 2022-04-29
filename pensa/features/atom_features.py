@@ -71,11 +71,21 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
     
     if write is True:
         if not os.path.exists('atom_features/'):
-            os.makedirs('atom_features/')
-        protein = u.select_atoms("protein")
-        pdb_outname = 'atom_features/'+ out_name + element + "_Sites.pdb"
-        u.trajectory[0]
-        protein.write(pdb_outname)
+            os.makedirs('atom_features/')     
+        p = u.select_atoms("protein")
+        pdb_outname = 'atom_features/' + out_name + "_AtomSites.pdb"
+        p_avg = np.zeros_like(p.positions)
+        # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+        for ts in u.trajectory:
+            p_avg += p.positions
+        p_avg /= len(u.trajectory)
+        # temporarily replace positions with the average
+        p.positions = p_avg
+        # write average protein coordinates
+        p.write(pdb_outname)
+        # just make sure that we have clean original coordinates again (start at the beginning)
+        u.trajectory.rewind()        
+        
         if grid_input is None:
             g = get_grid(u, atomgroup, "Angstrom^{-3}", out_name)        
         else:
