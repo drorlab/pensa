@@ -75,7 +75,7 @@ def _copy_coords(ag):
     """
     return ag.positions.copy()
 
-def local_maxima_3D(data, order=3):
+def local_maxima_3D(data, order=1):
     """
     Detects local maxima in a 3D array to obtain coordinates for density maxima. 
 
@@ -191,7 +191,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)
     # a resolution of delta=1.0 ensures the coordinates of the maxima match the coordinates of the simulation box
     D = DensityAnalysis(density_atomgroup, delta=1.0)
-    D.run()
+    D.run(verbose=True)
     D.density.convert_density(write_grid_as)
     D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
     
@@ -221,6 +221,24 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     condition_a = mda.Universe(struc_a,xtc_a)
     condition_b = mda.Universe(struc_b,xtc_b)    
     
+    
+    # Align a onto the average structure of b
+    p = condition_b.select_atoms("protein")
+    pdb_outname = 'dens/alignment_ref.pdb'
+    p_avg = np.zeros_like(p.positions)
+    # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+    for ts in condition_b.trajectory:
+        p_avg += p.positions
+    p_avg /= len(condition_b.trajectory)
+    # temporarily replace positions with the average
+    # p.load_new(p_avg)
+    p.positions = p_avg
+    # write average protein coordinates
+    p.write(pdb_outname)
+    # just make sure that we have clean original coordinates again (start at the beginning)
+    condition_b = mda.Universe(pdb_outname)    
+
+    
     align_xtc_name='dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'    
     
     #align condition a to condition b
@@ -229,7 +247,7 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
                     select= 'name CA',  # selection of atoms to align
                     filename= align_xtc_name,  # file to write the trajectory to
                     match_atoms=True,  # whether to match atoms based on mass
-                    ).run()    
+                    ).run(verbose=True)    
     
 def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     """
@@ -273,7 +291,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
 
     return g
         
-def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35, 
+def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
                   grid_input=None, write=None, write_grid_as=None, out_name=None):
     
     """
