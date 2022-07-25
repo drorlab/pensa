@@ -5,7 +5,7 @@ from pensa.statesinfo import *
 
 # -- Functions to calculate SSI statistics across paired ensembles --
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=True,
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False,
                           verbose=True, write_plots=False, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -261,7 +261,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
 def cossi_featens_analysis(features_a, features_b, features_c, features_d, 
                            all_data_a, all_data_b, all_data_c, all_data_d, 
                            discrete_states_ab, discrete_states_cd, 
-                           max_thread_no=1, pbc=True, h2o=False, verbose=True, override_name_check=False):
+                           max_thread_no=1, pbca=True, pbcb=True, h2oa=False, h2ob=False, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -318,9 +318,12 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
         assert len(features_a) == len(features_b)
+        assert len(features_c) == len(features_d)
     else:
         assert features_a == features_b
+        assert features_c == features_d
     assert all_data_a.shape[0] == all_data_b.shape[0] 
+    assert all_data_c.shape[0] == all_data_d.shape[0] 
     
     # Extract the names of the features
     data_names = []
@@ -344,11 +347,11 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
             set_distr_a.append(res1_data_both)
 
         ## Saving distribution length
-        traj1_len = len(res1_data_ens1[dist_no_a])   
-        traj2_len = len(res1_data_ens2[dist_no_a])   
+        traj1_len = len(res1_data_ens1[0])   
+        traj2_len = len(res1_data_ens2[0])   
             
-        if pbc:
-            if h2o:
+        if pbca:
+            if h2oa:
                 set_distr_a = correct_spher_angle_periodicity(set_distr_a)
             else:
                 ## Correct the periodicity of angles (in radians)
@@ -368,8 +371,8 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
                     set_distr_b.append(res2_data_both)            
  
-                if pbc:
-                    if h2o:
+                if pbcb:
+                    if h2ob:
                         set_distr_b = correct_spher_angle_periodicity(set_distr_b)
                     else:
                         ## Correct the periodicity of angles (in radians)
@@ -383,7 +386,7 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     traj_2_fraction = 1 - traj_1_fraction
                     norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
                     
-                    set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
+                    set_distr_c=[[0.5]*traj1_len + [1.5]*traj2_len]
                     set_c_states= [[0,1,2]]                      
                     H_c = norm_factor       
                     
@@ -420,6 +423,8 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                         H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)
                         
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
+                    SSI_1 = ((H_a + H_c) - H_ac)/norm_factor
+                    SSI_2 = ((H_b + H_c) - H_bc)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
                     
                     data_ssi[count] = SSI       
@@ -428,6 +433,9 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     if verbose is True:
                         print('\nFeature Pair: ', data_names[count],
                               '\nSSI[bits]: ', data_ssi[count],
+                              '\nSSI1[bits]: ', SSI_1,
+                              '\nSSI2[bits]: ', SSI_2,
+                              '\nHc[bits]: ', H_c/norm_factor,                              
                               '\nCo-SSI[bits]: ', data_cossi[count])
                     count+=1                
          
