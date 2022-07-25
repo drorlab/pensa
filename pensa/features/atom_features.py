@@ -126,7 +126,7 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         print('\n')
 
         counting=[]            
-        shifted_coords=coords[wat_no]+g.origin
+        shifted_coords=coords[atom_no]+g.origin
         point_str = str(shifted_coords)[1:-1]
         ## Find all water atoms within 2.5 Angstroms of density maxima
         for i in tqdm(range(len(u.trajectory))):       
