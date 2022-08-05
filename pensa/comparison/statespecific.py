@@ -5,7 +5,7 @@ from pensa.statesinfo import *
 
 # -- Functions to calculate SSI statistics across paired ensembles --
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True,
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False,
                           verbose=True, write_plots=False, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -28,6 +28,9 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
+    h2o : bool, optional
+        If true, the apply periodic bounary corrections for spherical angles
+        with different periodicities. The default is False.
     verbose : bool, optional
         Print intermediate results. Default is True.
     write_plots : bool, optional
@@ -70,7 +73,11 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
         traj2_len = len(data_b[0])   
 
         if pbc:
-            combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
+            if h2o:
+                combined_dist = correct_spher_angle_periodicity(combined_dist)
+            else:
+                ## Correct the periodicity of angles (in radians)
+                combined_dist = [correct_angle_periodicity(distr) for distr in combined_dist]
          
         if max_thread_no>1:
             H_feat=calculate_entropy_multthread(res_states, combined_dist, max_thread_no) 
@@ -106,7 +113,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, verbose=True, override_name_check=False):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -129,6 +136,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
+    h2o : bool, optional
+        If true, the apply periodic bounary corrections for spherical angles
+        with different periodicities. The default is False.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -173,7 +183,11 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
         traj2_len = len(res1_data_ens2[dist_no_a])   
             
         if pbc:
-            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
+            if h2o:
+                set_distr_a = correct_spher_angle_periodicity(set_distr_a)
+            else:
+                ## Correct the periodicity of angles (in radians)
+                set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
         
         set_a_states = discrete_states_ab[res1]       
 
@@ -195,7 +209,11 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
                     set_distr_b.append(res2_data_both)            
                  
                 if pbc:
-                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
+                    if h2o:
+                        set_distr_b = correct_spher_angle_periodicity(set_distr_b)
+                    else:
+                        ## Correct the periodicity of angles (in radians)
+                        set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
                 set_b_states = discrete_states_ab[res2]       
   
                 if max_thread_no>1:
@@ -243,7 +261,7 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
 def cossi_featens_analysis(features_a, features_b, features_c, features_d, 
                            all_data_a, all_data_b, all_data_c, all_data_d, 
                            discrete_states_ab, discrete_states_cd, 
-                           max_thread_no=1, pbc=True, verbose=True, override_name_check=False):
+                           max_thread_no=1, pbca=True, pbcb=True, h2oa=False, h2ob=False, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -277,6 +295,9 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
     pbc : bool, optional
         If true, the apply periodic bounary corrections on angular distribution inputs.
         The input for periodic correction must be radians. The default is True.
+    h2o : bool, optional
+        If true, the apply periodic bounary corrections for spherical angles
+        with different periodicities. The default is False.
     verbose : bool, optional
         Print intermediate results. Default is True.
     override_name_check : bool, optional
@@ -297,9 +318,12 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
         assert len(features_a) == len(features_b)
+        assert len(features_c) == len(features_d)
     else:
         assert features_a == features_b
+        assert features_c == features_d
     assert all_data_a.shape[0] == all_data_b.shape[0] 
+    assert all_data_c.shape[0] == all_data_d.shape[0] 
     
     # Extract the names of the features
     data_names = []
@@ -323,12 +347,16 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
             set_distr_a.append(res1_data_both)
 
         ## Saving distribution length
-        traj1_len = len(res1_data_ens1[dist_no_a])   
-        traj2_len = len(res1_data_ens2[dist_no_a])   
+        traj1_len = len(res1_data_ens1[0])   
+        traj2_len = len(res1_data_ens2[0])   
             
-        if pbc:
-            set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
-            
+        if pbca:
+            if h2oa:
+                set_distr_a = correct_spher_angle_periodicity(set_distr_a)
+            else:
+                ## Correct the periodicity of angles (in radians)
+                set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
+                
         set_a_states = discrete_states_ab[res1]       
         H_a=calculate_entropy(set_a_states,set_distr_a) 
         
@@ -343,8 +371,12 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
                     set_distr_b.append(res2_data_both)            
  
-                if pbc:
-                    set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
+                if pbcb:
+                    if h2ob:
+                        set_distr_b = correct_spher_angle_periodicity(set_distr_b)
+                    else:
+                        ## Correct the periodicity of angles (in radians)
+                        set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
                     
                 set_b_states = discrete_states_cd[res2]       
                 H_b=calculate_entropy(set_b_states,set_distr_b)
@@ -354,7 +386,7 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     traj_2_fraction = 1 - traj_1_fraction
                     norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
                     
-                    set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
+                    set_distr_c=[[0.5]*traj1_len + [1.5]*traj2_len]
                     set_c_states= [[0,1,2]]                      
                     H_c = norm_factor       
                     
@@ -391,6 +423,8 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                         H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)
                         
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
+                    SSI_1 = ((H_a + H_c) - H_ac)/norm_factor
+                    SSI_2 = ((H_b + H_c) - H_bc)/norm_factor
                     coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
                     
                     data_ssi[count] = SSI       
@@ -399,6 +433,9 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     if verbose is True:
                         print('\nFeature Pair: ', data_names[count],
                               '\nSSI[bits]: ', data_ssi[count],
+                              '\nSSI1[bits]: ', SSI_1,
+                              '\nSSI2[bits]: ', SSI_2,
+                              '\nHc[bits]: ', H_c/norm_factor,                              
                               '\nCo-SSI[bits]: ', data_cossi[count])
                     count+=1                
          
@@ -410,7 +447,7 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                     count+=1
                 
         else:
-            for res2 in range(res1+1, len(mv_res_data_a)):
+            for res2 in range(len(all_data_c)):
                 if verbose is True:
                     print('\nFeature Pair: ', data_names[count],
                           '\nSSI[bits]: ', data_ssi[count],
@@ -419,174 +456,6 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
 
     
     return data_names, data_ssi, data_cossi
-
-def new_cossi_featens_analysis(features_a, features_b, features_c, features_d, all_data_a, all_data_b, all_data_c, all_data_d, verbose=True, override_name_check=False):
-
-    """
-    Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
-    
-    Parameters
-    ----------
-    features_a : list of str
-        Feature names of the first ensemble. 
-    features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
-    all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
-    all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
-    torsions : str
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
-        Default is None.
-    verbose : bool, default=True
-        Print intermediate results.
-    override_name_check : bool, default=False
-        Only check number of features, not their names.
-        
-        
-    Returns
-    -------
-        data_names : list of str
-            Feature names.
-        data_ssi : float array
-            State Specific Information SSI statistics for each feature.
-        data_cossi : float array
-            State Specific Information Co-SSI statistics for each feature.
-
-    """
-    
-    # Get the multivariate timeseries data
-    mv_res_feat_a, mv_res_data_a = features_a,all_data_a
-    mv_res_feat_b, mv_res_data_b = features_b,all_data_b
-    mv_res_feat_c, mv_res_data_c = features_c,all_data_c
-    mv_res_feat_d, mv_res_data_d = features_d,all_data_d
-            
-    # Assert that the features are the same and data sets have same number of features
-    if override_name_check:
-        assert len(mv_res_feat_a) == len(mv_res_feat_b)
-        assert len(mv_res_feat_c) == len(mv_res_feat_d)
-        
-    else:
-        assert mv_res_feat_a == mv_res_feat_b
-        assert mv_res_feat_c == mv_res_feat_d
-    assert mv_res_data_a.shape[0] == mv_res_data_b.shape[0] 
-    assert mv_res_data_c.shape[0] == mv_res_data_d.shape[0] 
-    # Extract the names of the features
-    data_names = []
-    for feat1 in range(len(mv_res_feat_a)):
-        for feat2 in range(len(mv_res_feat_c)):
-            data_names.append(mv_res_feat_a[feat1] + ' & ' + mv_res_feat_c[feat2])
-    # Initialize SSI and Co-SSI
-    data_ssi = np.zeros(len(data_names))
-    data_cossi = np.zeros(len(data_names))
-    # Loop over all features
-    count=0    
-    for res1 in range(len(mv_res_data_a)):
-        # print(res1)
-        res1_data_ens1 = mv_res_data_a[res1]
-        res1_data_ens2 = mv_res_data_b[res1]
-        res1_combined_dist=[]
-        for dist_no_a in range(len(res1_data_ens1)):
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
-            res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])     
-            res1_combined_dist.append(res1_data_both)
-
-        ## Saving distribution length
-        traj1_len = len(res1_data_ens1[dist_no_a])   
-            
-        # if calculate_ssi(res1_combined_dist, traj1_len)!=0:      
-        set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
-    
-        set_a_states=[]
-        for dim_num_a in range(len(set_distr_a)):
-                set_a_states.append(determine_state_limits(set_distr_a[dim_num_a], traj1_len))
-        H_a=calculate_entropy(set_a_states,set_distr_a) 
-        if H_a != 0:
-
-        
-            for res2 in range(len(mv_res_data_c)):
-                # Only run SSI if entropy is non-zero
-                res2_data_ens1 = mv_res_data_c[res2]
-                res2_data_ens2 = mv_res_data_d[res2]     
-                res2_combined_dist=[]
-                for dist_no_b in range(len(res2_data_ens1)):
-                    # # # combine the ensembles into one distribution (condition_a + condition_b)
-                    res2_data_both = list(res2_data_ens1[dist_no_b]) + list(res2_data_ens2[dist_no_b])
-                    res2_combined_dist.append(res2_data_both)            
-                 
-                set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
-                    
-                set_b_states=[]
-                for dim_num_b in range(len(set_distr_b)):
-                        set_b_states.append(determine_state_limits(set_distr_b[dim_num_b], traj1_len))
-                H_b=calculate_entropy(set_b_states,set_distr_b)
-                
-                if H_b!=0:
-                
-                    ab_joint_states= set_a_states + set_b_states
-                    ab_joint_distributions= set_distr_a + set_distr_b
-                    print('Length data a and b:',len(set_distr_a[0]),len(set_distr_b[0]))
-                    H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
-            
-                    traj_1_fraction = traj1_len/len(set_distr_a[0])
-                    traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
-                    
-                    set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
-                    set_c_states= [[0,1,2]]                      
-                    H_c = norm_factor       
-                    
-                    ##----------------
-                    ab_joint_states = set_a_states + set_b_states
-                    ab_joint_distributions = set_distr_a + set_distr_b
-                    
-                    H_ab = calculate_entropy(ab_joint_states, ab_joint_distributions)
-                    ##----------------
-                    ac_joint_states =  set_a_states + set_c_states 
-                    ac_joint_distributions = set_distr_a + set_distr_c
-                    
-                    H_ac = calculate_entropy(ac_joint_states, ac_joint_distributions)
-                    ##----------------
-                    bc_joint_states = set_b_states + set_c_states 
-                    bc_joint_distributions = set_distr_b + set_distr_c
-                    
-                    H_bc = calculate_entropy(bc_joint_states, bc_joint_distributions)
-                    ##----------------
-                    abc_joint_states = set_a_states + set_b_states + set_c_states 
-                    abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
-                    
-                    H_abc = calculate_entropy(abc_joint_states, abc_joint_distributions)    
-            
-                    SSI = ((H_a + H_b) - H_ab)/norm_factor
-                    coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor     
-                    
-                    data_ssi[count] = SSI       
-                    data_cossi[count] = coSSI       
-                    if verbose is True:
-                        print('\nFeature Pair: ', data_names[count],
-                              '\nSSI[bits]: ', data_ssi[count],
-                              '\nCo-SSI[bits]: ', data_cossi[count])
-                    count+=1                
-         
-                else:
-                    if verbose is True:
-                        print('\nFeature Pair: ', data_names[count],
-                              '\nSSI[bits]: ', data_ssi[count],
-                              '\nCo-SSI[bits]: ', data_cossi[count])
-                    count+=1
-                    
-        else:
-            for res2 in range(res1+1, len(mv_res_data_a)):
-                if verbose is True:
-                    print('\nFeature Pair: ', data_names[count],
-                          '\nSSI[bits]: ', data_ssi[count],
-                          '\nCo-SSI[bits]: ', data_cossi[count])
-                count+=1
-
-    
-    return data_names, data_ssi, data_cossi
-
 
 # -- Functions with more customizable capabilities for users to adapt to their needs --
 
