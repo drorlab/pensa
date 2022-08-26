@@ -343,3 +343,90 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     return labels, torsions[1]
 
 
+def get_protein_backbone_torsions(pdb, xtc, selection='all', 
+                                   first_frame=0, last_frame=None, step=1, 
+                                   naming='segindex', include_omega=False):
+    """
+    Load protein backbone torsions
+    
+    PHI (φ):   C(i-1)-N(i)-CA(i)-C(i)
+
+    PSI (ψ):   N(i)-CA(i)-C(i)-N(i+1)
+    
+    OMEGA (ω): CA(i)-C(i)-N(i+1)-CA(i+1)
+    
+    
+    Parameters
+    ----------
+    pdb : str
+        File name for the reference file (PDB or GRO format).
+    xtc : str
+        File name for the trajectory (xtc format).
+    selection : list, default='all'
+        List of quadruplets with selection indices to choose atoms for the torsions.  
+    first_frame : int, default=0
+        First frame to return of the features. Zero-based.
+    last_frame : int, default=None
+        Last frame to return of the features. Zero-based.
+    step : int, default=1
+        Subsampling step width when reading the frames.
+    naming : str, default='plain'
+        Naming scheme for each atom in the feature names.
+        plain: neither chain nor segment ID included
+        chainid: include chain ID (only works if chains are defined)
+        segid: include segment ID (only works if segments are defined)
+        segindex: include segment index (only works if segments are defined)
+        
+    Returns
+    -------
+    feature_names : list of str
+        Generic names of all torsions
+    features_data : numpy array
+        Data for all torsions [Å]
+    
+    """
+    # Find indices of torsion atoms for each residue
+    #   PHI (φ):   C(i-1)-N(i)-CA(i)-C(i)
+    indices_phi = find_atom_indices_per_residue(
+        pdb, 
+        at_names=["C","N","CA","C"], 
+        rel_res=[-1,0,0,0], 
+        selection=selection
+    )
+    #   PSI (ψ):   N(i)-CA(i)-C(i)-N(i+1)
+    indices_psi = find_atom_indices_per_residue(
+        pdb, 
+        at_names=["N","CA","C","N"], 
+        rel_res=[0,0,0,1],
+        selection=selection
+    )
+    #   OMEGA (ω): CA(i)-C(i)-N(i+1)-CA(i+1)
+    indices_omega = find_atom_indices_per_residue(
+        pdb, 
+        at_names=["CA","C","N","CA"], 
+        rel_res=[0,0,1,1], 
+        selection=selection
+    )
+    # Define angle names for labels
+    angles = ['PHI']*len(indices_phi) + ['PSI']*len(indices_psi)
+    torsion_selection = indices_phi+indices_psi
+    if include_omega:
+        angles += ['OMEGA']*len(indices_omega)
+        torsion_selection += indices_omega
+    # Calculate the torsions
+    torsions = get_torsions(
+        pdb, xtc, sel=torsion_selection, 
+        first_frame=0, last_frame=None, step=1,
+        naming = naming
+    )
+    # Extract the residue info
+    nums = [pti.split(' - ')[1].split(' ')[-2] for pti in torsions[0]]
+    names = [pti.split(' - ')[1].split(' ')[-3] for pti in torsions[0]]
+    if naming=='chainid' or naming=='segid' or naming=='segindex':
+        seg = [pti.split(' - ')[1].split(' ')[-4] for pti in torsions[0]]
+    else:
+        seg = ['0']*len(angles)
+    # Construct label names
+    labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
+    
+    return labels, torsions[1]
