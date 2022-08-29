@@ -36,14 +36,20 @@ def test_get_protein_backbone_torsions():
     bb_torsions_a = get_protein_backbone_torsions(
         pdb_file_a, trj_file_a[0], selection='all',
         first_frame=0, last_frame=None, step=1, 
-        naming='segindex', include_omega=False
+        naming='segindex', radians=True,
+        include_omega=False
         )
     bb_torsions_b = get_protein_backbone_torsions(
         pdb_file_b, trj_file_b[0], selection='all',
         first_frame=0, last_frame=None, step=1, 
-        naming='segindex', include_omega=False
+        naming='segindex', radians=True,
+        include_omega=False
         )
     assert len(bb_torsions_a) == len(bb_torsions_b)
+    assert bb_torsions_a[0][0] == bb_torsions_b[0][0] == 'PHI 0 VAL 66'
+    assert bb_torsions_a[0][-1] == bb_torsions_b[0][-1] == 'PSI 0 CYS 351'
+    assert '%1.4f %1.4f'%(bb_torsions_a[1][0][0], bb_torsions_a[1][0][-1]) == '-1.0394 -0.7756'
+    assert '%1.4f %1.4f'%(bb_torsions_a[1][-1][0], bb_torsions_a[1][-1][-1]) == '-1.0648 -0.5028'
 
 # Test protein side-chain torsions
 def test_get_protein_sidechain_torsions():
@@ -51,14 +57,18 @@ def test_get_protein_sidechain_torsions():
     sc_torsions_a = get_protein_sidechain_torsions(
         pdb_file_a, trj_file_a[0], selection='all',
         first_frame=0, last_frame=None, step=1, 
-        naming='segindex', include_omega=False
+        naming='segindex', radians=True
         )
     sc_torsions_b = get_protein_sidechain_torsions(
         pdb_file_b, trj_file_b[0], selection='all',
         first_frame=0, last_frame=None, step=1, 
-        naming='segindex', include_omega=False
+        naming='segindex', radians=True
         )
     assert len(sc_torsions_a) == len(sc_torsions_b)
+    assert sc_torsions_a[0][0] == sc_torsions_b[0][0] == 'CHI1 0 MET 65'
+    assert sc_torsions_a[0][-1] == sc_torsions_b[0][-1] == 'CHI5 0 ARG 348'
+    assert '%1.4f %1.4f'%(sc_torsions_a[1][0][0], sc_torsions_a[1][0][-1]) == '1.0151 -0.2732'
+    assert '%1.4f %1.4f'%(sc_torsions_a[1][-1][0], sc_torsions_a[1][-1][-1]) == '-0.7536 0.1536'
 
 # Tests
 def test_get_features():
