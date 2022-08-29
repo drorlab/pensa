@@ -245,7 +245,6 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     DELTA (δ):   C5'(i)-C4'(i)-C3'(i)-O3'(i)
     EPSILON (ε): C4'(i)-C3'(i)-O3'(i)-P(i+1)
     ZETA (ζ):    C3'(i)-O3'(i)-P(i+1)-O5'(i+1)
-    Not implemented yet:
     CHI (χ):     O4'(i)-C1'(i)-N9(i)-C4(i) for purines
                  O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
     
@@ -523,6 +522,7 @@ at_names_chi1 = [["N", "CA", "CB", "CG"],
 
 at_names_chi2 = [["CA", "CB", "CG", "CD"],
                  ["CA", "CB", "CG", "CD1"],
+                 ["CA", "CB", "CG1", "CD"],
                  ["CA", "CB", "CG1", "CD1"],
                  ["CA", "CB", "CG", "OD1"],
                  ["CA", "CB", "CG", "ND1"],
