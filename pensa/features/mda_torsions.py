@@ -235,7 +235,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
 
 def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all', 
                                       first_frame=0, last_frame=None, step=1, 
-                                      naming='segindex'):
+                                      naming='segindex', radians=False):
     """
     Load nucleic acid backbone torsions
     
@@ -268,6 +268,8 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
         chainid: include chain ID (only works if chains are defined)
         segid: include segment ID (only works if segments are defined)
         segindex: include segment index (only works if segments are defined)
+    radians : bool, default=False
+        Return torsions in radians instead of degrees.
         
     Returns
     -------
@@ -353,12 +355,15 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
         seg = ['0']*len(angles)
     # Construct label names
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
+    # Convert to radians if so desired
+    if radians:
+        torsions *= np.pi/180
     return labels, torsions[1]
 
 
 def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all', 
                                    first_frame=0, last_frame=None, step=1, 
-                                   naming='segindex'):
+                                   naming='segindex', radians=False):
     """
     Load nucleic acid pseudotorsions
     
@@ -385,7 +390,9 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
         chainid: include chain ID (only works if chains are defined)
         segid: include segment ID (only works if segments are defined)
         segindex: include segment index (only works if segments are defined)
-        
+    radians : bool, default=False
+        Return torsions in radians instead of degrees.
+
     Returns
     -------
     feature_names : list of str
@@ -424,13 +431,16 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
         seg = ['0']*len(angles)
     # Construct label names
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
-    
+    # Convert to radians if so desired
+    if radians:
+        torsions *= np.pi/180
     return labels, torsions[1]
 
 
 def get_protein_backbone_torsions(pdb, xtc, selection='all', 
                                    first_frame=0, last_frame=None, step=1, 
-                                   naming='segindex', include_omega=False):
+                                   naming='segindex', radians=False,
+                                   include_omega=False):
     """
     Load protein backbone torsions
     
@@ -458,6 +468,8 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
         chainid: include chain ID (only works if chains are defined)
         segid: include segment ID (only works if segments are defined)
         segindex: include segment index (only works if segments are defined)
+    radians : bool, default=False
+        Return torsions in radians instead of degrees.
         
     Returns
     -------
@@ -510,7 +522,9 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
         seg = ['0']*len(angles)
     # Construct label names
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
-    
+    # Convert to radians if so desired
+    if radians:
+        torsions *= np.pi/180
     return labels, torsions[1]
 
 
@@ -541,7 +555,7 @@ at_names_chi5 = [["CD", "NE", "CZ", "NH1"]]
 
 def get_protein_sidechain_torsions(pdb, xtc, selection='all', 
                                    first_frame=0, last_frame=None, step=1, 
-                                   naming='segindex', include_omega=False):
+                                   naming='segindex', radians=False):
     """
     Load protein sidechain torsions.
     
@@ -565,6 +579,8 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
         chainid: include chain ID (only works if chains are defined)
         segid: include segment ID (only works if segments are defined)
         segindex: include segment index (only works if segments are defined)
+    radians : bool, default=False
+        Return torsions in radians instead of degrees.
         
     Returns
     -------
@@ -619,5 +635,7 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
         seg = ['0']*len(angles)
     # Construct label names
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
-    
+    # Convert to radians if so desired
+    if radians:
+        torsions *= np.pi/180
     return labels, torsions[1]
