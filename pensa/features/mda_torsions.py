@@ -357,8 +357,10 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
     # Convert to radians if so desired
     if radians:
-        torsions *= np.pi/180
-    return labels, torsions[1]
+        values = torsions[1] * np.pi/180
+    else:
+        values = torsions[1]
+    return labels, values
 
 
 def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all', 
@@ -433,8 +435,10 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
     # Convert to radians if so desired
     if radians:
-        torsions *= np.pi/180
-    return labels, torsions[1]
+        values = torsions[1] * np.pi/180
+    else:
+        values = torsions[1]
+    return labels, values
 
 
 def get_protein_backbone_torsions(pdb, xtc, selection='all', 
@@ -524,8 +528,10 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
     # Convert to radians if so desired
     if radians:
-        torsions *= np.pi/180
-    return labels, torsions[1]
+        values = torsions[1] * np.pi/180
+    else:
+        values = torsions[1]
+    return labels, values
 
 
 at_names_chi1 = [["N", "CA", "CB", "CG"],
@@ -637,5 +643,7 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
     labels = [ ang+' '+seg[i]+' '+names[i]+' '+nums[i] for i, ang in enumerate(angles)]
     # Convert to radians if so desired
     if radians:
-        torsions *= np.pi/180
-    return labels, torsions[1]
+        values = torsions[1] * np.pi/180
+    else:
+        values = torsions[1]
+    return labels, values
