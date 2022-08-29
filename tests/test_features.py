@@ -29,6 +29,8 @@ trj_file_o = root_dir_o+'/trajfit-nw_step100.xtc'
 
 # Simulation S (DNA-std)
 root_dir_s = test_data_path+'/DNA-std'
+ref_file_s = root_dir_s+'/DNA-nw.gro'
+trj_file_s = root_dir_s+'/trajfit-nw_step100.xtc'
 
 # Test protein backbone torsions
 def test_get_protein_backbone_torsions():
@@ -69,6 +71,10 @@ def test_get_protein_sidechain_torsions():
     assert sc_torsions_a[0][-1] == sc_torsions_b[0][-1] == 'CHI5 0 ARG 348'
     assert '%1.4f %1.4f'%(sc_torsions_a[1][0][0], sc_torsions_a[1][0][-1]) == '1.0151 -0.2732'
     assert '%1.4f %1.4f'%(sc_torsions_a[1][-1][0], sc_torsions_a[1][-1][-1]) == '-0.7536 0.1536'
+
+# TODO: Test nucleic-acid backbone torsions
+
+# TODO: Test nucleic-acid pseudotorsions
 
 # Tests
 def test_get_features():
