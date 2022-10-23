@@ -32,9 +32,9 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
             Name of the PDF file to save the plot.
         pdb_filename : str
             Name of the PDB file to save the structure with the values to visualize.
-        selection str, default='max'
+        selection : str, default='max'
             How to select the value to visualize for each residue from all its features 
-            Options: 'max', 'min'.
+            Options: 'max', 'min', 'avg'.
         y_label : str, default='max. JS dist. of BB torsions'
             Label of the y axis of the plot.
         offset : int, default=0
@@ -49,12 +49,18 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
          
     """
     # -- INITIALIZATION --
+    assert selection in ['avg', 'max', 'min']
     # Structure to use for visualization
     u = mda.Universe(ref_filename)
     u.residues.resids -= offset
     vis_resids = u.residues.resids
     # Output values
-    default = 0 if selection=='max' else 1
+    if selection == 'max':
+        default = 0 
+    elif selection =='min':
+        default = 1
+    else:
+        default = np.nan
     vis_values = default*np.ones(len(vis_resids))
     # -- VALUE ASSIGNMENT --
     for i,name in enumerate(names):
@@ -66,6 +72,8 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
             vis_values[index] = np.maximum(vis_values[index], data[i])
         elif selection == 'min':
             vis_values[index] = np.minimum(vis_values[index], data[i])
+        elif selection == 'avg':
+            vis_values[index] = np.average(data[i])
     # -- FIGURE --
     fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=300)
     # Plot values against residue number
