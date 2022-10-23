@@ -83,7 +83,7 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
                                               discretize=discretize, pbc=pbc)
 
         print('block length = ', bl)
-        ssi_names, data_ssi = ssi_ensemble_analysis(features_a, features_b, block_data_a, block_data_b, discrete_states, verbose=True)
+        ssi_names, data_ssi = ssi_ensemble_analysis(features_a, features_b, block_data_a, block_data_b, discrete_states, verbose=verbose)
         ssi_blocks.append(data_ssi)
 
     ssi_names, ssi_blocks =  np.transpose(ssi_names), np.transpose(ssi_blocks)
@@ -141,7 +141,7 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
         block_data_b = all_data_b[bl[0]:bl[1]]
 
         print('block length = ', bl)       
-        relen = relative_entropy_analysis(features_a, features_b, block_data_a, block_data_b, verbose=True)        
+        relen = relative_entropy_analysis(features_a, features_b, block_data_a, block_data_b, verbose=verbose)        
         relen_blocks.append(relen)
                     
     np.save('relen_bl'+str(blockanlen), np.transpose(np.array(relen_blocks)))
