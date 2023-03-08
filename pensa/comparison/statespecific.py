@@ -6,7 +6,7 @@ from pensa.statesinfo import *
 # -- Functions to calculate SSI statistics across paired ensembles --
 
 def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False,
-                          verbose=True, write_plots=False, override_name_check=False):
+                          verbose=True, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
     
@@ -33,8 +33,6 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
         with different periodicities. The default is False.
     verbose : bool, optional
         Print intermediate results. Default is True.
-    write_plots : bool, optional
-        If true, visualise the states over the raw distribution. The default is False.
     override_name_check : bool, optional
         Only check number of features, not their names. Default is False.
         
