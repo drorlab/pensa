@@ -33,7 +33,7 @@ For the most common applications, example [Python scripts](https://github.com/dr
 #### Demo on Google Colab
 We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1msHB6uGeu2tBw_MnAFFTxcxeW4RnR0is)
 
 
 ## Citation
