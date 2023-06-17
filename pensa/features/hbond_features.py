@@ -9,7 +9,6 @@ import MDAnalysis as mda
 from MDAnalysis.analysis.hydrogenbonds.hbond_analysis import (
   HydrogenBondAnalysis as HBA)
 import numpy as np
-import itertools as it
 from gridData import Grid
 from tqdm import tqdm
 import os
