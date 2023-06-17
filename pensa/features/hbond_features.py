@@ -224,7 +224,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
         O_site_pdb_id = "O" + str(site_no)
         H_site_pdb_id = "H" + str(site_no)
         # Write data out and visualize water sites in pdb         
-        "FIX OUTPUT UNIFORMITY, SINGLE BONDS NOT OUTPUT WITH ANY ARRAY DIMENSION"
+        # "FIX OUTPUT UNIFORMITY, SINGLE BONDS NOT OUTPUT WITH ANY ARRAY DIMENSION"
         if write is True:    
             np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_names.txt', np.array(bondouts[0][0],dtype=object), fmt='%s')
             np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_data.txt',  np.array(bondouts[0][1],dtype=object), fmt='%s')
@@ -311,10 +311,7 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
     for frame_no in tqdm(range(len(u.trajectory))):   
     # for frame_no in tqdm(range(100)):       
         u.trajectory[frame_no]
-        # sorting the atomgroups into pairs for only inter bonds between ag1 and ag2 and not intra
         
-        # bond_atomgroup_pairs = [[atomgroup_donors1,atomgroup_acceptors2],[atomgroup_acceptors1,atomgroup_donors2]]
-
         # obtain indices for all donor and acceptor atoms
         frame_bonds = []
         for donor1_idx in donor1_idcs:
