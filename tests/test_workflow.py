@@ -1,4 +1,4 @@
-import unittest, gc, mdshare, pyemma, os, requests, scipy.spatial, scipy.spatial.distance, pytest, importlib, scipy.stats, sys, os
+import unittest, gc, mdshare, pyemma, os, scipy.spatial, scipy.spatial.distance, pytest, importlib, scipy.stats, sys, os
 import scipy as sp
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
