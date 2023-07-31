@@ -20,7 +20,7 @@ setup(name='pensa',
       install_requires=[
         'numpy',
         'scipy>=1.2',
-        'mdtraj==1.9.3',
+        'mdtraj==1.9.7',
         'mdshare',
         'pyemma',
         'MDAnalysis',
