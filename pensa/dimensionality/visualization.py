@@ -1,10 +1,39 @@
 import numpy as np
 import pyemma
+from pyemma.coordinates.transform.pca import PCA
+import deeptime
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
 
+
+def project_on_singularvector(data, ev_idx, ana):
+    """
+    Projects a trajectory onto an eigenvector of its PCA/tICA.
+    
+    Parameters
+    ----------
+        data : float array
+            Trajectory data [frames,frame_data].
+        ev_idx : int
+            Index of the eigenvector to project on (starts with zero). 
+        ana : PCA or tICA obj
+            Information of pre-calculated PCA or tICA.
+            Must be calculated for the same features (but not necessarily the same trajectory).
+    
+    Returns
+    -------
+        projection : float array
+            Value along the PC for each frame.
+        
+    """
+    # Project the features onto the components
+    projection = np.zeros(data.shape[0])
+    for ti in range(data.shape[0]):
+        projection[ti] = np.dot(data[ti], ana.singular_vectors_right[:,ev_idx])
+    # Return the value along the PC for each frame  
+    return projection
 
 def project_on_eigenvector(data, ev_idx, ana):
     """
@@ -32,7 +61,6 @@ def project_on_eigenvector(data, ev_idx, ana):
         projection[ti] = np.dot(data[ti], ana.eigenvectors[:,ev_idx])
     # Return the value along the PC for each frame  
     return projection
-    
     
 def compare_projections(data_a, data_b, ana, num=3, saveas=None, label_a=None, label_b=None):
     """
@@ -108,7 +136,12 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
         proj_evi = []
         for j,d in enumerate(data):
             # Calculate values along PC for each frame
-            proj = project_on_eigenvector(d, evi, ana)
+            if isinstance(ana, PCA):
+                proj = project_on_eigenvector(d, evi, ana)
+            elif isinstance(ana, deeptime.decomposition.CovarianceKoopmanModel):
+                proj = project_on_singularvector(d, evi, ana)
+            else:
+                raise ModuleNotFoundError("Accept only PCA or TICA")
             # Plot the time series in the left panel
             ax[evi,0].plot(proj, alpha=0.5, 
                            label=labels[j], color=colors[j])
@@ -172,9 +205,15 @@ def sort_traj_along_projection(data, ana, top, trj, out_name, num_comp=3, start_
     # Loop through the principal components
     for evi in range(num_comp):
         # Project the combined data on the principal component
-        proj = project_on_eigenvector(data, evi, ana)
+        if isinstance(ana, PCA):
+            proj = project_on_eigenvector(data, evi, ana)
+            out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
+        elif isinstance(ana, deeptime.decomposition.CovarianceKoopmanModel):
+            proj = project_on_singularvector(data, evi, ana)
+            out_xtc = out_name+"_tic"+str(evi+1)+".xtc"
+        else:
+            raise ModuleNotFoundError("Accept only PCA or TICA")
         # Sort everything along the projection onto the PC
-        out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
         proj_sort, sort_idx, oidx_sort = sort_coordinates(proj, top, trj, out_xtc, start_frame=start_frame)
         sorted_proj.append(proj_sort)
         sorted_indices_data.append(sort_idx)

@@ -1,10 +1,10 @@
 import numpy as np
-import pyemma
+import deeptime
 from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
-from .visualization import project_on_eigenvector, sort_traj_along_projection
+from .visualization import project_on_singularvector, sort_traj_along_projection
 
 
 # --- METHODS FOR TIME-LAGGED INDEPENDENT COMPONENT ANALYSIS ---
@@ -12,10 +12,10 @@ from .visualization import project_on_eigenvector, sort_traj_along_projection
 # http://emma-project.org/latest/api/generated/pyemma.coordinates.tica.html
 
 
-def calculate_tica(data, dim=-1, lag=10):
+def calculate_tica(data, dim=None, lag=10):
     """
     Performs a PyEMMA TICA on the provided data.
-    
+
     Parameters
     ----------
         data : float array
@@ -25,21 +25,21 @@ def calculate_tica(data, dim=-1, lag=10):
             -1 means all numerically available dimensions will be used.
         lag : int, optional, default = 10
             The lag time, in multiples of the input time step.
-        
+
     Returns
     -------
         tica : TICA obj
             Time-lagged independent component information.
-        
+
     """
-    tica = pyemma.coordinates.tica(data, lag=lag)
-    return tica
+    tica = deeptime.decomposition.TICA(lagtime=lag, dim=dim).fit(data)
+    return tica.fetch_model()
 
 
 def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     """
     Plots the highest eigenvalues over the number of the time-lagged independent components.
-    
+
     Parameters
     ----------
         tica : TICA obj
@@ -48,25 +48,27 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
             Number of eigenvalues to plot.
         plot_file : str, optional, default = None
             Path and name of the file to save the plot.
-        
+
     """
     # Plot eigenvalues over component numbers.
-    fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
-    componentnr = np.arange(num)+1 
-    eigenvalues = tica.eigenvalues[:num]
+    fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
+    componentnr = np.arange(num)+1
+    eigenvalues = tica.singular_values[:num]
+    print(tica.__dict__)
     ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
     # Save the figure to a file.
-    if plot_file: fig.savefig(plot_file, dpi=300)
+    if plot_file:
+        fig.savefig(plot_file, dpi=300)
     return componentnr, eigenvalues
 
 
 def tica_features(tica, features, num, threshold, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
-    
+
     Parameters
     ----------
         tica : TICA obj
@@ -82,34 +84,37 @@ def tica_features(tica, features, num, threshold, plot_file=None, add_labels=Fal
             Path and name of the file to save the plot.
         add_labels : bool, optional, default = False
             Add labels of the features to the x axis.
-        
+
     """
     # Plot the highest TIC correlations and print relevant features.
     height = num*2+2 if add_labels else num*2
-    fig,ax = plt.subplots(num,1,figsize=[4,height],dpi=300,sharex=True)
+    fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
     for i in range(num):
-        relevant = tica.feature_TIC_correlation[:,i]**2 > threshold**2
-        print("Features with abs. corr. above a threshold of %3.1f for TIC %i:"%(threshold, i+1))
+        relevant = tica.feature_component_correlation[:, i]**2 > threshold**2
+        print("Features with abs. corr. above a threshold of %3.1f for TIC %i:" % (
+            threshold, i+1))
         for j, ft in enumerate(features):
-            if relevant[j]: print(ft, "%6.3f"%(tica.feature_TIC_correlation[j,i]))
-        ax[i].plot(tica.feature_TIC_correlation[:,i])
-        test_feature = tica.feature_TIC_correlation[:,i]
-        ax[i].set_ylabel('corr. with TIC%i'%(i+1))
+            if relevant[j]:
+                print(ft, "%6.3f" % (tica.feature_component_correlation[j, i]))
+        ax[i].plot(tica.feature_component_correlation[:, i])
+        test_feature = tica.feature_component_correlation[:, i]
+        ax[i].set_ylabel('corr. with TIC%i' % (i+1))
     if add_labels:
         ax[-1].set_xticks(np.arange(len(features)))
-        ax[-1].set_xticklabels(features,rotation=90)
+        ax[-1].set_xticklabels(features, rotation=90)
     else:
         ax[-1].set_xlabel('feature index')
     fig.tight_layout()
     # Save the figure to a file.
-    if plot_file: fig.savefig(plot_file,dpi=300)
+    if plot_file:
+        fig.savefig(plot_file, dpi=300)
     return test_feature
-    
-   
+
+
 def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     """
     Projects a trajectory onto an eigenvector of its TICA.
-    
+
     Parameters
     ----------
         data : float array
@@ -125,24 +130,25 @@ def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
         lag : int, optional, default = 10
             The lag time, in multiples of the input time step.
             Only used if tica is not provided.
-                
+
     Returns
     -------
         projection : float array
             Value along the TIC for each frame.
-        
+
     """
     # Perform standard TICA if none is provided.
-    if tica is None: calculate_tica(data, dim=dim, lag=lag)
+    if tica is None:
+        calculate_tica(data, dim=dim, lag=lag)
     # Project the features onto the time-lagged independent components.
-    projection = project_on_eigenvector(data, ev_idx, tica) 
+    projection = project_on_singularvector(data, ev_idx, tica)
     return projection
-    
+
 
 def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its tICA.
-    
+
     Parameters
     ----------
         data : float array
@@ -160,34 +166,35 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
             Only used if tica is not provided.
         prefix : str, optional, default = ''
             First part of the component names. Second part is "IC"+<IC number>
-    
+
     Returns
     -------
         comp_names : list
             Names/numbers of the components.
         components : float array
             Component data [frames,components]
-        
+
     """
     # Perform tICA if none is provided.
-    if tica is None: calculate_tica(data, lag=lag)
+    if tica is None:
+        calculate_tica(data, lag=lag)
     # Project the features onto the principal components.
     comp_names = []
     components = []
     for ev_idx in range(num):
         projection = np.zeros(data.shape[0])
         for ti in range(data.shape[0]):
-            projection[ti] = np.dot(data[ti],tica.eigenvectors[:,ev_idx])
+            projection[ti] = np.dot(data[ti], tica.singular_vectors_right[:, ev_idx])
         components.append(projection)
         comp_names.append(prefix+'IC'+str(ev_idx+1))
     # Return the names and data.
     return comp_names, np.array(components).T
-    
+
 
 def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, start_frame=0):
     """
     Sort a trajectory along independent components.
-    
+
     Parameters
     ----------
         data : float array
@@ -210,7 +217,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
             Only used if tica is not provided.
         start_frame : int, optional, default = 0
             Offset of the data with respect to the trajectories (defined below).
-    
+
     Returns
     -------
         sorted_proj: list
@@ -222,7 +229,8 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
 
     """
     # Calculate the principal components if they are not given.
-    if tica is None: tica = calculate_tica(data, dim=num_ic, lag=lag)
+    if tica is None:
+        tica = calculate_tica(data, dim=num_ic, lag=lag)
     # Sort the trajectory along them.
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
         data, tica, top, trj, out_name, num_comp=num_ic, start_frame=start_frame
@@ -233,7 +241,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
 def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_ic=3, lag=10, start_frame=0):
     """
     Sort two trajectories along their most important common time-lagged independent components.
-    
+
     Parameters
     ----------
         data_a : float array
@@ -268,11 +276,12 @@ def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_
             Sorted indices of the data array for each principal component
         sorted_indices_traj : list
             Sorted indices of the coordinate frames for each principal component
-    
+
     """
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_mult_trajs_along_common_tic(
-        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_ic=num_ic, lag=lag, start_frame = start_frame
-        )
+        [data_a, data_b], [top_a, top_b], [
+            trj_a, trj_b], out_name, num_ic=num_ic, lag=lag, start_frame=start_frame
+    )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
@@ -298,7 +307,7 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
             Only used if tica is not provided.
         start_frame : int or list of int, default = 0
             Offset of the data with respect to the trajectories.
-            
+
     Returns
     -------
         sorted_proj: list
@@ -315,13 +324,13 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
         start_frame *= np.ones(num_traj)
         start_frame = start_frame.tolist()
     # Combine the input data
-    all_data = np.concatenate(data,0)
+    all_data = np.concatenate(data, 0)
     # Calculate the independent components
-    tica = pyemma.coordinates.tica(all_data, lag=lag)
+    tica = deeptime.decomposition.TICA(lagtime=lag).fit(all_data).fetch_model()
     # Initialize output
     sorted_proj = []
     sorted_indices_data = []
-    sorted_indices_traj = []    
+    sorted_indices_traj = []
     # Loop over principal components.
     for evi in range(num_ic):
         # Project the combined data on the independent component
@@ -330,9 +339,8 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
         out_xtc = out_name+"_tic"+str(evi+1)+".xtc"
         proj_sort, sort_idx, oidx_sort = merge_and_sort_coordinates(
             proj, top, trj, out_xtc, start_frame=start_frame, verbose=False
-            )
+        )
         sorted_proj.append(proj_sort)
         sorted_indices_data.append(sort_idx)
-        sorted_indices_traj.append(oidx_sort)        
+        sorted_indices_traj.append(oidx_sort)
     return sorted_proj, sorted_indices_data, sorted_indices_traj
-   
