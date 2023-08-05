@@ -11,22 +11,11 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: conda-incubator/setup-miniconda@v2
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
       with:
-        activate-environment: anaconda-client-env
-        environment-file: environment.yml
-        python-version: 3.8
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Activate conda environment
-      run: |
-        conda activate anaconda-client-env
-        conda info
-        conda list
+        python-version: 3.9
     - name: Lint with flake8
       run: |
         conda install flake8
