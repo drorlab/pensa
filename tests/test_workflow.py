@@ -1,10 +1,7 @@
-import unittest, gc, mdshare, pyemma, os, requests, scipy.spatial, scipy.spatial.distance, pytest, importlib, scipy.stats, sys, os
-import scipy as sp
-import MDAnalysis as mda
+import unittest, gc, os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyemma.util.contexts import settings
 from pensa.clusters import *
 from pensa.comparison import *
 from pensa.features import *
@@ -181,7 +178,8 @@ class Test_pensa(unittest.TestCase):
         combined_data_tors = np.concatenate([bbt_a, bbt_b],0)
     
         self.pca_combined = calculate_pca(combined_data_tors)
-        self.tica_combined = calculate_tica(combined_data_tors)
+        self.tica_bbt_a = calculate_tica(bbt_a)
+        self.tica_bbt_b = calculate_tica(bbt_b)
 
         # -- PCA features
         self.graph, self.corr = pca_features(
@@ -245,7 +243,7 @@ class Test_pensa(unittest.TestCase):
 
         
     # ** ENSEMBLE COMPARISON **
-    
+     
     
     # -- relative_entropy_analysis()
     def test_01_relative_entropy_analysis(self):
@@ -319,12 +317,13 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- sort_features()
-    def test_sort_features(self):
+    def test_05_sort_features(self):
         sf = sort_features(self.names_bbtors, self.jsd_bbtors)
         self.assertEqual(len(sf), 574)
 
+
     # -- residue_visualization()
-    def test_residue_visualization(self):
+    def test_06_residue_visualization(self):
         ref_filename = test_data_path + "/traj/condition-a_receptor.gro"
         out_filename = "receptor_bbtors-deviations_tremd"
         vis = residue_visualization(
@@ -340,8 +339,9 @@ class Test_pensa(unittest.TestCase):
         plt.close()
         del vis
 
+
     # -- distances_visualization()
-    def test_distances_visualization(self):
+    def test_07_distances_visualization(self):
         matrix = distances_visualization(
             self.names_bbdist, self.jsd_bbdist,
             test_data_path + "/plots/receptor_jsd-bbdist.pdf",
@@ -360,7 +360,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- calculate_pca()
-    def test_calculate_pca(self):
+    def test_08_calculate_pca(self):
         self.assertEqual(len(self.pca_combined.mean), 460)
         self.assertEqual(self.pca_combined.dim, -1)
         self.assertEqual(self.pca_combined.skip, 0)
@@ -369,13 +369,13 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- calculate_tica
-    def test_tica_combined(self):
-        self.assertEqual(self.tica_combined.lag, 10)
-        self.assertEqual(self.tica_combined.kinetic_map, True)
+    def test_09_calculate_tica(self):
+        self.assertEqual(self.tica_bbt_a.koopman_matrix.size, 841)
+        self.assertEqual(self.tica_bbt_b.koopman_matrix.size, 841)
 
 
     # -- pca_eigenvalues_plot()
-    def test_pca_eigenvalues_plot(self):
+    def test_10_pca_eigenvalues_plot(self):
         arr = pca_eigenvalues_plot(
             self.pca_combined, num=12, 
             plot_file=test_data_path+'/plots/combined_tmr_pca_ev.pdf'
@@ -387,17 +387,17 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- tica_eigenvalues_plot()
-    def test_tica_eigenvalues_plot(self):
+    def test_11_tica_eigenvalues_plot(self):
         arr_1, arr_2 = tica_eigenvalues_plot(
-            self.tica_combined, num=12, 
-            plot_file=test_data_path+'/plots/combined_tmr_tica_ev.pdf'
+            self.tica_bbt_a, num=12, 
+            plot_file=test_data_path+'/plots/combined_tmr_tica_bbt_a_ev.pdf'
             )
         self.assertEqual(len(arr_1), 12)
         self.assertEqual(len(arr_2), 12)
 
 
     #-- pca_features()
-    def test_pca_features(self):
+    def test_12_pca_features(self):
         self.assertEqual(len(self.graph), 3)
         plt.close()
         # -- Graph
@@ -408,21 +408,21 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- tica_features()
-    def test_tica_features(self):
+    def test_13_tica_features(self):
         test_feature = tica_features(
-            self.tica_combined, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4
+            self.tica_bbt_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4
             )
         self.assertEqual(len(test_feature), 460)
 
 
     # -- sort_trajs_along_common_pc() + sort_traj_along_pc() + project_on_pc()
-    def test_sort_trajs_along_pc(self):
+    def test_14_sort_trajs_along_pc(self):
         for ele in self.sort_common_traj:
             self.assertEqual(len(ele), 3)
         self.assertEqual(len(self.all_sort), 3)
 
     # -- sort_trajs_along_common_tic()
-    def test_sort_trajs_along_common_tic(self):
+    def test_15_sort_trajs_along_common_tic(self):
         sproj, sidx_data, sidx_traj = sort_trajs_along_common_tic(
             self.sim_a_tmr_data['bb-torsions'],
             self.sim_b_tmr_data['bb-torsions'],
@@ -438,20 +438,20 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- sort_traj_along_tic()
-    def test_sort_traj_along_tic(self):
+    def test_16_sort_traj_along_tic(self):
         all_sort, _, _ = sort_traj_along_tic(
             self.sim_a_tmr_data['bb-torsions'], 
             test_data_path + "/traj/condition-a_receptor.gro",
             test_data_path + "/traj/condition-a_receptor.xtc",
             test_data_path + "/pca/condition-a_receptor_by_tmr", 
-            tica = self.tica_combined, 
+            tica = self.tica_bbt_a, 
             num_ic=3
             )
         self.assertEqual(len(all_sort), 3)
 
 
     # -- compare_projections()
-    def test_compare_projections(self):
+    def test_17_compare_projections(self):
     
         self.assertEqual(len(self.val), 3)
         self.assertEqual(len(self.val[0]), 2)

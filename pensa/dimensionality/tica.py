@@ -1,6 +1,5 @@
 import numpy as np
 import deeptime
-from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
@@ -14,7 +13,7 @@ from .visualization import project_on_singularvector, sort_traj_along_projection
 
 def calculate_tica(data, dim=None, lag=10):
     """
-    Performs a PyEMMA TICA on the provided data.
+    Performs time-lagged independent component analysis (TICA) on the provided data.
 
     Parameters
     ----------
