@@ -7,12 +7,12 @@ We are always happy to help and to hear about your work and your success stories
 Report a bug or request a feature
 ***********************************
 
-PENSA is open-source and available on `Github <https://github.com/drorlab/pensa>`_. Please submit issues or requests using the `issue tracker <https://github.com/drorlab/pensa/issues>`_.
+PENSA is open-source and available on `GitHub <https://github.com/drorlab/pensa>`_. Please submit issues or requests using the `issue tracker <https://github.com/drorlab/pensa/issues>`_.
 
 Add new functionality 
 ***********************************
 
-We welcome any kind of contributions to improve or expand the PENSA code. In particular, we are interested in readers for new feature types and new ways to analyze and compare structural ensembles. PENSA is maintained on `Github <https://github.com/drorlab/pensa>`_ so you can fork it and create a pull request. For guidance, see our `contribution guidelines <https://github.com/drorlab/pensa/blob/master/CONTRIBUTING.md>`_. Please make sure to properly test your contribution before the request. For large or complicated contributions, please get in contact so we can coordinate them with you. 
+We welcome any kind of contributions to improve or expand the PENSA code. In particular, we are interested in readers for new feature types and new ways to analyze and compare structural ensembles. PENSA is maintained on `GitHub <https://github.com/drorlab/pensa>`_ so you can fork it and create a pull request. For guidance, see our `contribution guidelines <https://github.com/drorlab/pensa/blob/master/CONTRIBUTING.md>`_. Please make sure to properly test your contribution before the request. For large or complicated contributions, please get in contact so we can coordinate them with you. 
 
 We explain two of the most common cases below:
 

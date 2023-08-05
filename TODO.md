@@ -28,15 +28,18 @@
   - [x] SSI
 
 ### Plans
-- [ ] Try using MDAnalysis instead of biotite for water featurization
-- [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
 - [ ] Facilitate calculation of JSD etc. on principal components
 - [ ] Facilitate calculation of SSI on results of joint clustering.
-- [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
 - [ ] Feature comparison of more than two ensembles
   - [ ] with respect to the joint ensemble (all metrics)
   - [ ] with respect to a reference ensemble (will not always work for KLD)
+- [ ] Use MDAnalysis instead of biotite for water featurization
+- [ ] Use MDAnalysis instead of PyEMMA to read features (to avoid mmshare dependency).
+- [ ] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for clustering.
+- [ ] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for dimensionality reduction.
+- [ ] Put shared functionality of PCA and TICA into shared functions.
+- [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
@@ -49,7 +52,6 @@
   - [ ] First tests
   - [ ] write module
   - [ ] write unit tests
-- [ ] Put shared functionality of PCA and TICA into shared functions.
 - [ ] Make file format (png/pdf?) for matplotlib optional.
 - [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis).
 - [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
@@ -59,7 +61,6 @@
 - [ ] Logo
 - [ ] Hydrogen bonds as features
 - [ ] Contacts as features 
-  - [ ] can PyEMMA do this?
   - [ ] Think about a [GetContacts](https://getcontacts.github.io/) reader
 - [ ] Position deviations as features (similar to components of RMSD)
 - [ ] Estimate thresholds for significance of feature differences

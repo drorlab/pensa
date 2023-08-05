@@ -36,7 +36,7 @@ def calculate_pca(data, dim=-1):
 
 def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     """
-    Plots the highest eigenvalues over the numberr of the principal components.
+    Plots the highest eigenvalues over the number of the principal components.
     
     Parameters
     ----------
