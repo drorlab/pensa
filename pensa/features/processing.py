@@ -3,8 +3,6 @@ import scipy as sp
 import scipy.stats
 import scipy.spatial
 import scipy.spatial.distance
-import pyemma
-from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
@@ -16,7 +14,7 @@ def get_feature_subset(feat, data, selection):
     """
     Returns a subset of selected features. 
     Does not check whether the selected features are actually present in the input.
-    
+
     Parameters
     ----------
         feat : list of str
@@ -25,21 +23,21 @@ def get_feature_subset(feat, data, selection):
             Feature values data from the simulation.
         selection : list of str
            Names of the selected features.
-    
+
     Returns
     -------
         sub_feat : list of str
             List with all feature names of the subset.
         sub_data : float array
             Feature values data of the subset.
-    
+
     """
     # Select the feature and get its index.
-    indices = np.where( [f in selection for f in feat] )[0]
+    indices = np.where([f in selection for f in feat])[0]
     # Extract the new names.
     sub_feat = list(np.array(feat)[indices])
     # Extract the timeseries.
-    sub_data = data[:,indices]
+    sub_data = data[:, indices]
     return sub_feat, sub_data
 
 
@@ -49,7 +47,7 @@ def get_feature_subset(feat, data, selection):
 def get_feature_data(feat, data, feature_name):
     """
     Returns the timeseries of one particular feature.
-    
+
     Parameters
     ----------
         feat : list of str
@@ -58,24 +56,24 @@ def get_feature_data(feat, data, feature_name):
             Feature values data from the simulation.
         feature_name : str
            Name of the selected feature.
-    
+
     Returns
     -------
         timeseries : float array
             Value of the feature for each frame.
-    
+
     """
     # Select the feature and get its index.
-    index = np.where( np.array( feat ) == feature_name )[0][0]
+    index = np.where(np.array(feat) == feature_name)[0][0]
     # Extract the timeseries.
-    timeseries = data[:,index]
+    timeseries = data[:, index]
     return timeseries
 
 
 def get_feature_timeseries(feat, data, feature_type, feature_name):
     """
     Returns the timeseries of one particular feature from a set with several feature types.
-    
+
     Parameters
     ----------
         feat : list of str
@@ -87,20 +85,22 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
             ('bb-torsions', 'bb-distances', 'sc-torsions').
         feature_name : str
            Name of the selected feature.
-    
+
     Returns
     -------
         timeseries : float array
             Value of the feature for each frame.
-    
+
     """
-    timeseries = get_feature_data(feat[feature_type], data[feature_type], feature_name)
+    timeseries = get_feature_data(
+        feat[feature_type], data[feature_type], feature_name)
     return timeseries
 
-def get_multivar_res(feat,data):
+
+def get_multivar_res(feat, data):
     """
     Groups each timeseries of all features for one particular residue.
-   
+
 
     Parameters
     ----------
@@ -117,37 +117,37 @@ def get_multivar_res(feat,data):
         Data for all features
 
     """
-    
+
     feat_name_list = feat
-    #obtaining the residue numbers 
+    # obtaining the residue numbers
     res_numbers = [int(feat_name.split()[-1]) for feat_name in feat_name_list]
-    #grouping indices where feature refers to same residue
-    index_same_res = [list(np.where(np.array(res_numbers)==seq_num)[0])
-                      for seq_num in list(set(res_numbers))]   
-    
+    # grouping indices where feature refers to same residue
+    index_same_res = [list(np.where(np.array(res_numbers) == seq_num)[0])
+                      for seq_num in list(set(res_numbers))]
+
     new_data = []
     sorted_names = []
-        
+
     transdata = data.T
     for residue in index_same_res:
-        new_data.append( np.array( [transdata[residx] for residx in residue] ) )
+        new_data.append(np.array([transdata[residx] for residx in residue]))
 
     sorted_names = []
     for residue in range(len(index_same_res)):
         for residue_dim in index_same_res[residue]:
             feat_name_split = feat_name_list[residue].split()
-            resname = feat_name_split[-2] + ' ' + feat_name_split[-1] 
+            resname = feat_name_split[-2] + ' ' + feat_name_split[-1]
         sorted_names.append(resname)
 
     new_data = np.array(new_data, dtype=object)
-    
+
     return sorted_names, new_data
- 
+
 
 def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=None):
     """
     Returns the timeseries of one particular feature.
-    
+
     Parameters
     ----------
     feat : list of str
@@ -170,45 +170,47 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
     features_data : numpy array
         Data for all features
     """
-    
+
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
-    
+
     feat_name_list = feat[feature_type]
-    #obtaining the residue numbers 
+    # obtaining the residue numbers
     res_numbers = [int(feat_name.split()[-1]) for feat_name in feat_name_list]
-    #grouping indices where feature refers to same residue
-    index_same_res = [list(np.where(np.array(res_numbers)==seq_num)[0])
-                      for seq_num in list(set(res_numbers))]   
-    #obtaining timeseries data for each residue
-    multivar_res_timeseries_data=[]
+    # grouping indices where feature refers to same residue
+    index_same_res = [list(np.where(np.array(res_numbers) == seq_num)[0])
+                      for seq_num in list(set(res_numbers))]
+    # obtaining timeseries data for each residue
+    multivar_res_timeseries_data = []
     sorted_names = []
     for residue in range(len(index_same_res)):
-        feat_timeseries=[]
+        feat_timeseries = []
         for residue_dim in index_same_res[residue]:
-            single_feat_timeseries = get_feature_timeseries(feat,data,feature_type,feat_name_list[residue_dim])            
+            single_feat_timeseries = get_feature_timeseries(
+                feat, data, feature_type, feat_name_list[residue_dim])
             feat_timeseries.append(list(single_feat_timeseries))
         multivar_res_timeseries_data.append(feat_timeseries)
         feat_name_split = feat_name_list[residue_dim].split()
-        resname = feat_name_split[-2] + ' ' + feat_name_split[-1] 
+        resname = feat_name_split[-2] + ' ' + feat_name_split[-1]
         sorted_names.append(resname)
         if write is True:
             for subdir in [feature_type+'/']:
                 if not os.path.exists(subdir):
                     os.makedirs(subdir)
-            resname_out = feat_name_split[-2] + feat_name_split[-1] 
-            filename= feature_type+'/' + out_name + resname_out + ".txt"
+            resname_out = feat_name_split[-2] + feat_name_split[-1]
+            filename = feature_type+'/' + out_name + resname_out + ".txt"
             np.savetxt(filename, feat_timeseries, delimiter=',', newline='\n')
-            
-    # return multivar_res_timeseries_data
-    feature_names[feature_type]=sorted_names
-    features_data[feature_type]=np.array(multivar_res_timeseries_data, dtype=object)
-    # Return the dictionaries.
-    return feature_names, features_data            
 
-  
-def match_sim_lengths(sim1,sim2):
+    # return multivar_res_timeseries_data
+    feature_names[feature_type] = sorted_names
+    features_data[feature_type] = np.array(
+        multivar_res_timeseries_data, dtype=object)
+    # Return the dictionaries.
+    return feature_names, features_data
+
+
+def match_sim_lengths(sim1, sim2):
     """
     Make two lists the same length by truncating the longer list to match.
 
@@ -228,13 +230,12 @@ def match_sim_lengths(sim1,sim2):
         A one dimensional distribution of a specific feature.
 
     """
-    if len(sim1)!=len(sim2):
-        if len(sim1)>len(sim2):
-            sim1=sim1[0:len(sim2)]
-        if len(sim1)<len(sim2):
-            sim2=sim2[0:len(sim1)]  
+    if len(sim1) != len(sim2):
+        if len(sim1) > len(sim2):
+            sim1 = sim1[0:len(sim2)]
+        if len(sim1) < len(sim2):
+            sim2 = sim2[0:len(sim1)]
     return sim1, sim2
-
 
 
 # -- Utilities to sort the features
@@ -243,31 +244,31 @@ def match_sim_lengths(sim1,sim2):
 def sort_features(names, sortby):
     """
     Sorts features by a list of values.
-    
+
     Parameters
     ----------
     names : str array
         Array of feature names.
     sortby : float array
         Array of the values to sort the names by.
-        
+
     Returns
     -------
     sort : array of tuples [str,float]
         Array of sorted tuples with feature and value.
-    
+
     """
     # Get the indices of the sorted order
-    sort_id = np.argsort(sortby)[::-1]  
+    sort_id = np.argsort(sortby)[::-1]
     # Bring the names and values in the right order
-    sorted_names  = []
+    sorted_names = []
     sorted_values = []
     for i in sort_id:
         sorted_names.append(np.array(names)[i])
         sorted_values.append(sortby[i])
     sn, sv = np.array(sorted_names), np.array(sorted_values)
     # Format for output
-    sort = np.array([sn,sv]).T
+    sort = np.array([sn, sv]).T
     return sort
 
 
@@ -285,14 +286,15 @@ def sort_sincos_torsions_by_resnum(tors, data):
     """
     renamed = []
     for t in tors:
-        rn = t.split(' ')[-1].replace(')','')
-        ft = t.split(' ')[0].replace('(',' ')
+        rn = t.split(' ')[-1].replace(')', '')
+        ft = t.split(' ')[0].replace('(', ' ')
         sincos, angle = ft.split(' ')
-        renamed.append('%09i %s %s'%(int(rn),angle,sincos))
+        renamed.append('%09i %s %s' % (int(rn), angle, sincos))
     new_order = np.argsort(renamed)
     new_tors = np.array(tors)[new_order].tolist()
-    new_data = data[:,new_order]
+    new_data = data[:, new_order]
     return new_tors, new_data
+
 
 def sort_torsions_by_resnum(tors, data):
     """
@@ -310,11 +312,12 @@ def sort_torsions_by_resnum(tors, data):
     for t in tors:
         rn = t.split(' ')[-1]
         ft = t.split(' ')[0]
-        renamed.append('%09i %s'%(int(rn),ft))
+        renamed.append('%09i %s' % (int(rn), ft))
     new_order = np.argsort(renamed)
     new_tors = np.array(tors)[new_order].tolist()
-    new_data = data[:,new_order]
+    new_data = data[:, new_order]
     return new_tors, new_data
+
 
 def sort_features_alphabetically(tors, data):
     """
@@ -333,7 +336,7 @@ def sort_features_alphabetically(tors, data):
         renamed.append(t)
     new_order = np.argsort(renamed)
     new_tors = np.array(tors)[new_order].tolist()
-    new_data = data[:,new_order]
+    new_data = data[:, new_order]
     return new_tors, new_data
 
 
@@ -351,11 +354,11 @@ def sort_distances_by_resnum(dist, data):
     """
     renamed = []
     for d in dist:
-        rn1, at1, rn2, at2 = np.array(d.split(' '))[np.array([2,3,6,7])]
-        renamed.append('%09i %s %09i %s'%(int(rn1),at1,int(rn2),at2))
+        rn1, at1, rn2, at2 = np.array(d.split(' '))[np.array([2, 3, 6, 7])]
+        renamed.append('%09i %s %09i %s' % (int(rn1), at1, int(rn2), at2))
     new_order = np.argsort(renamed)
     new_dist = np.array(dist)[new_order].tolist()
-    new_data = data[:,new_order]
+    new_data = data[:, new_order]
     return new_dist, new_data
 
 
@@ -388,7 +391,7 @@ def select_common_features(features_a, features_b, boolean=True):
     common_a = np.array(is_common_a)
     common_b = np.array(is_common_b)
     return common_a, common_b
-    
+
 
 def get_common_features_data(features_a, features_b, data_a, data_b):
     """
@@ -412,9 +415,10 @@ def get_common_features_data(features_a, features_b, data_a, data_b):
         Data corresponding to common features between the two trajectories.
     """
     is_common_a, is_common_b = select_common_features(features_a, features_b)
-    new_data_a = data_a[:,is_common_a]
+    new_data_a = data_a[:, is_common_a]
     new_data_b = data_b[:, is_common_b]
-    new_features_a, new_features_b = select_common_features(features_a, features_b, boolean=False)
+    new_features_a, new_features_b = select_common_features(
+        features_a, features_b, boolean=False)
     return new_features_a, new_features_b, new_data_a, new_data_b
 
 
@@ -425,7 +429,7 @@ def correct_spher_angle_periodicity(two_angles):
     """
     Correcting for the periodicity of spherical angles [radians].  
     Waters featurized using PENSA and including discrete occupancy are handled.
-    
+
     Parameters
     ----------
     angle : list of psi and theta angles
@@ -437,17 +441,19 @@ def correct_spher_angle_periodicity(two_angles):
         Periodically corrected angle feature.
 
     """
-    
-    # PSI    
+
+    # PSI
     new_psi = two_angles[0].copy()
     psi_continuous_angles = [angle for angle in new_psi if angle != 10000.0]
-    psi_index_cont_angles = [index for index, angle in enumerate(new_psi) if angle != 10000.0]  
-    
+    psi_index_cont_angles = [index for index,
+                             angle in enumerate(new_psi) if angle != 10000.0]
+
     psi_heights = np.histogram(psi_continuous_angles, bins=90, density=True)
-    ## Shift everything before bin with minimum height by periodic amount φ ∈ [0, 2π)
+    # Shift everything before bin with minimum height by periodic amount φ ∈ [0, 2π)
     psi_shift = 2*np.pi
-    if psi_heights[0][0] > min(psi_heights[0]):  
-        perbound = psi_heights[1][np.where(psi_heights[0] == min(psi_heights[0]))[0][0]+1]
+    if psi_heights[0][0] > min(psi_heights[0]):
+        perbound = psi_heights[1][np.where(
+            psi_heights[0] == min(psi_heights[0]))[0][0]+1]
         for angle_index in range(len(psi_continuous_angles)):
             if psi_continuous_angles[angle_index] < perbound:
 
@@ -455,28 +461,35 @@ def correct_spher_angle_periodicity(two_angles):
     for index in range(len(psi_index_cont_angles)):
         new_psi[psi_index_cont_angles[index]] = psi_continuous_angles[index]
 
-    # THETA 
+    # THETA
     new_theta = two_angles[1].copy()
-    theta_continuous_angles = [angle for angle in new_theta if angle != 10000.0]
-    theta_index_cont_angles = [index for index, angle in enumerate(new_theta) if angle != 10000.0]  
-    
-    theta_heights = np.histogram(theta_continuous_angles, bins=90, density=True)
-    ## Shift everything before bin with minimum height by periodic amount θ ∈ [0, π]
+    theta_continuous_angles = [
+        angle for angle in new_theta if angle != 10000.0]
+    theta_index_cont_angles = [index for index,
+                               angle in enumerate(new_theta) if angle != 10000.0]
+
+    theta_heights = np.histogram(
+        theta_continuous_angles, bins=90, density=True)
+    # Shift everything before bin with minimum height by periodic amount θ ∈ [0, π]
     theta_shift = 2*np.pi
-    if theta_heights[0][0] > min(theta_heights[0]):   
-        perbound = theta_heights[1][np.where(theta_heights[0] == min(theta_heights[0]))[0][0]+1]
+    if theta_heights[0][0] > min(theta_heights[0]):
+        perbound = theta_heights[1][np.where(
+            theta_heights[0] == min(theta_heights[0]))[0][0]+1]
         for angle_index in range(len(theta_continuous_angles)):
             if theta_continuous_angles[angle_index] < perbound:
-                theta_continuous_angles[angle_index] = theta_shift - theta_continuous_angles[angle_index]
+                theta_continuous_angles[angle_index] = theta_shift - \
+                    theta_continuous_angles[angle_index]
     for index in range(len(theta_index_cont_angles)):
-        new_theta[theta_index_cont_angles[index]] = theta_continuous_angles[index]
-        
+        new_theta[theta_index_cont_angles[index]
+                  ] = theta_continuous_angles[index]
+
     return [new_psi, new_theta]
+
 
 def correct_angle_periodicity(angle):
     """
     Correcting for the periodicity of angles [radians].  
-    
+
     Parameters
     ----------
     angle : list
@@ -490,14 +503,14 @@ def correct_angle_periodicity(angle):
     """
     new_angle = angle.copy()
     heights = np.histogram(new_angle, bins=90, density=True)
-    ## Shift everything before bin with minimum height by periodic amount
-    if heights[0][0] > min(heights[0]):   
+    # Shift everything before bin with minimum height by periodic amount
+    if heights[0][0] > min(heights[0]):
         perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
         # print(perbound)
         for angle_index in range(len(new_angle)):
             if new_angle[angle_index] < perbound:
                 new_angle[angle_index] += 2*np.pi
-                           
+
     return new_angle
 
 
@@ -531,7 +544,9 @@ def sort_traj_along_feature(feat, data, feature_name, ref_name, trj_name, out_na
             Sorted data of the selected feature.
 
     """
-    if verbose: print('Sorting along feature '+feature_name)
+    if verbose:
+        print('Sorting along feature '+feature_name)
     d = get_feature_data(feat, data, feature_name)
-    d_sorted, sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
+    d_sorted, sort_idx, oidx_sort = sort_coordinates(
+        d, ref_name, trj_name, out_name, start_frame=start_frame)
     return d_sorted
