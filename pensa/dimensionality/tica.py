@@ -3,12 +3,12 @@ import deeptime
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
-from .visualization import project_on_singularvector, sort_traj_along_projection
+from .visualization import project_on_eigenvector_tica, sort_traj_along_projection
 
 
 # --- METHODS FOR TIME-LAGGED INDEPENDENT COMPONENT ANALYSIS ---
 
-# http://emma-project.org/latest/api/generated/pyemma.coordinates.tica.html
+# https://deeptime-ml.github.io/latest/api/generated/deeptime.decomposition.TICA.html
 
 
 def calculate_tica(data, dim=None, lag=10):
@@ -140,7 +140,7 @@ def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     if tica is None:
         calculate_tica(data, dim=dim, lag=lag)
     # Project the features onto the time-lagged independent components.
-    projection = project_on_singularvector(data, ev_idx, tica)
+    projection = project_on_eigenvector_tica(data, ev_idx, tica)
     return projection
 
 
@@ -183,7 +183,8 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
     for ev_idx in range(num):
         projection = np.zeros(data.shape[0])
         for ti in range(data.shape[0]):
-            projection[ti] = np.dot(data[ti], tica.singular_vectors_right[:, ev_idx])
+            projection[ti] = np.dot(
+                data[ti], tica.singular_vectors_right[:, ev_idx])
         components.append(projection)
         comp_names.append(prefix+'IC'+str(ev_idx+1))
     # Return the names and data.
