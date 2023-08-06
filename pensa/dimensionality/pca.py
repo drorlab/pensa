@@ -1,10 +1,9 @@
 import numpy as np
-import pyemma
-from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
-from .visualization import project_on_eigenvector, sort_traj_along_projection
+from .visualization import project_on_eigenvector_pca, sort_traj_along_projection
 
 
 # --- METHODS FOR PRINCIPAL COMPONENT ANALYSIS ---
@@ -12,10 +11,10 @@ from .visualization import project_on_eigenvector, sort_traj_along_projection
 # http://www.emma-project.org/latest/api/generated/pyemma.coordinates.pca.html
 
 
-def calculate_pca(data, dim=-1):
+def calculate_pca(data, dim=None):
     """
-    Performs a PyEMMA PCA on the provided data.
-    
+    Performs a scikit-learn PCA on the provided data.
+
     Parameters
     ----------
         data : float array
@@ -23,21 +22,22 @@ def calculate_pca(data, dim=-1):
         dim : int, optional, default = -1
             The number of dimensions (principal components) to project onto. 
             -1 means all numerically available dimensions will be used.
-        
+
     Returns
     -------
         pca : PCA obj
             Principal components information.
-        
+
     """
-    pca = pyemma.coordinates.pca(data, dim=dim)
+    pca = PCA(n_components=dim)
+    pca.fit(data)
     return pca
 
 
 def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     """
     Plots the highest eigenvalues over the number of the principal components.
-    
+
     Parameters
     ----------
         pca : PCA obj
@@ -46,25 +46,26 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
             Number of eigenvalues to plot.
         plot_file : str, optional, default = None
             Path and name of the file to save the plot.
-        
+
     """
     # Plot eigenvalues over component numbers
-    fig,ax = plt.subplots(1, 1, figsize=[4,3], dpi=300)
-    componentnr = np.arange(num)+1 
-    eigenvalues = pca.eigenvalues[:num]
+    fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
+    componentnr = np.arange(num)+1
+    eigenvalues = pca.singular_values_[:num]
     ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
     fig.tight_layout()
     # Save the figure to a file
-    if plot_file: fig.savefig(plot_file, dpi=300)
+    if plot_file:
+        fig.savefig(plot_file, dpi=300)
     return componentnr, eigenvalues
 
 
 def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
-    
+
     Parameters
     ----------
         pca : PCA obj
@@ -80,39 +81,42 @@ def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False
             Path and name of the file to save the plot.
         add_labels : bool, optional, default = False
             Add labels of the features to the x axis.
-            
-        
+
+
     """
     # Plot the highest PC correlations and print relevant features
     test_graph = []
     test_corr = []
     height = num*2+2 if add_labels else num*2
-    fig,ax = plt.subplots(num,1,figsize=[4,height],dpi=300,sharex=True)
+    fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
+    pca_feature_PC_correlation = pca.get_covariance()
     for i in range(num):
-        relevant = pca.feature_PC_correlation[:,i]**2 > threshold**2
-        print("Features with abs. corr. above a threshold of %3.1f for PC %i:"%(threshold, i+1))
+        relevant = pca_feature_PC_correlation[:, i]**2 > threshold**2
+        print("Features with abs. corr. above a threshold of %3.1f for PC %i:" % (
+            threshold, i+1))
         for j, ft in enumerate(features):
             if relevant[j]:
-                print(ft, "%6.3f"%(pca.feature_PC_correlation[j,i]))
-                test_corr.append(pca.feature_PC_correlation[j,i])
-        ax[i].bar(np.arange(len(features)), pca.feature_PC_correlation[:,i])
-        ax[i].set_ylabel('corr. with PC%i'%(i+1))
-        test_graph.append(pca.feature_PC_correlation[:,i])
+                print(ft, "%6.3f" % (pca_feature_PC_correlation[j, i]))
+                test_corr.append(pca_feature_PC_correlation[j, i])
+        ax[i].bar(np.arange(len(features)), pca_feature_PC_correlation[:, i])
+        ax[i].set_ylabel('corr. with PC%i' % (i+1))
+        test_graph.append(pca_feature_PC_correlation[:, i])
     if add_labels:
         ax[-1].set_xticks(np.arange(len(features)))
-        ax[-1].set_xticklabels(features,rotation=90)
+        ax[-1].set_xticklabels(features, rotation=90)
     else:
         ax[-1].set_xlabel('feature index')
     fig.tight_layout()
     # Save the figure to a file
-    if plot_file: fig.savefig(plot_file,dpi=300)
+    if plot_file:
+        fig.savefig(plot_file, dpi=300)
     return test_graph, test_corr
-    
-    
+
+
 def project_on_pc(data, ev_idx, pca=None, dim=-1):
     """
     Projects a trajectory onto an eigenvector of its PCA.
-    
+
     Parameters
     ----------
         data : float array
@@ -129,19 +133,20 @@ def project_on_pc(data, ev_idx, pca=None, dim=-1):
     -------
         projection : float array
             Value along the PC for each frame.
-        
+
     """
     # Perform PCA if none is provided.
-    if pca is None: pca = calculate_pca(data)
+    if pca is None:
+        pca = calculate_pca(data)
     # Project the features onto the principal components.
-    projection = project_on_eigenvector(data, ev_idx, pca)  
+    projection = project_on_eigenvector_pca(data, ev_idx, pca)
     return projection
 
-   
+
 def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its PCA.
-    
+
     Parameters
     ----------
         data : float array
@@ -156,34 +161,35 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
             Only used if tica is not provided.
         prefix : str, optional, default = ''
             First part of the component names. Second part is "PC"+<PC number>
-    
+
     Returns
     -------
         comp_names : list
             Names/numbers of the components.
         components : float array
             Component data [frames,components]
-        
+
     """
     # Perform PCA if none is provided
-    if pca is None: calculate_pca(data) 
+    if pca is None:
+        calculate_pca(data)
     # Project the features onto the principal components
     comp_names = []
     components = []
     for ev_idx in range(num):
         projection = np.zeros(data.shape[0])
         for ti in range(data.shape[0]):
-            projection[ti] = np.dot(data[ti],pca.eigenvectors[:,ev_idx])
+            projection[ti] = np.dot(data[ti], pca.components_[:, ev_idx])
         components.append(projection)
         comp_names.append(prefix+'PC'+str(ev_idx+1))
-    # Return the names and data  
+    # Return the names and data
     return comp_names, np.array(components).T
-     
+
 
 def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame=0):
     """
     Sort a trajectory along principal components.
-    
+
     Parameters
     ----------
         data : float array
@@ -203,7 +209,7 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
             Sort along the first num_pc principal components.
         start_frame : int, optional, default = 0
             Offset of the data with respect to the trajectories (defined below).
-    
+
     Returns
     -------
         sorted_proj: list
@@ -215,18 +221,19 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
 
     """
     # Calculate the principal components if they are not given.
-    if pca is None: calculate_pca(data, dim=num_pc)
+    if pca is None:
+        calculate_pca(data, dim=num_pc)
     # Sort the trajectory along them.
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_traj_along_projection(
-        data, pca, top, trj, out_name, num_comp=num_pc, start_frame = start_frame
-        )
+        data, pca, top, trj, out_name, num_comp=num_pc, start_frame=start_frame
+    )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
 def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_pc=3, start_frame=0):
     """
     Sort two trajectories along their most important common principal components.
-    
+
     Parameters
     ----------
         data_a : float array
@@ -258,11 +265,12 @@ def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_n
             Sorted indices of the data array for each principal component
         sorted_indices_traj : list
             Sorted indices of the coordinate frames for each principal component
-                
+
     """
     sorted_proj, sorted_indices_data, sorted_indices_traj = sort_mult_trajs_along_common_pc(
-        [data_a, data_b], [top_a, top_b], [trj_a, trj_b], out_name, num_pc=num_pc, start_frame = start_frame
-        )
+        [data_a, data_b], [top_a, top_b], [
+            trj_a, trj_b], out_name, num_pc=num_pc, start_frame=start_frame
+    )
     return sorted_proj, sorted_indices_data, sorted_indices_traj
 
 
@@ -302,13 +310,13 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
         start_frame *= np.ones(num_traj)
         start_frame = start_frame.tolist()
     # Combine the input data
-    all_data = np.concatenate(data,0)
+    all_data = np.concatenate(data, 0)
     # Calculate the principal component
     pca = calculate_pca(all_data)
     # Initialize output
     sorted_proj = []
     sorted_indices_data = []
-    sorted_indices_traj = []    
+    sorted_indices_traj = []
     # Loop over principal components.
     for evi in range(num_pc):
         # Project the combined data on the principal component
@@ -317,9 +325,8 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
         out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
         proj_sort, sort_idx, oidx_sort = merge_and_sort_coordinates(
             proj, top, trj, out_xtc, start_frame=start_frame, verbose=False
-            )
+        )
         sorted_proj.append(proj_sort)
         sorted_indices_data.append(sort_idx)
-        sorted_indices_traj.append(oidx_sort)        
+        sorted_indices_traj.append(oidx_sort)
     return sorted_proj, sorted_indices_data, sorted_indices_traj
-   
