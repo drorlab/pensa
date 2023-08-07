@@ -3,23 +3,19 @@ import scipy as sp
 import scipy.stats
 import scipy.spatial
 import scipy.spatial.distance
-import pyemma
-from pyemma.util.contexts import settings
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 import os
 from pensa.features import *
 
 
-
-
-def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename, 
-                          selection='max', y_label='max. JS dist. of BB torsions', 
+def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
+                          selection='max', y_label='max. JS dist. of BB torsions',
                           offset=0):
     """
     Visualizes features per residue as plot and in PDB files.
     Assumes values from 0 to 1. 
-    
+
     Parameters
     ----------
         names : str array
@@ -39,14 +35,14 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
             Label of the y axis of the plot.
         offset : int, default=0
             Number to subtract from the residue numbers that are loaded from the reference file.
-        
+
     Returns
     -------
         vis_resids : int array
             Residue numbers.
         vis_values : float array
             Values of the quantity to be visualized.
-         
+
     """
     # -- INITIALIZATION --
     assert selection in ['avg', 'max', 'min']
@@ -56,16 +52,16 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
     vis_resids = u.residues.resids
     # Output values
     if selection == 'max':
-        default = 0 
-    elif selection =='min':
+        default = 0
+    elif selection == 'min':
         default = 1
     else:
         default = np.nan
     vis_values = default*np.ones(len(vis_resids))
     # -- VALUE ASSIGNMENT --
-    for i,name in enumerate(names):
+    for i, name in enumerate(names):
         # To each residue ...
-        resid = int( name.split(' ')[-1].replace(')','') )
+        resid = int(name.split(' ')[-1].replace(')', ''))
         index = np.where(vis_resids == resid)[0][0]
         # ... assign the difference measures of the torsion angle with the higher (or lower) value
         if selection == 'max':
@@ -75,31 +71,31 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
         elif selection == 'avg':
             vis_values[index] = np.average(data[i])
     # -- FIGURE --
-    fig,ax = plt.subplots(1,1,figsize=[4,3],dpi=300)
+    fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
     # Plot values against residue number
     ax.bar(vis_resids, vis_values, width=1)
-    ax.set_ylim(0,1)
+    ax.set_ylim(0, 1)
     # Labels
     ax.set_xlabel('residue number')
     ax.set_ylabel(y_label)
     fig.tight_layout()
     # Save the figure
-    fig.savefig(pdf_filename,dpi=300)
+    fig.savefig(pdf_filename, dpi=300)
     # -- PDB FILE --
     u.add_TopologyAttr('tempfactors')
     # Write values as beta-factors ("tempfactors") to a PDB file
     for res in range(len(vis_values)):
         u.residues[res].atoms.tempfactors = vis_values[res]
-    u.atoms.write(pdb_filename)    
-    return vis_resids, vis_values        
-        
+    u.atoms.write(pdb_filename)
+    return vis_resids, vis_values
+
 
 def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
                           num_drop_char=0, sort_by_pos=None, numerical_sort=False,
                           vmin=None, vmax=None, symmetric=True, cbar_label=None):
     """
     Visualizes data per feature pair in a heatmap. 
-    
+
     Parameters
     ----------
         feat_names : str array
@@ -130,19 +126,19 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
             Defaults to True.
         cbar_label : str, optional
             Label for the color bar.
-        
+
     Returns
     -------
         diff : float array
             Matrix with the values of the difference/divergence.
-         
+
     """
     # Create lists of all pairs of feature parts
     part1_list = []
     part2_list = []
     for name in feat_names:
         split_name = name[num_drop_char:].split(separator)
-        assert len(split_name) == 2 # TODO: add warning
+        assert len(split_name) == 2  # TODO: add warning
         part1, part2 = split_name
         part1_list.append(part1)
         part2_list.append(part2)
@@ -150,27 +146,29 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
     # Sort the list if desired
     if sort_by_pos is not None:
         if numerical_sort:
-            sortpos = np.array([int(part.split(' ')[sort_by_pos]) for part in all_parts],dtype=int)
+            sortpos = np.array([int(part.split(' ')[sort_by_pos])
+                               for part in all_parts], dtype=int)
         else:
-            sortpos = np.array([part.split(' ')[sort_by_pos] for part in all_parts])
+            sortpos = np.array([part.split(' ')[sort_by_pos]
+                               for part in all_parts])
         all_parts = all_parts[np.argsort(sortpos)]
     # Initialize the matrix to store the values
     size = len(all_parts)
-    diff = np.zeros([size,size])
+    diff = np.zeros([size, size])
     # Write the values into the matrix
-    for n,name in enumerate(feat_names):
+    for n, name in enumerate(feat_names):
         part1, part2 = name[num_drop_char:].split(separator)
         i = np.where(all_parts == part1)
         j = np.where(all_parts == part2)
-        diff[i,j] = feat_diff[n]
+        diff[i, j] = feat_diff[n]
         if symmetric:
-            diff[j,i] = feat_diff[n]  
+            diff[j, i] = feat_diff[n]
     # Plot it as a heat map
-    fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
+    fig, ax = plt.subplots(1, 1, figsize=[6, 4], dpi=300)
     img = ax.imshow(diff, vmin=vmin, vmax=vmax)
     ax.xaxis.set_ticks_position('top')
-    ax.xaxis.set_tick_params(length=0,width=0)
-    ax.yaxis.set_tick_params(length=0,width=0)
+    ax.xaxis.set_tick_params(length=0, width=0)
+    ax.yaxis.set_tick_params(length=0, width=0)
     ax.set_xticks(np.arange(size))
     ax.set_yticks(np.arange(size))
     ax.set_xticklabels(all_parts)
@@ -178,15 +176,15 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
     ax.xaxis.set_label_position('top')
     fig.colorbar(img, ax=ax, label=cbar_label)
     fig.tight_layout()
-    fig.savefig(plot_filename,dpi=300)  
+    fig.savefig(plot_filename, dpi=300)
     return diff
-    
-    
+
+
 def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
                    vmin=None, vmax=None, symmetric=True, verbose=False, cbar_label=None, tick_step=50):
     """
     Visualizes data per residue pair in a heatmap. 
-    
+
     Parameters
     ----------
         feat_names : str array
@@ -212,39 +210,41 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
             Label for the color bar.
         tick_step : int, optional, default = 50
             Step between two ticks on the plot axes.
-        
+
     Returns
     -------
         diff : float array
             Matrix with the values of the difference/divergence.
-         
+
     """
     # Find first and last residue
     rn1 = [int(fn.split(' ')[res1_pos]) for fn in feat_names]
     rn2 = [int(fn.split(' ')[res2_pos]) for fn in feat_names]
-    resnums = np.concatenate([np.array(rn1,dtype=int),np.array(rn2,dtype=int)])
+    resnums = np.concatenate(
+        [np.array(rn1, dtype=int), np.array(rn2, dtype=int)])
     first_res = resnums.min()
-    last_res  = resnums.max()
-    if verbose: print('first res:', first_res, ', last res:', last_res)
-    # Create a 2D array with the values 
+    last_res = resnums.max()
+    if verbose:
+        print('first res:', first_res, ', last res:', last_res)
+    # Create a 2D array with the values
     size = last_res - first_res + 1
-    diff = np.zeros([size,size])
+    diff = np.zeros([size, size])
     for n, name in enumerate(feat_names):
         splitname = name.split(' ')
-        resi,resj = int(splitname[res1_pos]), int(splitname[res2_pos])
+        resi, resj = int(splitname[res1_pos]), int(splitname[res2_pos])
         i = resi - first_res
         j = resj - first_res
-        diff[i,j] = feat_diff[n]
+        diff[i, j] = feat_diff[n]
         if symmetric:
-            diff[j,i] = feat_diff[n]  
+            diff[j, i] = feat_diff[n]
     # Plot it as a heat map
-    fig,ax = plt.subplots(1,1,figsize=[6,4],dpi=300)
+    fig, ax = plt.subplots(1, 1, figsize=[6, 4], dpi=300)
     img = ax.imshow(diff, vmin=vmin, vmax=vmax)
     ax.xaxis.set_ticks_position('top')
     # Find position for the first tick
     first_tick = 0
     while first_res > first_tick:
-        first_tick += tick_step 
+        first_tick += tick_step
     # Ticks and labels
     ax.set_xticks(np.arange(first_tick-first_res, size, tick_step))
     ax.set_yticks(np.arange(first_tick-first_res, size, tick_step))
@@ -255,16 +255,16 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
     ax.set_ylabel('residue number')
     fig.colorbar(img, ax=ax, label=cbar_label)
     fig.tight_layout()
-    fig.savefig(plot_filename,dpi=300)  
+    fig.savefig(plot_filename, dpi=300)
     return diff
-    
-    
-def distances_visualization(dist_names, dist_diff, plot_filename, 
-                            vmin=None, vmax=None, verbose=True, 
+
+
+def distances_visualization(dist_names, dist_diff, plot_filename,
+                            vmin=None, vmax=None, verbose=True,
                             cbar_label=None, tick_step=50):
     """
     Visualizes distance features for pairs of residues in a heatmap. 
-    
+
     Parameters
     ----------
         dist_names : str array
@@ -289,12 +289,11 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
     -------
         diff : float array
             Distance matrix.
-         
+
     """
-    if verbose: print('Plotting heatmap for distance features.')
+    if verbose:
+        print('Plotting heatmap for distance features.')
     diff = resnum_heatmap(dist_names, dist_diff, plot_filename, res1_pos=2, res2_pos=6,
                           vmin=vmin, vmax=vmax, verbose=verbose, cbar_label=cbar_label,
                           tick_step=tick_step)
     return diff
-
-
