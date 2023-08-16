@@ -1,22 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Methods to featurize a protein, based on PyEMMA.
-
-More options are described here:
-http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
-"""
-
-import pyemma
+import pensa
+from .mda_torsions import get_protein_backbone_torsions, get_protein_sidechain_torsions
+from .mda_distances import get_calpha_distances
 from pensa.features.processing import get_feature_timeseries 
 from pensa.preprocessing.coordinates import sort_coordinates
 
 
-# -- Loading the Features --
+# MDAnalysis-based reimplementation of the old standard feature loader
+# The old feature loader is now called get_pyemma_features
+#
+# Note: It only loads protein features
+#
 
-
-def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
-                        features=['bb-torsions','sc-torsions','bb-distances'],
-                        resnum_offset=0):
+def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
+                           features=['bb-torsions','sc-torsions','bb-distances'],
+                           resnum_offset=0):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
     
@@ -50,74 +47,36 @@ def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
     features_data = {}
     # Add backbone torsions.
     if 'bb-torsions' in features:
-        bbtorsions_feat = pyemma.coordinates.featurizer(pdb)
-        bbtorsions_feat.add_backbone_torsions(cossin=cossin, periodic=False)
-        bbtorsions_data = pyemma.coordinates.load(xtc, features=bbtorsions_feat, stride=step_width)[start_frame:]
-        feature_names['bb-torsions'] = bbtorsions_feat.describe()
-        features_data['bb-torsions'] = bbtorsions_data
+        bbtorsions = get_protein_backbone_torsions(
+            pdb, xtc, selection='all',
+            first_frame=start_frame, last_frame=None, step=step_width, 
+            naming='segindex', radians=True,
+            include_omega=False
+            )
+        feature_names['bb-torsions'] = bbtorsions[0]
+        features_data['bb-torsions'] = bbtorsions[1]
     # Add sidechain torsions.
     if 'sc-torsions' in features:
-        sctorsions_feat = pyemma.coordinates.featurizer(pdb)
-        sctorsions_feat.add_sidechain_torsions(cossin=cossin, periodic=False)
-        sctorsions_data = pyemma.coordinates.load(xtc, features=sctorsions_feat, stride=step_width)[start_frame:]
-        feature_names['sc-torsions'] = sctorsions_feat.describe()
-        features_data['sc-torsions'] = sctorsions_data
+        sctorsions = get_protein_sidechain_torsions(
+            pdb, xtc, selection='all',
+            first_frame=start_frame, last_frame=None, step=step_width,
+            naming='segindex', radians=True
+            )
+        feature_names['sc-torsions'] = sctorsions[0]
+        features_data['sc-torsions'] = sctorsions[1]
     # Add backbone C-alpha distances.
     if 'bb-distances' in features:
-        bbdistances_feat = pyemma.coordinates.featurizer(pdb)
-        bbdistances_feat.add_distances(bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
-        bbdistances_data = pyemma.coordinates.load(xtc, features=bbdistances_feat, stride=step_width)[start_frame:]
-        feature_names['bb-distances'] = _describe_dist_without_atom_numbers(bbdistances_feat)
-        features_data['bb-distances'] = bbdistances_data
+        bbdistances = get_calpha_distances(
+            pdb, xtc,
+            first_frame=start_frame, last_frame=None, step=step_width,
+            )
+        feature_names['bb-distances'] = bbdistances[0]
+        features_data['bb-distances'] = bbdistances[1]
     # Remove the residue-number offset
     if resnum_offset != 0:
         feature_names = _remove_resnum_offset(feature_names,resnum_offset)
     # Return the dictionaries.
     return feature_names, features_data
-
-
-def _describe_dist_without_atom_numbers(feature_names):
-    """
-    Provides feature descriptors without atom numbers.
-    
-    Parameters
-    ----------
-    feature_names : dict
-        Names of all features (assumes distances).
-    
-    Returns
-    -------
-    desc : list of str
-        The feature descriptors without atom numbers.
-    
-    """
-    desc = feature_names.describe()
-    desc = [ _remove_atom_numbers_from_distance(d) for d in desc ]
-    return desc
-
-
-def _remove_atom_numbers_from_distance(feat_str):
-    """
-    Remove atom numbers from a distance feature string.
-    
-    Parameters
-    ----------
-    feat_str : str
-        The string describing a single feature.
-    
-    Returns
-    -------
-    new_feat : str
-        The feature string without atom numbers.
-    
-    """
-    # Split the feature string in its parts
-    parts = feat_str.split(' ')
-    # Glue the desired parts back together
-    new_feat = parts[0]
-    for nr in [1,2,3,5,6,7,8]:
-        new_feat += ' '+parts[nr]
-    return new_feat
 
 
 def _remove_resnum_offset(features, offset):
@@ -165,11 +124,11 @@ def _remove_resnum_offset(features, offset):
             new_features['bb-distances'].append(' '.join(fsplit))
         
     return new_features
-    
-    
-def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_name, trj_name, out_name, start_frame=0):
+
+
+def sort_traj_along_combined_feature(feat, data, feature_name, feature_type, ref_name, trj_name, out_name, start_frame=0):
     """
-    Sort a trajectory along a PyEMMA feature.
+    Sort a trajectory along one feature in a combined set.
 
     Parameters
     ----------
@@ -201,4 +160,3 @@ def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_n
     sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
     d_sorted = d[sort_idx]
     return d_sorted
-

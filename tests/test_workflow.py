@@ -241,19 +241,64 @@ class Test_pensa(unittest.TestCase):
             )
 
 
+    # ** COORDINATES AND FEATURES **
+
+
+    # -- extract_coordinates() and extract_coordinates_combined()
+    def test_01_extract_coordinates(self):
+    
+        # Number of atoms from selection in first test case
+        self.assertEqual(self.file_extr_a, 2322)
+        self.assertEqual(self.file_extr_b, 2322)
+
+        # Number of Atom from the selction
+        self.assertEqual(self.file_tm_single_a, 1877)
+        self.assertEqual(self.file_tm_single_b, 1877)
+        # Number of Atom from the selection - combined
+        self.assertEqual(self.file_tm_combined, 1877)
+
+
+    # -- load_selection()
+    def test_02_load_selection(self):
+    
+        sel_base_a = "(not name H*) and protein"
+        sel_base_b = "(not name H*) and protein"
+    
+        sel_string_a = load_selection(test_data_path + "/mor_tm.txt", sel_base_a+" and ")
+        sel_string_b = load_selection(test_data_path + "/mor_tm.txt", sel_base_b+" and ")
+
+        self.assertEqual(sel_string_a, '(not name H*) and protein and resid 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 ')
+        self.assertEqual(sel_string_b, '(not name H*) and protein and resid 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 ')
+
+
+    # -- get_features()
+    def test_03_get_feature(self):
+    
+        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
+        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
+    
+        self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (30, 448))
+        self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (30, 423))
+
+        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
+        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
+
+        self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (30, 448))
+        self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (30, 423))
+
         
     # ** ENSEMBLE COMPARISON **
      
     
     # -- relative_entropy_analysis()
-    def test_01_relative_entropy_analysis(self):
+    def test_04_relative_entropy_analysis(self):
     
         self.assertEqual(len(self.relen_bbtor[1]), 574)
         self.assertEqual(len(self.relen_bbtor[0]), 574)
     
     
     # -- relen_sem_analysis()
-    def test_02_relen_sem_analysis(self):
+    def test_05_relen_sem_analysis(self):
     
         # --- Uncertainty for torsions
         self.relen_bbtor_blocks = relen_block_analysis(
@@ -291,7 +336,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- ssi_ensemble_analysis()
-    def test_03_ssi_ensemble_analysis(self):
+    def test_06_ssi_ensemble_analysis(self):
     
         # --- Torsions
         ssi_sctor = ssi_ensemble_analysis(
@@ -303,7 +348,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- ssi_sem_analysis()
-    def test_04_ssi_sem_analysis(self):
+    def test_07_ssi_sem_analysis(self):
     
         # --- Uncertainty for torsions
         ssi_names, ssi_sctor_blocks = ssi_block_analysis(
@@ -317,13 +362,13 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- sort_features()
-    def test_05_sort_features(self):
+    def test_08_sort_features(self):
         sf = sort_features(self.names_bbtors, self.jsd_bbtors)
         self.assertEqual(len(sf), 574)
 
 
     # -- residue_visualization()
-    def test_06_residue_visualization(self):
+    def test_09_residue_visualization(self):
         ref_filename = test_data_path + "/traj/condition-a_receptor.gro"
         out_filename = "receptor_bbtors-deviations_tremd"
         vis = residue_visualization(
@@ -341,7 +386,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- distances_visualization()
-    def test_07_distances_visualization(self):
+    def test_10_distances_visualization(self):
         matrix = distances_visualization(
             self.names_bbdist, self.jsd_bbdist,
             test_data_path + "/plots/receptor_jsd-bbdist.pdf",
@@ -360,8 +405,8 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- calculate_pca()
-    def test_08_calculate_pca(self):
-        self.assertEqual(len(self.pca_combined.mean), 460)
+    def test_11_calculate_pca(self):
+        self.assertEqual(len(self.pca_combined.mean), 448)
         self.assertEqual(self.pca_combined.dim, -1)
         self.assertEqual(self.pca_combined.skip, 0)
         self.assertEqual(self.pca_combined.stride, 1)
@@ -369,13 +414,13 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- calculate_tica
-    def test_09_calculate_tica(self):
+    def test_12_calculate_tica(self):
         self.assertEqual(self.tica_bbt_a.koopman_matrix.size, 841)
         self.assertEqual(self.tica_bbt_b.koopman_matrix.size, 841)
 
 
     # -- pca_eigenvalues_plot()
-    def test_10_pca_eigenvalues_plot(self):
+    def test_13_pca_eigenvalues_plot(self):
         arr = pca_eigenvalues_plot(
             self.pca_combined, num=12, 
             plot_file=test_data_path+'/plots/combined_tmr_pca_ev.pdf'
@@ -387,7 +432,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- tica_eigenvalues_plot()
-    def test_11_tica_eigenvalues_plot(self):
+    def test_14_tica_eigenvalues_plot(self):
         arr_1, arr_2 = tica_eigenvalues_plot(
             self.tica_bbt_a, num=12, 
             plot_file=test_data_path+'/plots/combined_tmr_tica_bbt_a_ev.pdf'
@@ -397,32 +442,32 @@ class Test_pensa(unittest.TestCase):
 
 
     #-- pca_features()
-    def test_12_pca_features(self):
+    def test_15_pca_features(self):
         self.assertEqual(len(self.graph), 3)
         plt.close()
         # -- Graph
         for i in range(len(self.graph)):
-            self.assertEqual(len(self.graph[i]), 460)
+            self.assertEqual(len(self.graph[i]), 448)
         # -- Corr
-        self.assertEqual(len(self.corr), 51)
+        self.assertEqual(len(self.corr), 48)
 
 
     # -- tica_features()
-    def test_13_tica_features(self):
+    def test_16_tica_features(self):
         test_feature = tica_features(
             self.tica_bbt_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4
             )
-        self.assertEqual(len(test_feature), 460)
+        self.assertEqual(len(test_feature), 448)
 
 
     # -- sort_trajs_along_common_pc() + sort_traj_along_pc() + project_on_pc()
-    def test_14_sort_trajs_along_pc(self):
+    def test_17_sort_trajs_along_pc(self):
         for ele in self.sort_common_traj:
             self.assertEqual(len(ele), 3)
         self.assertEqual(len(self.all_sort), 3)
 
     # -- sort_trajs_along_common_tic()
-    def test_15_sort_trajs_along_common_tic(self):
+    def test_18_sort_trajs_along_common_tic(self):
         sproj, sidx_data, sidx_traj = sort_trajs_along_common_tic(
             self.sim_a_tmr_data['bb-torsions'],
             self.sim_b_tmr_data['bb-torsions'],
@@ -438,7 +483,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- sort_traj_along_tic()
-    def test_16_sort_traj_along_tic(self):
+    def test_19_sort_traj_along_tic(self):
         all_sort, _, _ = sort_traj_along_tic(
             self.sim_a_tmr_data['bb-torsions'], 
             test_data_path + "/traj/condition-a_receptor.gro",
@@ -451,7 +496,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- compare_projections()
-    def test_17_compare_projections(self):
+    def test_20_compare_projections(self):
     
         self.assertEqual(len(self.val), 3)
         self.assertEqual(len(self.val[0]), 2)
@@ -472,7 +517,7 @@ class Test_pensa(unittest.TestCase):
 
     
     # -- obtain_combined_clusters()
-    def test_obtain_combined_clusters(self):
+    def test_21_obtain_combined_clusters(self):
         self.assertEqual(len(self.cidx), 60)
         self.assertEqual(len(self.cond), 60)
         test_oidx = [ 
@@ -482,22 +527,22 @@ class Test_pensa(unittest.TestCase):
             21, 22, 23, 24, 25, 26, 27, 28, 29
             ]
         self.assertEqual(len(self.centroids), 3)
-        self.assertEqual(len(self.centroids[0]), 460)
-        self.assertEqual(len(self.centroids[1]), 460)
-        self.assertEqual(len(self.centroids[2]), 460)
+        self.assertEqual(len(self.centroids[0]), 448)
+        self.assertEqual(len(self.centroids[1]), 448)
+        self.assertEqual(len(self.centroids[2]), 448)
         for i in range(len(self.oidx)):
             self.assertEqual(self.oidx[i], test_oidx[i])
 
     
     # -- write_cluster_traj()
-    def test_write_cluster_traj(self):
+    def test_22_write_cluster_traj(self):
         self.assertEqual(len(self.atom_group), 30)
         for i in range(len(self.atom_group)):
             self.assertEqual(self.atom_group[i].n_atoms, 1877)
 
     
     # --  wss_over_number_of_combined_clusters()
-    def test_wss_over_number_of_combined_clusters(self):
+    def test_23_wss_over_number_of_combined_clusters(self):
     
         # -- wss over number of combined
         wss_combined_avg, wss_combined_std = wss_over_number_of_combined_clusters(
@@ -526,7 +571,7 @@ class Test_pensa(unittest.TestCase):
 
 
     # -- obtain_clusters()
-    def test_obtain_clusters(self):
+    def test_24_obtain_clusters(self):
         # -- obtain combined clusters
         _ci, _wss, _centroids = obtain_clusters(self.sim_a_tmr_data['bb-torsions'], num_clusters=5 )
         plt.close()
@@ -536,50 +581,7 @@ class Test_pensa(unittest.TestCase):
 
         self.assertEqual(len(_centroids), 5)
         for i in range(len(_centroids)):
-            self.assertEqual(len(_centroids[i]), 460)
-            
-            
-            
-    # ** COORDINATES AND FEATURES **
-
-
-    # -- extract_coordinates() and extract_coordinates_combined()
-    def test_extract_coordinates(self):
-    
-        # Number of atoms from selection in first test case
-        self.assertEqual(self.file_extr_a, 2322)
-        self.assertEqual(self.file_extr_b, 2322)
-
-        # Number of Atom from the selction
-        self.assertEqual(self.file_tm_single_a, 1877)
-        self.assertEqual(self.file_tm_single_b, 1877)
-        # Number of Atom from the selection - combined
-        self.assertEqual(self.file_tm_combined, 1877)
-
-
-    # -- load_selection()
-    def test_load_selection(self):
-    
-        sel_base_a = "(not name H*) and protein"
-        sel_base_b = "(not name H*) and protein"
-    
-        sel_string_a = load_selection(test_data_path + "/mor_tm.txt", sel_base_a+" and ")
-        sel_string_b = load_selection(test_data_path + "/mor_tm.txt", sel_base_b+" and ")
-
-        self.assertEqual(sel_string_a, '(not name H*) and protein and resid 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 ')
-        self.assertEqual(sel_string_b, '(not name H*) and protein and resid 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 ')
-
-
-    # -- get_features()
-    def test_get_feature(self):
-    
-        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
-        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
-    
-        self.assertEqual(self.sim_b_rec_data['bb-torsions'].shape, (30, 574))
-        self.assertEqual(self.sim_b_rec_data['sc-torsions'].shape, (30, 527))
-        
-        
+            self.assertEqual(len(_centroids[i]), 448)
 
 
 
