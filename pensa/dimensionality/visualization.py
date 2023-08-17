@@ -60,7 +60,7 @@ def project_on_eigenvector_pca(data, ev_idx, ana):
     # Project the features onto the components
     projection = np.zeros(data.shape[0])
     for ti in range(data.shape[0]):
-        projection[ti] = np.dot(data[ti], ana.components_[:, ev_idx])
+        projection[ti] = np.dot(data[ti], ana.components_[ev_idx])
     # Return the value along the PC for each frame
     return projection
 
