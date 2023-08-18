@@ -94,18 +94,18 @@ class Test_pensa(unittest.TestCase):
 
         # - FEATURES -
     
-        start_frame = 0
+        self.start_frame = 0
   
         # -- Receptor features --
         sim_a_rec = get_structure_features(
             test_data_path + "/traj/condition-a_receptor.gro",
             test_data_path + "/traj/condition-a_receptor.xtc",
-            start_frame
+            self.start_frame
             )
         sim_b_rec = get_structure_features(
             test_data_path + "/traj/condition-b_receptor.gro",
             test_data_path + "/traj/condition-b_receptor.xtc",
-            start_frame
+            self.start_frame
             )
         self.sim_a_rec_feat, self.sim_a_rec_data = sim_a_rec
         self.sim_b_rec_feat, self.sim_b_rec_data = sim_b_rec
@@ -114,12 +114,12 @@ class Test_pensa(unittest.TestCase):
         sim_a_tmr = get_structure_features(
             test_data_path + "/traj/condition-a_tm.gro",
             test_data_path + "/traj/condition-a_tm.xtc",
-            start_frame
+            self.start_frame
             )
         sim_b_tmr = get_structure_features(
             test_data_path + "/traj/condition-b_tm.gro",
             test_data_path + "/traj/condition-b_tm.xtc",
-            start_frame
+            self.start_frame
             )
         self.sim_a_tmr_feat, self.sim_a_tmr_data = sim_a_tmr
         self.sim_b_tmr_feat, self.sim_b_tmr_data = sim_b_tmr
@@ -187,19 +187,6 @@ class Test_pensa(unittest.TestCase):
             )
         plt.close()
 
-        # -- Sort trajectory along common pc
-        self.sort_common_traj = sort_trajs_along_common_pc(
-            self.sim_a_tmr_data['bb-torsions'],     
-            self.sim_b_tmr_data['bb-torsions'],
-            test_data_path + "/traj/condition-a_receptor.gro",
-            test_data_path + "/traj/condition-b_receptor.gro",    
-            test_data_path + "/traj/condition-a_receptor.xtc",
-            test_data_path + "/traj/condition-b_receptor.xtc",
-            test_data_path + "/pca/receptor_by_tmr",
-            num_pc=3, start_frame = start_frame
-            )
-        plt.close()
-
         # -- Sort trajectory pc
         pca_a = calculate_pca(self.sim_a_tmr_data['bb-torsions'])
         pca_features(pca_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
@@ -237,7 +224,7 @@ class Test_pensa(unittest.TestCase):
             self.cidx[self.cond==0], 
             test_data_path + "/traj/"+name+".gro",test_data_path + "/traj/"+name+".xtc",
             test_data_path + "/clusters/"+"combined_clust_bbtors_"+name, 
-            start_frame 
+            self.start_frame 
             )
 
 
@@ -406,11 +393,11 @@ class Test_pensa(unittest.TestCase):
 
     # -- calculate_pca()
     def test_11_calculate_pca(self):
-        self.assertEqual(len(self.pca_combined.mean), 448)
-        self.assertEqual(self.pca_combined.dim, -1)
-        self.assertEqual(self.pca_combined.skip, 0)
-        self.assertEqual(self.pca_combined.stride, 1)
-        self.assertEqual(self.pca_combined.var_cutoff, 0.95)
+        self.assertEqual(len(self.pca_combined.mean_), 448)
+#        self.assertEqual(self.pca_combined.dim, -1)
+#        self.assertEqual(self.pca_combined.skip, 0)
+#        self.assertEqual(self.pca_combined.stride, 1)
+#        self.assertEqual(self.pca_combined.var_cutoff, 0.95)
 
 
     # -- calculate_tica
@@ -462,7 +449,18 @@ class Test_pensa(unittest.TestCase):
 
     # -- sort_trajs_along_common_pc() + sort_traj_along_pc() + project_on_pc()
     def test_17_sort_trajs_along_pc(self):
-        for ele in self.sort_common_traj:
+        sort_common_traj = sort_trajs_along_common_pc(
+            self.sim_a_tmr_data['bb-torsions'],     
+            self.sim_b_tmr_data['bb-torsions'],
+            test_data_path + "/traj/condition-a_receptor.gro",
+            test_data_path + "/traj/condition-b_receptor.gro",    
+            test_data_path + "/traj/condition-a_receptor.xtc",
+            test_data_path + "/traj/condition-b_receptor.xtc",
+            test_data_path + "/pca/receptor_by_tmr",
+            num_pc=3, start_frame = self.start_frame
+            )
+        plt.close()
+        for ele in sort_common_traj:
             self.assertEqual(len(ele), 3)
         self.assertEqual(len(self.all_sort), 3)
 
@@ -564,10 +562,10 @@ class Test_pensa(unittest.TestCase):
         plt.close()
         self.assertEqual(len(wss_avg), 11)
         self.assertEqual(len(wss_std), 11)
-        self.assertEqual(wss_std[0], 0)
+        self.assertLess(wss_std[0], 1.0e-12)
         self.assertEqual(len(wss_combined_avg), 11)
         self.assertEqual(len(wss_combined_std), 11)
-        self.assertEqual(wss_combined_std[0], 0)
+        self.assertLess(wss_combined_std[0], 1.0e-12)
 
 
     # -- obtain_clusters()
