@@ -179,7 +179,7 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
     for ev_idx in range(num):
         projection = np.zeros(data.shape[0])
         for ti in range(data.shape[0]):
-            projection[ti] = np.dot(data[ti], pca.components_[:, ev_idx])
+            projection[ti] = np.dot(data[ti], pca.components_[ev_idx])
         components.append(projection)
         comp_names.append(prefix+'PC'+str(ev_idx+1))
     # Return the names and data
