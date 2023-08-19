@@ -51,7 +51,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     # Plot eigenvalues over component numbers
     fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
     componentnr = np.arange(num)+1
-    eigenvalues = pca.singular_values_[:num]
+    eigenvalues = pca.explained_variance_[:num]
     ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
     ax.set_ylabel('eigenvalue')
