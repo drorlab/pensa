@@ -1,8 +1,10 @@
+import warnings
 import numpy as np
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
+from pensa.comparison import feature_correlation
 from .visualization import project_on_eigenvector_pca, sort_traj_along_projection
 
 
@@ -62,7 +64,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     return componentnr, eigenvalues
 
 
-def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False):
+def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
 
@@ -71,8 +73,9 @@ def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False
         pca : PCA obj
             The PCA of which to plot the features.
         features : list of str
-            Features for which the PCA was performed.
-            (obtained from features object via .describe()).
+            Names of the features for which the PCA was performed.
+        data : float array
+            Trajectory data [frames,frame_data].
         num : float
             Number of feature correlations to plot.
         threshold : float
@@ -84,12 +87,15 @@ def pca_features(pca, features, num, threshold, plot_file=None, add_labels=False
 
 
     """
+    warnings.warn("The function pca_features in versions > 0.2.8 needs the data for the features, not only their names!")
+    # Project the trajectory data on the principal components
+    projection = get_components_pca(data, num, pca)[1]
     # Plot the highest PC correlations and print relevant features
     test_graph = []
     test_corr = []
     height = num*2+2 if add_labels else num*2
     fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
-    pca_feature_PC_correlation = pca.get_covariance()
+    pca_feature_PC_correlation = feature_correlation(data, projection)
     for i in range(num):
         relevant = pca_feature_PC_correlation[:, i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for PC %i:" % (

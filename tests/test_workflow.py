@@ -134,7 +134,7 @@ class Test_pensa(unittest.TestCase):
             self.sim_a_rec_feat, self.sim_a_rec_data, 'sc-torsions', write=True, out_name=out_name_a
             )
         self.sim_b_rec_multivar_feat, self.sim_b_rec_multivar_data = get_multivar_res_timeseries(
-            self.sim_b_rec_feat, self.sim_b_rec_data, 'sc-torsions', write=True, out_name=out_name_a
+            self.sim_b_rec_feat, self.sim_b_rec_data, 'sc-torsions', write=True, out_name=out_name_b
             )
         
         # --- Gaussian Discretization 
@@ -183,7 +183,7 @@ class Test_pensa(unittest.TestCase):
 
         # -- PCA features
         self.graph, self.corr = pca_features(
-            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], 3, 0.1,
+            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], combined_data_tors, 3, 0.1,
             plot_file=test_data_path + "/plots/pca-features_bbtors_a.pdf"
             )
         plt.close()
