@@ -100,12 +100,12 @@ class Test_pensa(unittest.TestCase):
         sim_a_rec = get_structure_features(
             test_data_path + "/traj/condition-a_receptor.gro",
             test_data_path + "/traj/condition-a_receptor.xtc",
-            self.start_frame
+            start_frame = self.start_frame
             )
         sim_b_rec = get_structure_features(
             test_data_path + "/traj/condition-b_receptor.gro",
             test_data_path + "/traj/condition-b_receptor.xtc",
-            self.start_frame
+            start_frame = self.start_frame 
             )
         self.sim_a_rec_feat, self.sim_a_rec_data = sim_a_rec
         self.sim_b_rec_feat, self.sim_b_rec_data = sim_b_rec
@@ -114,12 +114,12 @@ class Test_pensa(unittest.TestCase):
         sim_a_tmr = get_structure_features(
             test_data_path + "/traj/condition-a_tm.gro",
             test_data_path + "/traj/condition-a_tm.xtc",
-            self.start_frame
+            start_frame = self.start_frame
             )
         sim_b_tmr = get_structure_features(
             test_data_path + "/traj/condition-b_tm.gro",
             test_data_path + "/traj/condition-b_tm.xtc",
-            self.start_frame
+            start_frame = self.start_frame
             )
         self.sim_a_tmr_feat, self.sim_a_tmr_data = sim_a_tmr
         self.sim_b_tmr_feat, self.sim_b_tmr_data = sim_b_tmr
@@ -183,13 +183,13 @@ class Test_pensa(unittest.TestCase):
 
         # -- PCA features
         self.graph, self.corr = pca_features(
-            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4
+            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], 3, 0.1,
+            plot_file=test_data_path + "/plots/pca-features_bbtors_a.pdf"
             )
         plt.close()
 
         # -- Sort trajectory pc
         pca_a = calculate_pca(self.sim_a_tmr_data['bb-torsions'])
-        pca_features(pca_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4)
         plt.close()
         self.all_sort, _, _ = sort_traj_along_pc(
             self.sim_a_tmr_data['bb-torsions'],
@@ -260,16 +260,24 @@ class Test_pensa(unittest.TestCase):
 
     # -- get_features()
     def test_03_get_feature(self):
-    
+
+        self.assertEqual(len(self.sim_a_rec_feat['bb-torsions']), 574)
+        self.assertEqual(len(self.sim_a_rec_feat['sc-torsions']), 527)
         self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
         self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
     
-        self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (30, 448))
-        self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (30, 423))
+        self.assertEqual(len(self.sim_b_rec_feat['bb-torsions']), 574)
+        self.assertEqual(len(self.sim_b_rec_feat['sc-torsions']), 527)
+        self.assertEqual(self.sim_b_rec_data['bb-torsions'].shape, (30, 574))
+        self.assertEqual(self.sim_b_rec_data['sc-torsions'].shape, (30, 527))
 
-        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
-        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
+        self.assertEqual(len(self.sim_a_tmr_feat['bb-torsions']), 448)
+        self.assertEqual(len(self.sim_a_tmr_feat['sc-torsions']), 423)
+        self.assertEqual(self.sim_a_tmr_data['bb-torsions'].shape, (30, 448))
+        self.assertEqual(self.sim_a_tmr_data['sc-torsions'].shape, (30, 423))
 
+        self.assertEqual(len(self.sim_b_tmr_feat['bb-torsions']), 448)
+        self.assertEqual(len(self.sim_b_tmr_feat['sc-torsions']), 423)
         self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (30, 448))
         self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (30, 423))
 
@@ -394,10 +402,7 @@ class Test_pensa(unittest.TestCase):
     # -- calculate_pca()
     def test_11_calculate_pca(self):
         self.assertEqual(len(self.pca_combined.mean_), 448)
-#        self.assertEqual(self.pca_combined.dim, -1)
-#        self.assertEqual(self.pca_combined.skip, 0)
-#        self.assertEqual(self.pca_combined.stride, 1)
-#        self.assertEqual(self.pca_combined.var_cutoff, 0.95)
+        self.assertEqual(self.pca_combined.get_covariance().shape[0], 448)
 
 
     # -- calculate_tica
