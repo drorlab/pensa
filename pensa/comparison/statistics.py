@@ -138,3 +138,30 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
             print(i, '/', len(all_data_a), ':', data_names[i], " %1.2f" % data_avg[i],
                   " %1.2f" % data_diff[i])
     return data_names, data_avg, data_diff
+
+
+def feature_correlation(data_a, data_b):
+    """
+    Calculates the correlation matrix between two sets of features. 
+    The features are normalized before the correlation is calculated.
+
+    Parameters
+    ----------
+    data_a : float array
+        Trajectory data [frames, frame_data].
+    data_b : float array
+        Trajectory data [frames, frame_data].
+        
+    Returns
+    -------
+    corr : float array
+        Correlation matrix [num. features a, num. features b]   
+
+    """    
+    corr = np.zeros([data_a.shape[1],data_b.shape[1]])
+    for _i, a in enumerate(data_a.T):
+        for _j, b in enumerate(data_b.T):
+            a_norm = (a-np.mean(a))/np.std(a)
+            b_norm = (b-np.mean(b))/np.std(b)
+            corr[_i,_j] = np.corrcoef(a_norm, b_norm)[0,1]
+    return corr
