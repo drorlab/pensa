@@ -183,7 +183,7 @@ class Test_pensa(unittest.TestCase):
 
         # -- PCA features
         self.graph, self.corr = pca_features(
-            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], combined_data_tors, 3, 0.1,
+            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], combined_data_tors, 3, 0.4,
             plot_file=test_data_path + "/plots/pca-features_bbtors_a.pdf"
             )
         plt.close()
