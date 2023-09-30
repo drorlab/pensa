@@ -1,9 +1,8 @@
 import warnings
 import numpy as np
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
+from pensa.preprocessing import merge_and_sort_coordinates
 from pensa.comparison import feature_correlation
 from .visualization import project_on_eigenvector_pca, sort_traj_along_projection
 

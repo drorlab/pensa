@@ -26,8 +26,6 @@ from MDAnalysis.coordinates.memory import MemoryReader
 from MDAnalysis.analysis import align
 import biotite.structure as struc
 import biotite.structure.io as strucio
-# from pensa import *
-# from pensa.features.processing import *
 from tqdm import tqdm
 
 # -- Processing trajectories for density analysis

@@ -2,8 +2,6 @@ import numpy as np
 from pensa import *
 from pensa.comparison import *
 from pensa.dimensionality import *
-import random
-import math
 
 
 """

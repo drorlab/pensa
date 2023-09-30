@@ -1,8 +1,7 @@
 import numpy as np
 import deeptime
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
-from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
+from pensa.preprocessing import merge_and_sort_coordinates
 from .visualization import project_on_eigenvector_tica, sort_traj_along_projection
 
 

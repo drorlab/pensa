@@ -5,7 +5,6 @@ import scipy.spatial
 import scipy.spatial.distance
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
-import os
 from pensa.features import *
 
 

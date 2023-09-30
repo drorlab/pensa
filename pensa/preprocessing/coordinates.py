@@ -1,7 +1,5 @@
 import MDAnalysis as mda
 import numpy as np
-import os
-import requests
 from MDAnalysis.analysis import align
 
 

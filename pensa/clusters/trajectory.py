@@ -1,13 +1,5 @@
 import numpy as np
-import scipy as sp
-import scipy.stats
-import mdshare
-import pyemma
-from pyemma.util.contexts import settings
 import MDAnalysis as mda
-import matplotlib.pyplot as plt
-
-
 
 
 def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0):

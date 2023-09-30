@@ -1,11 +1,8 @@
 import numpy as np
-import pyemma
 from sklearn.decomposition import PCA
 import deeptime
-from pyemma.util.contexts import settings
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
-from pensa.preprocessing import sort_coordinates, merge_and_sort_coordinates
+from pensa.preprocessing import sort_coordinates
 
 
 def project_on_eigenvector_tica(data, ev_idx, ana):

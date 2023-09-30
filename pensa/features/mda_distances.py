@@ -2,7 +2,6 @@ import pensa
 import numpy as np
 import MDAnalysis as mda
 import MDAnalysis.lib.distances as ld
-import matplotlib.pyplot as plt
 import gpcrmining.gpcrdb as db
 
 

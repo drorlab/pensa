@@ -1,16 +1,8 @@
 import numpy as np
-import scipy as sp
-import scipy.stats
-import mdshare
-import pyemma
-from pyemma.util.contexts import settings
-import MDAnalysis as mda
 import matplotlib.pyplot as plt
 
 from pensa.clusters import obtain_clusters, obtain_combined_clusters
 
-
-                    
 
 def wss_over_number_of_clusters(data, algorithm='kmeans', 
                                 max_iter=100, num_repeats = 5, max_num_clusters = 12,

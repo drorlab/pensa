@@ -1,5 +1,4 @@
-import numpy as np
-from tqdm import tqdm
+import numpy as np 
 from pensa.features import *
 from pensa.statesinfo import *
 
