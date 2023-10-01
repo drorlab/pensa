@@ -14,12 +14,12 @@ def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, 
     Parameters
     ----------
         features_a : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
         features_b : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
-            Must be the same as features_a. Provided as a sanity check. 
+            Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
             Trajectory data from the first ensemble. Format: [frames,frame_data].
         all_data_b : float array
@@ -78,12 +78,12 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
     Parameters
     ----------
         features_a : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
         features_b : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
-            Must be the same as features_a. Provided as a sanity check. 
+            Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
             Trajectory data from the first ensemble. Format: [frames,frame_data].
         all_data_b : float array
@@ -139,7 +139,7 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
 
 def feature_correlation(data_a, data_b):
     """
-    Calculates the correlation matrix between two sets of features. 
+    Calculates the correlation matrix between two sets of features.
     The features are normalized before the correlation is calculated.
 
     Parameters
@@ -148,13 +148,13 @@ def feature_correlation(data_a, data_b):
         Trajectory data [frames, frame_data].
     data_b : float array
         Trajectory data [frames, frame_data].
-        
+
     Returns
     -------
     corr : float array
-        Correlation matrix [num. features a, num. features b]   
+        Correlation matrix [num. features a, num. features b]
 
-    """    
+    """
     corr = np.zeros([data_a.shape[1],data_b.shape[1]])
     for _i, a in enumerate(data_a.T):
         for _j, b in enumerate(data_b.T):

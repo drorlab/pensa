@@ -14,7 +14,7 @@ def extract_coordinates(top, pdb, trj_list, out_name, sel_string, start_frame=0,
     Parameters
     ----------
         top : str
-            File name for topology. 
+            File name for topology.
             Can read all MDAnalysis-compatible topology formats.
         pdb : str
             File name for the reference PDB file.
@@ -56,8 +56,8 @@ def extract_coordinates_combined(top, trj, sel_string, out_name, start_frame=0, 
 
     Parameters
     ----------
-        top : list of str 
-            File names for the topologies. 
+        top : list of str
+            File names for the topologies.
             Can read all MDAnalysis-compatible topology formats.
         trj : list of str
             File names for the input trajectories.
@@ -96,7 +96,7 @@ def merge_coordinates(top_files, trj_files, out_name, segid=None):
     ----------
         top_files : str[]
             List of input topology files.
-        trj_files : str[]: 
+        trj_files : str[]:
             List of input trajectory files.
         out_name : str
             Name of the output files (without ending).
@@ -156,7 +156,7 @@ def align_coordinates(top, pdb, trj_list, out_name, sel_string='all', start_fram
         sel_string : str
             Selection string in MDAnalysis format. Defines on which atoms to align.
         start_frame : int, optional
-            First frame to read from the trajectory. 
+            First frame to read from the trajectory.
     """
     # Read the topology+PDB files and align selected parts.
     u = mda.Universe(top, pdb)
@@ -177,9 +177,9 @@ def sort_coordinates(values, top_name, trj_name, out_name, start_frame=0, verbos
     values: float array
         Values along which to sort the trajectory.
     top_name: str
-        Topology for the trajectory. 
+        Topology for the trajectory.
     trj_name: str
-        Trajetory from which the frames are picked. 
+        Trajetory from which the frames are picked.
         Usually the same as the values are from.
     out_name: str
         Name of the output trajectory (usual format is .xtc).
@@ -228,9 +228,9 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
     values: list of float arrays
         Values along which to sort the trajectory.
     top_names: list of str
-        topology for the trajectory. 
+        topology for the trajectory.
     trj_names: list of str
-        Trajetory from which the frames are picked. 
+        Trajetory from which the frames are picked.
         Usually the same as the values are from.
     out_name: str
         Name of the output trajectory (usual format is .xtc).

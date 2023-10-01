@@ -3,16 +3,16 @@
 Methods to obtain a distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
 
-For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket. 
+For a water molecule to exist within a water pocket, just the oxygen must occupy the pocket.
 If there is ever an instance where two water molecules occupy the same pocket at the same time,
 then the water polarisation of the molecule ID that occupies the pocket most often is used.
 
 The methods here are based on the following paper:
 
-    |    Neil J. Thomson, Owen N. Vickery, Callum M. Ives, Ulrich Zachariae: 
-    |    Ion-water coupling controls class A GPCR signal transduction pathways. 
+    |    Neil J. Thomson, Owen N. Vickery, Callum M. Ives, Ulrich Zachariae:
+    |    Ion-water coupling controls class A GPCR signal transduction pathways.
     |    https://doi.org/10.1101/2020.08.28.271510
-    
+
 """
 
 import numpy as np
@@ -54,12 +54,12 @@ def _match_sim_lengths(sim1,sim2):
         if len(sim1)>len(sim2):
             sim1=sim1[0:len(sim2)]
         if len(sim1)<len(sim2):
-            sim2=sim2[0:len(sim1)]  
+            sim2=sim2[0:len(sim1)]
     return sim1, sim2
 
 def _copy_coords(ag):
     """
-    Copy the coordinates of the frames in a universe.    
+    Copy the coordinates of the frames in a universe.
 
     Parameters
     ----------
@@ -75,7 +75,7 @@ def _copy_coords(ag):
 
 def local_maxima_3D(data, order=1):
     """
-    Detects local maxima in a 3D array to obtain coordinates for density maxima. 
+    Detects local maxima in a 3D array to obtain coordinates for density maxima.
 
     Parameters
     ---------
@@ -103,7 +103,7 @@ def local_maxima_3D(data, order=1):
 
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
     """
-    Writes out combined atomgroup density for both input simulations.    
+    Writes out combined atomgroup density for both input simulations.
     Parameters
     ----------
     struc_a : str
@@ -117,24 +117,24 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     atomgroup : str
         Atomgroup selection to calculate the density for (atom name in structure_input).
     write_grid_as : str
-        The water model to convert the density into. 
+        The water model to convert the density into.
         Options are: SPC, TIP3P, TIP4P, water
     out_name : str
-        Prefix for written filename. 
+        Prefix for written filename.
     prot_prox : bool, optional
         Select only waters within 3.5 Angstroms of the protein. The default is True.
     use_memmap : bool, optional
         Uses numpy memmap to write out a pseudo-trajectory coordinate array.
         This is used for large trajectories to avoid memory errors with large
         python arrays. The default is False.
-    """        
+    """
     if not os.path.exists('dens/'):
         os.makedirs('dens/')
-    
+
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
-   
-    
+
+
     if use_memmap is True:
         # # # Combine both ensembles' atoms into one universe
         Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
@@ -147,8 +147,8 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # Writing out pseudo-trajetcory
         merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0],array_shape[1],array_shape[2]))
         # # # Creating universe with blank timesteps from pseudo-trajectory
-        Combined_conditions.load_new(merged_coords, format=MemoryReader)    
-        
+        Combined_conditions.load_new(merged_coords, format=MemoryReader)
+
         # # # Creating universe with correct timesteps
         for frameno in tqdm(range(smallest_traj_len)):
             condition_a.trajectory[frameno]
@@ -158,10 +158,10 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
             coords_b = condition_b.atoms.positions
             # # # Then we merge the coordinates into one system
             stacked = np.concatenate((coords_a,coords_b),axis=0)
-            # # # Write over blank trajectory with new coordinates 
+            # # # Write over blank trajectory with new coordinates
             Combined_conditions.trajectory[frameno].positions = stacked
- 
-    
+
+
     else:
         # # # Combine both ensembles' atoms into one universe
         Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
@@ -174,14 +174,14 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # otherwise it will be unevely biased towards one condition.
         # # # So we match the simulation lengths first
         sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a,aligned_coords_b)
-    
+
         # # # Then we merge the coordinates into one system
         merged_coords = np.hstack([sim1_coords, sim2_coords])
         # # # We load in the merged coordinated into our new universe that contains
         # # # the receptor in both conditions
-        Combined_conditions.load_new(merged_coords, format=MemoryReader)    
- 
-    # # # Grab the density for atomgroup proximal to protein only    
+        Combined_conditions.load_new(merged_coords, format=MemoryReader)
+
+    # # # Grab the density for atomgroup proximal to protein only
     if prot_prox is True:
         density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup + " and around 3.5 protein", updating=True)
     # # # Grab the density for atomgroup anywhere in simulation box
@@ -192,12 +192,12 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     D.run(verbose=True)
     D.density.convert_density(write_grid_as)
     D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
-    
-    
+
+
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     """
     Writes out combined atomgroup density for both input simulations.
-    
+
 
     Parameters
     ----------
@@ -213,13 +213,13 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     """
     if not os.path.exists('dens/'):
         os.makedirs('dens/')
-    
-    # # Before we extract the water densities, we need to first align the trajectories 
+
+    # # Before we extract the water densities, we need to first align the trajectories
     # # so that we can featurize water sites in both ensembles using the same coordinates
     condition_a = mda.Universe(struc_a,xtc_a)
-    condition_b = mda.Universe(struc_b,xtc_b)    
-    
-    
+    condition_b = mda.Universe(struc_b,xtc_b)
+
+
     # Align a onto the average structure of b
     p = condition_b.select_atoms("protein")
     pdb_outname = 'dens/alignment_ref.pdb'
@@ -234,19 +234,19 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     # write average protein coordinates
     p.write(pdb_outname)
     # just make sure that we have clean original coordinates again (start at the beginning)
-    condition_b = mda.Universe(pdb_outname)    
+    condition_b = mda.Universe(pdb_outname)
 
-    
-    align_xtc_name='dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'    
-    
+
+    align_xtc_name='dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'
+
     #align condition a to condition b
     align.AlignTraj(condition_a,  # trajectory to align
                     condition_b,  # reference
                     select= 'name CA',  # selection of atoms to align
                     filename= align_xtc_name,  # file to write the trajectory to
                     match_atoms=True,  # whether to match atoms based on mass
-                    ).run(verbose=True)    
-    
+                    ).run(verbose=True)
+
 def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     """
     Obtain the grid for atomgroup density.
@@ -258,7 +258,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     atomgroup : str
         Atomgroup selection to calculate the density for (atom name in structure_input).
     write_grid_as : str, optional
-        If you choose to write out the grid, you must specify the water model 
+        If you choose to write out the grid, you must specify the water model
         to convert the density into. The default is None.
     out_name : str, optional
         Prefix for all written filenames. The default is None.
@@ -271,7 +271,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
         Density grid.
 
     """
- 
+
     if prot_prox is True:
         density_atomgroup = u.select_atoms("name " + atomgroup + " and around 3.5 protein", updating=True)
     else:
@@ -280,7 +280,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()
     g = D.density
-    
+
     if write_grid_as is not None:
         if not os.path.exists('dens/'):
             os.makedirs('dens/')
@@ -288,10 +288,10 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
         D.density.export('dens/' + out_name + atomgroup + "_density.dx", type="double")
 
     return g
-        
+
 def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
                   grid_input=None, write=None, write_grid_as=None, out_name=None):
-    
+
     """
     Write out water pockets for the top X most probable atoms (top_atoms).
 
@@ -310,7 +310,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
     write : bool, optional
         If true, a reference pdb will be written out. The default is None.
     write_grid_as : str, optional
-        If you choose to write out the grid, you must specify the water model 
+        If you choose to write out the grid, you must specify the water model
         to convert the density into. The default is None. Options are suggested if default.
     out_name : str, optional
         Prefix for all written filenames. The default is None.
@@ -327,9 +327,9 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
     if write is not None:
         if out_name is None:
             print('WARNING: You are writing results without providing out_name.')
-        
+
     u = mda.Universe(structure_input, xtc_input)
-    
+
     if write is True:
         if not os.path.exists('water_features/'):
             os.makedirs('water_features/')
@@ -346,27 +346,27 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         # write average protein coordinates
         p.write(pdb_outname)
         # just make sure that we have clean original coordinates again (start at the beginning)
-        u.trajectory.rewind()    
+        u.trajectory.rewind()
         if grid_input is None:
-            g = get_grid(u, atomgroup, write_grid_as,  out_name)           
+            g = get_grid(u, atomgroup, write_grid_as,  out_name)
         else:
-            g = Grid(grid_input)  
+            g = Grid(grid_input)
     elif grid_input is None:
-        g = get_grid(u, atomgroup)              
+        g = get_grid(u, atomgroup)
     else:
-        g = Grid(grid_input)  
+        g = Grid(grid_input)
 
     xyz, val = local_maxima_3D(g.grid)
     ## Negate the array to get probabilities in descending order
     val_sort = np.argsort(-1*val.copy())
-    newvals = [val[max_val] for max_val in val_sort]  
-    coords = [xyz[max_val] for max_val in val_sort]    
+    newvals = [val[max_val] for max_val in val_sort]
+    coords = [xyz[max_val] for max_val in val_sort]
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
     atom_information=[]
     atom_dists=[]
 
     if top_atoms > len(coords):
-        top_atoms = len(coords)  
+        top_atoms = len(coords)
 
 
     print('\n')
@@ -377,7 +377,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         print('\n')
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
-        # Shifting the coordinates of the maxima by the grid origin to match 
+        # Shifting the coordinates of the maxima by the grid origin to match
         # the simulation box coordinates
         shifted_coords=coords[at_no]+g.origin
         point_str = str(shifted_coords)[1:-1]
@@ -387,9 +387,9 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         atom_location = shifted_coords
 
         atom_information.append([atom_ID,list(atom_location),densval])
-        
-        ## Write data out and visualize water sites in pdb           
-        if write is True:    
+
+        ## Write data out and visualize water sites in pdb
+        if write is True:
             write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
             u_pdb = mda.Universe(pdb_outname)
             u_pdb.add_TopologyAttr('tempfactors')
@@ -399,7 +399,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
                 atom_resid = len(u_pdb.residues) - at_no-1 + res
                 u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
-    
+
     # Return the dictionaries.
     return print('Pdb file completed.')
 
@@ -421,9 +421,9 @@ def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
         MDAnalysis atomgroup to describe the atom.
 
     """
-    
-    ##PDB_VISUALISATION     
-    ##rescursively add waters to the pdb file one by one as they are processed           
+
+    ##PDB_VISUALISATION
+    ##rescursively add waters to the pdb file one by one as they are processed
     # # Read the file into Biotite's structure object (atom array)
     atom_array = strucio.load_structure(pdb_outname)
     res_id = atom_array.res_id[-1] + 1
@@ -476,9 +476,9 @@ def convert_to_occ(distr, unocc_no, water=True):
         Distribution representing pocket occupancy.
 
     """
-    
+
     occ = np.ones(len(distr))
-    
+
     if water is True:
         for item in range(len(occ)):
             if distr[item] == unocc_no:
@@ -487,6 +487,6 @@ def convert_to_occ(distr, unocc_no, water=True):
         for item in range(len(occ)):
             if distr[item][0] == unocc_no:
                 occ[item] = 0
-    
+
     return list(occ)
 

@@ -5,7 +5,7 @@ import MDAnalysis.lib.distances as ld
 import gpcrmining.gpcrdb as db
 
 
-def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG', 
+def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
                              first_frame=0, last_frame=None, step=1,
                              naming='plain'):
     """
@@ -18,9 +18,9 @@ def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
     xtc : str
         File name for the trajectory (xtc format).
     sel_a : str, default='protein'
-        Selection string to choose atoms for the first group. 
+        Selection string to choose atoms for the first group.
     sel_b : str, default='resname LIG'
-        Selection string to choose atoms for the second group. 
+        Selection string to choose atoms for the second group.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -58,7 +58,7 @@ def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
     else:
         at_labels_a = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in a]
         at_labels_b = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in b]
-    
+
     # Name the distance labels
     d_labels = []
     k = -1
@@ -148,7 +148,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
         frame += 1
 
     return d_labels, data_arr
-    
+
 
 def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
     """
@@ -175,17 +175,17 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
         Data for all C-alpha distances [Å]
 
     """
-    names, data =  get_atom_self_distances(pdb, xtc, 
-                                           selection='name CA', 
-                                           first_frame=first_frame, 
-                                           last_frame=last_frame,                                                 
+    names, data =  get_atom_self_distances(pdb, xtc,
+                                           selection='name CA',
+                                           first_frame=first_frame,
+                                           last_frame=last_frame,
                                            step=step)
     return names, data
 
 
 def select_gpcr_residues(gpcr_name, res_dbnum):
     """
-    Gets sequential residue numbers for residues provided as GPCRdb numbers. 
+    Gets sequential residue numbers for residues provided as GPCRdb numbers.
 
     Parameters
     ----------

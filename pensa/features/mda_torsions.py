@@ -7,7 +7,7 @@ from MDAnalysis.analysis.dihedrals import Dihedral
 def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame=None, step=1, naming=None):
     """
     Load distances between all atom pairs between two selected groups.
-    
+
     Parameters
     ----------
     pdb : str
@@ -15,7 +15,7 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
     xtc : str
         File name for the trajectory (xtc format).
     sel : list, default=[[0,1,2,3]]
-        List of quadruplets with selection indices to choose atoms for the torsions.  
+        List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -28,7 +28,7 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
         chainid: include chain ID (only works if chains are defined)
         segid: include segment ID (only works if segments are defined)
         segindex: include segment index (only works if segments are defined)
-        
+
     Returns
     -------
     feature_names : list of str
@@ -39,7 +39,7 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
 
     for selection in sel:
         assert len(selection) == 4
-    
+
     # Read the dihedral angles
     u = mda.Universe(pdb, xtc)
     torsion_atoms = [u.atoms[selection] for selection in sel]
@@ -60,26 +60,26 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
         # Name the torsion labels
         _tl = 'TORS: %s - %s - %s - %s'%(at_labels[0], at_labels[1], at_labels[2], at_labels[3])
         torsion_labels.append(_tl)
-        
+
     return torsion_labels, dihedrals.angles
 
 
 def find_atom_by_name(res, at_name):
     """
     Find the index of the first atom of a certain name in a residue.
-    
+
     Parameters
     ----------
     res : Residue
         MDAnalysis residue object.
     at_name : str
         Name of the requested atom.
-        
+
     Returns
     -------
     index : int
         Index of the first atom with name at_name or -1 (if none of the atoms has this name)
-    
+
     """
     for atom in res.atoms:
         if atom.name == at_name:
@@ -87,11 +87,11 @@ def find_atom_by_name(res, at_name):
     return -1
 
 
-def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1], 
+def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1],
                                   selection='all', verbose=False):
     """
     Find the indices of atoms with a certain name for each residue (and its neighbors).
-    
+
     Parameters
     ----------
     pdb : str
@@ -99,12 +99,12 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
     at_names : list of str
         Names of the requested atoms.
     rel_res : list of int, default=[[0,1,2,3]]
-        Residue number of each atom's residue relative to the current residue. 
+        Residue number of each atom's residue relative to the current residue.
     selection : str, default = 'all'
         MDAnalysis selection string
     verbose : bool, default = False
         Print info for all residues.
-        
+
     Returns
     -------
     feature_names : list of str
@@ -112,16 +112,16 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
     features_data : numpy array
         Data for all torsions [Å]
     """
-    
+
     assert len(at_names) == len(rel_res)
     rel_res = np.array(rel_res, dtype=int)
-    
+
     u = mda.Universe(pdb)
     a = u.select_atoms(selection)
     r = a.residues
-    
+
     indices_list = []
-    
+
     # In each residue ..
     for i, res in enumerate(r):
 
@@ -129,7 +129,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         sel_resinds = i + rel_res
 
         # Check whether all residue indices are present.
-        if not np.all(sel_resinds < len(r)): 
+        if not np.all(sel_resinds < len(r)):
             continue
 
         # Check whether consecutive indices correspond to consecutive residue numbers
@@ -146,10 +146,10 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         if np.all(indices >= 0):
             if verbose: print(indices, a[indices].names, a[indices].resids)
             indices_list.append(indices)
-    
+
     return indices_list
-    
-    
+
+
 def list_depth(l):
     if isinstance(l, list):
         return 1 + max(list_depth(item) for item in l)
@@ -157,11 +157,11 @@ def list_depth(l):
         return 0
 
 
-def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1], 
+def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1],
                                   selection='all', verbose=False):
     """
     Find the indices of atoms with a certain name for each residue (and its neighbors).
-    
+
     Parameters
     ----------
     pdb : str
@@ -170,12 +170,12 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         Names of the requested atoms or list of sets of names of requested atoms.
         If a list of lists is passed, all sub-lists must have the same length.
     rel_res : list of int, default=[-1,0,0,1]]
-        Residue number of each atom's residue relative to the current residue. 
+        Residue number of each atom's residue relative to the current residue.
     selection : str, default = 'all'
         MDAnalysis selection string
     verbose : bool, default = False
         Print info for all residues.
-        
+
     Returns
     -------
     feature_names : list of str
@@ -183,7 +183,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
     features_data : numpy array
         Data for all torsions [Å]
     """
-    
+
     # If only one name list is given, create a list with this list
     if list_depth(at_names) <= 1:
         at_names = [at_names]
@@ -192,13 +192,13 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         assert len(an) == len(rel_res)
     # Make sure the relative residue numbers are indices
     rel_res = np.array(rel_res, dtype=int)
-    
+
     u = mda.Universe(pdb)
     a = u.select_atoms(selection)
     r = a.residues
-    
+
     indices_list = []
-    
+
     # In each residue ..
     for i, res in enumerate(r):
 
@@ -206,14 +206,14 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         sel_resinds = i + rel_res
 
         # Check whether all residue indices are present.
-        if not np.all(sel_resinds < len(r)): 
+        if not np.all(sel_resinds < len(r)):
             continue
 
         # Check whether consecutive indices correspond to consecutive residue numbers
         # (we don't want to calculate torsions between non-connected residues)
         if not np.all(sel_resnums == r[sel_resinds].resnums):
             continue
-               
+
         # Try each set of selection names ...
         num_indices = 0
         num_at_sets = 0
@@ -229,17 +229,17 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         if num_indices == len(rel_res):
             if verbose: print(indices, a[indices].names, a[indices].resids)
             indices_list.append(indices)
-    
+
     return indices_list
 
 
-def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all', 
-                                      first_frame=0, last_frame=None, step=1, 
+def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
+                                      first_frame=0, last_frame=None, step=1,
                                       naming='segindex', radians=False):
     """
     Load nucleic acid backbone torsions
-    
-    ALPHA (α):   O3'(i-1)-P(i)-O5'(i)-C5'(i) 
+
+    ALPHA (α):   O3'(i-1)-P(i)-O5'(i)-C5'(i)
     BETA (β):    P(i)-O5'(i)-C5'(i)-C4'(i)
     GAMMA (γ):   O5'(i)-C5'(i)-C4'(i)-C3'(i)
     DELTA (δ):   C5'(i)-C4'(i)-C3'(i)-O3'(i)
@@ -247,7 +247,7 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     ZETA (ζ):    C3'(i)-O3'(i)-P(i+1)-O5'(i+1)
     CHI (χ):     O4'(i)-C1'(i)-N9(i)-C4(i) for purines
                  O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
-    
+
     Parameters
     ----------
     pdb : str
@@ -255,7 +255,7 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     xtc : str
         File name for the trajectory (xtc format).
     selection : list, default='all'
-        List of quadruplets with selection indices to choose atoms for the torsions.  
+        List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -270,70 +270,70 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
         segindex: include segment index (only works if segments are defined)
     radians : bool, default=False
         Return torsions in radians instead of degrees.
-        
+
     Returns
     -------
     feature_names : list of str
         Generic names of all torsions
     features_data : numpy array
         Data for all torsions [Å]
-    
+
     """
     # Find indices of torsion atoms for each residue
     # ALPHA (α):   O3'(i-1)-P(i)-O5'(i)-C5'(i)
     indices_alpha = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["O3'","P","O5'","C5'"], 
-        rel_res=[-1,0,0,0], 
+        pdb,
+        at_names=["O3'","P","O5'","C5'"],
+        rel_res=[-1,0,0,0],
         selection=selection
     )
     # BETA (β):    P(i)-O5'(i)-C5'(i)-C4'(i)
     indices_beta = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["P","O5'","C5'","C4'"], 
-        rel_res=[0,0,0,0], 
+        pdb,
+        at_names=["P","O5'","C5'","C4'"],
+        rel_res=[0,0,0,0],
         selection=selection
     )
     # GAMMA (γ):   O5'(i)-C5'(i)-C4'(i)-C3'(i)
     indices_gamma = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["O5'","C5'","C4'","C3'"], 
-        rel_res=[0,0,0,0], 
+        pdb,
+        at_names=["O5'","C5'","C4'","C3'"],
+        rel_res=[0,0,0,0],
         selection=selection
     )
     # DELTA (δ):   C5'(i)-C4'(i)-C3'(i)-O3'(i)
     indices_delta = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["C5'","C4'","C3'","O3'"], 
-        rel_res=[0,0,0,0], 
+        pdb,
+        at_names=["C5'","C4'","C3'","O3'"],
+        rel_res=[0,0,0,0],
         selection=selection
     )
     # EPSILON (ε): C4'(i)-C3'(i)-O3'(i)-P(i+1)
     indices_epsilon = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["C4'","C3'","O3'","P"], 
-        rel_res=[0,0,0,1], 
+        pdb,
+        at_names=["C4'","C3'","O3'","P"],
+        rel_res=[0,0,0,1],
         selection=selection
     )
     # ZETA (ζ):    C3'(i)-O3'(i)-P(i+1)-O5'(i+1)
     indices_zeta = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["C3'","O3'","P","O5'"], 
-        rel_res=[0,0,1,1], 
+        pdb,
+        at_names=["C3'","O3'","P","O5'"],
+        rel_res=[0,0,1,1],
         selection=selection
     )
     # CHI (χ):     O4'(i)-C1'(i)-N9(i)-C4(i) for purines
     #              O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
     indices_chi = find_atom_indices_per_residue(
-        pdb, 
-        at_names=[["O4'","C1'","N9","C4"],["O4'","C1'","N1","C2"]], 
-        rel_res=[0,0,0,0], 
+        pdb,
+        at_names=[["O4'","C1'","N9","C4"],["O4'","C1'","N1","C2"]],
+        rel_res=[0,0,0,0],
         selection=selection
     )
 
     # Define angle names for labels
     angles = []
-    angles += ['ALPHA']*len(indices_alpha) 
+    angles += ['ALPHA']*len(indices_alpha)
     angles += ['BETA']*len(indices_beta)
     angles += ['GAMMA']*len(indices_gamma)
     angles += ['DELTA']*len(indices_delta)
@@ -342,7 +342,7 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     angles += ['CHI']*len(indices_chi)
     # Calculate the torsions
     torsions = get_torsions(
-        pdb, xtc, sel=indices_alpha+indices_beta+indices_gamma+indices_delta+indices_epsilon+indices_zeta+indices_chi, 
+        pdb, xtc, sel=indices_alpha+indices_beta+indices_gamma+indices_delta+indices_epsilon+indices_zeta+indices_chi,
         first_frame=0, last_frame=None, step=1,
         naming = naming
     )
@@ -363,15 +363,15 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     return labels, values
 
 
-def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all', 
-                                   first_frame=0, last_frame=None, step=1, 
+def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
+                                   first_frame=0, last_frame=None, step=1,
                                    naming='segindex', radians=False):
     """
     Load nucleic acid pseudotorsions
-    
-    ETA (η):   C4'(i-1)-P(i)-C4'(i)-P(i+1) 
+
+    ETA (η):   C4'(i-1)-P(i)-C4'(i)-P(i+1)
     THETA (θ): P(i)-C4'(i)-P(i+1)-C4'(i+1)
-    
+
     Parameters
     ----------
     pdb : str
@@ -379,7 +379,7 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     xtc : str
         File name for the trajectory (xtc format).
     selection : list, default='all'
-        List of quadruplets with selection indices to choose atoms for the torsions.  
+        List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -401,26 +401,26 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
         Generic names of all torsions
     features_data : numpy array
         Data for all torsions [Å]
-    
+
     """
     # Find indices of torsion atoms for each residue
     indices_eta = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["C4'","P","C4'","P"], 
-        rel_res=[-1,0,0,1], 
+        pdb,
+        at_names=["C4'","P","C4'","P"],
+        rel_res=[-1,0,0,1],
         selection=selection
     )
     indices_theta = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["P","C4'","P","C4'"], 
-        rel_res=[0,0,1,1], 
+        pdb,
+        at_names=["P","C4'","P","C4'"],
+        rel_res=[0,0,1,1],
         selection=selection
     )
     # Define angle names for labels
     angles = ['ETA']*len(indices_eta) + ['THETA']*len(indices_theta)
     # Calculate the torsions
     torsions = get_torsions(
-        pdb, xtc, sel=indices_eta+indices_theta, 
+        pdb, xtc, sel=indices_eta+indices_theta,
         first_frame=0, last_frame=None, step=1,
         naming = naming
     )
@@ -441,17 +441,17 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     return labels, values
 
 
-def get_protein_backbone_torsions(pdb, xtc, selection='all', 
-                                   first_frame=0, last_frame=None, step=1, 
+def get_protein_backbone_torsions(pdb, xtc, selection='all',
+                                   first_frame=0, last_frame=None, step=1,
                                    naming='segindex', radians=False,
                                    include_omega=False):
     """
     Load protein backbone torsions
-    
+
     PHI (φ):   C(i-1)-N(i)-CA(i)-C(i)
     PSI (ψ):   N(i)-CA(i)-C(i)-N(i+1)
     OMEGA (ω): CA(i)-C(i)-N(i+1)-CA(i+1)
-    
+
     Parameters
     ----------
     pdb : str
@@ -459,7 +459,7 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
     xtc : str
         File name for the trajectory (xtc format).
     selection : list, default='all'
-        List of quadruplets with selection indices to choose atoms for the torsions.  
+        List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -474,35 +474,35 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
         segindex: include segment index (only works if segments are defined)
     radians : bool, default=False
         Return torsions in radians instead of degrees.
-        
+
     Returns
     -------
     feature_names : list of str
         Generic names of all torsions
     features_data : numpy array
         Data for all torsions [Å]
-    
+
     """
     # Find indices of torsion atoms for each residue
     #   PHI (φ):   C(i-1)-N(i)-CA(i)-C(i)
     indices_phi = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["C","N","CA","C"], 
-        rel_res=[-1,0,0,0], 
+        pdb,
+        at_names=["C","N","CA","C"],
+        rel_res=[-1,0,0,0],
         selection=selection
     )
     #   PSI (ψ):   N(i)-CA(i)-C(i)-N(i+1)
     indices_psi = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["N","CA","C","N"], 
+        pdb,
+        at_names=["N","CA","C","N"],
         rel_res=[0,0,0,1],
         selection=selection
     )
     #   OMEGA (ω): CA(i)-C(i)-N(i+1)-CA(i+1)
     indices_omega = find_atom_indices_per_residue(
-        pdb, 
-        at_names=["CA","C","N","CA"], 
-        rel_res=[0,0,1,1], 
+        pdb,
+        at_names=["CA","C","N","CA"],
+        rel_res=[0,0,1,1],
         selection=selection
     )
     # Define angle names for labels
@@ -513,7 +513,7 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
         torsion_selection += indices_omega
     # Calculate the torsions
     torsions = get_torsions(
-        pdb, xtc, sel=torsion_selection, 
+        pdb, xtc, sel=torsion_selection,
         first_frame=0, last_frame=None, step=1,
         naming = naming
     )
@@ -559,12 +559,12 @@ at_names_chi4 = [["CG", "CD", "NE", "CZ"],
 at_names_chi5 = [["CD", "NE", "CZ", "NH1"]]
 
 
-def get_protein_sidechain_torsions(pdb, xtc, selection='all', 
-                                   first_frame=0, last_frame=None, step=1, 
+def get_protein_sidechain_torsions(pdb, xtc, selection='all',
+                                   first_frame=0, last_frame=None, step=1,
                                    naming='segindex', radians=False):
     """
     Load protein sidechain torsions.
-    
+
     Parameters
     ----------
     pdb : str
@@ -572,7 +572,7 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
     xtc : str
         File name for the trajectory (xtc format).
     selection : list, default='all'
-        List of quadruplets with selection indices to choose atoms for the torsions.  
+        List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
     last_frame : int, default=None
@@ -587,14 +587,14 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
         segindex: include segment index (only works if segments are defined)
     radians : bool, default=False
         Return torsions in radians instead of degrees.
-        
+
     Returns
     -------
     feature_names : list of str
         Generic names of all torsions
     features_data : numpy array
         Data for all torsions [Å]
-    
+
     """
     # Find indices of torsion atoms for each residue
     indices_chi1 = find_atom_indices_per_residue(
@@ -628,7 +628,7 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
     torsion_selection += indices_chi5
     # Calculate the torsions
     torsions = get_torsions(
-        pdb, xtc, sel=torsion_selection, 
+        pdb, xtc, sel=torsion_selection,
         first_frame=0, last_frame=None, step=1,
         naming = naming
     )

@@ -16,21 +16,21 @@ def obtain_clusters(data, algorithm='kmeans',
     ----------
         data : float array)
             Trajectory data. Format: [frames,frame_data]
-        algorithm : string) 
-            The algorithm to use for the clustering. 
-            Options: kmeans, rspace. 
+        algorithm : string)
+            The algorithm to use for the clustering.
+            Options: kmeans, rspace.
             Default: kmeans
         num_clusters : int, optional
-            Number of clusters for k-means clustering. 
+            Number of clusters for k-means clustering.
             Default: 2.
         min_dist : float, optional
-            Minimum distance for regspace clustering. 
+            Minimum distance for regspace clustering.
             Default: 12.
         max_iter : int, optional
-            Maximum number of iterations. 
+            Maximum number of iterations.
             Default: 100.
         plot : bool, optional
-            Create a plot. 
+            Create a plot.
             Default: True
         saveas : str, optional
             Name of the file in which to save the plot.
@@ -95,20 +95,20 @@ def obtain_combined_clusters(data_a, data_b, label_a='Sim A', label_b='Sim B', s
             Frame from which the clustering data starts.
             Default: 0.
         algorithm : string
-            The algorithm to use for the clustering. 
-            Options: kmeans, rspace. 
+            The algorithm to use for the clustering.
+            Options: kmeans, rspace.
             Default: kmeans
         num_clusters : int, optional
-            Number of clusters for k-means clustering. 
+            Number of clusters for k-means clustering.
             Default: 2.
         min_dist : float, optional
-            Minimum distance for regspace clustering. 
+            Minimum distance for regspace clustering.
             Default: 12.
         max_iter : int, optional
-            Maximum number of iterations. 
+            Maximum number of iterations.
             Default: 100.
         plot : bool, optional
-            Create a plot. 
+            Create a plot.
             Default: True
         saveas : str, optional
             Name of the file in which to save the plot.
@@ -186,20 +186,20 @@ def obtain_mult_combined_clusters(data, start_frame=0, algorithm='kmeans',
             Frame from which the clustering data starts.
             Default: 0.
         algorithm : string
-            The algorithm to use for the clustering. 
-            Options: kmeans, rspace. 
+            The algorithm to use for the clustering.
+            Options: kmeans, rspace.
             Default: kmeans
         num_clusters : int, optional
-            Number of clusters for k-means clustering. 
+            Number of clusters for k-means clustering.
             Default: 2.
         min_dist : float, optional
-            Minimum distance for regspace clustering. 
+            Minimum distance for regspace clustering.
             Default: 12.
         max_iter : int, optional
-            Maximum number of iterations. 
+            Maximum number of iterations.
             Default: 100.
         plot : bool, optional
-            Create a plot. 
+            Create a plot.
             Default: True
         saveas : str, optional
             Name of the file in which to save the plot.

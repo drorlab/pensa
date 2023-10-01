@@ -19,7 +19,7 @@ from pensa.dimensionality import *
         all_data_a : float array
             Trajectory data from the first ensemble. Format: [frames,frame_data].
         all_data_b : float array
-            Trajectory data from the second ensemble. 
+            Trajectory data from the second ensemble.
             For kld functions, the second ensemble should be the reference ensemble.
             Format: [frames,frame_data].
         bin_width : float, default=None
@@ -35,7 +35,7 @@ from pensa.dimensionality import *
     Returns
     -------
         Each function returns one value.
-        
+
         average_jsd : float
             Average Jensen-Shannon distance from two ensembles.
         max_jsd : float
@@ -67,7 +67,7 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
 
 
 """
-    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of five functions uses the kolmogorov_smirnov_analysis function with the same parameters. 
+    Calculates the average and maximum Kolmogorov-Smirnov statistic for two distributions. Each of five functions uses the kolmogorov_smirnov_analysis function with the same parameters.
 
     Parameters
     ----------
@@ -109,39 +109,39 @@ def average_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, ov
     return np.mean(data_kss)
 
 
-def max_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+def max_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, data_kss, _ = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_kss)
 
-def average_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+def average_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.mean(data_ksp)
 
 
-def max_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+def max_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_ksp)
 
-def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False): 
+def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.min(data_ksp)
 
 """
-    Calculates average and maximum State Specific Information statistic for a feature across two ensembles. Each of two functions uses the ssi_ensemble_analysis function with the same parameters. 
-    
+    Calculates average and maximum State Specific Information statistic for a feature across two ensembles. Each of two functions uses the ssi_ensemble_analysis function with the same parameters.
+
     Parameters
     ----------
     features_a : list of str
-        Feature names of the first ensemble. 
+        Feature names of the first ensemble.
     features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
+        Feature names of the first ensemble.
+        Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
         Trajectory data from the second ensemble. Format: [frames,frame_data].
     torsions : str
-        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'. 
+        Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'.
         Default is None.
     pocket_occupancy : bool, optional
         Set to 'True' if the data input is pocket occupancy distribution.
@@ -154,8 +154,8 @@ def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, overri
     write_plots : bool, optional
         If true, visualise the states over the raw distribution. The default is None.
     override_name_check : bool, default=False
-        Only check number of features, not their names.   
-        
+        Only check number of features, not their names.
+
     Returns
     -------
         Each function returns one value.
@@ -178,7 +178,7 @@ def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocke
 
 """
     Calculates the relative sampling efficiency of test data based on reference data.
-    
+
     Parameters
     ----------
     ref_data : float array
@@ -187,12 +187,12 @@ def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocke
         Trajectory data from the test ensemble. Format: [frames,frame_data].
     num_pc : int
         Number of principal components used.
-        
+
     Returns
     -------
         pca_se : float
             Sampling efficiency of test data based on reference data.
-        
+
 """
 
 def pca_sampling_efficiency(ref_data, test_data, num_pc=2):
@@ -215,6 +215,6 @@ def pca_sampling_efficiency(ref_data, test_data, num_pc=2):
 
 
 
-            
+
 
 

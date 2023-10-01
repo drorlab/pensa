@@ -9,7 +9,7 @@ from pensa.preprocessing import sort_coordinates
 
 def get_feature_subset(feat, data, selection):
     """
-    Returns a subset of selected features. 
+    Returns a subset of selected features.
     Does not check whether the selected features are actually present in the input.
 
     Parameters
@@ -78,7 +78,7 @@ def get_feature_timeseries(feat, data, feature_type, feature_name):
         data : float array
             Feature values data from the simulation.
         feature_type : str
-            Type of the selected feature 
+            Type of the selected feature
             ('bb-torsions', 'bb-distances', 'sc-torsions').
         feature_name : str
            Name of the selected feature.
@@ -152,13 +152,13 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
     data : float array
         Feature values data from the simulation.
     feature_type : str
-        Type of the selected feature 
+        Type of the selected feature
         ('bb-torsions', 'bb-distances', 'sc-torsions').
     write : bool, optional
         If true, write out the data into a directory titled with the feature_type str.
         The default is None.
     out_name : str, optional
-        Prefix for the written data. The default is None.    
+        Prefix for the written data. The default is None.
 
     Returns
     -------
@@ -424,7 +424,7 @@ def get_common_features_data(features_a, features_b, data_a, data_b):
 
 def correct_spher_angle_periodicity(two_angles):
     """
-    Correcting for the periodicity of spherical angles [radians].  
+    Correcting for the periodicity of spherical angles [radians].
     Waters featurized using PENSA and including discrete occupancy are handled.
 
     Parameters
@@ -485,7 +485,7 @@ def correct_spher_angle_periodicity(two_angles):
 
 def correct_angle_periodicity(angle):
     """
-    Correcting for the periodicity of angles [radians].  
+    Correcting for the periodicity of angles [radians].
 
     Parameters
     ----------

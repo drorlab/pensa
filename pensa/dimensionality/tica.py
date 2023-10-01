@@ -19,7 +19,7 @@ def calculate_tica(data, dim=None, lag=10):
         data : float array
             Trajectory data. Format: [frames,frame_data].
         dim : int, optional, default -1
-            The number of dimensions (independent components) to project onto. 
+            The number of dimensions (independent components) to project onto.
             -1 means all numerically available dimensions will be used.
         lag : int, optional, default = 10
             The lag time, in multiples of the input time step.
@@ -152,7 +152,7 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
         data : float array
             Trajectory data [frames,frame_data].
         num : int
-            Number of eigenvectors to project on. 
+            Number of eigenvectors to project on.
         tica : tICA obj, optional, default = None
             Information of pre-calculated tICA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
@@ -199,9 +199,9 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
         data : float array
             Trajectory data [frames,frame_data].
         top : str
-            File name of the reference topology for the trajectory. 
+            File name of the reference topology for the trajectory.
         trj : str
-            File name of the trajetory from which the frames are picked. 
+            File name of the trajetory from which the frames are picked.
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files
@@ -248,14 +248,14 @@ def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_
         data_b : float array
             Trajectory data [frames,frame_data].
         top_a : str
-            Reference topology for the first trajectory. 
+            Reference topology for the first trajectory.
         top_b : str
-            Reference topology for the second trajectory. 
+            Reference topology for the second trajectory.
         trj_a : str
-            First of the trajetories from which the frames are picked. 
+            First of the trajetories from which the frames are picked.
             Should be the same as data_a was from.
         trj_b : str
-            Second of the trajetories from which the frames are picked. 
+            Second of the trajetories from which the frames are picked.
             Should be the same as data_b was from.
         out_name : str
             Core part of the name of the output files.

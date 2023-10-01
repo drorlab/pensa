@@ -13,7 +13,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
                           offset=0):
     """
     Visualizes features per residue as plot and in PDB files.
-    Assumes values from 0 to 1. 
+    Assumes values from 0 to 1.
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
         pdb_filename : str
             Name of the PDB file to save the structure with the values to visualize.
         selection : str, default='max'
-            How to select the value to visualize for each residue from all its features 
+            How to select the value to visualize for each residue from all its features
             Options: 'max', 'min', 'avg'.
         y_label : str, default='max. JS dist. of BB torsions'
             Label of the y axis of the plot.
@@ -93,7 +93,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
                           num_drop_char=0, sort_by_pos=None, numerical_sort=False,
                           vmin=None, vmax=None, symmetric=True, cbar_label=None):
     """
-    Visualizes data per feature pair in a heatmap. 
+    Visualizes data per feature pair in a heatmap.
 
     Parameters
     ----------
@@ -108,7 +108,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
         num_drop_char : int
             Number of characters to drop at the beginning of the feature name.
             Defaults to 0.
-        sort_by_pos : int 
+        sort_by_pos : int
             Position in the name of the feature part of the quantity by which it is to be sorted.
             Assumes that the name is split by ' ' (single whitespace). Counting is 0-based.
             If None, the entire name of the feature part is sorted by numpy.unique().
@@ -121,7 +121,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
         vmax : float, optional
             Maximum value for the heatmap.
         symmetric : bool, optional
-            The matrix is symmetric and values provided only for the upper or lower triangle. 
+            The matrix is symmetric and values provided only for the upper or lower triangle.
             Defaults to True.
         cbar_label : str, optional
             Label for the color bar.
@@ -182,7 +182,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
 def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
                    vmin=None, vmax=None, symmetric=True, verbose=False, cbar_label=None, tick_step=50):
     """
-    Visualizes data per residue pair in a heatmap. 
+    Visualizes data per residue pair in a heatmap.
 
     Parameters
     ----------
@@ -201,7 +201,7 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
         vmax : float, optional, default = None
             Maximum value for the heatmap.
         symmetric : bool, optional, default = True
-            The matrix is symmetric and values provided only for the upper or lower triangle. 
+            The matrix is symmetric and values provided only for the upper or lower triangle.
             Defaults to True.
         verbose : bool, optional, default = False
             Print numbers of first and last residue. Defaults to True.
@@ -262,12 +262,12 @@ def distances_visualization(dist_names, dist_diff, plot_filename,
                             vmin=None, vmax=None, verbose=True,
                             cbar_label=None, tick_step=50):
     """
-    Visualizes distance features for pairs of residues in a heatmap. 
+    Visualizes distance features for pairs of residues in a heatmap.
 
     Parameters
     ----------
         dist_names : str array
-            Names of the distances in PyEMMA nomenclature 
+            Names of the distances in PyEMMA nomenclature
             (contain residue IDs at position [2] and [6] when separated by ' ').
         dist_diff : float array
             Data for each distance feature.

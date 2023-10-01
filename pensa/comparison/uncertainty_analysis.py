@@ -16,7 +16,7 @@ from scipy.optimize import curve_fit
 
 def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
                        blockanlen=10000, pbc=True, discretize='gaussian', group_feat=True, cumdist=False, verbose=True):
-    
+
     """
     Block analysis on the State Specific Information statistic for each feature across two ensembles.
 
@@ -24,10 +24,10 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
     Parameters
     ----------
     features_a : list of str
-        Feature names of the first ensemble. 
+        Feature names of the first ensemble.
     features_b : list of str
-        Feature names of the first ensemble. 
-        Must be the same as features_a. Provided as a sanity check. 
+        Feature names of the first ensemble.
+        Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
@@ -36,7 +36,7 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
         Length of block to be used in the block analysis. Trajectory is then
         segmented into X equal size blocks. The default is None.
     discretize : str, optional
-        Method for state discretization. Options are 'gaussian', which defines 
+        Method for state discretization. Options are 'gaussian', which defines
         state limits by gaussian intersects, and 'partition_values', which defines
         state limits by partitioning all values in the data. The default is 'gaussian'.
     pbc : bool, optional
@@ -47,16 +47,16 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
         in length by the block length. The default is False.
     verbose : bool, default=True
         Print intermediate results.
-        
+
     Returns
     -------
-    ssi_names : list 
+    ssi_names : list
         Feature names of the ensembles.
     ssi_blocks : list of lists
         State Specific Information statistics for each feature, for each block.
 
     """
-    
+
     # Define the block limits
     ssi_blocks = []
     block_lengths = []
@@ -67,18 +67,18 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
         else:
             block_lengths.append([frameno, frameno+blockanlen])
         frameno += blockanlen
-    
+
 
     # Run the SSI analysis on each block
     for bl in block_lengths:
-        
+
         block_data_a = all_data_a[bl[0]:bl[1]]
         block_data_b = all_data_b[bl[0]:bl[1]]
 
         if group_feat:
             features_a, block_data_a = get_multivar_res(features_a, block_data_a)
             features_b, block_data_b = get_multivar_res(features_b, block_data_b)
-        
+
         discrete_states = get_discrete_states(block_data_a, block_data_b,
                                               discretize=discretize, pbc=pbc)
 
@@ -91,21 +91,21 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
 
 
 
-def relen_block_analysis(features_a, features_b, all_data_a, all_data_b, 
+def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
                          blockanlen=10000, cumdist=False, verbose=True):
     """
     Block analysis on the relative entropy metrics for each feature from two ensembles.
-    
+
 
     Parameters
     ----------
     features_a : list of str
-        Feature names of the first ensemble. 
+        Feature names of the first ensemble.
         Can be obtained from features object via .describe().
     features_b : list of str
-        Feature names of the first ensemble. 
+        Feature names of the first ensemble.
         Can be obtained from features object via .describe().
-        Must be the same as features_a. Provided as a sanity check. 
+        Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
         Trajectory data from the first ensemble. Format: [frames,frame_data].
     all_data_b : float array
@@ -125,8 +125,8 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
         List of relative entropy analysis outputs for each block.
 
     """
-    
-    relen_blocks=[]        
+
+    relen_blocks=[]
     block_lengths=[]
     frameno=0
     while frameno < min(len(all_data_a),len(all_data_b)):
@@ -135,24 +135,24 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
         else:
             block_lengths.append([frameno,frameno+blockanlen])
         frameno+=blockanlen
-    
+
     for bl in block_lengths:
         block_data_a = all_data_a[bl[0]:bl[1]]
         block_data_b = all_data_b[bl[0]:bl[1]]
 
-        print('block length = ', bl)       
-        relen = relative_entropy_analysis(features_a, features_b, block_data_a, block_data_b, verbose=verbose)        
+        print('block length = ', bl)
+        relen = relative_entropy_analysis(features_a, features_b, block_data_a, block_data_b, verbose=verbose)
         relen_blocks.append(relen)
-                    
+
     np.save('relen_bl'+str(blockanlen), np.transpose(np.array(relen_blocks)))
-    
+
     return np.transpose(relen_blocks)
 
 
 def _pop_arr_val(listid, pop_val):
     """
-    Remove value from list. Necessary for SEM calculations which include an 
-    error value of -1 for SSI. 
+    Remove value from list. Necessary for SEM calculations which include an
+    error value of -1 for SSI.
 
     Parameters
     ----------
@@ -220,7 +220,7 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
         value upon full convergence. Not yet fully accurate. The default is False.
     plot_dir : str, optional
         Directory in which to save the plots (if write_plots == True)
-        
+
     Returns
     -------
     avsemvals : list of lists
@@ -231,35 +231,35 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
         SSI values for each block, for each residue type.
 
     """
-    
-    ssi_names = [string[:3] for string in ssi_namelist] 
+
+    ssi_names = [string[:3] for string in ssi_namelist]
     resnames = list(set(ssi_names))
     resids = []
-    
+
     for i in range(len(resnames)):
         resids.append(list(np.where(np.array(ssi_names) == resnames[i])[0]))
-    
+
     resssivals = []
     avresssivals=[]
     avsemvals=[]
-    
+
     arr = _pop_arr_val(ssi_blocks, -1)
-    
+
     for i in range(len(resids)):
         resssivals.append([arr[index] for index in resids[i]])
         avresssivals.append(list(np.average(np.array([arr[index] for index in resids[i]],dtype=object),axis=0)))
         avsemvals.append([scipy.stats.sem(avresssivals[-1][:seg]) for seg in range(len(avresssivals[-1]))])
 
-    if write_plot is True:    
+    if write_plot is True:
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
-            
+
         for i in range(len(resnames)):
-            
+
             x=list(range(len(avsemvals[i][2:])))
             y=avsemvals[i][2:]
-            
-            
+
+
             plt.figure()
             plt.ion()
             plt.scatter(x, y,label='raw data',marker='x',color='r')
@@ -271,7 +271,7 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
             if expfit is True:
                 expofit=np.polyfit(x, np.log(y), 1)
                 expy=[np.exp(expofit[0]*xval+expofit[1]) for xval in x]
-                
+
                 a=expofit[1]
                 b=expofit[0]
                 c=min(expy)
@@ -282,13 +282,13 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
                 plt.legend()
-            plt.ioff()                
+            plt.ioff()
             plt.savefig(plot_dir+'/' + resnames[i] + plot_prefix + 'standarderrorSSI.png')
-        
-            
+
+
     return avsemvals, avresssivals, resssivals
 
-  
+
 def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM_plots', plot_prefix=''):
     """
     Standard error analysis for the block averages.
@@ -319,17 +319,17 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
 
     relen_names = [relen_i[0][0].split(' ')[2] for relen_i in relen_dat]
     namesnodups = list(set(relen_names))
-    
+
     matching_indices = []
-    
+
     for i in namesnodups:
         matching_indices.append(list(np.where(np.array(relen_names)==i)[0]))
-    
-    
+
+
     resrelenvals = []
     avresrelenvals=[]
     avsemvals=[]
-    
+
     for i in range(len(matching_indices)):
         datain=[list(relen_dat[index][1])[:-1] for index in matching_indices[i]]
         respre = []
@@ -338,18 +338,18 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
         resrelenvals.append(respre)
         avresrelenvals.append(list(np.average(np.array(resrelenvals[-1]),axis=0)))
         avsemvals.append([scipy.stats.sem(avresrelenvals[-1][:seg]) for seg in range(len(avresrelenvals[-1]))])
-    
+
     ## Plotting the sem over each block to see the convergence
     if write_plot is True:
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
         for i in range(len(namesnodups)):
             print("plotting res", i,  namesnodups[i])
-            
+
             x=list(range(len(avsemvals[i][2:])))
             y=avsemvals[i][2:]
-            
-            plt.figure()      
+
+            plt.figure()
             plt.ion()
             plt.scatter(x, y,label='raw data',marker='x',color='r')
             plt.title(namesnodups[i])
@@ -367,7 +367,7 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
                 y1 = _expfunc(x1, *popt)
                 plt.plot(x1, y1,  label='Exp. fit',alpha=0.75)
                 plt.axhline(popt[-1],label='Converged value =~: ' +str(round(popt[-1],5)),linestyle='--',color='k')
-                plt.legend()   
+                plt.legend()
             plt.ioff()
             plt.savefig(plot_dir+'/' + namesnodups[i] + plot_prefix + 'standarderrorJSD.png')
 
@@ -383,13 +383,13 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
 # gro1 = '../../tutorial/mor-data/11426_dyn_151.pdb'
 # gro2 = '../../tutorial/mor-data/11426_dyn_151.pdb'
 
-# start_frame=0  
-# a_rec = get_structure_features(gro1, 
+# start_frame=0
+# a_rec = get_structure_features(gro1,
 #                                xtc1,
 #                                start_frame, features=['sc-torsions'])
 # a_rec_feat, a_rec_data = a_rec
 
-# b_rec = get_structure_features(gro2, 
+# b_rec = get_structure_features(gro2,
 #                                xtc2,
 #                                start_frame, features=['sc-torsions'])
 # b_rec_feat, b_rec_data = b_rec
@@ -397,15 +397,15 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
 # # relen_dat = relen_block_analysis(a_rec_feat['sc-torsions'],
 # #                                   b_rec_feat['sc-torsions'],
 # #                                   a_rec_data['sc-torsions'],
-# #                                   b_rec_data['sc-torsions'], 
+# #                                   b_rec_data['sc-torsions'],
 # #                                   blockanlen=1000, cumdist=False, verbose=True)
- 
+
 # # resrelenvals, avresrelenvals, avsemvals = relen_sem_analysis(relen_dat)
 
 # ssi_names, ssi_dat = ssi_block_analysis(a_rec_feat['sc-torsions'],
 #                                         b_rec_feat['sc-torsions'],
 #                                         a_rec_data['sc-torsions'],
-#                                         b_rec_data['sc-torsions'], 
+#                                         b_rec_data['sc-torsions'],
 #                                         blockanlen=2500, pbc=True,
 #                                         discretize='gaussian', group_feat=True,
 #                                         cumdist=False, verbose=True)

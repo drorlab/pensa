@@ -12,7 +12,7 @@ def download_from_gpcrmd(filename, folder):
     Parameters
     ----------
         filename : str
-            Name of the file to download. 
+            Name of the file to download.
             Must be a file that is in GPCRmd.
         folder : str
             Target directory.
@@ -41,7 +41,7 @@ def get_transmem_from_uniprot(uniprot_id):
 
     Returns
     -------
-        tm : list 
+        tm : list
             List of all transmembrane regions, represented as tuples with first and last residue ID.
 
     """

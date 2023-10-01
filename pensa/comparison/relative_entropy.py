@@ -13,18 +13,18 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
     Parameters
     ----------
         features_a : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
         features_b : list of str
-            Feature names of the first ensemble. 
+            Feature names of the first ensemble.
             Can be obtained from features object via .describe().
-            Must be the same as features_a. Provided as a sanity check. 
+            Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
             Trajectory data from the first ensemble. Format: [frames,frame_data].
         all_data_b : float array
             Trajectory data from the second ensemble. Format: [frames,frame_data].
         bin_width : float, default=None
-            Bin width for the axis to compare the distributions on. 
+            Bin width for the axis to compare the distributions on.
             If bin_width is None, bin_num (see below) bins are used and the width is determined from the common histogram.
         bin_num : int, default=10
             Number of bins for the axis to compare the distributions on (only if bin_width=None).

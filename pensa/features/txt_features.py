@@ -1,13 +1,13 @@
 import numpy as np
 from pensa import *
-import random 
+import random
 import math
 
 
 
 def get_txt_features_ala2(filename, num_frames, cossin=False):
     """
-    Parses features for ala2 from a text file. 
+    Parses features for ala2 from a text file.
     The text file must be formatted with "phi", followed by all phi angles, a blank line,
     followed by "psi" and all psi angles, with one angle per line.
 
@@ -62,5 +62,5 @@ def get_txt_features_ala2(filename, num_frames, cossin=False):
 
     return features
 
-            
+
 

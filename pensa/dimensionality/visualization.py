@@ -14,7 +14,7 @@ def project_on_eigenvector_tica(data, ev_idx, ana):
         data : float array
             Trajectory data [frames,frame_data].
         ev_idx : int
-            Index of the eigenvector to project on (starts with zero). 
+            Index of the eigenvector to project on (starts with zero).
         ana : tICA obj
             Information of pre-calculated tICA.
             Must be calculated for the same features (but not necessarily the same trajectory).
@@ -43,7 +43,7 @@ def project_on_eigenvector_pca(data, ev_idx, ana):
         data : float array
             Trajectory data [frames,frame_data].
         ev_idx : int
-            Index of the eigenvector to project on (starts with zero). 
+            Index of the eigenvector to project on (starts with zero).
         ana : PCA obj
             Information of pre-calculated PCA.
             Must be calculated for the same features (but not necessarily the same trajectory).
@@ -75,7 +75,7 @@ def compare_projections(data_a, data_b, ana, num=3, saveas=None, label_a=None, l
         ana : PCA or tICA object
             Components analysis information.
         num : int
-            Number of components to plot. 
+            Number of components to plot.
         saveas : str, optional
             Name of the output file.
         label_a : str, optional
@@ -109,7 +109,7 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
         ana : PCA or tICA object
             Components analysis information.
         num : int
-            Number of principal components to plot. 
+            Number of principal components to plot.
         saveas : str, optional
             Name of the output file.
         labels : list of str, optional
@@ -178,9 +178,9 @@ def sort_traj_along_projection(data, ana, top, trj, out_name, num_comp=3, start_
         ana : PCA or tICA obj
             Components information.
         top : str
-            File name of the reference topology for the trajectory. 
+            File name of the reference topology for the trajectory.
         trj : str
-            File name of the trajetory from which the frames are picked. 
+            File name of the trajetory from which the frames are picked.
             Should be the same as data was from.
         out_name : str
             Core part of the name of the output files
