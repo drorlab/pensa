@@ -1,8 +1,6 @@
 import numpy as np
-from pensa import *
 import random
 import math
-
 
 
 def get_txt_features_ala2(filename, num_frames, cossin=False):
@@ -51,7 +49,7 @@ def get_txt_features_ala2(filename, num_frames, cossin=False):
         features = np.zeros((num_frames, 2))
         for i in range(num_frames):
             features[i, 0] = phi[i]
-            reatures[i, 1] = psi[i]
+            features[i, 1] = psi[i]
     else:
         features = np.zeros((num_frames, 4))
         for i in range(num_frames):
@@ -61,6 +59,3 @@ def get_txt_features_ala2(filename, num_frames, cossin=False):
             features[i, 3] = math.sin(psi[i])
 
     return features
-
-
-
