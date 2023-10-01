@@ -13,7 +13,7 @@ from functools import partial
 # -- Functions to cluster feature distributions into discrete states --
 
 
-def _smooth(x,window_len,window=None):
+def _smooth(x, window_len, window=None):
     """
     Smooth data so that true extrema can be found without any noise
 
@@ -48,12 +48,12 @@ def _smooth(x,window_len,window=None):
         return x
     if not window_type in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
         raise ValueError
-    s=np.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
+    s=np.r_[x[window_len-1:0:-1], x, x[-2:-window_len-1:-1]]
     if window_type  ==  'flat': #moving average
-        w=np.ones(window_len,'d')
+        w=np.ones(window_len, 'd')
     else:
         w=eval('np.'+window_type+'(window_len)')
-    y=np.convolve(w/w.sum(),s,mode='valid')
+    y=np.convolve(w/w.sum(), s, mode='valid')
     return y
 
 def _find_nearest(distr, value):
@@ -77,7 +77,7 @@ def _find_nearest(distr, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def _printKclosest(arr,n,x,k):
+def _printKclosest(arr, n, x, k):
     """
     Print K closest values to a specified value.
 
@@ -103,24 +103,24 @@ def _printKclosest(arr,n,x,k):
     # first k elements.
     pq = PriorityQueue()
     for neighb in range(k):
-        pq.put((-abs(arr[neighb]-x),neighb))
+        pq.put((-abs(arr[neighb]-x), neighb))
     # Now process remaining elements
-    for neighb in range(k,n):
+    for neighb in range(k, n):
         diff = abs(arr[neighb]-x)
-        p,pi = pq.get()
+        p, pi = pq.get()
         curr = -p
         # If difference with current
         # element is more than root,
         # then put it back.
         if diff>curr:
-            pq.put((-curr,pi))
+            pq.put((-curr, pi))
             continue
         else:
             # Else remove root and insert
-            pq.put((-diff,neighb))
+            pq.put((-diff, neighb))
     # Print contents of heap.
     while(not pq.empty()):
-        p,q = pq.get()
+        p, q = pq.get()
         a.append(str("{} ".format(arr[q])))
     return a
 
@@ -150,41 +150,41 @@ def _gauss(x, x0, sigma, a):
         gaussian = abs(a*np.exp(-(x-x0)**2/(2*sigma**2)))
     return gaussian
 
-def _bimodal(x,mu1,sigma1,A1,mu2,sigma2,A2):
+def _bimodal(x, mu1, sigma1, A1, mu2, sigma2, A2):
     """ Two gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)
 
-def _trimodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3):
+def _trimodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3):
     """ Three gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)
 
-def _quadmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4):
+def _quadmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4):
     """ Four gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)
 
-def _quinmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5):
+def _quinmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5):
     """ Five gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)
 
-def _sexmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6):
+def _sexmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6):
     """ Six gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)+_gauss(x, mu6, sigma6, A6)
 
-def _septmodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7):
+def _septmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7):
     """ Seven gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)+_gauss(x, mu6, sigma6, A6)+_gauss(x, mu7, sigma7, A7)
 
-def _octomodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8):
+def _octomodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8):
     """ Eight gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)+_gauss(x, mu6, sigma6, A6)+_gauss(x, mu7, sigma7, A7)+_gauss(x, mu8, sigma8, A8)
 
-def _nonamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9):
+def _nonamodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8, mu9, sigma9, A9):
     """ Nine gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)+_gauss(x,mu9,sigma9,A9)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)+_gauss(x, mu6, sigma6, A6)+_gauss(x, mu7, sigma7, A7)+_gauss(x, mu8, sigma8, A8)+_gauss(x, mu9, sigma9, A9)
 
-def _decamodal(x,mu1,sigma1,A1,mu2,sigma2,A2,mu3,sigma3,A3,mu4,sigma4,A4,mu5,sigma5,A5,mu6,sigma6,A6,mu7,sigma7,A7,mu8,sigma8,A8,mu9,sigma9,A9,mu10,sigma10,A10):
+def _decamodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8, mu9, sigma9, A9, mu10, sigma10, A10):
     """ Ten gaussians """
-    return _gauss(x,mu1,sigma1,A1)+_gauss(x,mu2,sigma2,A2)+_gauss(x,mu3,sigma3,A3)+_gauss(x,mu4,sigma4,A4)+_gauss(x,mu5,sigma5,A5)+_gauss(x,mu6,sigma6,A6)+_gauss(x,mu7,sigma7,A7)+_gauss(x,mu8,sigma8,A8)+_gauss(x,mu9,sigma9,A9)+_gauss(x,mu10,sigma10,A10)
+    return _gauss(x, mu1, sigma1, A1)+_gauss(x, mu2, sigma2, A2)+_gauss(x, mu3, sigma3, A3)+_gauss(x, mu4, sigma4, A4)+_gauss(x, mu5, sigma5, A5)+_gauss(x, mu6, sigma6, A6)+_gauss(x, mu7, sigma7, A7)+_gauss(x, mu8, sigma8, A8)+_gauss(x, mu9, sigma9, A9)+_gauss(x, mu10, sigma10, A10)
 
 def _integral(x, mu, sigma, A):
     """
@@ -240,10 +240,10 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
     distr2 = distribution[traj1_len:]
 
     histox = np.histogram(distribution, bins=gauss_bin, density=True)[1]
-    histo1 = np.histogram(distr1, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
-    histo2 = np.histogram(distr2, bins=gauss_bin, range=(min(histox),max(histox)), density=True)[0]
+    histo1 = np.histogram(distr1, bins=gauss_bin, range=(min(histox), max(histox)), density=True)[0]
+    histo2 = np.histogram(distr2, bins=gauss_bin, range=(min(histox), max(histox)), density=True)[0]
 
-    combined_histo = [(height1 + height2)/2 for height1,height2 in zip(histo1,histo2)]
+    combined_histo = [(height1 + height2)/2 for height1, height2 in zip(histo1, histo2)]
 
     distributionx = _smooth(histox[0:-1], gauss_smooth)
     ## Setting histrogram minimum to zero with uniform linear shift (for noisey distributions)
@@ -262,7 +262,7 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
         closest_xvals = [np.where(distributiony==float(closesty))[0][0] for closesty in closest_yvals]
 
         mean_xval = distributionx[np.where(distributiony==extrema)[0][0]]
-        half_max_xval = _find_nearest(distributionx[closest_xvals],mean_xval)
+        half_max_xval = _find_nearest(distributionx[closest_xvals], mean_xval)
 
         FWHM = np.absolute(half_max_xval - mean_xval)
         sigma = FWHM /(2*(np.sqrt(2*np.log(2))))
@@ -275,9 +275,9 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
         sigma_pop.append(sig_vals[extr_num])
 
     ##x is the space of angles
-    Gauss_xvals=np.linspace(min(distribution),max(distribution),10000)
+    Gauss_xvals=np.linspace(min(distribution), max(distribution), 10000)
     ##choosing the fitting mode
-    peak_number=[_gauss,_bimodal,_trimodal,_quadmodal,_quinmodal,_sexmodal,_septmodal,_octomodal,_nonamodal,_decamodal]
+    peak_number=[_gauss, _bimodal, _trimodal, _quadmodal, _quinmodal, _sexmodal, _septmodal, _octomodal, _nonamodal, _decamodal]
     mode=peak_number[len(sig_vals)-1]
     expected=[]
 
@@ -286,10 +286,10 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
         expected.append(sigma_pop[param_num])
         expected.append(maxima[param_num])
 
-    params, cov = curve_fit(mode,distributionx,distributiony,expected,maxfev=1000000)
+    params, cov = curve_fit(mode, distributionx, distributiony, expected, maxfev=1000000)
 
     gaussians=[]
-    gauss_num_space=np.linspace(0,(len(params))-3,int(len(params)/3))
+    gauss_num_space=np.linspace(0, (len(params))-3, int(len(params)/3))
 
     for gauss_index in gauss_num_space:
         intmax = _integral(max(distribution),
@@ -347,7 +347,7 @@ def smart_gauss_fit(distr, traj1_len, gauss_bins=180, gauss_smooth=None, write_n
     attempt_no = 0
 
     ##making a list of +/- values for bin trials to ensure minimal change
-    bin_adjust_up = np.array(range(1,10000))
+    bin_adjust_up = np.array(range(1, 10000))
     bin_adjust_down = bin_adjust_up.copy()*-1
     bin_adjust = np.insert(bin_adjust_up, np.arange(len(bin_adjust_down)), bin_adjust_down)
 
@@ -371,7 +371,7 @@ def smart_gauss_fit(distr, traj1_len, gauss_bins=180, gauss_smooth=None, write_n
 
     return gaussians, Gauss_xvals
 
-def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_name=None):
+def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None, write_name=None):
     """
     Obtain the intersects of a mixture of Gaussians which have been obtained
     from decomposing a distribution into Gaussians. Additional state limits are
@@ -431,11 +431,11 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None,write_
             os.makedirs('ssi_plots/')
         plt.figure()
         plt.ion()
-        plt.hist(distribution,bins=360, density=True, alpha=0.5)
+        plt.hist(distribution, bins=360, density=True, alpha=0.5)
         for gauss_index in range(len(reorder_gaussians)):
             plt.plot(Gauss_xvals, reorder_gaussians[gauss_index], lw=2)
         for intersect_index in range(len(all_intersects)):
-            plt.axvline(all_intersects[intersect_index],color='k',lw=1,ls='--')
+            plt.axvline(all_intersects[intersect_index], color='k', lw=1, ls='--')
         plt.xlabel('Radians')
         plt.ylabel('Count')
         plt.title(write_name)
@@ -487,7 +487,7 @@ def determine_state_limits(distr, traj1_len, gauss_bins=180, gauss_smooth=None, 
 
 # -- Functions to operate on discrete states --
 
-def _check(value,x,y):
+def _check(value, x, y):
     """
     Check if a value is between x and y
 
@@ -539,7 +539,7 @@ def _create_states(data):
 
 
 
-def calculate_entropy(state_limits,distribution_list):
+def calculate_entropy(state_limits, distribution_list):
     """
     Calculate the Shannon entropy of a distribution as the summation of all
     -p*log(p) where p refers to the probability of a conformational state.
@@ -589,12 +589,12 @@ def calculate_entropy(state_limits,distribution_list):
                 distribution=dist_list[dist_num]
 
                 for frame_num in range(len(distribution)):
-                    limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1])
-            mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+                    limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num], limits[0], limits[1])
+            mut_prob[it.multi_index]= sum(np.prod(limit_occupancy_checks, axis=0)) / len(limit_occupancy_checks[0])
             ##calculating the entropy as the summation of all -p*log(p)
 
             if mut_prob[it.multi_index] != 0:
-                entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index],2)
+                entropy+=-1*mut_prob[it.multi_index]*math.log(mut_prob[it.multi_index], 2)
             it.iternext()
     return entropy
 
@@ -642,13 +642,13 @@ def _lim_occ_par(idx, params):
             distribution=dist_list[dist_num]
 
             for frame_num in range(len(distribution)):
-                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num],limits[0],limits[1])
+                limit_occupancy_checks[dist_num][frame_num]= _check(distribution[frame_num], limits[0], limits[1])
 
-        mut_prob[loopno]= sum(np.prod(limit_occupancy_checks,axis=0)) / len(limit_occupancy_checks[0])
+        mut_prob[loopno]= sum(np.prod(limit_occupancy_checks, axis=0)) / len(limit_occupancy_checks[0])
         ##calculating the entropy as the summation of all -p*log(p)
 
         if mut_prob[loopno] != 0:
-            entropy+=-1*mut_prob[loopno]*math.log(mut_prob[loopno],2)
+            entropy+=-1*mut_prob[loopno]*math.log(mut_prob[loopno], 2)
     return entropy
 
 def _divisorGenerator(n):
@@ -675,7 +675,7 @@ def _divisorGenerator(n):
     for divisor in reversed(large_divisors):
         yield divisor
 
-def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
+def calculate_entropy_multthread(state_limits, distribution_list, max_thread_no):
     """
     Calculate the Shannon entropy of a distribution as the summation of all
     -p*log(p) where p refers to the probability of a conformational state.
@@ -726,9 +726,9 @@ def calculate_entropy_multthread(state_limits,distribution_list,max_thread_no):
         threadno = [num for num in list(_divisorGenerator(multiidx_loopno)) if num < max_thread_no+1]
         multthr = threadno[-1]
         # Start and stop indices for state subsets
-        poolprocs1 = list(range(0,multiidx_loopno+1,int(multthr)))[:-1]
-        poolprocs2 = list(range(0,multiidx_loopno+1,int(multthr)))[1:]
-        poolproc = [[i,j] for i,j in zip(poolprocs1,poolprocs2)]
+        poolprocs1 = list(range(0, multiidx_loopno+1, int(multthr)))[:-1]
+        poolprocs2 = list(range(0, multiidx_loopno+1, int(multthr)))[1:]
+        poolproc = [[i, j] for i, j in zip(poolprocs1, poolprocs2)]
 
         param = [state_lims, dist_list]
 
@@ -820,7 +820,7 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
                                                               write_plots=write_plots,
                                                               write_name=plot_name))
                 except:
-                    print('Distribution ',residue,' not clustering properly.')
+                    print('Distribution ', residue, ' not clustering properly.')
 
         ssi_states.append(feat_states)
 
