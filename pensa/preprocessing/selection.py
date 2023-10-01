@@ -18,7 +18,7 @@ def range_to_string(a, b):
             String containing all int numbers from a to b.
 
     """
-    r = np.arange(a, b+1)
+    r = np.arange(a, b + 1)
     string = ''
     for ri in r:
         string += str(ri)
@@ -50,5 +50,3 @@ def load_selection(sel_file, sel_base=''):
             r = np.array(line.strip().split(' '), dtype=int)
             sel_string += range_to_string(*r)
     return sel_string
-
-

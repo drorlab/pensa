@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# - * - coding: utf-8 - * -
 """
 Methods to featurize a protein, based on PyEMMA.
 
@@ -92,7 +92,7 @@ def _describe_dist_without_atom_numbers(feature_names):
 
     """
     desc = feature_names.describe()
-    desc = [ _remove_atom_numbers_from_distance(d) for d in desc ]
+    desc = [_remove_atom_numbers_from_distance(d) for d in desc]
     return desc
 
 
@@ -116,7 +116,7 @@ def _remove_atom_numbers_from_distance(feat_str):
     # Glue the desired parts back together
     new_feat = parts[0]
     for nr in [1, 2, 3, 5, 6, 7, 8]:
-        new_feat += ' '+parts[nr]
+        new_feat += ' ' + parts[nr]
     return new_feat
 
 
@@ -144,22 +144,22 @@ def _remove_resnum_offset(features, offset):
     if 'bb-torsions' in features.keys():
         for f in features['bb-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['bb-torsions'].append(' '.join(fsplit))
 
     if 'sc-torsions' in features.keys():
         for f in features['sc-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['sc-torsions'].append(' '.join(fsplit))
 
     if 'bb-distances' in features.keys():
         for f in features['bb-distances']:
             fsplit = f.split(' ')
-            resnum1 = int(f.split(' ')[2])-offset
-            resnum2 = int(f.split(' ')[6])-offset
+            resnum1 = int(f.split(' ')[2]) - offset
+            resnum2 = int(f.split(' ')[6]) - offset
             fsplit[2] = str(resnum1)
             fsplit[6] = str(resnum2)
             new_features['bb-distances'].append(' '.join(fsplit))
@@ -201,4 +201,3 @@ def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_n
     sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
     d_sorted = d[sort_idx]
     return d_sorted
-

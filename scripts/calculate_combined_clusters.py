@@ -75,7 +75,7 @@ if __name__ == "__main__":
     # Write indices to results file
     np.savetxt(args.out_results+'_combined-cluster-indices.csv',
                np.array([cidx, cond, oidx], dtype=int).T,
-               delimiter=',', fmt='%i',
+               delimiter=', ', fmt='%i',
                header='Cluster, Condition, Index within condition')
 
     # Write out frames for each cluster for each simulation

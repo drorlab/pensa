@@ -68,4 +68,3 @@ def get_drormd_features(csv_file):
     for i, f in enumerate(feature_names):
         feature_data[:, i] = df[f]
     return feature_names, feature_data
-

@@ -1,8 +1,4 @@
 import numpy as np
-import scipy as sp
-import scipy.stats
-import scipy.spatial
-import scipy.spatial.distance
 import os
 from pensa.preprocessing import sort_coordinates
 
@@ -192,11 +188,11 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
         resname = feat_name_split[-2] + ' ' + feat_name_split[-1]
         sorted_names.append(resname)
         if write is True:
-            for subdir in [feature_type+'/']:
+            for subdir in [feature_type + '/']:
                 if not os.path.exists(subdir):
                     os.makedirs(subdir)
             resname_out = feat_name_split[-2] + feat_name_split[-1]
-            filename = feature_type+'/' + out_name + resname_out + ".txt"
+            filename = feature_type + '/' + out_name + resname_out + ".txt"
             np.savetxt(filename, feat_timeseries, delimiter=', ', newline='\n')
 
     # return multivar_res_timeseries_data
@@ -447,10 +443,10 @@ def correct_spher_angle_periodicity(two_angles):
 
     psi_heights = np.histogram(psi_continuous_angles, bins=90, density=True)
     # Shift everything before bin with minimum height by periodic amount φ ∈ [0, 2π)
-    psi_shift = 2*np.pi
+    psi_shift = 2 * np.pi
     if psi_heights[0][0] > min(psi_heights[0]):
         perbound = psi_heights[1][np.where(
-            psi_heights[0] == min(psi_heights[0]))[0][0]+1]
+            psi_heights[0] == min(psi_heights[0]))[0][0] + 1]
         for angle_index in range(len(psi_continuous_angles)):
             if psi_continuous_angles[angle_index] < perbound:
 
@@ -468,10 +464,10 @@ def correct_spher_angle_periodicity(two_angles):
     theta_heights = np.histogram(
         theta_continuous_angles, bins=90, density=True)
     # Shift everything before bin with minimum height by periodic amount θ ∈ [0, π]
-    theta_shift = 2*np.pi
+    theta_shift = 2 * np.pi
     if theta_heights[0][0] > min(theta_heights[0]):
         perbound = theta_heights[1][np.where(
-            theta_heights[0] == min(theta_heights[0]))[0][0]+1]
+            theta_heights[0] == min(theta_heights[0]))[0][0] + 1]
         for angle_index in range(len(theta_continuous_angles)):
             if theta_continuous_angles[angle_index] < perbound:
                 theta_continuous_angles[angle_index] = theta_shift - \
@@ -502,11 +498,11 @@ def correct_angle_periodicity(angle):
     heights = np.histogram(new_angle, bins=90, density=True)
     # Shift everything before bin with minimum height by periodic amount
     if heights[0][0] > min(heights[0]):
-        perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0]+1]
+        perbound = heights[1][np.where(heights[0] == min(heights[0]))[0][0] + 1]
         # print(perbound)
         for angle_index in range(len(new_angle)):
             if new_angle[angle_index] < perbound:
-                new_angle[angle_index] += 2*np.pi
+                new_angle[angle_index] += 2 * np.pi
 
     return new_angle
 
@@ -542,7 +538,7 @@ def sort_traj_along_feature(feat, data, feature_name, ref_name, trj_name, out_na
 
     """
     if verbose:
-        print('Sorting along feature '+feature_name)
+        print('Sorting along feature ' + feature_name)
     d = get_feature_data(feat, data, feature_name)
     d_sorted, sort_idx, oidx_sort = sort_coordinates(
         d, ref_name, trj_name, out_name, start_frame=start_frame)

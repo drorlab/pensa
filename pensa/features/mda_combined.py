@@ -1,4 +1,3 @@
-import pensa
 from .mda_torsions import get_protein_backbone_torsions, get_protein_sidechain_torsions
 from .mda_distances import get_calpha_distances
 from pensa.features.processing import get_feature_timeseries
@@ -52,7 +51,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
             first_frame=start_frame, last_frame=None, step=step_width,
             naming='segindex', radians=True,
             include_omega=False
-            )
+        )
         feature_names['bb-torsions'] = bbtorsions[0]
         features_data['bb-torsions'] = bbtorsions[1]
     # Add sidechain torsions.
@@ -61,7 +60,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
             pdb, xtc, selection='all',
             first_frame=start_frame, last_frame=None, step=step_width,
             naming='segindex', radians=True
-            )
+        )
         feature_names['sc-torsions'] = sctorsions[0]
         features_data['sc-torsions'] = sctorsions[1]
     # Add backbone C-alpha distances.
@@ -69,7 +68,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         bbdistances = get_calpha_distances(
             pdb, xtc,
             first_frame=start_frame, last_frame=None, step=step_width,
-            )
+        )
         feature_names['bb-distances'] = bbdistances[0]
         features_data['bb-distances'] = bbdistances[1]
     # Remove the residue-number offset
@@ -103,22 +102,22 @@ def _remove_resnum_offset(features, offset):
     if 'bb-torsions' in features.keys():
         for f in features['bb-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['bb-torsions'].append(' '.join(fsplit))
 
     if 'sc-torsions' in features.keys():
         for f in features['sc-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['sc-torsions'].append(' '.join(fsplit))
 
     if 'bb-distances' in features.keys():
         for f in features['bb-distances']:
             fsplit = f.split(' ')
-            resnum1 = int(f.split(' ')[2])-offset
-            resnum2 = int(f.split(' ')[6])-offset
+            resnum1 = int(f.split(' ')[2]) - offset
+            resnum2 = int(f.split(' ')[6]) - offset
             fsplit[2] = str(resnum1)
             fsplit[6] = str(resnum2)
             new_features['bb-distances'].append(' '.join(fsplit))

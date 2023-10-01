@@ -45,16 +45,16 @@ def get_transmem_from_uniprot(uniprot_id):
             List of all transmembrane regions, represented as tuples with first and last residue ID.
 
     """
-    url = 'https://www.uniprot.org/uniprot/'+uniprot_id+'.txt'
+    url = 'https://www.uniprot.org/uniprot/' + uniprot_id + '.txt'
     r = requests.get(url, allow_redirects=True)
     c = r.content
     tm = []
     for line in c.splitlines():
         if line.startswith(b'FT   TRANSMEM'):
-            l = str(line)
-            l = l.replace('b\'FT   TRANSMEM        ', '')
-            l = l.replace('\'', '')
-            s = l.split('.')
+            new_line = str(line)
+            new_line = new_line.replace('b\'FT   TRANSMEM        ', '')
+            new_line = new_line.replace('\'', '')
+            s = new_line.split('.')
             tm.append((int(s[0]), int(s[-1])))
     for tmi in tm:
         print(*tmi)

@@ -65,7 +65,7 @@ if __name__ == "__main__":
                                   plot_file=args.out_plots+"_"+ftype+"_eigenvalues_combined.pdf")
     # Save them to a CSV file
     np.savetxt(args.out_results+"_"+ftype+"_eigenvalues_combined.csv", np.array([cn, ev]).T,
-               delimiter=',', header='Component, Eigenvalue')
+               delimiter=', ', header='Component, Eigenvalue')
     # Plot feature correlation with top components and print relevant features
     pca_features(pca, feat_a[ftype],
                  args.num_components, args.feat_threshold,

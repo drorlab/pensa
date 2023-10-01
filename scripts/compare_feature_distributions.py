@@ -32,7 +32,7 @@ def workflow_torsions_jsd(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
     # Save all results (per feature) in CSV files
     np.savetxt(args.out_results+'_'+tors+'-torsions_relative-entropy.csv', np.array(relen).T,
-               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+               fmt='%s', delimiter=', ', header='Name, JSD(A, B), KLD(A, B), KLD(B, A)')
 
     # Save the Jensen-Shannon distance as "B factor" in a PDB file
     vis = residue_visualization(names, jsd, args.ref_file_a,
@@ -71,7 +71,7 @@ def workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
     # Save all results (per feature) in CSV files
     np.savetxt(args.out_results+'_'+tors+'-torsions_kolmogorov-smirnov.csv', np.array(ksana).T,
-               fmt='%s', delimiter=',', header='Name, KSS(A,B), p-value')
+               fmt='%s', delimiter=', ', header='Name, KSS(A, B), p-value')
 
     # Save the Kolmogorov-Smirnov statistic as "B factor" in a PDB file
     vis = residue_visualization(names, kss, args.ref_file_a,
@@ -105,7 +105,7 @@ def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
     # Save all results (per feature) in CSV files
     np.savetxt(args.out_results+'_'+tors+'-torsions_state-specific-information.csv', np.array(ana).T,
-               fmt='%s', delimiter=',', header='Name, SSI(A,B)')
+               fmt='%s', delimiter=', ', header='Name, SSI(A, B)')
 
     # Save the state-specific information as "B factor" in a PDB file
     vis = residue_visualization(resnames, ssi, args.ref_file_a,
@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
     # Save all results (per feature) in a CSV file
     np.savetxt(args.out_results+'_bb-distances_relative-entropy.csv', np.array(relen).T,
-               fmt='%s', delimiter=',', header='Name, JSD(A,B), KLD(A,B), KLD(B,A)')
+               fmt='%s', delimiter=', ', header='Name, JSD(A, B), KLD(A, B), KLD(B, A)')
 
     # Print the features with the highest values
     print("Backbone C-alpha distances with the strongest deviations:")
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     # Save all results (per feature) in a CSV file
     np.savetxt(args.out_results+'_bb-distances_difference-of-mean.csv', np.array(meanda).T,
-               fmt='%s', delimiter=',', header='Name, average, difference')
+               fmt='%s', delimiter=', ', header='Name, average, difference')
 
     # Sort the distances by their differences
     print("Backbone C-alpha distances with the strongest differences of their mean value:")

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# - * - coding: utf-8 - * -
 """
 Methods to read in and process features from coordinates.
 
@@ -13,4 +13,4 @@ from .water_features import *
 from .txt_features import *
 from .csv_features import *
 from .hbond_features import *
-#from .pyemma_features import *
+# from .pyemma_features import *
