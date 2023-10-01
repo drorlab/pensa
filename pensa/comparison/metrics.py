@@ -17,11 +17,11 @@ from pensa.dimensionality import *
             Can be obtained from features object via .describe().
             Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
-            Trajectory data from the first ensemble. Format: [frames,frame_data].
+            Trajectory data from the first ensemble. Format: [frames, frame_data].
         all_data_b : float array
             Trajectory data from the second ensemble.
             For kld functions, the second ensemble should be the reference ensemble.
-            Format: [frames,frame_data].
+            Format: [frames, frame_data].
         bin_width : float, default=None
             Bin width for the axis to compare the distributions on.
             If bin_width is None, bin_num (see below) bins are used and the width is determined from the common histogram.
@@ -79,9 +79,9 @@ def max_kld(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_
             Can be obtained from features object via .describe().
             Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
-            Trajectory data from the first ensemble. Format: [frames,frame_data].
+            Trajectory data from the first ensemble. Format: [frames, frame_data].
         all_data_b : float array
-            Trajectory data from the second ensemble. Format: [frames,frame_data].
+            Trajectory data from the second ensemble. Format: [frames, frame_data].
         verbose : bool, default=True
             Print intermediate results.
         override_name_check : bool, default=False
@@ -137,9 +137,9 @@ def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, overri
         Feature names of the first ensemble.
         Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     torsions : str
         Torsion angles to use for SSI, including backbone - 'bb', and sidechain - 'sc'.
         Default is None.
@@ -182,9 +182,9 @@ def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocke
     Parameters
     ----------
     ref_data : float array
-        Trajectory data from the reference ensemble. Format: [frames,frame_data].
+        Trajectory data from the reference ensemble. Format: [frames, frame_data].
     test_data : float array
-        Trajectory data from the test ensemble. Format: [frames,frame_data].
+        Trajectory data from the test ensemble. Format: [frames, frame_data].
     num_pc : int
         Number of principal components used.
 

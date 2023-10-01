@@ -24,8 +24,8 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     # Load and select the protein
     u = mda.Universe(top_file, trj_file)
     protein = u.select_atoms('all')
-    print('Number of frames in trajectory:',len(u.trajectory))
-    print('Number of cluster indices:',len(cluster_idx))
+    print('Number of frames in trajectory:', len(u.trajectory))
+    print('Number of cluster indices:', len(cluster_idx))
     return_protein = []
     # Loop over clusters
     num_clusters = np.max(cluster_idx)+1

@@ -17,9 +17,9 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
         Feature names of the first ensemble.
         Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     discrete_states_ab : list of list
         List of state limits for each feature.
     max_thread_no : int, optional
@@ -87,18 +87,18 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
             ##calculating the entropy for set_distr_b
             ## if no dist (None) then apply the binary dist for two simulations
             ens_distr=[[0.5]*traj1_len + [1.5]*traj2_len]
-            ens_states= [[0,1,2]]
+            ens_states= [[0, 1, 2]]
 
             traj_1_fraction = traj1_len/(traj1_len+traj2_len)
             traj_2_fraction = 1 - traj_1_fraction
-            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
             H_ens = norm_factor
 
             featens_joint_states= res_states + ens_states
             featens_joint_distr= combined_dist + ens_distr
 
             if max_thread_no>1:
-                H_featens=calculate_entropy_multthread(featens_joint_states,featens_joint_distr, max_thread_no)
+                H_featens=calculate_entropy_multthread(featens_joint_states, featens_joint_distr, max_thread_no)
             else:
                 H_featens=calculate_entropy(featens_joint_states, featens_joint_distr)
 
@@ -106,7 +106,7 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
             data_ssi[residue] = SSI
 
         if verbose is True:
-            print(data_names[residue],data_ssi[residue])
+            print(data_names[residue], data_ssi[residue])
 
 
     return data_names, data_ssi
@@ -125,9 +125,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
         Feature names of the first ensemble.
         Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     discrete_states_ab : list of list
         List of state limits for each feature.
     max_thread_no : int, optional
@@ -191,9 +191,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
         set_a_states = discrete_states_ab[res1]
 
         if max_thread_no>1:
-            H_a=calculate_entropy_multthread(set_a_states,set_distr_a, max_thread_no)
+            H_a=calculate_entropy_multthread(set_a_states, set_distr_a, max_thread_no)
         else:
-            H_a=calculate_entropy(set_a_states,set_distr_a)
+            H_a=calculate_entropy(set_a_states, set_distr_a)
 
         if H_a != 0:
 
@@ -216,9 +216,9 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
                 set_b_states = discrete_states_ab[res2]
 
                 if max_thread_no>1:
-                    H_b=calculate_entropy_multthread(set_b_states,set_distr_b, max_thread_no)
+                    H_b=calculate_entropy_multthread(set_b_states, set_distr_b, max_thread_no)
                 else:
-                    H_b=calculate_entropy(set_b_states,set_distr_b)
+                    H_b=calculate_entropy(set_b_states, set_distr_b)
 
 
                 if H_b!=0:
@@ -227,31 +227,31 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
                     ab_joint_distributions= set_distr_a + set_distr_b
 
                     if max_thread_no>1:
-                        H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                        H_ab=calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
                     else:
-                        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+                        H_ab=calculate_entropy(ab_joint_states, ab_joint_distributions)
 
 
                     traj_1_fraction = traj1_len/(traj1_len+traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
 
                     data_ssi[count] = SSI
 
                     if verbose is True:
-                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])
+                        print(data_names[count], '\nSSI[bits]: ', data_ssi[count])
                     count+=1
                 else:
                     if verbose is True:
-                        print(data_names[count],'\nSSI[bits]: ',data_ssi[count])
+                        print(data_names[count], '\nSSI[bits]: ', data_ssi[count])
                     count+=1
 
         else:
             for res2 in range(res1+1, len(mv_res_data_a)):
                 if verbose is True:
-                    print(data_names[count],'\nSSI[bits]: ',data_ssi[count])
+                    print(data_names[count], '\nSSI[bits]: ', data_ssi[count])
                 count+=1
 
     return data_names, data_ssi
@@ -278,13 +278,13 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
         Feature names of the fourth ensemble.
         Must be the same as features_c. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     all_data_c : float array
-        Trajectory data from the third ensemble. Format: [frames,frame_data].
+        Trajectory data from the third ensemble. Format: [frames, frame_data].
     all_data_d : float array
-        Trajectory data from the fourth ensemble. Format: [frames,frame_data].
+        Trajectory data from the fourth ensemble. Format: [frames, frame_data].
     discrete_states_ab : list of list
         List of state limits for each feature.
     discrete_states_cd : list of list
@@ -357,7 +357,7 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                 set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in set_distr_a]
 
         set_a_states = discrete_states_ab[res1]
-        H_a=calculate_entropy(set_a_states,set_distr_a)
+        H_a=calculate_entropy(set_a_states, set_distr_a)
 
         if H_a != 0:
             for res2 in range(len(all_data_c)):
@@ -378,48 +378,48 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                         set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in set_distr_b]
 
                 set_b_states = discrete_states_cd[res2]
-                H_b=calculate_entropy(set_b_states,set_distr_b)
+                H_b=calculate_entropy(set_b_states, set_distr_b)
 
                 if H_b!=0:
                     traj_1_fraction = traj1_len/(traj1_len+traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
                     set_distr_c=[[0.5]*traj1_len + [1.5]*traj2_len]
-                    set_c_states= [[0,1,2]]
+                    set_c_states= [[0, 1, 2]]
                     H_c = norm_factor
 
                     ##----------------
                     ab_joint_states = set_a_states + set_b_states
                     ab_joint_distributions = set_distr_a + set_distr_b
                     if max_thread_no>1:
-                        H_ab=calculate_entropy_multthread(ab_joint_states,ab_joint_distributions, max_thread_no)
+                        H_ab=calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
                     else:
-                        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+                        H_ab=calculate_entropy(ab_joint_states, ab_joint_distributions)
 
                     ##----------------
                     ac_joint_states =  set_a_states + set_c_states
                     ac_joint_distributions = set_distr_a + set_distr_c
                     if max_thread_no>1:
-                        H_ac=calculate_entropy_multthread(ac_joint_states,ac_joint_distributions, max_thread_no)
+                        H_ac=calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
                     else:
-                        H_ac=calculate_entropy(ac_joint_states,ac_joint_distributions)
+                        H_ac=calculate_entropy(ac_joint_states, ac_joint_distributions)
 
                     ##----------------
                     bc_joint_states = set_b_states + set_c_states
                     bc_joint_distributions = set_distr_b + set_distr_c
                     if max_thread_no>1:
-                        H_bc=calculate_entropy_multthread(bc_joint_states,bc_joint_distributions, max_thread_no)
+                        H_bc=calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
                     else:
-                        H_bc=calculate_entropy(bc_joint_states,bc_joint_distributions)
+                        H_bc=calculate_entropy(bc_joint_states, bc_joint_distributions)
 
                     ##----------------
                     abc_joint_states = set_a_states + set_b_states + set_c_states
                     abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
                     if max_thread_no>1:
-                        H_abc=calculate_entropy_multthread(abc_joint_states,abc_joint_distributions, max_thread_no)
+                        H_abc=calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)
                     else:
-                        H_abc=calculate_entropy(abc_joint_states,abc_joint_distributions)
+                        H_abc=calculate_entropy(abc_joint_states, abc_joint_distributions)
 
                     SSI = ((H_a + H_b) - H_ab)/norm_factor
                     SSI_1 = ((H_a + H_c) - H_ac)/norm_factor
@@ -480,13 +480,13 @@ def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d,
         Feature names of the fourth ensemble.
         Must be the same as features_c. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     all_data_c : float array
-        Trajectory data from the third ensemble. Format: [frames,frame_data].
+        Trajectory data from the third ensemble. Format: [frames, frame_data].
     all_data_d : float array
-        Trajectory data from the fourth ensemble. Format: [frames,frame_data].
+        Trajectory data from the fourth ensemble. Format: [frames, frame_data].
     discrete_states_ab : list of list
         List of state limits for each feature.
     discrete_states_cd : list of list
@@ -548,7 +548,7 @@ def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d,
         # if calculate_ssi(res1_combined_dist, traj1_len)!=0:
         set_distr_a=[correct_angle_periodicity(distr_a) for distr_a in res1_combined_dist]
         set_a_states = discrete_states_ab[res1]
-        H_a=calculate_entropy(set_a_states,set_distr_a)
+        H_a=calculate_entropy(set_a_states, set_distr_a)
 
         if H_a != 0:
             for res2 in range(len(all_data_c)):
@@ -564,12 +564,12 @@ def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d,
 
                 set_distr_b=[correct_angle_periodicity(distr_b) for distr_b in res2_combined_dist]
                 set_b_states = discrete_states_cd[res2]
-                H_b=calculate_entropy(set_b_states,set_distr_b)
+                H_b=calculate_entropy(set_b_states, set_distr_b)
 
                 if H_b!=0:
                     traj_1_fraction = traj1_len/(traj1_len+traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                    norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
                     ##----------------
                     ab_joint_states = set_a_states + set_b_states
@@ -607,7 +607,7 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, 
     Calculates the State Specific Information SSI [bits] between two features from two ensembles.
     By default, the second feature is the binary switch between ensembles.
 
-    SSI(a,b) = H_a + H_b - H_ab
+    SSI(a, b) = H_a + H_b - H_ab
     H = Conformational state entropy
 
     Parameters
@@ -668,13 +668,13 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, 
         else:
             set_a_states = a_states
 
-        H_a=calculate_entropy(set_a_states,set_distr_a)
+        H_a=calculate_entropy(set_a_states, set_distr_a)
 
         ##calculating the entropy for set_distr_b
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_b_input is None:
             set_distr_b=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
-            set_b_states= [[0,1,2]]
+            set_b_states= [[0, 1, 2]]
 
         else:
             if pbc is True:
@@ -699,15 +699,15 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, 
 
             else:
                 set_b_states = b_states
-        H_b=calculate_entropy(set_b_states,set_distr_b)
+        H_b=calculate_entropy(set_b_states, set_distr_b)
 
         ab_joint_states= set_a_states + set_b_states
         ab_joint_distributions= set_distr_a + set_distr_b
-        H_ab=calculate_entropy(ab_joint_states,ab_joint_distributions)
+        H_ab=calculate_entropy(ab_joint_states, ab_joint_distributions)
 
         traj_1_fraction = traj1_len/len(set_distr_a[0])
         traj_2_fraction = 1 - traj_1_fraction
-        norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+        norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
         SSI = ((H_a + H_b) - H_ab)/norm_factor
 
@@ -720,16 +720,16 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None, a_states=None, 
 
         print('Default output of SSI= -1.')
 
-    return round(SSI,4)
+    return round(SSI, 4)
 
 
 def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None, a_states=None, b_states=None,
-                    c_states=None, gauss_bins=180, gauss_smooth=None, write_plots=None,write_name=None):
+                    c_states=None, gauss_bins=180, gauss_smooth=None, write_plots=None, write_name=None):
     """
     Calculates the State Specific Information Co-SSI [bits] between three features from two ensembles.
     By default, the third feature is the binary switch between ensembles.
 
-    CoSSI(a,b,c) = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
+    CoSSI(a, b, c) = H_a + H_b + H_c - H_ab - H_bc - H_ac + H_abc
 
     H = Conformational state entropy
 
@@ -802,7 +802,7 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
         else:
             set_a_states = a_states
 
-        H_a=calculate_entropy(set_a_states,set_distr_a)
+        H_a=calculate_entropy(set_a_states, set_distr_a)
 
         ##----------------
         ##calculating the entropy for set_distr_b
@@ -831,14 +831,14 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
         else:
             set_b_states = b_states
 
-        H_b=calculate_entropy(set_b_states,set_distr_b)
+        H_b=calculate_entropy(set_b_states, set_distr_b)
 
         ##----------------
         ##calculating the entropy for set_distr_c
         ## if no dist (None) then apply the binary dist for two simulations
         if distr_c_input is None:
             set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
-            set_c_states= [[0,1,2]]
+            set_c_states= [[0, 1, 2]]
 
 
         else:
@@ -859,7 +859,7 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
                         print('Distribution C not clustering properly.\nTry altering Gaussian parameters or input custom states.')
             else:
                 set_c_states = c_states
-        H_c=calculate_entropy(set_c_states,set_distr_c)
+        H_c=calculate_entropy(set_c_states, set_distr_c)
 
         ##----------------
         ab_joint_states = set_a_states + set_b_states
@@ -884,7 +884,7 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
 
         traj_1_fraction = traj1_len/len(set_distr_a[0])
         traj_2_fraction = 1 - traj_1_fraction
-        norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+        norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
         SSI = ((H_a + H_b) - H_ab)/norm_factor
         coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc)/norm_factor
@@ -903,7 +903,7 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
 
         print('Default output of -1.')
 
-    return round(SSI,4), round(coSSI,4)
+    return round(SSI, 4), round(coSSI, 4)
 
 
 def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
@@ -919,9 +919,9 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
         Feature names of the first ensemble.
         Must be the same as features_a. Provided as a sanity check.
     all_data_a : float array
-        Trajectory data from the first ensemble. Format: [frames,frame_data].
+        Trajectory data from the first ensemble. Format: [frames, frame_data].
     all_data_b : float array
-        Trajectory data from the second ensemble. Format: [frames,frame_data].
+        Trajectory data from the second ensemble. Format: [frames, frame_data].
     max_thread_no : int, optional
         Maximum number of threads to use in the multi-threading. Default is 1.
     torsions : str, optional
@@ -946,11 +946,11 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
 
     # Get the multivariate timeseries data
     if torsions is None:
-         mv_res_feat_a, mv_res_data_a = features_a,all_data_a
-         mv_res_feat_b, mv_res_data_b = features_b,all_data_b
+         mv_res_feat_a, mv_res_data_a = features_a, all_data_a
+         mv_res_feat_b, mv_res_data_b = features_b, all_data_b
     else:
-         mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a,all_data_a,torsions+'-torsions',write=False,out_name='')
-         mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b,all_data_b,torsions+'-torsions',write=False,out_name='')
+         mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a, all_data_a, torsions+'-torsions', write=False, out_name='')
+         mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b, all_data_b, torsions+'-torsions', write=False, out_name='')
 
          mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions+'-torsions'], mv_res_data_a[torsions+'-torsions']
          mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions+'-torsions'], mv_res_data_b[torsions+'-torsions']
@@ -1002,11 +1002,11 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
                 SSI = -1
                 data_ssi[count] = SSI
                 if verbose is True:
-                    print(data_names[count],data_ssi[count])
+                    print(data_names[count], data_ssi[count])
                 count+=1
 
         else:
-            H_a=calculate_entropy(set_a_states,set_distr_a)
+            H_a=calculate_entropy(set_a_states, set_distr_a)
             if H_a != 0:
 
 
@@ -1035,20 +1035,20 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
                         SSI = -1
                         data_ssi[count] = SSI
                         if verbose is True:
-                            print(data_names[count],data_ssi[count])
+                            print(data_names[count], data_ssi[count])
                         count+=1
 
                     else:
-                        H_b=calculate_entropy(set_b_states,set_distr_b)
+                        H_b=calculate_entropy(set_b_states, set_distr_b)
 
                         if H_b!=0:
 
                             traj_1_fraction = traj1_len/len(set_distr_a[0])
                             traj_2_fraction = 1 - traj_1_fraction
-                            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction,2) - 1*traj_2_fraction*math.log(traj_2_fraction,2)
+                            norm_factor = -1*traj_1_fraction*math.log(traj_1_fraction, 2) - 1*traj_2_fraction*math.log(traj_2_fraction, 2)
 
                             set_distr_c=[[0.5]*traj1_len + [1.5]*int(len(set_distr_a[0])-traj1_len)]
-                            set_c_states= [[0,1,2]]
+                            set_c_states= [[0, 1, 2]]
                             H_c = norm_factor
 
                             ##----------------

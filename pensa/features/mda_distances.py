@@ -50,14 +50,14 @@ def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
 
     # Name the atoms
     if naming=='chainid':
-        at_labels_a = ['%s %s %s %s'%(atom.chainID,atom.residue.resname,atom.resid,atom.name) for atom in a]
-        at_labels_b = ['%s %s %s %s'%(atom.chainID,atom.residue.resname,atom.resid,atom.name) for atom in b]
+        at_labels_a = ['%s %s %s %s'%(atom.chainID, atom.residue.resname, atom.resid, atom.name) for atom in a]
+        at_labels_b = ['%s %s %s %s'%(atom.chainID, atom.residue.resname, atom.resid, atom.name) for atom in b]
     elif naming=='segid':
-        at_labels_a = ['%s %s %s %s'%(atom.segid,atom.residue.resname,atom.resid,atom.name) for atom in a]
-        at_labels_b = ['%s %s %s %s'%(atom.segid,atom.residue.resname,atom.resid,atom.name) for atom in b]
+        at_labels_a = ['%s %s %s %s'%(atom.segid, atom.residue.resname, atom.resid, atom.name) for atom in a]
+        at_labels_b = ['%s %s %s %s'%(atom.segid, atom.residue.resname, atom.resid, atom.name) for atom in b]
     else:
-        at_labels_a = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in a]
-        at_labels_b = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in b]
+        at_labels_a = ['%s %s %s'%(atom.residue.resname, atom.resid, atom.name) for atom in a]
+        at_labels_b = ['%s %s %s'%(atom.residue.resname, atom.resid, atom.name) for atom in b]
 
     # Name the distance labels
     d_labels = []
@@ -72,8 +72,8 @@ def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
     num_at = len(a)
     num_dist = int(num_at*(num_at-1)/2)
     len_traj = len(u.trajectory[first_frame:last_frame:step])
-    template = np.zeros([num_dist,])
-    data_arr = np.zeros([len_traj,num_dist])
+    template = np.zeros([num_dist, ])
+    data_arr = np.zeros([len_traj, num_dist])
     frame = 0
     for ts in u.trajectory[first_frame:last_frame:step]:
         data_arr[frame] = ld.self_distance_array(a.positions, result=template)
@@ -121,11 +121,11 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
 
     # Name the atoms
     if naming=='chainid':
-        at_labels = ['%s %s %s %s'%(atom.chainID,atom.residue.resname,atom.resid,atom.name) for atom in a]
+        at_labels = ['%s %s %s %s'%(atom.chainID, atom.residue.resname, atom.resid, atom.name) for atom in a]
     elif naming=='segid':
-        at_labels = ['%s %s %s %s'%(atom.segid,atom.residue.resname,atom.resid,atom.name) for atom in a]
+        at_labels = ['%s %s %s %s'%(atom.segid, atom.residue.resname, atom.resid, atom.name) for atom in a]
     else:
-        at_labels = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in a]
+        at_labels = ['%s %s %s'%(atom.residue.resname, atom.resid, atom.name) for atom in a]
 
     # Name the distance labels
     d_labels = []
@@ -140,8 +140,8 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
     num_at = len(a)
     num_dist = int(num_at*(num_at-1)/2)
     len_traj = len(u.trajectory[first_frame:last_frame:step])
-    template = np.zeros([num_dist,])
-    data_arr = np.zeros([len_traj,num_dist])
+    template = np.zeros([num_dist, ])
+    data_arr = np.zeros([len_traj, num_dist])
     frame = 0
     for ts in u.trajectory[first_frame:last_frame:step]:
         data_arr[frame] = ld.self_distance_array(a.positions, result=template)

@@ -19,7 +19,7 @@ def calculate_pca(data, dim=None):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         dim : int, optional, default = -1
             The number of dimensions (principal components) to project onto.
             -1 means all numerically available dimensions will be used.
@@ -74,7 +74,7 @@ def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels
         features : list of str
             Names of the features for which the PCA was performed.
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         num : float
             Number of feature correlations to plot.
         threshold : float
@@ -125,7 +125,7 @@ def project_on_pc(data, ev_idx, pca=None, dim=-1):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero).
         pca : PCA obj, optional, default = None
@@ -155,7 +155,7 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         num : int
             Number of eigenvectors to project on.
         pca : PCA obj, optional, default = None
@@ -172,7 +172,7 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
         comp_names : list
             Names/numbers of the components.
         components : float array
-            Component data [frames,components]
+            Component data [frames, components]
 
     """
     # Perform PCA if none is provided
@@ -198,7 +198,7 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         top : str
             File name of the reference topology for the trajectory.
         trj : str
@@ -242,9 +242,9 @@ def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_n
     Parameters
     ----------
         data_a : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         data_b : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         top_a : str
             Reference topology for the first trajectory.
         top_b : str
@@ -286,7 +286,7 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
     Parameters
     ----------
         data : list of float arrays
-            List of trajectory data arrays, each [frames,frame_data].
+            List of trajectory data arrays, each [frames, frame_data].
         top : list of str
             Reference topology files.
         trj : list of str

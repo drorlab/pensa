@@ -39,9 +39,9 @@ def read_csv_features(csv_file):
     """
     df = pd.read_csv(csv_file)
     feature_names = list(df.keys())
-    feature_data = np.zeros([len(df),len(feature_names)])
-    for i,f in enumerate(feature_names):
-        feature_data[:,i] = df[f]
+    feature_data = np.zeros([len(df), len(feature_names)])
+    for i, f in enumerate(feature_names):
+        feature_data[:, i] = df[f]
     return feature_names, feature_data
 
 
@@ -64,8 +64,8 @@ def get_drormd_features(csv_file):
     """
     df = pd.read_csv(csv_file, index_col=0)
     feature_names = list(df.keys())
-    feature_data = np.zeros([len(df),len(feature_names)])
-    for i,f in enumerate(feature_names):
-        feature_data[:,i] = df[f]
+    feature_data = np.zeros([len(df), len(feature_names)])
+    for i, f in enumerate(feature_names):
+        feature_data[:, i] = df[f]
     return feature_names, feature_data
 

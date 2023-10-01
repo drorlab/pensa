@@ -119,10 +119,10 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         top_atoms = len(coords)
 
     print('\n')
-    print('Featurizing ',top_atoms,' Atoms')
+    print('Featurizing ', top_atoms, ' Atoms')
     for atom_no in range(top_atoms):
         print('\n')
-        print('Atom no: ',atom_no+1)
+        print('Atom no: ', atom_no+1)
         print('\n')
 
         counting=[]
@@ -144,8 +144,8 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
         atom_ID = 'a' + str(atom_no+1)
         atom_location = shifted_coords
         pocket_occupation_frequency = 1 - flat_list.count(-1)/len(flat_list)
-        pocket_occupation_frequency = round(pocket_occupation_frequency,4)
-        atom_information.append([atom_ID,list(atom_location),pocket_occupation_frequency])
+        pocket_occupation_frequency = round(pocket_occupation_frequency, 4)
+        atom_information.append([atom_ID, list(atom_location), pocket_occupation_frequency])
         atom_dists.append(counting)
 
         ## Write data out and visualize atom sites in pdb
@@ -168,15 +168,15 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
 
     # Add atom pocket frequencies
     feature_names[element+'Pocket_Occup']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information],dtype=object)
+    features_data[element+'Pocket_Occup']= np.array([atinfo[2] for atinfo in atom_information], dtype=object)
 
     # Add atom pocket occupancy timeseries
     feature_names[element+'Pocket_OccupDistr']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists],dtype=object)
+    features_data[element+'Pocket_OccupDistr']= np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists], dtype=object)
 
     # Add atom pocket locations
     feature_names[element+'Pocket_xyz']= [atinfo[0] for atinfo in atom_information]
-    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information],dtype=object)
+    features_data[element+'Pocket_xyz']= np.array([atinfo[1] for atinfo in atom_information], dtype=object)
 
     # Return the dictionaries.
     return feature_names, features_data

@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 # -- Processing trajectories for density analysis
 
-def _match_sim_lengths(sim1,sim2):
+def _match_sim_lengths(sim1, sim2):
     """
     Make two lists the same length by truncating the longer list to match.
 
@@ -141,11 +141,11 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # The density needs to be formed from an even contribution of both conditions
         # # # otherwise it will be unevely biased towards one condition.
         # # # So we iterate over the smallest simulation length
-        smallest_traj_len = min(len(condition_a.trajectory),len(condition_b.trajectory))
+        smallest_traj_len = min(len(condition_a.trajectory), len(condition_b.trajectory))
         # # # The shape for memmap pseudo-trajetcory
-        array_shape=[smallest_traj_len,len(condition_a.atoms)+len(condition_b.atoms),3]
+        array_shape=[smallest_traj_len, len(condition_a.atoms)+len(condition_b.atoms), 3]
         # # # Writing out pseudo-trajetcory
-        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0],array_shape[1],array_shape[2]))
+        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0], array_shape[1], array_shape[2]))
         # # # Creating universe with blank timesteps from pseudo-trajectory
         Combined_conditions.load_new(merged_coords, format=MemoryReader)
 
@@ -157,7 +157,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
             coords_a = condition_a.atoms.positions
             coords_b = condition_b.atoms.positions
             # # # Then we merge the coordinates into one system
-            stacked = np.concatenate((coords_a,coords_b),axis=0)
+            stacked = np.concatenate((coords_a, coords_b), axis=0)
             # # # Write over blank trajectory with new coordinates
             Combined_conditions.trajectory[frameno].positions = stacked
 
@@ -173,7 +173,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # The density needs to be formed from an even contribution of both conditions
         # # # otherwise it will be unevely biased towards one condition.
         # # # So we match the simulation lengths first
-        sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a,aligned_coords_b)
+        sim1_coords, sim2_coords = _match_sim_lengths(aligned_coords_a, aligned_coords_b)
 
         # # # Then we merge the coordinates into one system
         merged_coords = np.hstack([sim1_coords, sim2_coords])
@@ -216,8 +216,8 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
 
     # # Before we extract the water densities, we need to first align the trajectories
     # # so that we can featurize water sites in both ensembles using the same coordinates
-    condition_a = mda.Universe(struc_a,xtc_a)
-    condition_b = mda.Universe(struc_b,xtc_b)
+    condition_a = mda.Universe(struc_a, xtc_a)
+    condition_b = mda.Universe(struc_b, xtc_b)
 
 
     # Align a onto the average structure of b
@@ -370,10 +370,10 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
 
 
     print('\n')
-    print('Featurizing ',top_atoms,' Waters')
+    print('Featurizing ', top_atoms, ' Waters')
     for at_no in tqdm(range(top_atoms)):
         print('\n')
-        print('Atom no: ',at_no+1)
+        print('Atom no: ', at_no+1)
         print('\n')
 
         ## Find all water atoms within 3.5 Angstroms of density maxima
@@ -386,7 +386,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         atom_ID = "O" + str(at_no+1)
         atom_location = shifted_coords
 
-        atom_information.append([atom_ID,list(atom_location),densval])
+        atom_information.append([atom_ID, list(atom_location), densval])
 
         ## Write data out and visualize water sites in pdb
         if write is True:
@@ -414,7 +414,7 @@ def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
     pdb_outname : str
         Filename of reference structure.
     atom_location : array
-        (x,y,z) coordinates of the atom location with respect to the reference structure.
+        (x, y, z) coordinates of the atom location with respect to the reference structure.
     atom_ID : str
         A unique ID for the atom.
     atomgroup : str

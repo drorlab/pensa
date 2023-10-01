@@ -21,9 +21,9 @@ def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, 
             Can be obtained from features object via .describe().
             Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
-            Trajectory data from the first ensemble. Format: [frames,frame_data].
+            Trajectory data from the first ensemble. Format: [frames, frame_data].
         all_data_b : float array
-            Trajectory data from the second ensemble. Format: [frames,frame_data].
+            Trajectory data from the second ensemble. Format: [frames, frame_data].
         verbose : bool, default=True
             Print intermediate results.
         override_name_check : bool, default=False
@@ -85,9 +85,9 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
             Can be obtained from features object via .describe().
             Must be the same as features_a. Provided as a sanity check.
         all_data_a : float array
-            Trajectory data from the first ensemble. Format: [frames,frame_data].
+            Trajectory data from the first ensemble. Format: [frames, frame_data].
         all_data_b : float array
-            Trajectory data from the second ensemble. Format: [frames,frame_data].
+            Trajectory data from the second ensemble. Format: [frames, frame_data].
         bin_width : float, default=0.001
             Bin width for the axis to compare the distributions on.
         verbose : bool, default=True
@@ -155,10 +155,10 @@ def feature_correlation(data_a, data_b):
         Correlation matrix [num. features a, num. features b]
 
     """
-    corr = np.zeros([data_a.shape[1],data_b.shape[1]])
+    corr = np.zeros([data_a.shape[1], data_b.shape[1]])
     for _i, a in enumerate(data_a.T):
         for _j, b in enumerate(data_b.T):
             a_norm = (a-np.mean(a))/np.std(a)
             b_norm = (b-np.mean(b))/np.std(b)
-            corr[_i,_j] = np.corrcoef(a_norm, b_norm)[0,1]
+            corr[_i, _j] = np.corrcoef(a_norm, b_norm)[0, 1]
     return corr

@@ -14,7 +14,7 @@ def wss_over_number_of_clusters(data, algorithm='kmeans',
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         algorithm : string
             The algorithm to use for the clustering.
             Options: kmeans, rspace.
@@ -44,7 +44,7 @@ def wss_over_number_of_clusters(data, algorithm='kmeans',
     all_wss = []
     std_wss = []
     # Loop over the number of clusters
-    for nc in range(1,max_num_clusters):
+    for nc in range(1, max_num_clusters):
         rep_wss = []
         # Run each clustering several times.
         for repeat in range(num_repeats):
@@ -58,8 +58,8 @@ def wss_over_number_of_clusters(data, algorithm='kmeans',
         std_wss.append(np.std(rep_wss))
 
     # Plot the WSS over the number of clusters
-    fig, ax = plt.subplots(1,1, figsize=[4,3], dpi=300)
-    ax.errorbar(np.arange(len(all_wss))+2,np.array(all_wss),yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
+    ax.errorbar(np.arange(len(all_wss))+2, np.array(all_wss), yerr=np.array(std_wss)/np.sqrt(num_repeats))
     ax.set_xlabel('number of clusters')
     ax.set_ylabel('total WSS')
     fig.tight_layout()
@@ -79,9 +79,9 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     Parameters
     ----------
         data_a : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         data_b : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         label_a : str, optional
             Label for the plot.
         label_b : str, optional
@@ -117,7 +117,7 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     all_wss = []
     std_wss = []
     # Loop over the number of clusters
-    for nc in range(1,max_num_clusters):
+    for nc in range(1, max_num_clusters):
         rep_wss = []
         # Run each clustering several times.
         for repeat in range(num_repeats):
@@ -132,8 +132,8 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
         std_wss.append(np.std(rep_wss))
 
     # Plot the WSS over the number of clusters
-    fig, ax = plt.subplots(1,1, figsize=[4,3], dpi=300)
-    ax.errorbar(np.arange(len(all_wss))+2,np.array(all_wss),yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
+    ax.errorbar(np.arange(len(all_wss))+2, np.array(all_wss), yerr=np.array(std_wss)/np.sqrt(num_repeats))
     ax.set_xlabel('number of clusters')
     ax.set_ylabel('total WSS')
     fig.tight_layout()

@@ -12,7 +12,7 @@ from pensa.preprocessing.coordinates import sort_coordinates
 #
 
 def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
-                           features=['bb-torsions','sc-torsions','bb-distances'],
+                           features=['bb-torsions', 'sc-torsions', 'bb-distances'],
                            resnum_offset=0):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
@@ -74,7 +74,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         features_data['bb-distances'] = bbdistances[1]
     # Remove the residue-number offset
     if resnum_offset != 0:
-        feature_names = _remove_resnum_offset(feature_names,resnum_offset)
+        feature_names = _remove_resnum_offset(feature_names, resnum_offset)
     # Return the dictionaries.
     return feature_names, features_data
 

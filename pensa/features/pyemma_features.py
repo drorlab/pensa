@@ -15,7 +15,7 @@ from pensa.preprocessing.coordinates import sort_coordinates
 
 
 def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
-                        features=['bb-torsions','sc-torsions','bb-distances'],
+                        features=['bb-torsions', 'sc-torsions', 'bb-distances'],
                         resnum_offset=0):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
@@ -71,7 +71,7 @@ def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         features_data['bb-distances'] = bbdistances_data
     # Remove the residue-number offset
     if resnum_offset != 0:
-        feature_names = _remove_resnum_offset(feature_names,resnum_offset)
+        feature_names = _remove_resnum_offset(feature_names, resnum_offset)
     # Return the dictionaries.
     return feature_names, features_data
 
@@ -115,7 +115,7 @@ def _remove_atom_numbers_from_distance(feat_str):
     parts = feat_str.split(' ')
     # Glue the desired parts back together
     new_feat = parts[0]
-    for nr in [1,2,3,5,6,7,8]:
+    for nr in [1, 2, 3, 5, 6, 7, 8]:
         new_feat += ' '+parts[nr]
     return new_feat
 

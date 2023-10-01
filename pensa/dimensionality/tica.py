@@ -17,7 +17,7 @@ def calculate_tica(data, dim=None, lag=10):
     Parameters
     ----------
         data : float array
-            Trajectory data. Format: [frames,frame_data].
+            Trajectory data. Format: [frames, frame_data].
         dim : int, optional, default -1
             The number of dimensions (independent components) to project onto.
             -1 means all numerically available dimensions will be used.
@@ -116,7 +116,7 @@ def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero).
         tica : TICA obj, optional, default = None
@@ -150,7 +150,7 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         num : int
             Number of eigenvectors to project on.
         tica : tICA obj, optional, default = None
@@ -170,7 +170,7 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
         comp_names : list
             Names/numbers of the components.
         components : float array
-            Component data [frames,components]
+            Component data [frames, components]
 
     """
     # Perform tICA if none is provided.
@@ -197,7 +197,7 @@ def sort_traj_along_tic(data, top, trj, out_name, tica=None, num_ic=3, lag=10, s
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         top : str
             File name of the reference topology for the trajectory.
         trj : str
@@ -244,9 +244,9 @@ def sort_trajs_along_common_tic(data_a, data_b, top_a, top_b, trj_a, trj_b, out_
     Parameters
     ----------
         data_a : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         data_b : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         top_a : str
             Reference topology for the first trajectory.
         top_b : str
@@ -291,7 +291,7 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
     Parameters
     ----------
         data : list of float arrays
-            List of trajectory data arrays, each [frames,frame_data].
+            List of trajectory data arrays, each [frames, frame_data].
         top : list of str
             Reference topology files.
         trj : list of str

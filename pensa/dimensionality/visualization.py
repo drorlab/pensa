@@ -12,7 +12,7 @@ def project_on_eigenvector_tica(data, ev_idx, ana):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero).
         ana : tICA obj
@@ -41,7 +41,7 @@ def project_on_eigenvector_pca(data, ev_idx, ana):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ev_idx : int
             Index of the eigenvector to project on (starts with zero).
         ana : PCA obj
@@ -69,9 +69,9 @@ def compare_projections(data_a, data_b, ana, num=3, saveas=None, label_a=None, l
     Parameters
     ----------
         data_a : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         data_b : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ana : PCA or tICA object
             Components analysis information.
         num : int
@@ -105,7 +105,7 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
     Parameters
     ----------
         data : list of float arrays
-            Data from multiple trajectories [frames,frame_data].
+            Data from multiple trajectories [frames, frame_data].
         ana : PCA or tICA object
             Components analysis information.
         num : int
@@ -174,7 +174,7 @@ def sort_traj_along_projection(data, ana, top, trj, out_name, num_comp=3, start_
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data].
+            Trajectory data [frames, frame_data].
         ana : PCA or tICA obj
             Components information.
         top : str

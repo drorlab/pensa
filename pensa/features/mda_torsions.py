@@ -4,7 +4,7 @@ import MDAnalysis as mda
 from MDAnalysis.analysis.dihedrals import Dihedral
 
 
-def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame=None, step=1, naming=None):
+def get_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, last_frame=None, step=1, naming=None):
     """
     Load distances between all atom pairs between two selected groups.
 
@@ -14,7 +14,7 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
         File name for the reference file (PDB or GRO format).
     xtc : str
         File name for the trajectory (xtc format).
-    sel : list, default=[[0,1,2,3]]
+    sel : list, default=[[0, 1, 2, 3]]
         List of quadruplets with selection indices to choose atoms for the torsions.
     first_frame : int, default=0
         First frame to return of the features. Zero-based.
@@ -50,13 +50,13 @@ def get_torsions(pdb, xtc, sel=[[0,1,2,3], [1,2,3,4]], first_frame=0, last_frame
     for ta in torsion_atoms:
         # Name the atoms
         if naming=='chainid':
-            at_labels = ['%s %s %s %s'%(atom.chainID,atom.residue.resname,atom.resid,atom.name) for atom in ta]
+            at_labels = ['%s %s %s %s'%(atom.chainID, atom.residue.resname, atom.resid, atom.name) for atom in ta]
         elif naming=='segid':
-            at_labels = ['%s %s %s %s'%(atom.segid,atom.residue.resname,atom.resid,atom.name) for atom in ta]
+            at_labels = ['%s %s %s %s'%(atom.segid, atom.residue.resname, atom.resid, atom.name) for atom in ta]
         elif naming=='segindex':
-            at_labels = ['%s %s %s %s'%(atom.segindex,atom.residue.resname,atom.resid,atom.name) for atom in ta]
+            at_labels = ['%s %s %s %s'%(atom.segindex, atom.residue.resname, atom.resid, atom.name) for atom in ta]
         else:
-            at_labels = ['%s %s %s'%(atom.residue.resname,atom.resid,atom.name) for atom in ta]
+            at_labels = ['%s %s %s'%(atom.residue.resname, atom.resid, atom.name) for atom in ta]
         # Name the torsion labels
         _tl = 'TORS: %s - %s - %s - %s'%(at_labels[0], at_labels[1], at_labels[2], at_labels[3])
         torsion_labels.append(_tl)
@@ -87,7 +87,7 @@ def find_atom_by_name(res, at_name):
     return -1
 
 
-def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1],
+def find_atom_indices_per_residue(pdb, at_names=["C4'", "P", "C4'", "P"], rel_res=[-1, 0, 0, 1],
                                   selection='all', verbose=False):
     """
     Find the indices of atoms with a certain name for each residue (and its neighbors).
@@ -98,7 +98,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
         File name for the reference file (PDB or GRO format).
     at_names : list of str
         Names of the requested atoms.
-    rel_res : list of int, default=[[0,1,2,3]]
+    rel_res : list of int, default=[[0, 1, 2, 3]]
         Residue number of each atom's residue relative to the current residue.
     selection : str, default = 'all'
         MDAnalysis selection string
@@ -157,7 +157,7 @@ def list_depth(l):
         return 0
 
 
-def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[-1,0,0,1],
+def find_atom_indices_per_residue(pdb, at_names=["C4'", "P", "C4'", "P"], rel_res=[-1, 0, 0, 1],
                                   selection='all', verbose=False):
     """
     Find the indices of atoms with a certain name for each residue (and its neighbors).
@@ -169,7 +169,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'","P","C4'","P"], rel_res=[
     at_names : list of str or list of list of str
         Names of the requested atoms or list of sets of names of requested atoms.
         If a list of lists is passed, all sub-lists must have the same length.
-    rel_res : list of int, default=[-1,0,0,1]]
+    rel_res : list of int, default=[-1, 0, 0, 1]]
         Residue number of each atom's residue relative to the current residue.
     selection : str, default = 'all'
         MDAnalysis selection string
@@ -283,51 +283,51 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     # ALPHA (α):   O3'(i-1)-P(i)-O5'(i)-C5'(i)
     indices_alpha = find_atom_indices_per_residue(
         pdb,
-        at_names=["O3'","P","O5'","C5'"],
-        rel_res=[-1,0,0,0],
+        at_names=["O3'", "P", "O5'", "C5'"],
+        rel_res=[-1, 0, 0, 0],
         selection=selection
     )
     # BETA (β):    P(i)-O5'(i)-C5'(i)-C4'(i)
     indices_beta = find_atom_indices_per_residue(
         pdb,
-        at_names=["P","O5'","C5'","C4'"],
-        rel_res=[0,0,0,0],
+        at_names=["P", "O5'", "C5'", "C4'"],
+        rel_res=[0, 0, 0, 0],
         selection=selection
     )
     # GAMMA (γ):   O5'(i)-C5'(i)-C4'(i)-C3'(i)
     indices_gamma = find_atom_indices_per_residue(
         pdb,
-        at_names=["O5'","C5'","C4'","C3'"],
-        rel_res=[0,0,0,0],
+        at_names=["O5'", "C5'", "C4'", "C3'"],
+        rel_res=[0, 0, 0, 0],
         selection=selection
     )
     # DELTA (δ):   C5'(i)-C4'(i)-C3'(i)-O3'(i)
     indices_delta = find_atom_indices_per_residue(
         pdb,
-        at_names=["C5'","C4'","C3'","O3'"],
-        rel_res=[0,0,0,0],
+        at_names=["C5'", "C4'", "C3'", "O3'"],
+        rel_res=[0, 0, 0, 0],
         selection=selection
     )
     # EPSILON (ε): C4'(i)-C3'(i)-O3'(i)-P(i+1)
     indices_epsilon = find_atom_indices_per_residue(
         pdb,
-        at_names=["C4'","C3'","O3'","P"],
-        rel_res=[0,0,0,1],
+        at_names=["C4'", "C3'", "O3'", "P"],
+        rel_res=[0, 0, 0, 1],
         selection=selection
     )
     # ZETA (ζ):    C3'(i)-O3'(i)-P(i+1)-O5'(i+1)
     indices_zeta = find_atom_indices_per_residue(
         pdb,
-        at_names=["C3'","O3'","P","O5'"],
-        rel_res=[0,0,1,1],
+        at_names=["C3'", "O3'", "P", "O5'"],
+        rel_res=[0, 0, 1, 1],
         selection=selection
     )
     # CHI (χ):     O4'(i)-C1'(i)-N9(i)-C4(i) for purines
     #              O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
     indices_chi = find_atom_indices_per_residue(
         pdb,
-        at_names=[["O4'","C1'","N9","C4"],["O4'","C1'","N1","C2"]],
-        rel_res=[0,0,0,0],
+        at_names=[["O4'", "C1'", "N9", "C4"], ["O4'", "C1'", "N1", "C2"]],
+        rel_res=[0, 0, 0, 0],
         selection=selection
     )
 
@@ -406,14 +406,14 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     # Find indices of torsion atoms for each residue
     indices_eta = find_atom_indices_per_residue(
         pdb,
-        at_names=["C4'","P","C4'","P"],
-        rel_res=[-1,0,0,1],
+        at_names=["C4'", "P", "C4'", "P"],
+        rel_res=[-1, 0, 0, 1],
         selection=selection
     )
     indices_theta = find_atom_indices_per_residue(
         pdb,
-        at_names=["P","C4'","P","C4'"],
-        rel_res=[0,0,1,1],
+        at_names=["P", "C4'", "P", "C4'"],
+        rel_res=[0, 0, 1, 1],
         selection=selection
     )
     # Define angle names for labels
@@ -487,22 +487,22 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
     #   PHI (φ):   C(i-1)-N(i)-CA(i)-C(i)
     indices_phi = find_atom_indices_per_residue(
         pdb,
-        at_names=["C","N","CA","C"],
-        rel_res=[-1,0,0,0],
+        at_names=["C", "N", "CA", "C"],
+        rel_res=[-1, 0, 0, 0],
         selection=selection
     )
     #   PSI (ψ):   N(i)-CA(i)-C(i)-N(i+1)
     indices_psi = find_atom_indices_per_residue(
         pdb,
-        at_names=["N","CA","C","N"],
-        rel_res=[0,0,0,1],
+        at_names=["N", "CA", "C", "N"],
+        rel_res=[0, 0, 0, 1],
         selection=selection
     )
     #   OMEGA (ω): CA(i)-C(i)-N(i+1)-CA(i+1)
     indices_omega = find_atom_indices_per_residue(
         pdb,
-        at_names=["CA","C","N","CA"],
-        rel_res=[0,0,1,1],
+        at_names=["CA", "C", "N", "CA"],
+        rel_res=[0, 0, 1, 1],
         selection=selection
     )
     # Define angle names for labels
@@ -598,19 +598,19 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
     """
     # Find indices of torsion atoms for each residue
     indices_chi1 = find_atom_indices_per_residue(
-        pdb, at_names_chi1, [0,0,0,0], selection
+        pdb, at_names_chi1, [0, 0, 0, 0], selection
     )
     indices_chi2 = find_atom_indices_per_residue(
-        pdb, at_names_chi2, [0,0,0,0], selection
+        pdb, at_names_chi2, [0, 0, 0, 0], selection
     )
     indices_chi3 = find_atom_indices_per_residue(
-        pdb, at_names_chi3, [0,0,0,0], selection
+        pdb, at_names_chi3, [0, 0, 0, 0], selection
     )
     indices_chi4 = find_atom_indices_per_residue(
-        pdb, at_names_chi4, [0,0,0,0], selection
+        pdb, at_names_chi4, [0, 0, 0, 0], selection
     )
     indices_chi5 = find_atom_indices_per_residue(
-        pdb, at_names_chi5, [0,0,0,0], selection
+        pdb, at_names_chi5, [0, 0, 0, 0], selection
     )
     # Define angle names for labels
     angles = []

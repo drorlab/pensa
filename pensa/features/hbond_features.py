@@ -104,7 +104,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
 
         ID_to_idx = site_no - 1
         print('\n')
-        print('Site no: ',site_no)
+        print('Site no: ', site_no)
         print('\n')
         O_hbonds = []
         H_hbonds = []
@@ -135,7 +135,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
             site_resid=counting[frame_no]
             # print(site_resid)
             if len(site_resid)==1:
-                ## (x,y,z) positions for the water oxygen at trajectory frame_no
+                ## (x, y, z) positions for the water oxygen at trajectory frame_no
                 proxprotatg = 'protein and around 3.5 byres index ' + str(site_resid[0])
                 O_site = 'index ' + str(site_resid[0])
                 H_site = '((byres index ' +  str(site_resid[0]) + ') and (name '+atomgroups[1]+' or name '+atomgroups[2]+'))'
@@ -163,7 +163,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
             elif len(site_resid)>1:
                 freq_count=[]
                 for ID in site_resid:
-                    freq_count.append([flat_list.count(ID),ID])
+                    freq_count.append([flat_list.count(ID), ID])
                 freq_count.sort(key = lambda x: x[0])
 
                 proxprotatg = 'protein and around 3.5 byres index ' + str(freq_count[-1][1])
@@ -196,7 +196,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
 
 
         bondouts=[]
-        for bondtype in [O_hbonds,H_hbonds]:
+        for bondtype in [O_hbonds, H_hbonds]:
             resids = []
             for line in bondtype:
                 if type(line) is str:
@@ -213,30 +213,30 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
             names = list(set([flat for sub in resids for flat in sub]))
             if names.count('unocc')>0:
                 names.remove('unocc')
-            dist = np.zeros((len(names),len(u.trajectory)))
+            dist = np.zeros((len(names), len(u.trajectory)))
             for bondsite in range(len(names)):
                 for frame in range(len(resids)):
                     if resids[frame].count(names[bondsite])>0:
                         dist[bondsite][frame]=1
-            bondouts.append([names,dist])
+            bondouts.append([names, dist])
 
         O_site_pdb_id = "O" + str(site_no)
         H_site_pdb_id = "H" + str(site_no)
         # Write data out and visualize water sites in pdb
         # "FIX OUTPUT UNIFORMITY, SINGLE BONDS NOT OUTPUT WITH ANY ARRAY DIMENSION"
         if write is True:
-            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_names.txt', np.array(bondouts[0][0],dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_data.txt',  np.array(bondouts[0][1],dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_names.txt', np.array(bondouts[1][0],dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_data.txt',  np.array(bondouts[1][1],dtype=object), fmt='%s')
+            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_names.txt', np.array(bondouts[0][0], dtype=object), fmt='%s')
+            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_data.txt',  np.array(bondouts[0][1], dtype=object), fmt='%s')
+            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_names.txt', np.array(bondouts[1][0], dtype=object), fmt='%s')
+            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_data.txt',  np.array(bondouts[1][1], dtype=object), fmt='%s')
 
 
-        feature_names['W'+str(site_no)]['acceptor_names'] = np.array(bondouts[0][0],dtype=object)
-        feature_names['W'+str(site_no)]['donor_names'] = np.array(bondouts[1][0],dtype=object)
-        features_data['W'+str(site_no)]['acceptor_timeseries'] = np.array(bondouts[0][1],dtype=object)
-        features_data['W'+str(site_no)]['donor_timeseries'] = np.array(bondouts[1][1],dtype=object)
-        features_data['W'+str(site_no)]['acceptor_frequencies'] = np.sum(np.array(bondouts[0][1],dtype=object),axis=1)/len(u.trajectory)
-        features_data['W'+str(site_no)]['donor_frequencies'] = np.sum(np.array(bondouts[1][1],dtype=object),axis=1)/len(u.trajectory)
+        feature_names['W'+str(site_no)]['acceptor_names'] = np.array(bondouts[0][0], dtype=object)
+        feature_names['W'+str(site_no)]['donor_names'] = np.array(bondouts[1][0], dtype=object)
+        features_data['W'+str(site_no)]['acceptor_timeseries'] = np.array(bondouts[0][1], dtype=object)
+        features_data['W'+str(site_no)]['donor_timeseries'] = np.array(bondouts[1][1], dtype=object)
+        features_data['W'+str(site_no)]['acceptor_frequencies'] = np.sum(np.array(bondouts[0][1], dtype=object), axis=1)/len(u.trajectory)
+        features_data['W'+str(site_no)]['donor_frequencies'] = np.sum(np.array(bondouts[1][1], dtype=object), axis=1)/len(u.trajectory)
 
     return feature_names, features_data
 
@@ -305,8 +305,8 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
     acceptor2_idcs = u.select_atoms(atomgroup_acceptors2).indices
 
     # First locate all potential bonding sites for atomgroups
-    # bonds for [[atomgroup1 donors] ,[atomgroup1 acceptors]]
-    all_bonds = [[],[]]
+    # bonds for [[atomgroup1 donors] , [atomgroup1 acceptors]]
+    all_bonds = [[], []]
     for frame_no in tqdm(range(len(u.trajectory))):
     # for frame_no in tqdm(range(100)):
         u.trajectory[frame_no]
@@ -321,7 +321,7 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
                 acceptor2_pos = np.array(u.select_atoms("index "+str(acceptor2_idx)).positions)
                 # if distance between atoms less than 3.5 angstrom then count as bond
                 if np.linalg.norm(donor1_pos-acceptor2_pos) < 3.5:
-                    idx_bonds.append([donor1_idx,acceptor2_idx])
+                    idx_bonds.append([donor1_idx, acceptor2_idx])
             # print(idx_bonds)
             frame_bonds.append(idx_bonds)
             # print(frame_bonds)
@@ -337,7 +337,7 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
                 acceptor1_pos = np.array(u.select_atoms("index "+str(acceptor1_idx)).positions)
                 # if distance between atoms less than 3.5 angstrom then count as bond
                 if np.linalg.norm(donor2_pos-acceptor1_pos) < 3.5:
-                    idx_bonds.append([donor2_idx,acceptor1_idx])
+                    idx_bonds.append([donor2_idx, acceptor1_idx])
             # print(idx_bonds)
             frame_bonds.append(idx_bonds)
             # print(frame_bonds)
@@ -346,11 +346,11 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
     all_donor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
     all_acceptor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
 
-    all_donor_pair_names = [[atg_to_names(u.select_atoms('index '+str(i[0])))[0],atg_to_names(u.select_atoms('index '+str(i[1])))[0]] for i in all_donor_pairs]
-    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index '+str(i[0])))[0],atg_to_names(u.select_atoms('index '+str(i[1])))[0]] for i in all_acceptor_pairs]
+    all_donor_pair_names = [[atg_to_names(u.select_atoms('index '+str(i[0])))[0], atg_to_names(u.select_atoms('index '+str(i[1])))[0]] for i in all_donor_pairs]
+    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index '+str(i[0])))[0], atg_to_names(u.select_atoms('index '+str(i[1])))[0]] for i in all_acceptor_pairs]
 
-    donor_dist =np.zeros((len(all_donor_pairs),len(u.trajectory)))
-    acceptor_dist = np.zeros((len(all_acceptor_pairs),len(u.trajectory)))
+    donor_dist =np.zeros((len(all_donor_pairs), len(u.trajectory)))
+    acceptor_dist = np.zeros((len(all_acceptor_pairs), len(u.trajectory)))
 
     for frame in tqdm(range(len(u.trajectory))):
     # for frame_no in tqdm(range(100)):
@@ -364,10 +364,10 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
 
     # Write data out and visualize water sites in pdb
     if write is True:
-        np.savetxt('lig_hbonds/'+out_name+'all_donor_pair_names.txt', np.array(all_donor_pair_names,dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/'+out_name+'all_acceptor_pair_names.txt',  np.array(all_acceptor_pair_names,dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/'+out_name+'all_donor_pair_data.txt', np.array(donor_dist,dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/'+out_name+'all_acceptor_pair_data.txt',  np.array(acceptor_dist,dtype=object), fmt='%s')
+        np.savetxt('lig_hbonds/'+out_name+'all_donor_pair_names.txt', np.array(all_donor_pair_names, dtype=object), fmt='%s')
+        np.savetxt('lig_hbonds/'+out_name+'all_acceptor_pair_names.txt',  np.array(all_acceptor_pair_names, dtype=object), fmt='%s')
+        np.savetxt('lig_hbonds/'+out_name+'all_donor_pair_data.txt', np.array(donor_dist, dtype=object), fmt='%s')
+        np.savetxt('lig_hbonds/'+out_name+'all_acceptor_pair_data.txt',  np.array(acceptor_dist, dtype=object), fmt='%s')
 
     feature_names['donor_names'] = np.array(all_donor_pair_names)
     feature_names['acceptor_names'] = np.array(all_acceptor_pair_names)

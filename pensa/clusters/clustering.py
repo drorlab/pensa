@@ -15,7 +15,7 @@ def obtain_clusters(data, algorithm='kmeans',
     Parameters
     ----------
         data : float array)
-            Trajectory data. Format: [frames,frame_data]
+            Trajectory data. Format: [frames, frame_data]
         algorithm : string)
             The algorithm to use for the clustering.
             Options: kmeans, rspace.
@@ -82,9 +82,9 @@ def obtain_combined_clusters(data_a, data_b, label_a='Sim A', label_b='Sim B', s
     Parameters
     ----------
         data_a : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         data_b : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         label_a : str, optional
             Label for the plot.
             Default: Sim A.
@@ -181,7 +181,7 @@ def obtain_mult_combined_clusters(data, start_frame=0, algorithm='kmeans',
     Parameters
     ----------
         data : list of float arrays
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         start_frame : int
             Frame from which the clustering data starts.
             Default: 0.
@@ -288,7 +288,7 @@ def find_closest_frames(data, points):
     Parameters
     ----------
         data : float array
-            Trajectory data [frames,frame_data]
+            Trajectory data [frames, frame_data]
         points : list of float arrays
             Points to which the closest frames shall be found.
             Dimension must be that of frame_data.

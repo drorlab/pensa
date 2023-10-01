@@ -45,7 +45,7 @@ def load_selection(sel_file, sel_base=''):
 
     """
     sel_string = sel_base + 'resid '
-    with open(sel_file,'r') as sf:
+    with open(sel_file, 'r') as sf:
         for line in sf.readlines():
             r = np.array(line.strip().split(' '), dtype=int)
             sel_string += range_to_string(*r)

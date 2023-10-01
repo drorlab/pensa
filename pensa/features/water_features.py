@@ -56,11 +56,11 @@ def _convert_to_dipole(water_atom_positions):
     ## Convert to spherical coordinates
     ## radians
     # φ ∈ [0, 2π)
-    psi=np.arctan2(y_axis,x_axis)
+    psi=np.arctan2(y_axis, x_axis)
     # θ ∈ [0, π]
     theta=np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2)))
     ## degrees
-    # psi=math.degrees(np.arctan2(y_axis,x_axis))
+    # psi=math.degrees(np.arctan2(y_axis, x_axis))
     # theta=math.degrees(np.arccos(z_axis/(np.sqrt(x_axis**2+y_axis**2+z_axis**2))))
 
     return psi, theta
@@ -149,10 +149,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
 
     print('\n')
-    print('Featurizing ',top_waters,' Waters')
+    print('Featurizing ', top_waters, ' Waters')
     for wat_no in range(top_waters):
         print('\n')
-        print('Water no: ',wat_no+1)
+        print('Water no: ', wat_no+1)
         print('\n')
         thetalist=[]
         psilist=[]
@@ -179,7 +179,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             u.trajectory[frame_no]
             waters_resid=counting[frame_no]
             if len(waters_resid)==1:
-                ## (x,y,z) positions for the water oxygen at trajectory frame_no
+                ## (x, y, z) positions for the water oxygen at trajectory frame_no
                 water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(waters_resid[0])).positions]
                 psi, theta = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
@@ -188,7 +188,7 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             elif len(waters_resid)>1:
                 freq_count=[]
                 for ID in waters_resid:
-                    freq_count.append([flat_list.count(ID),ID])
+                    freq_count.append([flat_list.count(ID), ID])
                 freq_count.sort(key = lambda x: x[0])
                 water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(freq_count[-1][1])).positions]
                 psi, theta = _convert_to_dipole(water_atom_positions)
@@ -203,10 +203,10 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         water_dists.append(water_out)
         water_ID = "O" + str(wat_no+1)
         water_pocket_occupation_frequency = 1 - psilist.count(10000.0)/len(psilist)
-        water_pocket_occupation_frequency = round(water_pocket_occupation_frequency,4)
+        water_pocket_occupation_frequency = round(water_pocket_occupation_frequency, 4)
         atom_location = shifted_coords
 
-        water_information.append([water_ID,list(atom_location),water_pocket_occupation_frequency])
+        water_information.append([water_ID, list(atom_location), water_pocket_occupation_frequency])
 
         ## Write data out and visualize water sites in pdb
         if write is True:

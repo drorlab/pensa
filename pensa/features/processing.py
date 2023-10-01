@@ -197,7 +197,7 @@ def get_multivar_res_timeseries(feat, data, feature_type, write=None, out_name=N
                     os.makedirs(subdir)
             resname_out = feat_name_split[-2] + feat_name_split[-1]
             filename = feature_type+'/' + out_name + resname_out + ".txt"
-            np.savetxt(filename, feat_timeseries, delimiter=',', newline='\n')
+            np.savetxt(filename, feat_timeseries, delimiter=', ', newline='\n')
 
     # return multivar_res_timeseries_data
     feature_names[feature_type] = sorted_names
@@ -251,7 +251,7 @@ def sort_features(names, sortby):
 
     Returns
     -------
-    sort : array of tuples [str,float]
+    sort : array of tuples [str, float]
         Array of sorted tuples with feature and value.
 
     """
