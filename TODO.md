@@ -1,19 +1,9 @@
 ### In Progress
-
 - [ ] Tests
   - [x] Workflow test with example data
   - [ ] Trivial examples for each function
   - [ ] Unit tests for SSI 
   - [ ] Unit tests for density features
-- [ ] Integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
-  - [x] Lay out module structure in separate branch.
-  - [x] Copy core network from DiffNets repo.
-  - [ ] Try to use existing featurization.
-  - [ ] Include existing DiffNets featurization and compare.
-- [ ] exploratory analysis via correlation coefficients of the features
-  - [x] First tests --> not very promising.
-  - [ ] Try [different metric](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.correlation.html)
-  - [ ] Find useful application or leave it out.
 - [ ] Unified tutorial in documentation. Make one page for each subpackage
   - [x] preprocessing
     - [x] coordinates
@@ -28,15 +18,12 @@
   - [x] SSI
 
 ### Plans
-- [ ] Try using MDAnalysis instead of biotite for water featurization
-- [ ] Integrate more options for features from PyEMMA (think carefully about how to make it more flexible)
 - [ ] More example tcl scripts for VMD 
-- [ ] Facilitate calculation of JSD etc. on principal components
-- [ ] Facilitate calculation of SSI on results of joint clustering.
-- [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
 - [ ] Feature comparison of more than two ensembles
   - [ ] with respect to the joint ensemble (all metrics)
   - [ ] with respect to a reference ensemble (will not always work for KLD)
+- [ ] Use MDAnalysis instead of biotite for water featurization
+- [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
@@ -49,17 +36,13 @@
   - [ ] First tests
   - [ ] write module
   - [ ] write unit tests
-- [ ] Put shared functionality of PCA and TICA into shared functions.
 - [ ] Make file format (png/pdf?) for matplotlib optional.
 - [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis).
 - [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
-- [ ] Implement nucleic acid torsions and pseudo-torsions, as reviewed [Keating et al.](https://www.cambridge.org/core/journals/quarterly-reviews-of-biophysics/article/new-way-to-see-rna/2A2D428A5FAB150D2488A5A1D87007BD) and as used in [x3DNA](https://x3dna.org/highlights/pseudo-torsions-to-simplify-the-representation-of-dna-rna-backbone-conformation) or [Barnaba](https://rnajournal.cshlp.org/content/25/2/219) ([Barnaba code on GitHub](https://github.com/srnas/barnaba))
 
 ### Ideas
 - [ ] Logo
-- [ ] Hydrogen bonds as features
 - [ ] Contacts as features 
-  - [ ] can PyEMMA do this?
   - [ ] Think about a [GetContacts](https://getcontacts.github.io/) reader
 - [ ] Position deviations as features (similar to components of RMSD)
 - [ ] Estimate thresholds for significance of feature differences
@@ -68,10 +51,6 @@
   - [ ] modify p-value of KS test using number of simulation runs per ensemble
 - [ ] Wasserstein distance to compare ensembles
 - [ ] Add option to whiten features
-- [ ] Featurizers for other molecule types
-  - [ ] ligands
-  - [ ] lipids
-  - [ ] nucleic acids
 - [ ] Account for [Bonferroni correction](https://en.wikipedia.org/wiki/Bonferroni_correction) in comparison.
 - [ ] Implement conformational entropy calculations
   - [ ] Read papers, e.g, [1](https://www.pnas.org/content/111/43/15396), [2](https://www.mdpi.com/2079-3197/6/1/21/htm), [3](https://pubs.acs.org/doi/10.1021/acs.jcim.0c01375)
@@ -105,11 +84,21 @@
 - [x] Slack channel for all developers and testers, and to provide support for the user community.
 - [x] Implement clustering in principal component space
 - [x] Option to write and load features as CSV file.
+- [x] Implement nucleic acid torsions and pseudo-torsions, as reviewed [Keating et al.](https://www.cambridge.org/core/journals/quarterly-reviews-of-biophysics/article/new-way-to-see-rna/2A2D428A5FAB150D2488A5A1D87007BD) and as used in [x3DNA](https://x3dna.org/highlights/pseudo-torsions-to-simplify-the-representation-of-dna-rna-backbone-conformation) or [Barnaba](https://rnajournal.cshlp.org/content/25/2/219) ([Barnaba code on GitHub](https://github.com/srnas/barnaba))
+- [x] Hydrogen bods as features
+- [x] Use MDAnalysis instead of PyEMMA to read features (to avoid mmshare dependency).
+- [x] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for clustering.
+- [x] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for dimensionality reduction.
+- [x] exploratory analysis via correlation coefficients of the features
 
 ### Abandoned
-
 - [ ] Frame classification via CNN on features
   - [x] Prototype to classify simulation frames --> Diffnets probably more powerful.
   - [ ] Interpret weights as relevance of features
   - [ ] Write module
   - [ ] Write unit tests
+- [ ] Integrate [DiffNets](https://doi.org/10.1101/2020.07.01.182725).
+  - [x] Lay out module structure in separate branch.
+  - [x] Copy core network from DiffNets repo.
+  - [ ] Try to use existing featurization.
+  - [ ] Include existing DiffNets featurization and compare.

@@ -3,8 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies: 
-  - python==3.7
-  - mdtraj==1.9.3 
-  - mdshare 
-  - pyemma 
+  - python==3.9
+  - scipy>=1.2
+  - numpy
+  - pandas
+  - matplotlib
   - MDAnalysis 
+  - deeptime
+  - biotite

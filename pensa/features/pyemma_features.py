@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# - * - coding: utf-8 - * -
 """
 Methods to featurize a protein, based on PyEMMA.
 
@@ -6,23 +6,20 @@ More options are described here:
 http://www.emma-project.org/latest/api/generated/pyemma.coordinates.featurizer.html
 """
 
-import warnings
-import numpy as np
 import pyemma
-from pyemma.util.contexts import settings
-from pensa.features.processing import get_feature_timeseries 
+from pensa.features.processing import get_feature_timeseries
 from pensa.preprocessing.coordinates import sort_coordinates
 
 
 # -- Loading the Features --
 
 
-def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
-                           features=['bb-torsions','sc-torsions','bb-distances'],
-                           resnum_offset=0):
+def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
+                        features=['bb-torsions', 'sc-torsions', 'bb-distances'],
+                        resnum_offset=0):
     """
     Load the features. Currently implemented: bb-torsions, sc-torsions, bb-distances
-    
+
     Parameters
     ----------
     pdb : str
@@ -32,21 +29,21 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
     start_frame : int, default=0
         First frame to return of the features. Already takes subsampling by stride>=1 into account.
     step_width : int, default=1
-        Subsampling step width when reading the frames. 
+        Subsampling step width when reading the frames.
     cossin : bool, default=False
         Use cosine and sine for angles.
     features : list of str, default=['bb-torsions', 'sc-torsions']
         Names of the features to be extracted.
     resnum_offset : int, default=0
         Number to subtract from the residue numbers that are loaded from the reference file.
-        
+
     Returns
     -------
     feature_names : dict of lists of str
         Names of all features
     features_data : dict of numpy arrays
         Data for all features
-    
+
     """
     # Initialize the dictionaries.
     feature_names = {}
@@ -74,7 +71,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         features_data['bb-distances'] = bbdistances_data
     # Remove the residue-number offset
     if resnum_offset != 0:
-        feature_names = _remove_resnum_offset(feature_names,resnum_offset)
+        feature_names = _remove_resnum_offset(feature_names, resnum_offset)
     # Return the dictionaries.
     return feature_names, features_data
 
@@ -82,94 +79,94 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
 def _describe_dist_without_atom_numbers(feature_names):
     """
     Provides feature descriptors without atom numbers.
-    
+
     Parameters
     ----------
     feature_names : dict
         Names of all features (assumes distances).
-    
+
     Returns
     -------
     desc : list of str
         The feature descriptors without atom numbers.
-    
+
     """
     desc = feature_names.describe()
-    desc = [ _remove_atom_numbers_from_distance(d) for d in desc ]
+    desc = [_remove_atom_numbers_from_distance(d) for d in desc]
     return desc
 
 
 def _remove_atom_numbers_from_distance(feat_str):
     """
     Remove atom numbers from a distance feature string.
-    
+
     Parameters
     ----------
     feat_str : str
         The string describing a single feature.
-    
+
     Returns
     -------
     new_feat : str
         The feature string without atom numbers.
-    
+
     """
     # Split the feature string in its parts
     parts = feat_str.split(' ')
     # Glue the desired parts back together
     new_feat = parts[0]
-    for nr in [1,2,3,5,6,7,8]:
-        new_feat += ' '+parts[nr]
+    for nr in [1, 2, 3, 5, 6, 7, 8]:
+        new_feat += ' ' + parts[nr]
     return new_feat
 
 
 def _remove_resnum_offset(features, offset):
     """
     Removes (subtracts) the offset from residue numbers in PyEMMA structure features.
-    
+
     Parameters
     ----------
     features : list
         The feature names to be modified.
     offset : int
         The number to subtract from the residue numbers.
-    
+
     Returns
     -------
     new_feastures : str
         The feature names without the offset.
-    
-    """    
+
+    """
     new_features = {}
     for key in features.keys():
-        new_features[key] = [] 
+        new_features[key] = []
 
     if 'bb-torsions' in features.keys():
         for f in features['bb-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['bb-torsions'].append(' '.join(fsplit))
-    
+
     if 'sc-torsions' in features.keys():
         for f in features['sc-torsions']:
             fsplit = f.split(' ')
-            resnum = int(f.split(' ')[3])-offset
+            resnum = int(f.split(' ')[3]) - offset
             fsplit[3] = str(resnum)
             new_features['sc-torsions'].append(' '.join(fsplit))
-        
+
     if 'bb-distances' in features.keys():
         for f in features['bb-distances']:
             fsplit = f.split(' ')
-            resnum1 = int(f.split(' ')[2])-offset
-            resnum2 = int(f.split(' ')[6])-offset
+            resnum1 = int(f.split(' ')[2]) - offset
+            resnum2 = int(f.split(' ')[6]) - offset
             fsplit[2] = str(resnum1)
             fsplit[6] = str(resnum2)
             new_features['bb-distances'].append(' '.join(fsplit))
-        
+
     return new_features
-    
-    
+
+
 def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_name, trj_name, out_name, start_frame=0):
     """
     Sort a trajectory along a PyEMMA feature.
@@ -204,4 +201,3 @@ def sort_traj_along_pyemma_feature(feat, data, feature_name, feature_type, ref_n
     sort_idx, oidx_sort = sort_coordinates(d, ref_name, trj_name, out_name, start_frame=start_frame)
     d_sorted = d[sort_idx]
     return d_sorted
-

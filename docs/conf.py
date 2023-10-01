@@ -21,7 +21,7 @@ import pensa
 # -- Project information -----------------------------------------------------
 
 project = 'PENSA'
-copyright = '2020-2021, Martin Vögele, Neil Thomson, Sang Truong'
+copyright = '2020-2023, Martin Vögele, Neil Thomson, Sang Truong'
 author = 'Martin Vögele, Neil Thomson, Sang Truong'
 
 
@@ -64,12 +64,10 @@ master_doc = 'index'
 autodoc_mock_imports = [
     'numpy', 
     'scipy',
+    'pandas',
     'matplotlib',
-    'mdtraj',
-    'pyemma',
-    'mdshare',
+    'deeptime',
     'MDAnalysis',
-    'cython',
     'biotite'
 ]
 
