@@ -27,4 +27,4 @@ jobs:
       run: |
         pip install pytest
         pip install -e .
-        pytest --ignore pensa/diffnets/tests/test_api.py --ignore pensa/diffnets/tests/test_cli.py --ignore pensa/diffnets/tests/test_diffnets.py
+        pytest
