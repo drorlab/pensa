@@ -1,11 +1,6 @@
 import numpy as np
-import scipy as sp
-import scipy.stats
-import scipy.spatial
-import scipy.spatial.distance
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
-from pensa.features import *
 
 
 def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
@@ -56,7 +51,7 @@ def residue_visualization(names, data, ref_filename, pdf_filename, pdb_filename,
         default = 1
     else:
         default = np.nan
-    vis_values = default*np.ones(len(vis_resids))
+    vis_values = default * np.ones(len(vis_resids))
     # -- VALUE ASSIGNMENT --
     for i, name in enumerate(names):
         # To each residue ...
@@ -141,7 +136,7 @@ def pair_features_heatmap(feat_names, feat_diff, plot_filename, separator=' - ',
         part1, part2 = split_name
         part1_list.append(part1)
         part2_list.append(part2)
-    all_parts = np.unique(np.array(part1_list+part2_list))
+    all_parts = np.unique(np.array(part1_list + part2_list))
     # Sort the list if desired
     if sort_by_pos is not None:
         if numerical_sort:
@@ -245,10 +240,10 @@ def resnum_heatmap(feat_names, feat_diff, plot_filename, res1_pos=2, res2_pos=6,
     while first_res > first_tick:
         first_tick += tick_step
     # Ticks and labels
-    ax.set_xticks(np.arange(first_tick-first_res, size, tick_step))
-    ax.set_yticks(np.arange(first_tick-first_res, size, tick_step))
-    ax.set_xticklabels(np.arange(first_tick, last_res+1, tick_step))
-    ax.set_yticklabels(np.arange(first_tick, last_res+1, tick_step))
+    ax.set_xticks(np.arange(first_tick - first_res, size, tick_step))
+    ax.set_yticks(np.arange(first_tick - first_res, size, tick_step))
+    ax.set_xticklabels(np.arange(first_tick, last_res + 1, tick_step))
+    ax.set_yticklabels(np.arange(first_tick, last_res + 1, tick_step))
     ax.xaxis.set_label_position('top')
     ax.set_xlabel('residue number')
     ax.set_ylabel('residue number')

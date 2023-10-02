@@ -1,18 +1,15 @@
 import numpy as np
-from pensa import *
-from pensa.features import *
-from pensa.statesinfo import *
-from pensa.comparison import *
-import scipy as sp
-import scipy.stats
-import scipy.spatial
+from pensa.statesinfo import get_discrete_states
+from pensa.comparison import ssi_ensemble_analysis, relative_entropy_analysis
+from pensa.features import get_multivar_res
 import scipy.spatial.distance
 import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
 
 
-# -- Functions to uncertainty analysis on statistics across paired ensembles --
+# -- Functions for uncertainty analysis on statistics across paired ensembles --
+
 
 def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
                        blockanlen=10000, pbc=True, discretize='gaussian', group_feat=True, cumdist=False, verbose=True):
@@ -63,11 +60,10 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
     frameno = 0
     while frameno < min(len(all_data_a), len(all_data_b)):
         if cumdist is True:
-            block_lengths.append([0, frameno+blockanlen])
+            block_lengths.append([0, frameno + blockanlen])
         else:
-            block_lengths.append([frameno, frameno+blockanlen])
+            block_lengths.append([frameno, frameno + blockanlen])
         frameno += blockanlen
-
 
     # Run the SSI analysis on each block
     for bl in block_lengths:
@@ -86,9 +82,8 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
         ssi_names, data_ssi = ssi_ensemble_analysis(features_a, features_b, block_data_a, block_data_b, discrete_states, verbose=verbose)
         ssi_blocks.append(data_ssi)
 
-    ssi_names, ssi_blocks =  np.transpose(ssi_names), np.transpose(ssi_blocks)
+    ssi_names, ssi_blocks = np.transpose(ssi_names), np.transpose(ssi_blocks)
     return ssi_names, ssi_blocks
-
 
 
 def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
@@ -126,15 +121,15 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
 
     """
 
-    relen_blocks=[]
-    block_lengths=[]
-    frameno=0
+    relen_blocks = []
+    block_lengths = []
+    frameno = 0
     while frameno < min(len(all_data_a), len(all_data_b)):
-        if cumdist is True:
-            block_lengths.append([0, frameno+blockanlen])
+        if cumdist:
+            block_lengths.append([0, frameno + blockanlen])
         else:
-            block_lengths.append([frameno, frameno+blockanlen])
-        frameno+=blockanlen
+            block_lengths.append([frameno, frameno + blockanlen])
+        frameno += blockanlen
 
     for bl in block_lengths:
         block_data_a = all_data_a[bl[0]:bl[1]]
@@ -144,7 +139,7 @@ def relen_block_analysis(features_a, features_b, all_data_a, all_data_b,
         relen = relative_entropy_analysis(features_a, features_b, block_data_a, block_data_b, verbose=verbose)
         relen_blocks.append(relen)
 
-    np.save('relen_bl'+str(blockanlen), np.transpose(np.array(relen_blocks)))
+    np.save('relen_bl' + str(blockanlen), np.transpose(np.array(relen_blocks)))
 
     return np.transpose(relen_blocks)
 
@@ -240,8 +235,8 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
         resids.append(list(np.where(np.array(ssi_names) == resnames[i])[0]))
 
     resssivals = []
-    avresssivals=[]
-    avsemvals=[]
+    avresssivals = []
+    avsemvals = []
 
     arr = _pop_arr_val(ssi_blocks, -1)
 
@@ -250,15 +245,15 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
         avresssivals.append(list(np.average(np.array([arr[index] for index in resids[i]], dtype=object), axis=0)))
         avsemvals.append([scipy.stats.sem(avresssivals[-1][:seg]) for seg in range(len(avresssivals[-1]))])
 
-    if write_plot is True:
+    if write_plot:
+
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
 
         for i in range(len(resnames)):
 
-            x=list(range(len(avsemvals[i][2:])))
-            y=avsemvals[i][2:]
-
+            x = list(range(len(avsemvals[i][2:])))
+            y = avsemvals[i][2:]
 
             plt.figure()
             plt.ion()
@@ -267,24 +262,23 @@ def ssi_sem_analysis(ssi_namelist, ssi_blocks, write_plot=True, expfit=False, pl
             plt.xlabel('Block # (in steps of 10, 000 frames per simulation)')
             plt.ylabel('SSI standard error for residue type')
 
-            ## Convergence Test
+            # Convergence Test
             if expfit is True:
-                expofit=np.polyfit(x, np.log(y), 1)
-                expy=[np.exp(expofit[0]*xval+expofit[1]) for xval in x]
-
-                a=expofit[1]
-                b=expofit[0]
-                c=min(expy)
-                p0=[a, b, c]
+                expofit = np.polyfit(x, np.log(y), 1)
+                expy = [np.exp(expofit[0] * xval + expofit[1]) for xval in x]
+                a = expofit[1]
+                b = expofit[0]
+                c = min(expy)
+                p0 = [a, b, c]
                 popt, pcov = curve_fit(_expfunc, x, y, p0=p0)
-                x1 = np.linspace(min(x), 200, num =1700)
+                x1 = np.linspace(min(x), 200, num=1700)
                 y1 = _expfunc(x1, *popt)
-                plt.plot(x1, y1,  label='Exp. fit', alpha=0.75)
-                plt.axhline(popt[-1], label='Converged value =~: ' +str(round(popt[-1], 5)), linestyle='--', color='k')
+                plt.plot(x1, y1, label='Exp. fit', alpha=0.75)
+                plt.axhline(popt[-1], label='Converged value =~: ' + str(round(popt[-1], 5)), linestyle='--', color='k')
                 plt.legend()
-            plt.ioff()
-            plt.savefig(plot_dir+'/' + resnames[i] + plot_prefix + 'standarderrorSSI.png')
 
+            plt.ioff()
+            plt.savefig(plot_dir + '/' + resnames[i] + plot_prefix + 'standarderrorSSI.png')
 
     return avsemvals, avresssivals, resssivals
 
@@ -323,15 +317,14 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
     matching_indices = []
 
     for i in namesnodups:
-        matching_indices.append(list(np.where(np.array(relen_names)==i)[0]))
-
+        matching_indices.append(list(np.where(np.array(relen_names) == i)[0]))
 
     resrelenvals = []
-    avresrelenvals=[]
-    avsemvals=[]
+    avresrelenvals = []
+    avsemvals = []
 
     for i in range(len(matching_indices)):
-        datain=[list(relen_dat[index][1])[:-1] for index in matching_indices[i]]
+        datain = [list(relen_dat[index][1])[:-1] for index in matching_indices[i]]
         respre = []
         for sub in range(len(datain)):
             respre.append([float(val) for val in datain[sub]])
@@ -339,15 +332,18 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
         avresrelenvals.append(list(np.average(np.array(resrelenvals[-1]), axis=0)))
         avsemvals.append([scipy.stats.sem(avresrelenvals[-1][:seg]) for seg in range(len(avresrelenvals[-1]))])
 
-    ## Plotting the sem over each block to see the convergence
-    if write_plot is True:
+    # Plot the sem over each block to see the convergence
+    if write_plot:
+
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
-        for i in range(len(namesnodups)):
-            print("plotting res", i,  namesnodups[i])
 
-            x=list(range(len(avsemvals[i][2:])))
-            y=avsemvals[i][2:]
+        for i in range(len(namesnodups)):
+
+            print("plotting res", i, namesnodups[i])
+
+            x = list(range(len(avsemvals[i][2:])))
+            y = avsemvals[i][2:]
 
             plt.figure()
             plt.ion()
@@ -355,27 +351,28 @@ def relen_sem_analysis(relen_dat, write_plot=True, expfit=False, plot_dir='./SEM
             plt.title(namesnodups[i])
             plt.xlabel('Block # (in steps of 10, 000 frames per simulation)')
             plt.ylabel('JSD average standard error for residue type')
-            if expfit is True:
-                expofit=np.polyfit(x, np.log(y), 1)
-                expy=[np.exp(expofit[0]*xval+expofit[1]) for xval in x]
-                a=expofit[1]
-                b=expofit[0]
-                c=min(expy)
-                p0=[a, b, c]
+
+            if expfit:
+                expofit = np.polyfit(x, np.log(y), 1)
+                expy = [np.exp(expofit[0] * xval + expofit[1]) for xval in x]
+                a = expofit[1]
+                b = expofit[0]
+                c = min(expy)
+                p0 = [a, b, c]
                 popt, pcov = curve_fit(_expfunc, x, y, p0=p0)
-                x1 = np.linspace(min(x), 200, num =1700)
+                x1 = np.linspace(min(x), 200, num=1700)
                 y1 = _expfunc(x1, *popt)
-                plt.plot(x1, y1,  label='Exp. fit', alpha=0.75)
-                plt.axhline(popt[-1], label='Converged value =~: ' +str(round(popt[-1], 5)), linestyle='--', color='k')
+                plt.plot(x1, y1, label='Exp. fit', alpha=0.75)
+                plt.axhline(popt[-1], label='Converged value =~: ' + str(round(popt[-1], 5)), linestyle='--', color='k')
                 plt.legend()
+
             plt.ioff()
-            plt.savefig(plot_dir+'/' + namesnodups[i] + plot_prefix + 'standarderrorJSD.png')
+            plt.savefig(plot_dir + '/' + namesnodups[i] + plot_prefix + 'standarderrorJSD.png')
 
     return resrelenvals, avresrelenvals, avsemvals
 
 
-
-## EXAMPLE USAGE
+# ** EXAMPLE USAGE **
 
 # xtc1 = '../../tutorial/mor-data/11423_trj_151.xtc'
 # xtc2 = '../../tutorial/mor-data/11424_trj_151.xtc'

@@ -1,9 +1,5 @@
 import numpy as np
 import scipy as sp
-import scipy.stats
-import scipy.spatial
-import scipy.spatial.distance
-from pensa.features import *
 
 
 def kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=True,
@@ -125,8 +121,8 @@ def mean_difference_analysis(features_a, features_b, all_data_a, all_data_b, ver
         mean_a = np.mean(data_a)
         mean_b = np.mean(data_b)
         # Calculate difference of means between the two data sets
-        diff_ab = mean_a-mean_b
-        mean_ab = 0.5*(mean_a+mean_b)
+        diff_ab = mean_a - mean_b
+        mean_ab = 0.5 * (mean_a + mean_b)
         # Update the output arrays
         data_avg[i] = mean_ab
         data_diff[i] = diff_ab
@@ -158,7 +154,7 @@ def feature_correlation(data_a, data_b):
     corr = np.zeros([data_a.shape[1], data_b.shape[1]])
     for _i, a in enumerate(data_a.T):
         for _j, b in enumerate(data_b.T):
-            a_norm = (a-np.mean(a))/np.std(a)
-            b_norm = (b-np.mean(b))/np.std(b)
+            a_norm = (a - np.mean(a)) / np.std(a)
+            b_norm = (b - np.mean(b)) / np.std(b)
             corr[_i, _j] = np.corrcoef(a_norm, b_norm)[0, 1]
     return corr

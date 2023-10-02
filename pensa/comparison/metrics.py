@@ -1,7 +1,10 @@
 import numpy as np
-from pensa import *
-from pensa.comparison import *
-from pensa.dimensionality import *
+from pensa.comparison import \
+    relative_entropy_analysis, \
+    kolmogorov_smirnov_analysis, \
+    ssi_ensemble_analysis
+from pensa.dimensionality import \
+    calculate_pca, get_components_pca
 
 
 """
@@ -45,6 +48,7 @@ from pensa.dimensionality import *
         max_kld : float
             Maximum Kullback-Leibler divergence from two ensembles.
 """
+
 
 def average_jsd(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False):
     _, data_jsdist, _, _ = relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=bin_width, bin_num=bin_num, verbose=verbose, override_name_check=override_name_check)
@@ -113,6 +117,7 @@ def max_kss(features_a, features_b, all_data_a, all_data_b, verbose=True, overri
     _, data_kss, _ = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_kss)
 
+
 def average_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.mean(data_ksp)
@@ -122,9 +127,11 @@ def max_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, overri
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.max(data_ksp)
 
+
 def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, override_name_check=False):
     _, _, data_ksp = kolmogorov_smirnov_analysis(features_a, features_b, all_data_a, all_data_b, verbose=verbose, override_name_check=override_name_check)
     return np.min(data_ksp)
+
 
 """
     Calculates average and maximum State Specific Information statistic for a feature across two ensembles. Each of two functions uses the ssi_ensemble_analysis function with the same parameters.
@@ -166,55 +173,45 @@ def min_ksp(features_a, features_b, all_data_a, all_data_b, verbose=True, overri
             Maximum of State Specific Information for a feature across two ensembles.
 """
 
+
 def average_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, verbose=True, write_plots=None, override_name_check=False):
     _, data_ssi = ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=torsions, pocket_occupancy=pocket_occupancy, pbc=pbc, verbose=verbose, write_plots=write_plots, override_name_check=override_name_check)
     return np.mean(data_ssi)
 
 
-def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbs=True, verbose=True, write_plots=None, override_name_check=False):
+def max_ssi(features_a, features_b, all_data_a, all_data_b, torsions=None, pocket_occupancy=None, pbc=True, verbose=True, write_plots=None, override_name_check=False):
     _, data_ssi = ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, torsions=torsions, pocket_occupancy=pocket_occupancy, pbc=pbc, verbose=verbose, write_plots=write_plots, override_name_check=override_name_check)
     return np.max(data_ssi)
 
 
-"""
+# ** Sampling Efficiency **
+
+
+def pca_sampling_efficiency(ref_data, test_data, num_pc=2):
+    """
     Calculates the relative sampling efficiency of test data based on reference data.
 
     Parameters
     ----------
-    ref_data : float array
-        Trajectory data from the reference ensemble. Format: [frames, frame_data].
-    test_data : float array
-        Trajectory data from the test ensemble. Format: [frames, frame_data].
-    num_pc : int
-        Number of principal components used.
+        ref_data : float array
+            Trajectory data from the reference ensemble. Format: [frames, frame_data].
+        test_data : float array
+            Trajectory data from the test ensemble. Format: [frames, frame_data].
+        num_pc : int
+            Number of principal components used.
 
     Returns
     -------
         pca_se : float
             Sampling efficiency of test data based on reference data.
 
-"""
-
-def pca_sampling_efficiency(ref_data, test_data, num_pc=2):
+    """
     pca = calculate_pca(ref_data)
-
     _, ref_components = get_components_pca(ref_data, num_pc, pca=pca)
     _, test_components = get_components_pca(test_data, num_pc, pca=pca)
-
     ref_var = np.var(ref_components, axis=0)
     test_var = np.var(test_components, axis=0)
-
     ref_vol = np.prod(ref_var)
     test_vol = np.prod(test_var)
-
     pca_se = test_vol / ref_vol
-
     return pca_se
-
-
-
-
-
-
-
-

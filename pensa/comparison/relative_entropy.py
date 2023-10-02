@@ -3,7 +3,6 @@ import scipy as sp
 import scipy.stats
 import scipy.spatial
 import scipy.spatial.distance
-from pensa.features import *
 
 
 def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False):
@@ -84,9 +83,11 @@ def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bi
         data_kld_ba[i] = np.sum(sp.special.kl_div(distr_b, distr_a))
         # Calculate the Jensen-Shannon distance
         data_jsdist[i] = scipy.spatial.distance.jensenshannon(
-            distr_a, distr_b, base=2.0)
+            distr_a, distr_b, base=2.0
+        )
         # Print information
         if verbose:
             print(i, '/', len(all_data_a), ':', data_names[i], " %1.2f" % data_avg[i],
-                  " %1.2f %1.2f %1.2f" % (data_jsdist[i], data_kld_ab[i], data_kld_ba[i]))
+                  " %1.2f %1.2f %1.2f" % (data_jsdist[i], data_kld_ab[i], data_kld_ba[i])
+                  )
     return data_names, data_jsdist, data_kld_ab, data_kld_ba
