@@ -106,7 +106,8 @@ def local_maxima_3D(data, order=1):
     return coords, values
 
 
-def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
+def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name,
+                          prot_prox=True, use_memmap=False):
     """
     Writes out combined atomgroup density for both input simulations.
     Parameters
@@ -149,7 +150,8 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # The shape for memmap pseudo-trajetcory
         array_shape = [smallest_traj_len, len(condition_a.atoms) + len(condition_b.atoms), 3]
         # # # Writing out pseudo-trajetcory
-        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0], array_shape[1], array_shape[2]))
+        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+',
+                                  shape=(array_shape[0], array_shape[1], array_shape[2]))
         # # # Creating universe with blank timesteps from pseudo-trajectory
         Combined_conditions.load_new(merged_coords, format=MemoryReader)
 
@@ -186,7 +188,8 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
 
     # # # Grab the density for atomgroup proximal to protein only
     if prot_prox is True:
-        density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup + " and around 3.5 protein", updating=True)
+        _selection = "name " + atomgroup + " and around 3.5 protein"
+        density_atomgroup = Combined_conditions.select_atoms(_selection, updating=True)
     # # # Grab the density for atomgroup anywhere in simulation box
     else:
         density_atomgroup = Combined_conditions.select_atoms("name " + atomgroup)

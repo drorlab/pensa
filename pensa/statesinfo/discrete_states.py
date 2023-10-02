@@ -159,48 +159,140 @@ def _gauss(x, x0, sigma, a):
 
 
 def _bimodal(x, mu1, sigma1, A1, mu2, sigma2, A2):
-    """ Two gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2)
+    """
+    Two Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    return _distribution
 
 
-def _trimodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3):
-    """ Three gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3)
+def _trimodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+              mu3, sigma3, A3):
+    """
+    Three Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    return _distribution
 
 
-def _quadmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4):
-    """ Four gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4)
+def _quadmodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4):
+    """
+    Four Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    return _distribution
 
 
-def _quinmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5):
-    """ Five gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5)
+def _quinmodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4,
+               mu5, sigma5, A5):
+    """
+    Five Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    return _distribution
 
 
-def _sexmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6):
-    """ Six gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5) + _gauss(x, mu6, sigma6, A6)
+def _sexmodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+              mu3, sigma3, A3, mu4, sigma4, A4,
+              mu5, sigma5, A5, mu6, sigma6, A6):
+    """
+    Six Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    _distribution += _gauss(x, mu6, sigma6, A6)
+    return _distribution
 
 
-def _septmodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7):
-    """ Seven gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5) + _gauss(x, mu6, sigma6, A6) + _gauss(x, mu7, sigma7, A7)
+def _septmodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4,
+               mu5, sigma5, A5, mu6, sigma6, A6,
+               mu7, sigma7, A7):
+    """
+    Seven Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    _distribution += _gauss(x, mu6, sigma6, A6)
+    _distribution += _gauss(x, mu7, sigma7, A7)
+    return _distribution
 
 
-def _octomodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8):
-    """ Eight gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5) + _gauss(x, mu6, sigma6, A6) + _gauss(x, mu7, sigma7, A7) + _gauss(x, mu8, sigma8, A8)
+def _octomodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4,
+               mu5, sigma5, A5, mu6, sigma6, A6,
+               mu7, sigma7, A7, mu8, sigma8, A8):
+    """
+    Eight Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    _distribution += _gauss(x, mu6, sigma6, A6)
+    _distribution += _gauss(x, mu7, sigma7, A7)
+    _distribution += _gauss(x, mu8, sigma8, A8)
+    return _distribution
 
 
-def _nonamodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8, mu9, sigma9, A9):
-    """ Nine gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5) + _gauss(x, mu6, sigma6, A6) + _gauss(x, mu7, sigma7, A7) + _gauss(x, mu8, sigma8, A8) + _gauss(x, mu9, sigma9, A9)
+def _nonamodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4,
+               mu5, sigma5, A5, mu6, sigma6, A6,
+               mu7, sigma7, A7, mu8, sigma8, A8,
+               mu9, sigma9, A9):
+    """
+    Nine Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    _distribution += _gauss(x, mu6, sigma6, A6)
+    _distribution += _gauss(x, mu7, sigma7, A7)
+    _distribution += _gauss(x, mu8, sigma8, A8)
+    _distribution += _gauss(x, mu9, sigma9, A9)
+    return _distribution
 
 
-def _decamodal(x, mu1, sigma1, A1, mu2, sigma2, A2, mu3, sigma3, A3, mu4, sigma4, A4, mu5, sigma5, A5, mu6, sigma6, A6, mu7, sigma7, A7, mu8, sigma8, A8, mu9, sigma9, A9, mu10, sigma10, A10):
-    """ Ten gaussians """
-    return _gauss(x, mu1, sigma1, A1) + _gauss(x, mu2, sigma2, A2) + _gauss(x, mu3, sigma3, A3) + _gauss(x, mu4, sigma4, A4) + _gauss(x, mu5, sigma5, A5) + _gauss(x, mu6, sigma6, A6) + _gauss(x, mu7, sigma7, A7) + _gauss(x, mu8, sigma8, A8) + _gauss(x, mu9, sigma9, A9) + _gauss(x, mu10, sigma10, A10)
+def _decamodal(x, mu1, sigma1, A1, mu2, sigma2, A2,
+               mu3, sigma3, A3, mu4, sigma4, A4,
+               mu5, sigma5, A5, mu6, sigma6, A6,
+               mu7, sigma7, A7, mu8, sigma8, A8,
+               mu9, sigma9, A9, mu10, sigma10, A10):
+    """
+    Ten Gaussians
+    """
+    _distribution = _gauss(x, mu1, sigma1, A1)
+    _distribution += _gauss(x, mu2, sigma2, A2)
+    _distribution += _gauss(x, mu3, sigma3, A3)
+    _distribution += _gauss(x, mu4, sigma4, A4)
+    _distribution += _gauss(x, mu5, sigma5, A5)
+    _distribution += _gauss(x, mu6, sigma6, A6)
+    _distribution += _gauss(x, mu7, sigma7, A7)
+    _distribution += _gauss(x, mu8, sigma8, A8)
+    _distribution += _gauss(x, mu9, sigma9, A9)
+    _distribution += _gauss(x, mu10, sigma10, A10)
+    return _distribution
 
 
 def _integral(x, mu, sigma, A):
@@ -293,7 +385,8 @@ def _gauss_fit(distribution, traj1_len, gauss_bin, gauss_smooth):
     # x is the space of angles
     Gauss_xvals = np.linspace(min(distribution), max(distribution), 10000)
     # choosing the fitting mode
-    peak_number = [_gauss, _bimodal, _trimodal, _quadmodal, _quinmodal, _sexmodal, _septmodal, _octomodal, _nonamodal, _decamodal]
+    peak_number = [_gauss, _bimodal, _trimodal, _quadmodal, _quinmodal,
+                   _sexmodal, _septmodal, _octomodal, _nonamodal, _decamodal]
     mode = peak_number[len(sig_vals) - 1]
     expected = []
 
@@ -383,7 +476,9 @@ def smart_gauss_fit(distr, traj1_len, gauss_bins=180, gauss_smooth=None, write_n
             if write_name is None:
                 warnings.warn('Altered gauss_bins by >10% for clustering.\nYou might want to check cluster plot.')
             else:
-                warnings.warn('Altered gauss_bins by >10% for clustering of ' + write_name + '.\nYou might want to check cluster plot.')
+                _warn_string = 'Altered gauss_bins by >10% for clustering of ' + write_name + '.\n'
+                _warn_string += 'You might want to check cluster plot.'
+                warnings.warn(_warn_string)
 
     return gaussians, Gauss_xvals
 
@@ -425,7 +520,8 @@ def get_intersects(gaussians, distribution, Gauss_xvals, write_plots=None, write
 
     for gauss_index in range(len(reorder_gaussians) - 1):
         # Find indices between neighbouring gaussians
-        idx = np.argwhere(np.diff(np.sign(reorder_gaussians[gauss_index] - reorder_gaussians[gauss_index + 1]))).flatten()
+        idx_sign = np.sign(reorder_gaussians[gauss_index] - reorder_gaussians[gauss_index + 1])
+        idx = np.argwhere(np.diff(idx_sign)).flatten()
         if len(idx) == 1:
             all_intersects.append(float(Gauss_xvals[idx][0]))
         elif len(idx) != 0:
@@ -602,7 +698,8 @@ def calculate_entropy(state_limits, distribution_list):
             limit_occupancy_checks = np.zeros((len(arrayindices), len(dist_list[0])))
 
             for dist_num in range(len(arrayindices)):
-                limits = [state_lims[dist_num][arrayindices[dist_num]], state_lims[dist_num][arrayindices[dist_num] + 1]]
+                limits = [state_lims[dist_num][arrayindices[dist_num]],
+                          state_lims[dist_num][arrayindices[dist_num] + 1]]
                 distribution = dist_list[dist_num]
 
                 for frame_num in range(len(distribution)):
@@ -831,10 +928,12 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
                 else:
                     plot_name = None
                 try:
-                    feat_states.append(determine_state_limits(combined_dist[dim_num],
-                                                              traj1_len,
-                                                              write_plots=write_plots,
-                                                              write_name=plot_name))
+                    feat_states.append(
+                        determine_state_limits(
+                            combined_dist[dim_num], traj1_len,
+                            write_plots=write_plots, write_name=plot_name
+                        )
+                    )
                 except Exception:
                     warnings.warn('Distribution ', residue, ' not clustering properly.')
 
