@@ -28,7 +28,9 @@ import biotite.structure as struc
 import biotite.structure.io as strucio
 from tqdm import tqdm
 
+
 # -- Processing trajectories for density analysis
+
 
 def _match_sim_lengths(sim1, sim2):
     """
@@ -50,12 +52,13 @@ def _match_sim_lengths(sim1, sim2):
         A one dimensional distribution of a specific feature.
 
     """
-    if len(sim1)!=len(sim2):
-        if len(sim1)>len(sim2):
-            sim1=sim1[0:len(sim2)]
-        if len(sim1)<len(sim2):
-            sim2=sim2[0:len(sim1)]
+    if len(sim1) != len(sim2):
+        if len(sim1) > len(sim2):
+            sim1 = sim1[0:len(sim2)]
+        if len(sim1) < len(sim2):
+            sim2 = sim2[0:len(sim1)]
     return sim1, sim2
+
 
 def _copy_coords(ag):
     """
@@ -72,6 +75,7 @@ def _copy_coords(ag):
 
     """
     return ag.positions.copy()
+
 
 def local_maxima_3D(data, order=1):
     """
@@ -100,6 +104,7 @@ def local_maxima_3D(data, order=1):
     values = data[mask_local_maxima]
 
     return coords, values
+
 
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name, prot_prox=True, use_memmap=False):
     """
@@ -134,7 +139,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
 
-
     if use_memmap is True:
         # # # Combine both ensembles' atoms into one universe
         Combined_conditions = mda.Merge(condition_a.atoms, condition_b.atoms)
@@ -143,7 +147,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # # # So we iterate over the smallest simulation length
         smallest_traj_len = min(len(condition_a.trajectory), len(condition_b.trajectory))
         # # # The shape for memmap pseudo-trajetcory
-        array_shape=[smallest_traj_len, len(condition_a.atoms)+len(condition_b.atoms), 3]
+        array_shape = [smallest_traj_len, len(condition_a.atoms) + len(condition_b.atoms), 3]
         # # # Writing out pseudo-trajetcory
         merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+', shape=(array_shape[0], array_shape[1], array_shape[2]))
         # # # Creating universe with blank timesteps from pseudo-trajectory
@@ -160,7 +164,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
             stacked = np.concatenate((coords_a, coords_b), axis=0)
             # # # Write over blank trajectory with new coordinates
             Combined_conditions.trajectory[frameno].positions = stacked
-
 
     else:
         # # # Combine both ensembles' atoms into one universe
@@ -191,7 +194,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run(verbose=True)
     D.density.convert_density(write_grid_as)
-    D.density.export('dens/' + out_name + atomgroup +"_density.dx", type="double")
+    D.density.export('dens/' + out_name + atomgroup + "_density.dx", type="double")
 
 
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
@@ -219,7 +222,6 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     condition_a = mda.Universe(struc_a, xtc_a)
     condition_b = mda.Universe(struc_b, xtc_b)
 
-
     # Align a onto the average structure of b
     p = condition_b.select_atoms("protein")
     pdb_outname = 'dens/alignment_ref.pdb'
@@ -236,16 +238,16 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     # just make sure that we have clean original coordinates again (start at the beginning)
     condition_b = mda.Universe(pdb_outname)
 
+    align_xtc_name = 'dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'
 
-    align_xtc_name='dens/' + struc_a.split('/')[-1][:-4] + 'aligned.xtc'
-
-    #align condition a to condition b
+    # Align condition a to condition b
     align.AlignTraj(condition_a,  # trajectory to align
                     condition_b,  # reference
-                    select= 'name CA',  # selection of atoms to align
-                    filename= align_xtc_name,  # file to write the trajectory to
+                    select='name CA',  # selection of atoms to align
+                    filename=align_xtc_name,  # file to write the trajectory to
                     match_atoms=True,  # whether to match atoms based on mass
                     ).run(verbose=True)
+
 
 def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     """
@@ -289,8 +291,9 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
 
     return g
 
+
 def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
-                  grid_input=None, write=None, write_grid_as=None, out_name=None):
+                  grid_input=None, write=False, write_grid_as=None, out_name=None):
 
     """
     Write out water pockets for the top X most probable atoms (top_atoms).
@@ -308,7 +311,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
     grid_input : str, optional
         File name for the density grid input. The default is None, and a grid is automatically generated.
     write : bool, optional
-        If true, a reference pdb will be written out. The default is None.
+        If True, a reference pdb will be written out. The default is False.
     write_grid_as : str, optional
         If you choose to write out the grid, you must specify the water model
         to convert the density into. The default is None. Options are suggested if default.
@@ -324,13 +327,13 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
 
     """
 
-    if write is not None:
+    if not write:
         if out_name is None:
             print('WARNING: You are writing results without providing out_name.')
 
     u = mda.Universe(structure_input, xtc_input)
 
-    if write is True:
+    if write:
         if not os.path.exists('water_features/'):
             os.makedirs('water_features/')
         p = u.select_atoms("protein")
@@ -348,7 +351,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         # just make sure that we have clean original coordinates again (start at the beginning)
         u.trajectory.rewind()
         if grid_input is None:
-            g = get_grid(u, atomgroup, write_grid_as,  out_name)
+            g = get_grid(u, atomgroup, write_grid_as, out_name)
         else:
             g = Grid(grid_input)
     elif grid_input is None:
@@ -357,52 +360,52 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         g = Grid(grid_input)
 
     xyz, val = local_maxima_3D(g.grid)
-    ## Negate the array to get probabilities in descending order
-    val_sort = np.argsort(-1*val.copy())
+    # Negate the array to get probabilities in descending order
+    val_sort = np.argsort(-1 * val.copy())
     newvals = [val[max_val] for max_val in val_sort]
     coords = [xyz[max_val] for max_val in val_sort]
     maxdens_coord_str = [str(item)[1:-1] for item in coords]
-    atom_information=[]
-    atom_dists=[]
+    atom_information = []
+    atom_dists = []
 
     if top_atoms > len(coords):
         top_atoms = len(coords)
 
-
     print('\n')
     print('Featurizing ', top_atoms, ' Waters')
+
     for at_no in tqdm(range(top_atoms)):
+
         print('\n')
-        print('Atom no: ', at_no+1)
+        print('Atom no: ', at_no + 1)
         print('\n')
 
-        ## Find all water atoms within 3.5 Angstroms of density maxima
+        # Find all water atoms within 3.5 Angstroms of density maxima
         # Shifting the coordinates of the maxima by the grid origin to match
         # the simulation box coordinates
-        shifted_coords=coords[at_no]+g.origin
+        shifted_coords = coords[at_no] + g.origin
         point_str = str(shifted_coords)[1:-1]
         densval = newvals[at_no]
 
-        atom_ID = "O" + str(at_no+1)
+        atom_ID = "O" + str(at_no + 1)
         atom_location = shifted_coords
 
         atom_information.append([atom_ID, list(atom_location), densval])
 
-        ## Write data out and visualize water sites in pdb
-        if write is True:
+        # Write data out and visualize water sites in pdb
+        if write:
             write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
             u_pdb = mda.Universe(pdb_outname)
             u_pdb.add_TopologyAttr('tempfactors')
             # Write values as beta-factors ("tempfactors") to a PDB file
             for res in range(len(atom_information)):
-                #scale the atom resid by the starting resid
-                atom_resid = len(u_pdb.residues) - at_no-1 + res
+                # Scale the atom resid by the starting resid
+                atom_resid = len(u_pdb.residues) - at_no - 1 + res
                 u_pdb.residues[atom_resid].atoms.tempfactors = atom_information[res][-1]
             u_pdb.atoms.write(pdb_outname)
 
     # Return the dictionaries.
     return print('Pdb file completed.')
-
 
 
 def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
@@ -422,25 +425,26 @@ def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
 
     """
 
-    ##PDB_VISUALISATION
-    ##rescursively add waters to the pdb file one by one as they are processed
-    # # Read the file into Biotite's structure object (atom array)
+    # PDB_VISUALISATION
+    # rescursively add waters to the pdb file one by one as they are processed
+    # Read the file into Biotite's structure object (atom array)
     atom_array = strucio.load_structure(pdb_outname)
     res_id = atom_array.res_id[-1] + 1
     # Add an HETATM
     atom = struc.Atom(
-        coord = atom_location,
-        chain_id = "X",
+        coord=atom_location,
+        chain_id="X",
         # The residue ID is the last ID in the file +1
-        res_id = res_id,
-        res_name = atom_ID,
-        hetero = True,
-        atom_name = atomgroup,
-        element = "O"
-        )
+        res_id=res_id,
+        res_name=atom_ID,
+        hetero=True,
+        atom_name=atomgroup,
+        element="O"
+    )
     atom_array += struc.array([atom])
     # Save edited structure
     strucio.save_structure(pdb_outname, atom_array)
+
 
 def data_out(filename, data):
     """
@@ -489,4 +493,3 @@ def convert_to_occ(distr, unocc_no, water=True):
                 occ[item] = 0
 
     return list(occ)
-

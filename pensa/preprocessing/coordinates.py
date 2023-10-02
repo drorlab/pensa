@@ -37,10 +37,10 @@ def extract_coordinates(top, pdb, trj_list, out_name, sel_string, start_frame=0,
     if rename_segments is not None:
         for s in selection.segments:
             s.segid = rename_segments
-    selection.write(out_name+'.pdb')
-    selection.write(out_name+'.gro')
+    selection.write(out_name + '.pdb')
+    selection.write(out_name + '.gro')
     # Read the trajectories and extract selected parts.
-    with mda.Writer(out_name+'.xtc', selection.n_atoms) as W:
+    with mda.Writer(out_name + '.xtc', selection.n_atoms) as W:
         for trj in trj_list:
             u = mda.Universe(top, trj)
             u.residues.resids -= residues_offset
@@ -75,7 +75,7 @@ def extract_coordinates_combined(top, trj, sel_string, out_name, start_frame=0, 
     selection = u.select_atoms(sel_string[0])
     num_at = selection.n_atoms
     # Go through trajectories and write selections
-    with mda.Writer(out_name+'.xtc', num_at) as W:
+    with mda.Writer(out_name + '.xtc', num_at) as W:
         for r, t, s in zip(top, trj, sel_string):
             print(r, t)
             if verbose:
@@ -121,10 +121,10 @@ def merge_coordinates(top_files, trj_files, out_name, segid=None):
     if segid is not None:
         univ.segments.segids = segid
     # Write the merged starting structure
-    univ.atoms.write(out_name+'.gro')
-    univ.atoms.write(out_name+'.pdb')
+    univ.atoms.write(out_name + '.gro')
+    univ.atoms.write(out_name + '.pdb')
     # Merge and write trajectory frame by frame
-    with mda.Writer(out_name+'.xtc', new_num_at) as W:
+    with mda.Writer(out_name + '.xtc', new_num_at) as W:
         for f in range(num_frames):
             # Set all universes to the current timesteps
             ts = [ui.trajectory[f] for ui in u]
@@ -214,6 +214,7 @@ def sort_coordinates(values, top_name, trj_name, out_name, start_frame=0, verbos
     # Write out sorted trajectory
     with mda.Writer(out_name, a.n_atoms) as W:
         for i in range(len(values)):
+            # Move the trajectory reader to the new frame!
             ts = u.trajectory[oidx_sort[i]]
             W.write(a)
     return data_sort, sort_idx, oidx_sort
@@ -267,7 +268,7 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
     # Combine the input data
     data = np.concatenate(values)
     # Remember which simulation the data came frome
-    cond = np.concatenate([i*np.ones(num_frames[i], dtype=int)
+    cond = np.concatenate([i * np.ones(num_frames[i], dtype=int)
                           for i in range(num_traj)])
     # Remember the index in the respective simulation (taking into account cutoff)
     oidx = np.concatenate(
@@ -298,6 +299,7 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
             j = cond_sort[i]
             o = oidx_sort[i]
             uj = univs[j]
+            # Move the trajectory reader to frame o!
             ts = uj.trajectory[o]
             W.write(atoms[j])
 
