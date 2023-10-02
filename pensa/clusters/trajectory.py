@@ -28,14 +28,12 @@ def write_cluster_traj(cluster_idx, top_file, trj_file, out_name, start_frame=0)
     print('Number of cluster indices:', len(cluster_idx))
     return_protein = []
     # Loop over clusters
-    num_clusters = np.max(cluster_idx)+1
+    num_clusters = np.max(cluster_idx) + 1
     for nr in range(num_clusters):
         # For each cluster, write the corresponding frames to their new trajectory.
-        with mda.Writer(out_name+"_c"+str(nr)+".xtc", protein.n_atoms) as W:
+        with mda.Writer(out_name + "_c" + str(nr) + ".xtc", protein.n_atoms) as W:
             for ts in u.trajectory:
-                if ts.frame >= start_frame and cluster_idx[ts.frame-start_frame] == nr:
+                if ts.frame >= start_frame and cluster_idx[ts.frame - start_frame] == nr:
                     W.write(protein)
                     return_protein.append(protein)
     return return_protein
-
-

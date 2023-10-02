@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pensa.clusters import obtain_clusters, obtain_combined_clusters
+from pensa.clusters import \
+    obtain_clusters, obtain_combined_clusters
 
 
 def wss_over_number_of_clusters(data, algorithm='kmeans',
-                                max_iter=100, num_repeats = 5, max_num_clusters = 12,
-                                plot_file = None):
+                                max_iter=100, num_repeats=5,
+                                max_num_clusters=12,
+                                plot_file=None):
     """
     Calculates the within-sum-of-squares (WSS) for different numbers of clusters,
     averaged over several iterations.
@@ -59,19 +61,20 @@ def wss_over_number_of_clusters(data, algorithm='kmeans',
 
     # Plot the WSS over the number of clusters
     fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
-    ax.errorbar(np.arange(len(all_wss))+2, np.array(all_wss), yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    ax.errorbar(np.arange(len(all_wss)) + 2, np.array(all_wss), yerr=np.array(std_wss) / np.sqrt(num_repeats))
     ax.set_xlabel('number of clusters')
     ax.set_ylabel('total WSS')
     fig.tight_layout()
     # Save the plot to file.
-    if plot_file: fig.savefig(plot_file)
+    if plot_file:
+        fig.savefig(plot_file)
 
     return all_wss, std_wss
 
 
-def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', label_b = 'Sim B', start_frame = 0,
-                                         algorithm='kmeans', max_iter=100, num_repeats = 5, max_num_clusters = 12,
-                                         plot_file = None):
+def wss_over_number_of_combined_clusters(data_a, data_b, label_a='Sim A', label_b='Sim B', start_frame=0,
+                                         algorithm='kmeans', max_iter=100, num_repeats=5, max_num_clusters=12,
+                                         plot_file=None):
     """
     Calculates the Within-Sum-of-Squares for different numbers of clusters,
     averaged over several iterations.
@@ -116,6 +119,7 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
     # Initialize lists
     all_wss = []
     std_wss = []
+
     # Loop over the number of clusters
     for nc in range(1, max_num_clusters):
         rep_wss = []
@@ -133,11 +137,12 @@ def wss_over_number_of_combined_clusters(data_a, data_b, label_a = 'Sim A', labe
 
     # Plot the WSS over the number of clusters
     fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
-    ax.errorbar(np.arange(len(all_wss))+2, np.array(all_wss), yerr=np.array(std_wss)/np.sqrt(num_repeats))
+    ax.errorbar(np.arange(len(all_wss)) + 2, np.array(all_wss), yerr=np.array(std_wss) / np.sqrt(num_repeats))
     ax.set_xlabel('number of clusters')
     ax.set_ylabel('total WSS')
     fig.tight_layout()
     # Save the plot to file.
-    if plot_file: fig.savefig(plot_file)
+    if plot_file:
+        fig.savefig(plot_file)
 
     return all_wss, std_wss

@@ -137,7 +137,7 @@ def obtain_combined_clusters(data_a, data_b, label_a='Sim A', label_b='Sim B', s
 
     # Remember the index in the respective simulation (taking into account cutoff)
     oidx = np.concatenate(
-        [np.arange(len(data_a))+start_frame, np.arange(len(data_b))+start_frame])
+        [np.arange(len(data_a)) + start_frame, np.arange(len(data_b)) + start_frame])
 
     # Perform PyEMMA clustering
     assert algorithm in ['kmeans', 'rspace']
@@ -159,8 +159,8 @@ def obtain_combined_clusters(data_a, data_b, label_a='Sim A', label_b='Sim B', s
         c, nc = np.unique(cidx, return_counts=True)
         ca, nca = np.unique(cidx[cond == 0], return_counts=True)
         cb, ncb = np.unique(cidx[cond == 1], return_counts=True)
-        ax.bar(ca-0.15, nca, 0.3, label=label_a)
-        ax.bar(cb+0.15, ncb, 0.3, label=label_b)
+        ax.bar(ca - 0.15, nca, 0.3, label=label_a)
+        ax.bar(cb + 0.15, ncb, 0.3, label=label_b)
         ax.legend()
         ax.set_xticks(c)
         ax.set_xlabel('clusters')
@@ -239,11 +239,11 @@ def obtain_mult_combined_clusters(data, start_frame=0, algorithm='kmeans',
     # Combine the input data
     data = np.concatenate(data, 0)
     # Remember which simulation the data came frome
-    cond = np.concatenate([i*np.ones(num_frames[i], dtype=int)
+    cond = np.concatenate([i * np.ones(num_frames[i], dtype=int)
                           for i in range(num_traj)])
     # Remember the index in the respective simulation (taking into account cutoff)
     oidx = np.concatenate(
-        [np.arange(num_frames[i])+start_frame for i in range(num_traj)])
+        [np.arange(num_frames[i]) + start_frame for i in range(num_traj)])
 
     # Perform PyEMMA clustering
     assert algorithm in ['kmeans', 'rspace']
@@ -265,8 +265,11 @@ def obtain_mult_combined_clusters(data, start_frame=0, algorithm='kmeans',
         c, nc = np.unique(cidx, return_counts=True)
         for n in range(num_traj):
             ca, nca = np.unique(cidx[cond == n], return_counts=True)
-            ax.bar(ca-0.2+n*0.4/num_traj, nca, 0.4/num_traj,
-                   label=labels[n], color=colors[n])
+            bar_pos = ca - 0.2 + n * 0.4 / num_traj
+            bar_width = 0.4 / num_traj
+            ax.bar(bar_pos, nca, bar_width,
+                   label=labels[n], color=colors[n]
+                   )
         ax.legend()
         ax.set_xticks(c)
         ax.set_xlabel('clusters')
@@ -303,7 +306,7 @@ def find_closest_frames(data, points):
     """
     frames, distances = [], []
     for p in points:
-        diff = data-p
+        diff = data - p
         squd = np.square(diff)
         dist = np.sqrt(np.sum(squd, axis=1))
         frames.append(np.argmin(dist))
