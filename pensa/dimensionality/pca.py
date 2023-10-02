@@ -51,7 +51,7 @@ def pca_eigenvalues_plot(pca, num=12, plot_file=None):
     """
     # Plot eigenvalues over component numbers
     fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
-    componentnr = np.arange(num)+1
+    componentnr = np.arange(num) + 1
     eigenvalues = pca.explained_variance_[:num]
     ax.bar(componentnr, eigenvalues)
     ax.set_xlabel('component number')
@@ -92,19 +92,19 @@ def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels
     # Plot the highest PC correlations and print relevant features
     test_graph = []
     test_corr = []
-    height = num*2+2 if add_labels else num*2
+    height = num * 2 + 2 if add_labels else num * 2
     fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
     pca_feature_PC_correlation = feature_correlation(data, projection)
     for i in range(num):
         relevant = pca_feature_PC_correlation[:, i]**2 > threshold**2
         print("Features with abs. corr. above a threshold of %3.1f for PC %i:" % (
-            threshold, i+1))
+            threshold, i + 1))
         for j, ft in enumerate(features):
             if relevant[j]:
                 print(ft, "%6.3f" % (pca_feature_PC_correlation[j, i]))
                 test_corr.append(pca_feature_PC_correlation[j, i])
         ax[i].bar(np.arange(len(features)), pca_feature_PC_correlation[:, i])
-        ax[i].set_ylabel('corr. with PC%i' % (i+1))
+        ax[i].set_ylabel('corr. with PC%i' % (i + 1))
         test_graph.append(pca_feature_PC_correlation[:, i])
     if add_labels:
         ax[-1].set_xticks(np.arange(len(features)))
@@ -186,7 +186,7 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
         for ti in range(data.shape[0]):
             projection[ti] = np.dot(data[ti], pca.components_[ev_idx])
         components.append(projection)
-        comp_names.append(prefix+'PC'+str(ev_idx+1))
+        comp_names.append(prefix + 'PC' + str(ev_idx + 1))
     # Return the names and data
     return comp_names, np.array(components).T
 
@@ -309,7 +309,7 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
             Sorted indices of the coordinate frames for each principal component
 
     """
-    num_frames = [len(d) for d in data]
+    # num_frames = [len(d) for d in data]
     num_traj = len(data)
     if type(start_frame) == int:
         start_frame *= np.ones(num_traj)
@@ -327,7 +327,7 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
         # Project the combined data on the principal component
         proj = [project_on_pc(d, evi, pca=pca) for d in data]
         # Sort everything along the projection on the respective PC
-        out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
+        out_xtc = out_name + "_pc" + str(evi + 1) + ".xtc"
         proj_sort, sort_idx, oidx_sort = merge_and_sort_coordinates(
             proj, top, trj, out_xtc, start_frame=start_frame, verbose=False
         )

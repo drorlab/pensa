@@ -50,7 +50,7 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
     """
     # Plot eigenvalues over component numbers.
     fig, ax = plt.subplots(1, 1, figsize=[4, 3], dpi=300)
-    componentnr = np.arange(num)+1
+    componentnr = np.arange(num) + 1
     eigenvalues = tica.singular_values[:num]
     print(tica.__dict__)
     ax.bar(componentnr, eigenvalues)
@@ -85,18 +85,18 @@ def tica_features(tica, features, num, threshold, plot_file=None, add_labels=Fal
 
     """
     # Plot the highest TIC correlations and print relevant features.
-    height = num*2+2 if add_labels else num*2
+    height = num * 2 + 2 if add_labels else num * 2
     fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
     for i in range(num):
-        relevant = tica.feature_component_correlation[:, i]**2 > threshold**2
+        relevant = tica.feature_component_correlation[:, i] ** 2 > threshold ** 2
         print("Features with abs. corr. above a threshold of %3.1f for TIC %i:" % (
-            threshold, i+1))
+            threshold, i + 1))
         for j, ft in enumerate(features):
             if relevant[j]:
                 print(ft, "%6.3f" % (tica.feature_component_correlation[j, i]))
         ax[i].plot(tica.feature_component_correlation[:, i])
         test_feature = tica.feature_component_correlation[:, i]
-        ax[i].set_ylabel('corr. with TIC%i' % (i+1))
+        ax[i].set_ylabel('corr. with TIC%i' % (i + 1))
     if add_labels:
         ax[-1].set_xticks(np.arange(len(features)))
         ax[-1].set_xticklabels(features, rotation=90)
@@ -185,7 +185,7 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
             projection[ti] = np.dot(
                 data[ti], tica.singular_vectors_right[:, ev_idx])
         components.append(projection)
-        comp_names.append(prefix+'IC'+str(ev_idx+1))
+        comp_names.append(prefix + 'IC' + str(ev_idx + 1))
     # Return the names and data.
     return comp_names, np.array(components).T
 
@@ -317,7 +317,7 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
             Sorted indices of the coordinate frames for each independent component
 
     """
-    num_frames = [len(d) for d in data]
+    # num_frames = [len(d) for d in data]
     num_traj = len(data)
     if type(start_frame) == int:
         start_frame *= np.ones(num_traj)
@@ -335,7 +335,7 @@ def sort_mult_trajs_along_common_tic(data, top, trj, out_name, num_ic=3, lag=10,
         # Project the combined data on the independent component
         proj = [project_on_tic(d, evi, tica=tica) for d in data]
         # Sort everything along the projection on the respective independent component
-        out_xtc = out_name+"_tic"+str(evi+1)+".xtc"
+        out_xtc = out_name + "_tic" + str(evi + 1) + ".xtc"
         proj_sort, sort_idx, oidx_sort = merge_and_sort_coordinates(
             proj, top, trj, out_xtc, start_frame=start_frame, verbose=False
         )

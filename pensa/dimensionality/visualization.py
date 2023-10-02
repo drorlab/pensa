@@ -130,7 +130,7 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
     else:
         colors = ['C%i' % num for num in range(len(data))]
     # Start the figure
-    fig, ax = plt.subplots(num, 2, figsize=[9, 3*num], dpi=300)
+    fig, ax = plt.subplots(num, 2, figsize=[9, 3 * num], dpi=300)
     # Loop over components
     projections = []
     for evi in range(num):
@@ -153,8 +153,8 @@ def compare_mult_projections(data, ana, num=3, saveas=None, labels=None, colors=
         projections.append(proj_evi)
         # Axis labels
         ax[evi, 0].set_xlabel('frame number')
-        ax[evi, 0].set_ylabel('PC %i' % (evi+1))
-        ax[evi, 1].set_xlabel('PC %i' % (evi+1))
+        ax[evi, 0].set_ylabel('PC %i' % (evi + 1))
+        ax[evi, 1].set_xlabel('PC %i' % (evi + 1))
         ax[evi, 1].set_ylabel('frequency')
         # Legend
         if labels[0] is not None:
@@ -208,15 +208,16 @@ def sort_traj_along_projection(data, ana, top, trj, out_name, num_comp=3, start_
         # Project the combined data on the principal component
         if isinstance(ana, PCA):
             proj = project_on_eigenvector_pca(data, evi, ana)
-            out_xtc = out_name+"_pc"+str(evi+1)+".xtc"
+            out_xtc = out_name + "_pc" + str(evi + 1) + ".xtc"
         elif isinstance(ana, deeptime.decomposition.CovarianceKoopmanModel):
             proj = project_on_eigenvector_tica(data, evi, ana)
-            out_xtc = out_name+"_tic"+str(evi+1)+".xtc"
+            out_xtc = out_name + "_tic" + str(evi + 1) + ".xtc"
         else:
             raise ModuleNotFoundError("Accept only PCA or TICA")
         # Sort everything along the projection onto the PC
         proj_sort, sort_idx, oidx_sort = sort_coordinates(
-            proj, top, trj, out_xtc, start_frame=start_frame)
+            proj, top, trj, out_xtc, start_frame=start_frame
+        )
         sorted_proj.append(proj_sort)
         sorted_indices_data.append(sort_idx)
         sorted_indices_traj.append(oidx_sort)
