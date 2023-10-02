@@ -13,9 +13,9 @@ if __name__ == "__main__":
     parser.add_argument("--sel_file", type=str, default='')
     parser.add_argument("--ref_file", type=str, default='system.psf')
     parser.add_argument("--pdb_file", type=str, default='system.pdb')
-    parser.add_argument("--trj_file", type=str, default='stitched_310.nc',  nargs='+')
-    parser.add_argument("--out_name", type=str, default='coordinates' )
-    parser.add_argument("--start_frame", type=int, default=0  )
+    parser.add_argument("--trj_file", type=str, default='stitched_310.nc', nargs=' + ')
+    parser.add_argument("--out_name", type=str, default='coordinates')
+    parser.add_argument("--start_frame", type=int, default=0)
     args = parser.parse_args()
 
     # Load the selection and generate the string
@@ -28,4 +28,3 @@ if __name__ == "__main__":
     # Extract the coordinates from the trajectory
     extract_coordinates(args.ref_file, args.pdb_file, args.trj_file,
                         args.out_name, sel_string, args.start_frame)
-

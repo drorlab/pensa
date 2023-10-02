@@ -1,5 +1,4 @@
 import os
-import requests
 import argparse
 import MDAnalysis as mda
 from pensa import download_from_gpcrmd
@@ -36,11 +35,11 @@ if __name__ == "__main__":
     download_from_gpcrmd(psf_file, root)
     download_from_gpcrmd(pdb_file, root)
     for sim in ['11423_trj_151', '11424_trj_151', '11425_trj_151']:
-        xtc_file = sim+'.xtc'
+        xtc_file = sim + '.xtc'
         download_from_gpcrmd(xtc_file, root)
         if args.subsample:
-            out_file = sim+'_subsampled.xtc'
-            subsample(root+psf_file, root+xtc_file, root+out_file)
+            out_file = sim + '_subsampled.xtc'
+            subsample(root + psf_file, root + xtc_file, root + out_file)
 
     # MOR-BU72
     psf_file = '11580_dyn_169.psf'
@@ -48,9 +47,8 @@ if __name__ == "__main__":
     download_from_gpcrmd(psf_file, root)
     download_from_gpcrmd(pdb_file, root)
     for sim in ['11576_trj_169', '11577_trj_169', '11578_trj_169']:
-        xtc_file = sim+'.xtc'
+        xtc_file = sim + '.xtc'
         download_from_gpcrmd(xtc_file, root)
         if args.subsample:
-            out_file = sim+'_subsampled.xtc'
-            subsample(root+psf_file, root+xtc_file, root+out_file)
-
+            out_file = sim + '_subsampled.xtc'
+            subsample(root + psf_file, root + xtc_file, root + out_file)
