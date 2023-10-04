@@ -8,21 +8,27 @@ from pensa.clusters import \
     obtain_clusters, wss_over_number_of_clusters, \
     obtain_combined_clusters, wss_over_number_of_combined_clusters, \
     write_cluster_traj
+
+from pensa.statesinfo import \
+    get_discrete_states
+
 from pensa.comparison import \
-    get_discrete_states, \
     relative_entropy_analysis, relen_block_analysis, relen_sem_analysis, \
     ssi_ensemble_analysis, ssi_block_analysis, ssi_sem_analysis, \
     residue_visualization, distances_visualization
+
 from pensa.features import \
     get_structure_features, \
     get_multivar_res_timeseries, \
     sort_features
+
 from pensa.dimensionality import \
     calculate_pca, pca_features, pca_eigenvalues_plot, \
     calculate_tica, tica_features, tica_eigenvalues_plot, \
     sort_traj_along_pc, sort_trajs_along_common_pc, \
     sort_traj_along_tic, sort_trajs_along_common_tic, \
     compare_projections
+
 from pensa.preprocessing import \
     load_selection, extract_coordinates, extract_coordinates_combined
 

@@ -5,7 +5,8 @@ import scipy.spatial
 import scipy.spatial.distance
 
 
-def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b, bin_width=None, bin_num=10, verbose=True, override_name_check=False):
+def relative_entropy_analysis(features_a, features_b, all_data_a, all_data_b,
+                              bin_width=None, bin_num=10, verbose=True, override_name_check=False):
     """
     Calculates the Jensen-Shannon distance and the Kullback-Leibler divergences for each feature from two ensembles.
 

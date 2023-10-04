@@ -65,7 +65,8 @@ def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
     # Add backbone C-alpha distances.
     if 'bb-distances' in features:
         bbdistances_feat = pyemma.coordinates.featurizer(pdb)
-        bbdistances_feat.add_distances(bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2), periodic=False)
+        bbdistances_pairs = bbdistances_feat.pairs(bbdistances_feat.select_Ca(), excluded_neighbors=2)
+        bbdistances_feat.add_distances(bbdistances_pairs, periodic=False)
         bbdistances_data = pyemma.coordinates.load(xtc, features=bbdistances_feat, stride=step_width)[start_frame:]
         feature_names['bb-distances'] = _describe_dist_without_atom_numbers(bbdistances_feat)
         features_data['bb-distances'] = bbdistances_data

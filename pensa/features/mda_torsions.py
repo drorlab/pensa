@@ -278,7 +278,8 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     angles += ['ZETA'] * len(indices_zeta)
     angles += ['CHI'] * len(indices_chi)
     # Calculate the torsions
-    all_indices = indices_alpha + indices_beta + indices_gamma + indices_delta + indices_epsilon + indices_zeta + indices_chi
+    all_indices = indices_alpha + indices_beta + indices_gamma + indices_delta \
+        + indices_epsilon + indices_zeta + indices_chi
     torsions = get_torsions(
         pdb, xtc, sel=all_indices,
         first_frame=0, last_frame=None, step=1,

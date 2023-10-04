@@ -121,7 +121,8 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
         for frame_no in tqdm(range(len(u.trajectory))):
             u.trajectory[frame_no]
             radius = ' 3.5'
-            atomgroup_IDS = list(u.select_atoms('byres (name ' + atomgroups[0] + ' and point ' + point_str + radius + ')').indices)[::3]
+            at_sel = 'byres (name ' + atomgroups[0] + ' and point ' + point_str + radius + ')'
+            atomgroup_IDS = list(u.select_atoms(at_sel).indices)[::3]
             counting.append(list(set(atomgroup_IDS)))
 
         # Water atom indices that appear in the water site
@@ -136,9 +137,10 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
 
             if len(site_resid) == 1:
                 # (x, y, z) positions for the water oxygen at trajectory frame_no
-                proxprotatg = 'protein and around 3.5 byres index ' + str(site_resid[0])
-                O_site = 'index ' + str(site_resid[0])
-                H_site = '((byres index ' + str(site_resid[0]) + ') and (name ' + atomgroups[1] + ' or name ' + atomgroups[2] + '))'
+                resid = str(site_resid[0])
+                proxprotatg = 'protein and around 3.5 byres index ' + resid
+                O_site = 'index ' + resid
+                H_site = '((byres index ' + resid + ') and (name ' + atomgroups[1] + ' or name ' + atomgroups[2] + '))'
 
                 hbond = HBA(universe=u)
                 protein_hydrogens_sel = hbond.guess_hydrogens(proxprotatg)
@@ -166,9 +168,10 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
                     freq_count.append([flat_list.count(ID), ID])
                 freq_count.sort(key=lambda x: x[0])
 
-                proxprotatg = 'protein and around 3.5 byres index ' + str(freq_count[-1][1])
-                O_site = 'index ' + str(freq_count[-1][1])
-                H_site = '((byres index ' + str(freq_count[-1][1]) + ') and (name ' + atomgroups[1] + ' or name ' + atomgroups[2] + '))'
+                fcstr = str(freq_count[-1][1])
+                proxprotatg = 'protein and around 3.5 byres index ' + fcstr
+                O_site = 'index ' + fcstr
+                H_site = '((byres index ' + fcstr + ') and (name ' + atomgroups[1] + ' or name ' + atomgroups[2] + '))'
 
                 hbond = HBA(universe=u)
                 protein_hydrogens_sel = hbond.guess_hydrogens(proxprotatg)
@@ -224,17 +227,35 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
         # Write data out and visualize water sites in pdb
         # "FIX OUTPUT UNIFORMITY, SINGLE BONDS NOT OUTPUT WITH ANY ARRAY DIMENSION"
         if write is True:
-            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_names.txt', np.array(bondouts[0][0], dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + O_site_pdb_id + '_data.txt', np.array(bondouts[0][1], dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_names.txt', np.array(bondouts[1][0], dtype=object), fmt='%s')
-            np.savetxt('h2o_hbonds/' + out_name + H_site_pdb_id + '_data.txt', np.array(bondouts[1][1], dtype=object), fmt='%s')
+            np.savetxt(
+                'h2o_hbonds/' + out_name + O_site_pdb_id + '_names.txt',
+                np.array(bondouts[0][0], dtype=object), fmt='%s'
+            )
+            np.savetxt(
+                'h2o_hbonds/' + out_name + O_site_pdb_id + '_data.txt',
+                np.array(bondouts[0][1], dtype=object), fmt='%s'
+            )
+            np.savetxt(
+                'h2o_hbonds/' + out_name + H_site_pdb_id + '_names.txt',
+                np.array(bondouts[1][0], dtype=object), fmt='%s'
+            )
+            np.savetxt(
+                'h2o_hbonds/' + out_name + H_site_pdb_id + '_data.txt',
+                np.array(bondouts[1][1], dtype=object), fmt='%s'
+            )
 
-        feature_names['W' + str(site_no)]['acceptor_names'] = np.array(bondouts[0][0], dtype=object)
-        feature_names['W' + str(site_no)]['donor_names'] = np.array(bondouts[1][0], dtype=object)
-        features_data['W' + str(site_no)]['acceptor_timeseries'] = np.array(bondouts[0][1], dtype=object)
-        features_data['W' + str(site_no)]['donor_timeseries'] = np.array(bondouts[1][1], dtype=object)
-        features_data['W' + str(site_no)]['acceptor_frequencies'] = np.sum(np.array(bondouts[0][1], dtype=object), axis=1) / len(u.trajectory)
-        features_data['W' + str(site_no)]['donor_frequencies'] = np.sum(np.array(bondouts[1][1], dtype=object), axis=1) / len(u.trajectory)
+        feature_names['W' + str(site_no)]['acceptor_names'] = \
+            np.array(bondouts[0][0], dtype=object)
+        feature_names['W' + str(site_no)]['donor_names'] = \
+            np.array(bondouts[1][0], dtype=object)
+        features_data['W' + str(site_no)]['acceptor_timeseries'] = \
+            np.array(bondouts[0][1], dtype=object)
+        features_data['W' + str(site_no)]['donor_timeseries'] = \
+            np.array(bondouts[1][1], dtype=object)
+        features_data['W' + str(site_no)]['acceptor_frequencies'] = \
+            np.sum(np.array(bondouts[0][1], dtype=object), axis=1) / len(u.trajectory)
+        features_data['W' + str(site_no)]['donor_frequencies'] = \
+            np.sum(np.array(bondouts[1][1], dtype=object), axis=1) / len(u.trajectory)
 
     return feature_names, features_data
 
@@ -345,8 +366,10 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
     all_donor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
     all_acceptor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
 
-    all_donor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0], atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_donor_pairs]
-    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0], atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_acceptor_pairs]
+    all_donor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
+                             atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_donor_pairs]
+    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
+                                atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_acceptor_pairs]
 
     donor_dist = np.zeros((len(all_donor_pairs), len(u.trajectory)))
     acceptor_dist = np.zeros((len(all_acceptor_pairs), len(u.trajectory)))
@@ -361,10 +384,22 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
 
     # Write data out and visualize water sites in pdb
     if write is True:
-        np.savetxt('lig_hbonds/' + out_name + 'all_donor_pair_names.txt', np.array(all_donor_pair_names, dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/' + out_name + 'all_acceptor_pair_names.txt', np.array(all_acceptor_pair_names, dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/' + out_name + 'all_donor_pair_data.txt', np.array(donor_dist, dtype=object), fmt='%s')
-        np.savetxt('lig_hbonds/' + out_name + 'all_acceptor_pair_data.txt', np.array(acceptor_dist, dtype=object), fmt='%s')
+        np.savetxt(
+            'lig_hbonds/' + out_name + 'all_donor_pair_names.txt',
+            np.array(all_donor_pair_names, dtype=object), fmt='%s'
+        )
+        np.savetxt(
+            'lig_hbonds/' + out_name + 'all_acceptor_pair_names.txt',
+            np.array(all_acceptor_pair_names, dtype=object), fmt='%s'
+        )
+        np.savetxt(
+            'lig_hbonds/' + out_name + 'all_donor_pair_data.txt',
+            np.array(donor_dist, dtype=object), fmt='%s'
+        )
+        np.savetxt(
+            'lig_hbonds/' + out_name + 'all_acceptor_pair_data.txt',
+            np.array(acceptor_dist, dtype=object), fmt='%s'
+        )
 
     feature_names['donor_names'] = np.array(all_donor_pair_names)
     feature_names['acceptor_names'] = np.array(all_acceptor_pair_names)

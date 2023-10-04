@@ -167,16 +167,19 @@ def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=
     features_data[element + 'Pocket_Idx'] = np.array(atom_dists, dtype=object)
 
     # Add atom pocket frequencies
+    pocket_occup = [atinfo[2] for atinfo in atom_information]
     feature_names[element + 'Pocket_Occup'] = [atinfo[0] for atinfo in atom_information]
-    features_data[element + 'Pocket_Occup'] = np.array([atinfo[2] for atinfo in atom_information], dtype=object)
+    features_data[element + 'Pocket_Occup'] = np.array(pocket_occup, dtype=object)
 
     # Add atom pocket occupancy timeseries
+    pocket_occup_distr = [convert_to_occ(distr, -1, water=False) for distr in atom_dists]
     feature_names[element + 'Pocket_OccupDistr'] = [atinfo[0] for atinfo in atom_information]
-    features_data[element + 'Pocket_OccupDistr'] = np.array([convert_to_occ(distr, -1, water=False) for distr in atom_dists], dtype=object)
+    features_data[element + 'Pocket_OccupDistr'] = np.array(pocket_occup_distr, dtype=object)
 
     # Add atom pocket locations
+    pocket_xyz = [atinfo[1] for atinfo in atom_information]
     feature_names[element + 'Pocket_xyz'] = [atinfo[0] for atinfo in atom_information]
-    features_data[element + 'Pocket_xyz'] = np.array([atinfo[1] for atinfo in atom_information], dtype=object)
+    features_data[element + 'Pocket_xyz'] = np.array(pocket_xyz, dtype=object)
 
     # Return the dictionaries.
     return feature_names, features_data

@@ -14,7 +14,8 @@ from pensa.statesinfo import \
 # -- Functions to calculate SSI statistics across paired ensembles --
 
 
-def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False,
+def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab,
+                          max_thread_no=1, pbc=True, h2o=False,
                           verbose=True, write_plots=False, override_name_check=False):
     """
     Calculates State Specific Information statistic for a feature across two ensembles.
@@ -101,7 +102,8 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
 
             traj_1_fraction = traj1_len / (traj1_len + traj2_len)
             traj_2_fraction = 1 - traj_1_fraction
-            norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+            norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+            norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
             H_ens = norm_factor
 
             featens_joint_states = res_states + ens_states
@@ -121,7 +123,9 @@ def ssi_ensemble_analysis(features_a, features_b, all_data_a, all_data_b, discre
     return data_names, data_ssi
 
 
-def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab, max_thread_no=1, pbc=True, h2o=False, verbose=True, override_name_check=False):
+def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discrete_states_ab,
+                         max_thread_no=1, pbc=True, h2o=False,
+                         verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information statistic between two features across two ensembles.
@@ -241,7 +245,8 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
 
                     traj_1_fraction = traj1_len / (traj1_len + traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+                    norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
 
                     SSI = ((H_a + H_b) - H_ab) / norm_factor
 
@@ -267,7 +272,8 @@ def ssi_feature_analysis(features_a, features_b, all_data_a, all_data_b, discret
 def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                            all_data_a, all_data_b, all_data_c, all_data_d,
                            discrete_states_ab, discrete_states_cd,
-                           max_thread_no=1, pbca=True, pbcb=True, h2oa=False, h2ob=False, verbose=True, override_name_check=False):
+                           max_thread_no=1, pbca=True, pbcb=True, h2oa=False, h2ob=False,
+                           verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -390,7 +396,8 @@ def cossi_featens_analysis(features_a, features_b, features_c, features_d,
                 if H_b != 0:
                     traj_1_fraction = traj1_len / (traj1_len + traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+                    norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
 
                     set_distr_c = [[0.5] * traj1_len + [1.5] * traj2_len]
                     set_c_states = [[0, 1, 2]]
@@ -576,7 +583,8 @@ def _ssi_feat_feat_analysis(features_a, features_b, features_c, features_d,
                 if H_b != 0:
                     traj_1_fraction = traj1_len / (traj1_len + traj2_len)
                     traj_2_fraction = 1 - traj_1_fraction
-                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+                    norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+                    norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
 
                     # ----------------
                     ab_joint_states = set_a_states + set_b_states
@@ -669,7 +677,13 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None,
                 else:
                     plot_name = None
                 try:
-                    set_a_states.append(determine_state_limits(set_distr_a[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
+                    set_a_states.append(
+                        determine_state_limits(
+                            set_distr_a[dim_num], traj1_len,
+                            gauss_bins, gauss_smooth,
+                            write_plots, plot_name
+                        )
+                    )
                 except Exception:
                     warnings.warn('Distribution A not clustering properly.\nTry altering Gaussian parameters or input custom states.')
         else:
@@ -700,7 +714,13 @@ def _calculate_ssi(distr_a_input, traj1_len, distr_b_input=None,
                     else:
                         plot_name = None
                     try:
-                        set_b_states.append(determine_state_limits(set_distr_b[dim_num], traj1_len, gauss_bins, gauss_smooth, write_plots, plot_name))
+                        set_b_states.append(
+                            determine_state_limits(
+                                set_distr_b[dim_num], traj1_len,
+                                gauss_bins, gauss_smooth,
+                                write_plots, plot_name
+                            )
+                        )
                     except Exception:
                         warnings.warn('Distribution B not clustering properly.\nTry altering Gaussian parameters or input custom states.')
 
@@ -898,7 +918,8 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
 
         traj_1_fraction = traj1_len / len(set_distr_a[0])
         traj_2_fraction = 1 - traj_1_fraction
-        norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+        norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+        norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
 
         SSI = ((H_a + H_b) - H_ab) / norm_factor
         coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc) / norm_factor
@@ -918,7 +939,8 @@ def _calculate_cossi(distr_a_input, traj1_len, distr_b_input, distr_c_input=None
     return round(SSI, 4), round(coSSI, 4)
 
 
-def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
+def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b,
+                            max_thread_no=1, torsions=None, verbose=True, override_name_check=False):
 
     """
     Calculates State Specific Information Co-SSI statistic between two features and the ensembles condition.
@@ -961,10 +983,16 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
         mv_res_feat_a, mv_res_data_a = features_a, all_data_a
         mv_res_feat_b, mv_res_data_b = features_b, all_data_b
     else:
-        mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(features_a, all_data_a, torsions + '-torsions', write=False, out_name='')
-        mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(features_b, all_data_b, torsions + '-torsions', write=False, out_name='')
-        mv_res_feat_a, mv_res_data_a = mv_res_feat_a[torsions + '-torsions'], mv_res_data_a[torsions + '-torsions']
-        mv_res_feat_b, mv_res_data_b = mv_res_feat_b[torsions + '-torsions'], mv_res_data_b[torsions + '-torsions']
+        mv_res_feat_a, mv_res_data_a = get_multivar_res_timeseries(
+            features_a, all_data_a, torsions + '-torsions', write=False, out_name=''
+        )
+        mv_res_feat_b, mv_res_data_b = get_multivar_res_timeseries(
+            features_b, all_data_b, torsions + '-torsions', write=False, out_name=''
+        )
+        mv_res_feat_a = mv_res_feat_a[torsions + '-torsions']
+        mv_res_data_a = mv_res_data_a[torsions + '-torsions']
+        mv_res_feat_b = mv_res_feat_b[torsions + '-torsions']
+        mv_res_data_b = mv_res_data_b[torsions + '-torsions']
 
     # Assert that the features are the same and data sets have same number of features
     if override_name_check:
@@ -989,7 +1017,7 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
         res1_data_ens2 = mv_res_data_b[res1]
         res1_combined_dist = []
         for dist_no_a in range(len(res1_data_ens1)):
-            # # # combine the ensembles into one distribution (condition_a + condition_b)
+            # Combine the ensembles into one distribution (condition_a + condition_b)
             res1_data_both = list(res1_data_ens1[dist_no_a]) + list(res1_data_ens2[dist_no_a])
             res1_combined_dist.append(res1_data_both)
 
@@ -1055,7 +1083,8 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
 
                             traj_1_fraction = traj1_len / len(set_distr_a[0])
                             traj_2_fraction = 1 - traj_1_fraction
-                            norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2) - traj_2_fraction * math.log(traj_2_fraction, 2)
+                            norm_factor = -traj_1_fraction * math.log(traj_1_fraction, 2)
+                            norm_factor -= traj_2_fraction * math.log(traj_2_fraction, 2)
 
                             set_distr_c = [[0.5] * traj1_len + [1.5] * int(len(set_distr_a[0]) - traj1_len)]
                             set_c_states = [[0, 1, 2]]
@@ -1065,22 +1094,30 @@ def _cossi_featens_analysis(features_a, features_b, all_data_a, all_data_b, max_
                             ab_joint_states = set_a_states + set_b_states
                             ab_joint_distributions = set_distr_a + set_distr_b
 
-                            H_ab = calculate_entropy_multthread(ab_joint_states, ab_joint_distributions, max_thread_no)
+                            H_ab = calculate_entropy_multthread(
+                                ab_joint_states, ab_joint_distributions, max_thread_no
+                            )
                             # ----------------
                             ac_joint_states = set_a_states + set_c_states
                             ac_joint_distributions = set_distr_a + set_distr_c
 
-                            H_ac = calculate_entropy_multthread(ac_joint_states, ac_joint_distributions, max_thread_no)
+                            H_ac = calculate_entropy_multthread(
+                                ac_joint_states, ac_joint_distributions, max_thread_no
+                            )
                             # ----------------
                             bc_joint_states = set_b_states + set_c_states
                             bc_joint_distributions = set_distr_b + set_distr_c
 
-                            H_bc = calculate_entropy_multthread(bc_joint_states, bc_joint_distributions, max_thread_no)
+                            H_bc = calculate_entropy_multthread(
+                                bc_joint_states, bc_joint_distributions, max_thread_no
+                            )
                             # ----------------
                             abc_joint_states = set_a_states + set_b_states + set_c_states
                             abc_joint_distributions = set_distr_a + set_distr_b + set_distr_c
 
-                            H_abc = calculate_entropy_multthread(abc_joint_states, abc_joint_distributions, max_thread_no)
+                            H_abc = calculate_entropy_multthread(
+                                abc_joint_states, abc_joint_distributions, max_thread_no
+                            )
 
                             SSI = ((H_a + H_b) - H_ab) / norm_factor
                             coSSI = ((H_a + H_b + H_c) - (H_ab + H_ac + H_bc) + H_abc) / norm_factor

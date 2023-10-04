@@ -75,11 +75,16 @@ def ssi_block_analysis(features_a, features_b, all_data_a, all_data_b,
             features_a, block_data_a = get_multivar_res(features_a, block_data_a)
             features_b, block_data_b = get_multivar_res(features_b, block_data_b)
 
-        discrete_states = get_discrete_states(block_data_a, block_data_b,
-                                              discretize=discretize, pbc=pbc)
+        discrete_states = get_discrete_states(
+            block_data_a, block_data_b,
+            discretize=discretize, pbc=pbc
+        )
 
         print('block length = ', bl)
-        ssi_names, data_ssi = ssi_ensemble_analysis(features_a, features_b, block_data_a, block_data_b, discrete_states, verbose=verbose)
+        ssi_names, data_ssi = ssi_ensemble_analysis(
+            features_a, features_b, block_data_a, block_data_b,
+            discrete_states, verbose=verbose
+        )
         ssi_blocks.append(data_ssi)
 
     ssi_names, ssi_blocks = np.transpose(ssi_names), np.transpose(ssi_blocks)

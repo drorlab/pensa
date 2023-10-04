@@ -179,7 +179,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
             waters_resid = counting[frame_no]
             if len(waters_resid) == 1:
                 # (x, y, z) positions for the water oxygen at trajectory frame_no
-                water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(waters_resid[0])).positions]
+                _selection = 'byres index ' + str(waters_resid[0])
+                water_atom_positions = [list(pos) for pos in u.select_atoms(_selection).positions]
                 psi, theta = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
                 thetalist.append(theta)
@@ -189,7 +190,8 @@ def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
                 for ID in waters_resid:
                     freq_count.append([flat_list.count(ID), ID])
                 freq_count.sort(key=lambda x: x[0])
-                water_atom_positions = [list(pos) for pos in u.select_atoms('byres index ' + str(freq_count[-1][1])).positions]
+                _selection = 'byres index ' + str(freq_count[-1][1])
+                water_atom_positions = [list(pos) for pos in u.select_atoms(_selection).positions]
                 psi, theta = _convert_to_dipole(water_atom_positions)
                 psilist.append(psi)
                 thetalist.append(theta)

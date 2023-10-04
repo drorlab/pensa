@@ -86,7 +86,7 @@ def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels
 
 
     """
-    warnings.warn("The function pca_features in versions > 0.2.8 needs the data for the features, not only their names!")
+    warnings.warn("pca_features() in versions > 0.2.8 needs the data for the features, not only their names!")
     # Project the trajectory data on the principal components
     projection = get_components_pca(data, num, pca)[1]
     # Plot the highest PC correlations and print relevant features

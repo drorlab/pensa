@@ -125,7 +125,9 @@ def _remove_resnum_offset(features, offset):
     return new_features
 
 
-def sort_traj_along_combined_feature(feat, data, feature_name, feature_type, ref_name, trj_name, out_name, start_frame=0):
+def sort_traj_along_combined_feature(feat, data, feature_name, feature_type,
+                                     ref_name, trj_name, out_name,
+                                     start_frame=0):
     """
     Sort a trajectory along one feature in a combined set.
 
