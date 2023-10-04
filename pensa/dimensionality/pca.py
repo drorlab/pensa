@@ -311,7 +311,7 @@ def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_fr
     """
     # num_frames = [len(d) for d in data]
     num_traj = len(data)
-    if type(start_frame) == int:
+    if type(start_frame) is int:
         start_frame *= np.ones(num_traj)
         start_frame = start_frame.tolist()
     # Combine the input data
