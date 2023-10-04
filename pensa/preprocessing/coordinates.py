@@ -249,8 +249,7 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
             Sorted indices of the trajectory.
 
     """
-    assert type(values) == list and type(
-        top_names) == list and type(trj_names) == list
+    assert type(values) is list and type(top_names) is list and type(trj_names) is list
     # Get some stats
     num_traj = len(values)
     num_frames = [len(val) for val in values]
@@ -258,8 +257,8 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
     assert num_traj == len(top_names)
     assert num_traj == len(trj_names)
     # Set offset if not provided
-    assert type(start_frame) == int or len(start_frame) == num_traj
-    if type(start_frame) == int:
+    assert type(start_frame) is int or len(start_frame) == num_traj
+    if type(start_frame) is int:
         start_frame *= np.ones(num_traj)
         start_frame = start_frame.tolist()
     # Make sure the start indices are integers (MDA does not accept floats for indexing a trajectory)
