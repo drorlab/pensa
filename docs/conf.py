@@ -14,8 +14,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../pensa'))
 sys.path.insert(0, os.path.abspath('..'))
-import sphinx_rtd_theme
-import pensa
+# import sphinx_rtd_theme
+# import pensa
 
 
 # -- Project information -----------------------------------------------------
@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # Pretend these modules are imported
 autodoc_mock_imports = [
-    'numpy', 
+    'numpy',
     'scipy',
     'pandas',
     'matplotlib',
@@ -73,8 +73,7 @@ autodoc_mock_imports = [
 
 # Docstrings
 napoleon_google_docstring = True
-napoleon_numpy_docstring = True 
+napoleon_numpy_docstring = True
 
 # Short module names
 add_module_names = False
-
