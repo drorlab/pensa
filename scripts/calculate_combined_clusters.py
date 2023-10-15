@@ -2,8 +2,9 @@ import argparse
 import numpy as np
 
 # My own functions
-from pensa import \
-    read_structure_features, \
+from pensa.features import \
+    read_structure_features
+from pensa.clusters import \
     obtain_combined_clusters, \
     write_cluster_traj, \
     wss_over_number_of_combined_clusters

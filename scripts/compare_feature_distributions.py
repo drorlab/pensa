@@ -1,11 +1,17 @@
 import argparse
 import numpy as np
 
-from pensa import \
-    read_structure_features, sort_features, select_common_features, \
-    relative_entropy_analysis, kolmogorov_smirnov_analysis, \
-    ssi_ensemble_analysis, mean_difference_analysis, \
-    residue_visualization, distances_visualization
+from pensa.features import \
+    read_structure_features, \
+    sort_features, \
+    select_common_features
+from pensa.comparison import \
+    relative_entropy_analysis, \
+    kolmogorov_smirnov_analysis, \
+    ssi_ensemble_analysis, \
+    mean_difference_analysis, \
+    residue_visualization, \
+    distances_visualization
 
 
 def workflow_torsions_jsd(args, feat_a, feat_b, data_a, data_b, tors='bb'):

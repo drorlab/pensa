@@ -1,8 +1,9 @@
 import argparse
 import numpy as np
 
-from pensa import \
-    read_structure_features, \
+from pensa.features import \
+    read_structure_features
+from pensa.dimensionality import \
     calculate_pca, \
     pca_eigenvalues_plot, \
     pca_features, \

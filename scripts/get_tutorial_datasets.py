@@ -1,7 +1,7 @@
 import os
 import argparse
 import MDAnalysis as mda
-from pensa import download_from_gpcrmd
+from pensa.preprocessing import download_from_gpcrmd
 
 
 def subsample(psf_file, xtc_file, out_file):
