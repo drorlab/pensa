@@ -1,12 +1,5 @@
 #!/bin/bash
 
-#SBATCH --time=24:00:00
-#SBATCH --mem=20G
-#SBATCH --partition=rondror
-#SBATCH --constraint=GPU_MEM:12GB
-#SBATCH --qos=high_p
-
-
 ROOT="./mor-data"
 
 REF_FILE_A="$ROOT/11427_dyn_151.psf"
