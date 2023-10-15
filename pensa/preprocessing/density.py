@@ -251,7 +251,7 @@ def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
                     ).run(verbose=True)
 
 
-def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
+def generate_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     """
     Obtain the grid for atomgroup density.
 
@@ -353,11 +353,11 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
         # just make sure that we have clean original coordinates again (start at the beginning)
         u.trajectory.rewind()
         if grid_input is None:
-            g = get_grid(u, atomgroup, write_grid_as, out_name)
+            g = generate_grid(u, atomgroup, write_grid_as, out_name)
         else:
             g = Grid(grid_input)
     elif grid_input is None:
-        g = get_grid(u, atomgroup)
+        g = generate_grid(u, atomgroup)
     else:
         g = Grid(grid_input)
 

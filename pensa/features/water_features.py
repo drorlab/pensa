@@ -21,7 +21,7 @@ from gridData import Grid
 from tqdm import tqdm
 import os
 from pensa.preprocessing.density import \
-    convert_to_occ, data_out, write_atom_to_pdb, get_grid, local_maxima_3D
+    convert_to_occ, data_out, write_atom_to_pdb, generate_grid, local_maxima_3D
 
 
 def _convert_to_dipole(water_atom_positions):
@@ -129,11 +129,11 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         u.trajectory.rewind()
 
         if grid_input is None:
-            g = get_grid(u, atomgroup, write_grid_as, out_name)
+            g = generate_grid(u, atomgroup, write_grid_as, out_name)
         else:
             g = Grid(grid_input)
     elif grid_input is None:
-        g = get_grid(u, atomgroup)
+        g = generate_grid(u, atomgroup)
     else:
         g = Grid(grid_input)
 

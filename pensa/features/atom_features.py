@@ -19,7 +19,7 @@ from gridData import Grid
 from tqdm import tqdm
 import os
 from pensa.preprocessing.density import \
-    get_grid, data_out, write_atom_to_pdb, convert_to_occ, local_maxima_3D
+    generate_grid, data_out, write_atom_to_pdb, convert_to_occ, local_maxima_3D
 
 
 def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10,
@@ -85,11 +85,11 @@ def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms
         u.trajectory.rewind()
 
         if grid_input is None:
-            g = get_grid(u, atomgroup, "Angstrom^{-3}", out_name)
+            g = generate_grid(u, atomgroup, "Angstrom^{-3}", out_name)
         else:
             g = Grid(grid_input)
     elif grid_input is None:
-        g = get_grid(u, atomgroup)
+        g = generate_grid(u, atomgroup)
     else:
         g = Grid(grid_input)
 
