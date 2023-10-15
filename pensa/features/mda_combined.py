@@ -1,5 +1,5 @@
-from .mda_torsions import get_protein_backbone_torsions, get_protein_sidechain_torsions
-from .mda_distances import get_calpha_distances
+from .mda_torsions import read_protein_backbone_torsions, read_protein_sidechain_torsions
+from .mda_distances import read_calpha_distances
 from pensa.features.processing import get_feature_timeseries
 from pensa.preprocessing.coordinates import sort_coordinates
 
@@ -10,7 +10,7 @@ from pensa.preprocessing.coordinates import sort_coordinates
 # Note: It only loads protein features
 #
 
-def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
+def read_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                            features=['bb-torsions', 'sc-torsions', 'bb-distances'],
                            resnum_offset=0):
     """
@@ -46,7 +46,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
     features_data = {}
     # Add backbone torsions.
     if 'bb-torsions' in features:
-        bbtorsions = get_protein_backbone_torsions(
+        bbtorsions = read_protein_backbone_torsions(
             pdb, xtc, selection='all',
             first_frame=start_frame, last_frame=None, step=step_width,
             naming='segindex', radians=True,
@@ -56,7 +56,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         features_data['bb-torsions'] = bbtorsions[1]
     # Add sidechain torsions.
     if 'sc-torsions' in features:
-        sctorsions = get_protein_sidechain_torsions(
+        sctorsions = read_protein_sidechain_torsions(
             pdb, xtc, selection='all',
             first_frame=start_frame, last_frame=None, step=step_width,
             naming='segindex', radians=True
@@ -65,7 +65,7 @@ def get_structure_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
         features_data['sc-torsions'] = sctorsions[1]
     # Add backbone C-alpha distances.
     if 'bb-distances' in features:
-        bbdistances = get_calpha_distances(
+        bbdistances = read_calpha_distances(
             pdb, xtc,
             first_frame=start_frame, last_frame=None, step=step_width,
         )

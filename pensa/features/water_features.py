@@ -1,4 +1,3 @@
-# - * - coding: utf-8 - * -
 """
 Methods to obtain a timeseries distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
@@ -67,7 +66,7 @@ def _convert_to_dipole(water_atom_positions):
     return psi, theta
 
 
-def get_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
+def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
                        grid_input=None, write=None, write_grid_as=None, out_name=None):
     """
     Featurize water pockets for the top X most probable waters (top_waters).

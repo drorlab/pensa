@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Methods to obtain a distribution for the water pockets which respresents
 a combination of the water occupancy (binary variable) and the water polarisation (continuous variable).
@@ -285,7 +284,7 @@ def get_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=True):
     D = DensityAnalysis(density_atomgroup, delta=1.0)
     D.run()
     g = D.density
-
+    # Write the grid if requested
     if write_grid_as is not None:
         if not os.path.exists('dens/'):
             os.makedirs('dens/')

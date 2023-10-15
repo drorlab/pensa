@@ -1,8 +1,8 @@
 from pensa.features import \
-    get_protein_backbone_torsions, \
-    get_protein_sidechain_torsions, \
-    get_nucleicacid_backbone_torsions, \
-    get_nucleicacid_pseudotorsions
+    read_protein_backbone_torsions, \
+    read_protein_sidechain_torsions, \
+    read_nucleicacid_backbone_torsions, \
+    read_nucleicacid_pseudotorsions
 
 # Location of the data used in the tests
 test_data_path = './tests/test_data'
@@ -35,15 +35,15 @@ trj_file_s = root_dir_s + '/trajfit-nw_step100.xtc'
 
 
 # Test protein backbone torsions
-def test_get_protein_backbone_torsions():
+def test_read_protein_backbone_torsions():
     # Feature Loaders
-    bb_torsions_a = get_protein_backbone_torsions(
+    bb_torsions_a = read_protein_backbone_torsions(
         pdb_file_a, trj_file_a[0], selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True,
         include_omega=False
     )
-    bb_torsions_b = get_protein_backbone_torsions(
+    bb_torsions_b = read_protein_backbone_torsions(
         pdb_file_b, trj_file_b[0], selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True,
@@ -57,14 +57,14 @@ def test_get_protein_backbone_torsions():
 
 
 # Test protein side-chain torsions
-def test_get_protein_sidechain_torsions():
+def test_read_protein_sidechain_torsions():
     # Feature Loaders
-    sc_torsions_a = get_protein_sidechain_torsions(
+    sc_torsions_a = read_protein_sidechain_torsions(
         pdb_file_a, trj_file_a[0], selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True
     )
-    sc_torsions_b = get_protein_sidechain_torsions(
+    sc_torsions_b = read_protein_sidechain_torsions(
         pdb_file_b, trj_file_b[0], selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True
@@ -77,13 +77,13 @@ def test_get_protein_sidechain_torsions():
 
 
 # Test nucleic acid backbone torsions
-def test_get_nucleicacid_backbone_torsions():
-    bb_torsions_o = get_nucleicacid_backbone_torsions(
+def test_read_nucleicacid_backbone_torsions():
+    bb_torsions_o = read_nucleicacid_backbone_torsions(
         gro_file_o, trj_file_o, selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True
     )
-    bb_torsions_s = get_nucleicacid_backbone_torsions(
+    bb_torsions_s = read_nucleicacid_backbone_torsions(
         gro_file_s, trj_file_s, selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True
@@ -92,13 +92,13 @@ def test_get_nucleicacid_backbone_torsions():
 
 
 # Test nucleic acid pseudo-torsions
-def test_get_nucleicacid_pseudotorsions():
-    pseudotorsions_o = get_nucleicacid_pseudotorsions(
+def test_read_nucleicacid_pseudotorsions():
+    pseudotorsions_o = read_nucleicacid_pseudotorsions(
         gro_file_o, trj_file_o, selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True
     )
-    pseudotorsions_s = get_nucleicacid_pseudotorsions(
+    pseudotorsions_s = read_nucleicacid_pseudotorsions(
         gro_file_s, trj_file_s, selection='all',
         first_frame=0, last_frame=None, step=1,
         naming='segindex', radians=True

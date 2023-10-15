@@ -1,4 +1,3 @@
-# - * - coding: utf-8 - * -
 """
 Methods to featurize a protein, based on PyEMMA.
 
@@ -14,7 +13,7 @@ from pensa.preprocessing.coordinates import sort_coordinates
 # -- Loading the Features --
 
 
-def get_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
+def read_pyemma_features(pdb, xtc, start_frame=0, step_width=1, cossin=False,
                         features=['bb-torsions', 'sc-torsions', 'bb-distances'],
                         resnum_offset=0):
     """

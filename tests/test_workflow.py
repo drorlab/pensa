@@ -18,7 +18,7 @@ from pensa.comparison import \
     residue_visualization, distances_visualization
 
 from pensa.features import \
-    get_structure_features, \
+    read_structure_features, \
     get_multivar_res_timeseries, \
     sort_features
 
@@ -120,12 +120,12 @@ class Test_pensa(unittest.TestCase):
         self.start_frame = 0
 
         # -- Receptor features --
-        sim_a_rec = get_structure_features(
+        sim_a_rec = read_structure_features(
             test_data_path + "/traj/condition-a_receptor.gro",
             test_data_path + "/traj/condition-a_receptor.xtc",
             start_frame=self.start_frame
         )
-        sim_b_rec = get_structure_features(
+        sim_b_rec = read_structure_features(
             test_data_path + "/traj/condition-b_receptor.gro",
             test_data_path + "/traj/condition-b_receptor.xtc",
             start_frame=self.start_frame
@@ -134,12 +134,12 @@ class Test_pensa(unittest.TestCase):
         self.sim_b_rec_feat, self.sim_b_rec_data = sim_b_rec
 
         # -- TMR features --
-        sim_a_tmr = get_structure_features(
+        sim_a_tmr = read_structure_features(
             test_data_path + "/traj/condition-a_tm.gro",
             test_data_path + "/traj/condition-a_tm.xtc",
             start_frame=self.start_frame
         )
-        sim_b_tmr = get_structure_features(
+        sim_b_tmr = read_structure_features(
             test_data_path + "/traj/condition-b_tm.gro",
             test_data_path + "/traj/condition-b_tm.xtc",
             start_frame=self.start_frame

@@ -1,4 +1,3 @@
-# - * - coding: utf-8 - * -
 """
 Methods to obtain a timeseries distribution for the atom/ion pockets' occupancies.
 
@@ -23,7 +22,7 @@ from pensa.preprocessing.density import \
     get_grid, data_out, write_atom_to_pdb, convert_to_occ, local_maxima_3D
 
 
-def get_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10,
+def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms=10,
                       grid_input=None, write=None, out_name=None):
     """
     Featurize atom pockets for the top X most probable atoms (top_atoms).

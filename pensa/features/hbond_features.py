@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# - * - coding: utf-8 - * -
 """
 Created on Fri May  6 12:03:52 2022
 
@@ -14,11 +12,11 @@ import os
 from pensa.preprocessing.density import get_grid, local_maxima_3D, write_atom_to_pdb
 
 
-def Unique_bonding_pairs(lst):
+def _unique_bonding_pairs(lst):
     return ([list(i) for i in {* [tuple(sorted(i)) for i in lst]}])
 
 
-def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
+def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
                      grid_input=None, write=None, write_grid_as=None, out_name=None):
     """
     Find hydrogen bonds between waters occupying cavities and protein.
@@ -260,7 +258,7 @@ def get_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
     return feature_names, features_data
 
 
-def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, out_name=None):
+def read_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, out_name=None):
     """
     Find hydrogen bonding partners for atomgroup1 in atomgroup2.
 
@@ -363,8 +361,8 @@ def get_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, 
             # print(frame_bonds)
             all_bonds[1].append(frame_bonds)
 
-    all_donor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
-    all_acceptor_pairs = Unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
+    all_donor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
+    all_acceptor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
 
     all_donor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
                              atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_donor_pairs]

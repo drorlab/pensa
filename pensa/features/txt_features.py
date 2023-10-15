@@ -3,7 +3,7 @@ import random
 import math
 
 
-def get_txt_features_ala2(filename, num_frames, cossin=False):
+def read_txt_features_ala2(filename, num_frames, cossin=False):
     """
     Parses features for ala2 from a text file.
     The text file must be formatted with "phi", followed by all phi angles, a blank line,

@@ -45,7 +45,7 @@ def read_csv_features(csv_file):
     return feature_names, feature_data
 
 
-def get_drormd_features(csv_file):
+def read_drormd_features(csv_file):
     """
     Load features from a CSV file as produced by DrorMD.
 

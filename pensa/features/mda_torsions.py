@@ -3,7 +3,7 @@ import MDAnalysis as mda
 from MDAnalysis.analysis.dihedrals import Dihedral
 
 
-def get_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, last_frame=None, step=1, naming=None):
+def read_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, last_frame=None, step=1, naming=None):
     """
     Load distances between all atom pairs between two selected groups.
 
@@ -170,7 +170,7 @@ def find_atom_indices_per_residue(pdb, at_names=["C4'", "P", "C4'", "P"], rel_re
     return indices_list
 
 
-def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
+def read_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
                                       first_frame=0, last_frame=None, step=1,
                                       naming='segindex', radians=False):
     """
@@ -280,7 +280,7 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     # Calculate the torsions
     all_indices = indices_alpha + indices_beta + indices_gamma + indices_delta \
         + indices_epsilon + indices_zeta + indices_chi
-    torsions = get_torsions(
+    torsions = read_torsions(
         pdb, xtc, sel=all_indices,
         first_frame=0, last_frame=None, step=1,
         naming=naming
@@ -302,7 +302,7 @@ def get_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     return labels, values
 
 
-def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
+def read_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
                                    first_frame=0, last_frame=None, step=1,
                                    naming='segindex', radians=False):
     """
@@ -358,7 +358,7 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     # Define angle names for labels
     angles = ['ETA'] * len(indices_eta) + ['THETA'] * len(indices_theta)
     # Calculate the torsions
-    torsions = get_torsions(
+    torsions = read_torsions(
         pdb, xtc, sel=indices_eta + indices_theta,
         first_frame=0, last_frame=None, step=1,
         naming=naming
@@ -380,7 +380,7 @@ def get_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     return labels, values
 
 
-def get_protein_backbone_torsions(pdb, xtc, selection='all',
+def read_protein_backbone_torsions(pdb, xtc, selection='all',
                                   first_frame=0, last_frame=None, step=1,
                                   naming='segindex', radians=False,
                                   include_omega=False):
@@ -451,7 +451,7 @@ def get_protein_backbone_torsions(pdb, xtc, selection='all',
         angles += ['OMEGA'] * len(indices_omega)
         torsion_selection += indices_omega
     # Calculate the torsions
-    torsions = get_torsions(
+    torsions = read_torsions(
         pdb, xtc, sel=torsion_selection,
         first_frame=0, last_frame=None, step=1,
         naming=naming
@@ -498,7 +498,7 @@ at_names_chi4 = [["CG", "CD", "NE", "CZ"],
 at_names_chi5 = [["CD", "NE", "CZ", "NH1"]]
 
 
-def get_protein_sidechain_torsions(pdb, xtc, selection='all',
+def read_protein_sidechain_torsions(pdb, xtc, selection='all',
                                    first_frame=0, last_frame=None, step=1,
                                    naming='segindex', radians=False):
     """
@@ -566,7 +566,7 @@ def get_protein_sidechain_torsions(pdb, xtc, selection='all',
     torsion_selection += indices_chi4
     torsion_selection += indices_chi5
     # Calculate the torsions
-    torsions = get_torsions(
+    torsions = read_torsions(
         pdb, xtc, sel=torsion_selection,
         first_frame=0, last_frame=None, step=1,
         naming=naming

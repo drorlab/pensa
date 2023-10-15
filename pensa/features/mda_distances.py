@@ -4,9 +4,9 @@ import MDAnalysis.lib.distances as ld
 import gpcrmining.gpcrdb as db
 
 
-def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
-                             first_frame=0, last_frame=None, step=1,
-                             naming='plain'):
+def read_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
+                              first_frame=0, last_frame=None, step=1,
+                              naming='plain'):
     """
     Load distances between all atom pairs between two selected groups.
 
@@ -81,7 +81,7 @@ def get_atom_group_distances(pdb, xtc, sel_a='protein', sel_b='resname LIG',
     return d_labels, data_arr
 
 
-def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame=None, step=1, naming='plain'):
+def read_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame=None, step=1, naming='plain'):
     """
     Load distances between all selected atoms.
 
@@ -149,7 +149,7 @@ def get_atom_self_distances(pdb, xtc, selection='all', first_frame=0, last_frame
     return d_labels, data_arr
 
 
-def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
+def read_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
     """
     Load distances between all C-alpha atoms.
 
@@ -174,11 +174,13 @@ def get_calpha_distances(pdb, xtc, first_frame=0, last_frame=None, step=1):
         Data for all C-alpha distances [Å]
 
     """
-    names, data = get_atom_self_distances(pdb, xtc,
-                                          selection='name CA',
-                                          first_frame=first_frame,
-                                          last_frame=last_frame,
-                                          step=step)
+    names, data = read_atom_self_distances(
+        pdb, xtc,
+        selection='name CA',
+        first_frame=first_frame,
+        last_frame=last_frame,
+        step=step
+    )
     return names, data
 
 
@@ -208,8 +210,8 @@ def select_gpcr_residues(gpcr_name, res_dbnum):
     return sel_resnum, sel_labels
 
 
-def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
-                              first_frame=0, last_frame=None, step=1):
+def read_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
+                               first_frame=0, last_frame=None, step=1):
     """
     Load distances between all selected atoms.
 
@@ -255,9 +257,11 @@ def get_gpcr_calpha_distances(pdb, xtc, gpcr_name, res_dbnum,
             _dl = 'CA DIST: %s - %s' % (reslabels[i], reslabels[j])
             distlabels.append(_dl)
     # Calculate the distances and get the sequential names
-    names, data = get_atom_self_distances(pdb, xtc,
-                                          selection=selection,
-                                          first_frame=first_frame,
-                                          last_frame=last_frame,
-                                          step=step)
+    names, data = read_atom_self_distances(
+        pdb, xtc,
+        selection=selection,
+        first_frame=first_frame,
+        last_frame=last_frame,
+        step=step
+    )
     return names, distlabels, data
