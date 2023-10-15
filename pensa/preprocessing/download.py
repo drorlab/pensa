@@ -20,7 +20,8 @@ def download_from_gpcrmd(filename, folder):
 
     """
     print('Retrieving file', filename, 'from GPCRmd.')
-    url = 'https://submission.gpcrmd.org/dynadb/files/Dynamics/'
+#    url = 'https://submission.gpcrmd.org/dynadb/files/Dynamics/'
+    url = 'https://gpcrmd.org/dynadb/files/Dynamics/'
     url += filename
     req = requests.get(url, allow_redirects=True)
     out = os.path.join(folder, filename)
