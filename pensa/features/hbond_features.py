@@ -9,7 +9,7 @@ import numpy as np
 from gridData import Grid
 from tqdm import tqdm
 import os
-from pensa.preprocessing.density import get_grid, local_maxima_3D, write_atom_to_pdb
+from pensa.preprocessing.density import generate_grid, local_maxima_3D, write_atom_to_pdb
 
 
 def _unique_bonding_pairs(lst):
@@ -78,11 +78,11 @@ def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
         u.trajectory.rewind()
 
         if grid_input is None:
-            g = get_grid(u, atomgroups[0], write_grid_as, out_name)
+            g = generate_grid(u, atomgroups[0], write_grid_as, out_name)
         else:
             g = Grid(grid_input)
     elif grid_input is None:
-        g = get_grid(u, atomgroups)
+        g = generate_grid(u, atomgroups)
     else:
         g = Grid(grid_input)
 

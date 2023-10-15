@@ -17,6 +17,6 @@ from .download import \
 from .density import \
     extract_aligned_coords, \
     extract_combined_grid, \
-    get_grid, \
+    generate_grid, \
     dens_grid_pdb, \
     local_maxima_3D
