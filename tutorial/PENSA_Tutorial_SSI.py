@@ -2,7 +2,7 @@ import os
 from pensa import \
     download_from_gpcrmd, extract_coordinates, \
     extract_aligned_coords, extract_combined_grid, \
-    get_structure_features, get_water_features, \
+    read_structure_features, read_water_features, \
     get_multivar_res_timeseries, get_discrete_states, \
     ssi_ensemble_analysis, ssi_feature_analysis, cossi_featens_analysis \
 

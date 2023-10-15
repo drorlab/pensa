@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 
 from pensa import \
-    get_structure_features, \
+    read_structure_features, \
     calculate_pca, \
     pca_eigenvalues_plot, \
     pca_features, \
@@ -18,19 +18,19 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ref_file_a", type=str,
-                        default='traj/rhodopsin_arrbound_receptor.gro')
+                        default='traj/protein-condition-a.gro')
     parser.add_argument("--trj_file_a", type=str,
-                        default='traj/rhodopsin_arrbound_receptor.xtc')
+                        default='traj/protein-condition-a.xtc')
     parser.add_argument("--ref_file_b", type=str,
-                        default='traj/rhodopsin_gibound_receptor.gro')
+                        default='traj/protein-condition-b.gro')
     parser.add_argument("--trj_file_b", type=str,
-                        default='traj/rhodopsin_gibound_receptor.xtc')
+                        default='traj/protein-condition-b.xtc')
     parser.add_argument("--out_plots", type=str,
-                        default='plots/rhodopsin_receptor')
+                        default='plots/protein')
     parser.add_argument("--out_pc", type=str,
-                        default='pca/rhodopsin_receptor')
+                        default='pca/protein')
     parser.add_argument("--out_results", type=str,
-                        default='results/rhodopsin_receptor')
+                        default='results/protein')
     parser.add_argument("--start_frame", type=int, default=0)
     parser.add_argument("--feature_type", type=str, default='bb-torsions')
     parser.add_argument("--num_eigenvalues", type=int, default=12)
@@ -41,10 +41,10 @@ if __name__ == "__main__":
     # -- FEATURES --
 
     # Load Features
-    feat_a, data_a = get_structure_features(
+    feat_a, data_a = read_structure_features(
         args.ref_file_a, args.trj_file_a, args.start_frame, cossin=True
     )
-    feat_b, data_b = get_structure_features(
+    feat_b, data_b = read_structure_features(
         args.ref_file_b, args.trj_file_b, args.start_frame, cossin=True
     )
     # Report dimensions

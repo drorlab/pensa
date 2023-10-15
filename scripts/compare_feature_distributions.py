@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 
 from pensa import \
-    get_structure_features, sort_features, select_common_features, \
+    read_structure_features, sort_features, select_common_features, \
     relative_entropy_analysis, kolmogorov_smirnov_analysis, \
     ssi_ensemble_analysis, mean_difference_analysis, \
     residue_visualization, distances_visualization
@@ -164,9 +164,9 @@ if __name__ == "__main__":
     # -- FEATURES -- #
 
     # Load Features
-    feat_a, data_a = get_structure_features(
+    feat_a, data_a = read_structure_features(
         args.ref_file_a, args.trj_file_a, args.start_frame)
-    feat_b, data_b = get_structure_features(
+    feat_b, data_b = read_structure_features(
         args.ref_file_b, args.trj_file_b, args.start_frame)
     # Report dimensions
     print('Feature dimensions from', args.trj_file_a)

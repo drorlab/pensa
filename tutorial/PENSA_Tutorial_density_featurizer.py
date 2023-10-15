@@ -1,6 +1,6 @@
 from pensa import \
-    get_water_features, \
-    get_atom_features
+    read_water_features, \
+    read_atom_features
 
 
 """
@@ -24,7 +24,7 @@ Options include:
 
 struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
-water_feat, water_data = get_water_features(
+water_feat, water_data = read_water_features(
     structure_input=struc,
     xtc_input=xtc,
     top_waters=1,
@@ -45,7 +45,7 @@ xtc = "mor-data/11423_trj_151.xtc"
 # Here we locate the sodium site which has the highest probability
 # The density grid is written (write=True) using the default density conversion "Angstrom^{-3}" in MDAnalysis
 
-atom_feat, atom_data = get_atom_features(
+atom_feat, atom_data = read_atom_features(
     structure_input=struc,
     xtc_input=xtc,
     top_atoms=1,
@@ -61,7 +61,7 @@ atom_feat, atom_data = get_atom_features(
 struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
 grid = "dens/11426_dyn_151OH2_density.dx"
-water_feat, water_data = get_water_features(
+water_feat, water_data = read_water_features(
     structure_input=struc,
     xtc_input=xtc,
     top_waters=5,

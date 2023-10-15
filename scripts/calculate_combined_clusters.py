@@ -3,7 +3,7 @@ import numpy as np
 
 # My own functions
 from pensa import \
-    get_structure_features, \
+    read_structure_features, \
     obtain_combined_clusters, \
     write_cluster_traj, \
     wss_over_number_of_combined_clusters
@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # -- FEATURES --
 
     # Load Features
-    feat_a, data_a = get_structure_features(
+    feat_a, data_a = read_structure_features(
         args.ref_file_a, args.trj_file_a,
         args.start_frame, cossin=True
     )
-    feat_b, data_b = get_structure_features(
+    feat_b, data_b = read_structure_features(
         args.ref_file_b, args.trj_file_b,
         args.start_frame, cossin=True
     )

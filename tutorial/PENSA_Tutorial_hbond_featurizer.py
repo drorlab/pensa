@@ -1,4 +1,4 @@
-from pensa import get_cavity_bonds, get_h_bonds
+from pensa import read_cavity_bonds, read_h_bonds
 
 # Featurize water cavity hydrogen bonds
 
@@ -8,7 +8,7 @@ ref_file_a = root_dir + '/11427_dyn_151.psf'
 pdb_file_a = root_dir + '/11426_dyn_151.pdb'
 trj_file_a = root_dir + '/11423_trj_151.xtc'
 
-names, data = get_cavity_bonds(
+names, data = read_cavity_bonds(
     ref_file_a, trj_file_a,
     atomgroups=['OH2', 'H1', 'H2'],
     site_IDs=[1, 2],
@@ -24,7 +24,7 @@ ref_file_a = root_dir + '/11580_dyn_169.psf'
 pdb_file_a = root_dir + '/11579_dyn_169.pdb'
 trj_file_a = root_dir + '/11578_trj_169.xtc'
 
-names, data = get_h_bonds(
+names, data = read_h_bonds(
     ref_file_a, trj_file_a,
     fixed_group='resname 4VO',
     dyn_group='protein',
