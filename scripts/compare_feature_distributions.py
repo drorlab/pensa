@@ -5,6 +5,8 @@ from pensa.features import \
     read_structure_features, \
     sort_features, \
     select_common_features
+from pensa.statesinfo import \
+    get_discrete_states
 from pensa.comparison import \
     relative_entropy_analysis, \
     kolmogorov_smirnov_analysis, \
@@ -108,9 +110,13 @@ def workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
 def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
-    # SSI analysis with BB torsions
+    discrete_states_ab = get_discrete_states(
+        data_a[tors + '-torsions'], data_b[tors + '-torsions']
+    )
     ana = ssi_ensemble_analysis(
-        feat_a, feat_b, data_a, data_b, verbose=False,
+        feat_a[tors + '-torsions'], feat_b[tors + '-torsions'],
+        data_a[tors + '-torsions'], data_b[tors + '-torsions'],
+        discrete_states_ab, verbose=False, 
         override_name_check=args.override_name_check
     )
     resnames, ssi = ana
@@ -171,9 +177,11 @@ if __name__ == "__main__":
 
     # Load Features
     feat_a, data_a = read_structure_features(
-        args.ref_file_a, args.trj_file_a, args.start_frame)
+        args.ref_file_a, args.trj_file_a, args.start_frame
+    )
     feat_b, data_b = read_structure_features(
-        args.ref_file_b, args.trj_file_b, args.start_frame)
+        args.ref_file_b, args.trj_file_b, args.start_frame
+    )
     # Report dimensions
     print('Feature dimensions from', args.trj_file_a)
     for k in data_a.keys():
@@ -187,29 +195,37 @@ if __name__ == "__main__":
     print('BACKBONE TORSIONS')
 
     names, jsd = workflow_torsions_jsd(
-        args, feat_a, feat_b, data_a, data_b, tors='bb')
+        args, feat_a, feat_b, data_a, data_b, tors='bb'
+    )
     names, kss = workflow_torsions_kss(
-        args, feat_a, feat_b, data_a, data_b, tors='bb')
+        args, feat_a, feat_b, data_a, data_b, tors='bb'
+    )
     names, ssi = workflow_torsions_ssi(
-        args, feat_a, feat_b, data_a, data_b, tors='bb')
+        args, feat_a, feat_b, data_a, data_b, tors='bb'
+    )
 
     print('SIDECHAIN TORSIONS')
 
     names, jsd = workflow_torsions_jsd(
-        args, feat_a, feat_b, data_a, data_b, tors='sc')
+        args, feat_a, feat_b, data_a, data_b, tors='sc'
+    )
     names, kss = workflow_torsions_kss(
-        args, feat_a, feat_b, data_a, data_b, tors='sc')
+        args, feat_a, feat_b, data_a, data_b, tors='sc'
+    )
     names, ssi = workflow_torsions_ssi(
-        args, feat_a, feat_b, data_a, data_b, tors='sc')
+        args, feat_a, feat_b, data_a, data_b, tors='sc'
+    )
 
     # -- BACKBONE C-ALPHA DISTANCES --
 
     print('BACKBONE C-ALPHA DISTANCES')
 
     # Relative entropy analysis for C-alpha distances
-    relen = relative_entropy_analysis(feat_a['bb-distances'], feat_b['bb-distances'],
-                                      data_a['bb-distances'], data_b['bb-distances'],
-                                      bin_width=0.01, verbose=False)
+    relen = relative_entropy_analysis(
+        feat_a['bb-distances'], feat_b['bb-distances'],
+        data_a['bb-distances'], data_b['bb-distances'],
+        bin_width=0.01, verbose=False
+    )
     names, jsd, kld_ab, kld_ba = relen
 
     # Save all results (per feature) in a CSV file
@@ -245,4 +261,5 @@ if __name__ == "__main__":
 
     # Visualize the deviations in a matrix plot
     matrix = distances_visualization(
-        names, diff, args.out_plots + "_bb-diststances_difference-of-mean.pdf")
+        names, diff, args.out_plots + "_bb-diststances_difference-of-mean.pdf"
+    )
