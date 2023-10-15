@@ -1,10 +1,19 @@
 import os
-from pensa import \
-    download_from_gpcrmd, extract_coordinates, \
-    extract_aligned_coords, extract_combined_grid, \
-    read_structure_features, read_water_features, \
-    get_multivar_res_timeseries, get_discrete_states, \
-    ssi_ensemble_analysis, ssi_feature_analysis, cossi_featens_analysis \
+from pensa.preprocessing import \
+    download_from_gpcrmd, \
+    extract_coordinates, \
+    extract_aligned_coords, \
+    extract_combined_grid
+from pensa.features import \
+    read_structure_features, \
+    read_water_features, \
+    get_multivar_res_timeseries
+from pensa.statesinfo import \
+    get_discrete_states
+from pensa.comparison import \
+    ssi_ensemble_analysis, \
+    ssi_feature_analysis, \
+    cossi_featens_analysis \
 
 
 # Define where to save the GPCRmd files
@@ -55,14 +64,14 @@ extract_coordinates(
 
 # Extract the features from the beginning (start_frame) of the trajectory
 start_frame = 0
-a_rec = get_structure_features(
+a_rec = read_structure_features(
     out_name_a + "_receptor.gro",
     out_name_a + "_receptor.xtc",
     start_frame
 )
 a_rec_feat, a_rec_data = a_rec
 
-b_rec = get_structure_features(
+b_rec = read_structure_features(
     out_name_b + "_receptor.gro",
     out_name_b + "_receptor.xtc",
     start_frame
@@ -153,7 +162,7 @@ grid_combined = "dens/ab_grid_OH2_density.dx"
 # Then we featurize the waters common to both simulations
 # We can do the same analysis for ions using the get_atom_features featurizer.
 
-water_feat_a, water_data_a = get_water_features(
+water_feat_a, water_data_a = read_water_features(
     structure_input=out_name_a + ".gro",
     xtc_input="dens/cond-a_wateraligned.xtc",
     top_waters=2,
@@ -163,7 +172,7 @@ water_feat_a, water_data_a = get_water_features(
     out_name="cond_a"
 )
 
-water_feat_b, water_data_b = get_water_features(
+water_feat_b, water_data_b = read_water_features(
     structure_input=out_name_b + ".gro",
     xtc_input=out_name_b + ".xtc",
     top_waters=2,

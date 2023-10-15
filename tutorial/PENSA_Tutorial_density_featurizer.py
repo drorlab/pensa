@@ -1,4 +1,4 @@
-from pensa import \
+from pensa.features import \
     read_water_features, \
     read_atom_features
 

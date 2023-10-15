@@ -1,4 +1,4 @@
-from pensa import read_cavity_bonds, read_h_bonds
+from pensa.features import read_cavity_bonds, read_h_bonds
 
 # Featurize water cavity hydrogen bonds
 
