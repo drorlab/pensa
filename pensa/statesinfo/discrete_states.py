@@ -887,13 +887,10 @@ def get_discrete_states(all_data_a, all_data_b, discretize='gaussian', pbc=True,
 
     """
 
-    assert all_data_a.shape[0] == all_data_b.shape[0]
-
     # Initialize states list
     ssi_states = []
-    # Loop over all features
-    # all_data_a, all_data_b = all_data_a.T, all_data_b.T
 
+    # Loop over all features
     for residue in range(len(all_data_a)):
         data_a = all_data_a[residue]
         data_b = all_data_b[residue]

@@ -27,3 +27,7 @@ from .uncertainty_analysis import \
     relen_sem_analysis, \
     ssi_block_analysis, \
     ssi_sem_analysis
+
+from .projections import \
+    pca_features, \
+    tica_features

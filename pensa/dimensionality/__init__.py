@@ -1,7 +1,6 @@
 from .pca import \
     calculate_pca, \
     pca_eigenvalues_plot, \
-    pca_features, \
     project_on_pc, \
     get_components_pca, \
     sort_traj_along_pc, \
@@ -11,7 +10,6 @@ from .pca import \
 from .tica import \
     calculate_tica, \
     tica_eigenvalues_plot, \
-    tica_features, \
     project_on_tic, \
     get_components_tica, \
     sort_traj_along_tic, \

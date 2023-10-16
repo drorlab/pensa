@@ -6,10 +6,10 @@ from pensa.features import \
 from pensa.dimensionality import \
     calculate_pca, \
     pca_eigenvalues_plot, \
-    pca_features, \
     sort_trajs_along_common_pc, \
     compare_projections
-
+from pensa.comparison import \
+    pca_features
 
 # -------------#
 # --- MAIN --- #
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     )
     # Plot feature correlation with top components and print relevant features
     pca_features(
-        pca, feat_a[ftype], args.num_components, args.feat_threshold,
+        pca, feat_a[ftype], data_a[ftype], args.num_components, args.feat_threshold,
         plot_file=args.out_plots + "_" + ftype + "_feature_correlation.pdf"
     )
     # Sort each of the trajectories along the top components of combined data

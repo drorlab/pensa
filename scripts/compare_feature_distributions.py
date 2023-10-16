@@ -4,7 +4,8 @@ import numpy as np
 from pensa.features import \
     read_structure_features, \
     sort_features, \
-    select_common_features
+    select_common_features, \
+    get_multivar_res_timeseries
 from pensa.statesinfo import \
     get_discrete_states
 from pensa.comparison import \
@@ -110,12 +111,32 @@ def workflow_torsions_kss(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
 def workflow_torsions_ssi(args, feat_a, feat_b, data_a, data_b, tors='bb'):
 
-    discrete_states_ab = get_discrete_states(
-        data_a[tors + '-torsions'], data_b[tors + '-torsions']
+    # Use only features that are common to both ensembles
+    if args.only_common_sctors and tors == 'sc':
+        select_a, select_b = select_common_features(
+            feat_a[tors + '-torsions'],
+            feat_b[tors + '-torsions']
+        )
+    else:
+        select_a = np.arange(len(feat_a[tors + '-torsions']))
+        select_b = np.arange(len(feat_b[tors + '-torsions']))
+
+    multivar_res_feat_a, multivar_res_data_a = get_multivar_res_timeseries(
+        feat_a, data_a, tors + '-torsions'
     )
+    multivar_res_feat_b, multivar_res_data_b = get_multivar_res_timeseries(
+        feat_b, data_b, tors + '-torsions'
+    )
+
+    # Find the state boundaries
+    discrete_states_ab = get_discrete_states(
+        multivar_res_data_a[tors + '-torsions'], multivar_res_data_b[tors + '-torsions']
+    )
+
+    # Run the main analysis
     ana = ssi_ensemble_analysis(
-        feat_a[tors + '-torsions'], feat_b[tors + '-torsions'],
-        data_a[tors + '-torsions'], data_b[tors + '-torsions'],
+        multivar_res_feat_a[tors + '-torsions'], multivar_res_feat_b[tors + '-torsions'],
+        multivar_res_data_a[tors + '-torsions'], multivar_res_data_b[tors + '-torsions'],
         discrete_states_ab, verbose=False, 
         override_name_check=args.override_name_check
     )

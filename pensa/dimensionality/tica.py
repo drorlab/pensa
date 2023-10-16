@@ -64,49 +64,7 @@ def tica_eigenvalues_plot(tica, num=12, plot_file=None):
 
 
 def tica_features(tica, features, num, threshold, plot_file=None, add_labels=False):
-    """
-    Prints relevant features and plots feature correlations.
-
-    Parameters
-    ----------
-        tica : TICA obj
-            The TICA of which to plot the features.
-        features : list of str
-            Features for which the TICA was performed
-            (obtained from features object via .describe()).
-        num : float
-            Number of feature correlations to plot.
-        threshold : float
-            Features with a correlation above this will be printed.
-        plot_file : str, optional, default = None
-            Path and name of the file to save the plot.
-        add_labels : bool, optional, default = False
-            Add labels of the features to the x axis.
-
-    """
-    # Plot the highest TIC correlations and print relevant features.
-    height = num * 2 + 2 if add_labels else num * 2
-    fig, ax = plt.subplots(num, 1, figsize=[4, height], dpi=300, sharex=True)
-    for i in range(num):
-        relevant = tica.feature_component_correlation[:, i] ** 2 > threshold ** 2
-        print("Features with abs. corr. above a threshold of %3.1f for TIC %i:" % (
-            threshold, i + 1))
-        for j, ft in enumerate(features):
-            if relevant[j]:
-                print(ft, "%6.3f" % (tica.feature_component_correlation[j, i]))
-        ax[i].plot(tica.feature_component_correlation[:, i])
-        test_feature = tica.feature_component_correlation[:, i]
-        ax[i].set_ylabel('corr. with TIC%i' % (i + 1))
-    if add_labels:
-        ax[-1].set_xticks(np.arange(len(features)))
-        ax[-1].set_xticklabels(features, rotation=90)
-    else:
-        ax[-1].set_xlabel('feature index')
-    fig.tight_layout()
-    # Save the figure to a file.
-    if plot_file:
-        fig.savefig(plot_file, dpi=300)
-    return test_feature
+    raise NotImplementedError("The function 'tica_features' has been deprecated. Its functionality can be found in the comparison module.")
 
 
 def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
