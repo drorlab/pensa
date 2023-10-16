@@ -15,7 +15,7 @@ from pensa.statesinfo import \
 from pensa.comparison import \
     relative_entropy_analysis, relen_block_analysis, relen_sem_analysis, \
     ssi_ensemble_analysis, ssi_block_analysis, ssi_sem_analysis, \
-    residue_visualization, distances_visualization
+    residue_visualization, distances_visualization, pca_features, tica_features
 
 from pensa.features import \
     read_structure_features, \
@@ -23,8 +23,8 @@ from pensa.features import \
     sort_features
 
 from pensa.dimensionality import \
-    calculate_pca, pca_features, pca_eigenvalues_plot, \
-    calculate_tica, tica_features, tica_eigenvalues_plot, \
+    calculate_pca, pca_eigenvalues_plot, \
+    calculate_tica, tica_eigenvalues_plot, \
     sort_traj_along_pc, sort_trajs_along_common_pc, \
     sort_traj_along_tic, sort_trajs_along_common_tic, \
     compare_projections
