@@ -43,6 +43,8 @@ def read_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, las
     u = mda.Universe(pdb, xtc)
     torsion_atoms = [u.atoms[selection] for selection in sel]
     dihedrals = Dihedral(torsion_atoms).run()
+    dihedral_angles = dihedrals.angles
+    print('DIHEDRAL ANGLES', dihedral_angles.shape)
 
     # Generate the labels
     torsion_labels = []
@@ -60,7 +62,7 @@ def read_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, las
         _tl = 'TORS: %s - %s - %s - %s' % (at_labels[0], at_labels[1], at_labels[2], at_labels[3])
         torsion_labels.append(_tl)
 
-    return torsion_labels, dihedrals.angles
+    return torsion_labels, dihedral_angles[first_frame:last_frame:step]
 
 
 def find_atom_by_name(res, at_name):
@@ -281,9 +283,8 @@ def read_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     all_indices = indices_alpha + indices_beta + indices_gamma + indices_delta \
         + indices_epsilon + indices_zeta + indices_chi
     torsions = read_torsions(
-        pdb, xtc, sel=all_indices,
-        first_frame=0, last_frame=None, step=1,
-        naming=naming
+        pdb, xtc, sel=all_indices, naming=naming,
+        first_frame=first_frame, last_frame=last_frame, step=step
     )
     # Extract the residue info
     nums = [pti.split(' - ')[1].split(' ')[-2] for pti in torsions[0]]
@@ -359,9 +360,8 @@ def read_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
     angles = ['ETA'] * len(indices_eta) + ['THETA'] * len(indices_theta)
     # Calculate the torsions
     torsions = read_torsions(
-        pdb, xtc, sel=indices_eta + indices_theta,
-        first_frame=0, last_frame=None, step=1,
-        naming=naming
+        pdb, xtc, sel=indices_eta + indices_theta, naming=naming,
+        first_frame=first_frame, last_frame=last_frame, step=step
     )
     # Extract the residue info
     nums = [pti.split(' - ')[1].split(' ')[-2] for pti in torsions[0]]
@@ -381,9 +381,9 @@ def read_nucleicacid_pseudotorsions(pdb, xtc, selection='all',
 
 
 def read_protein_backbone_torsions(pdb, xtc, selection='all',
-                                  first_frame=0, last_frame=None, step=1,
-                                  naming='segindex', radians=False,
-                                  include_omega=False):
+                                   first_frame=0, last_frame=None, step=1,
+                                   naming='segindex', radians=False,
+                                   include_omega=False):
     """
     Load protein backbone torsions
 
@@ -452,9 +452,8 @@ def read_protein_backbone_torsions(pdb, xtc, selection='all',
         torsion_selection += indices_omega
     # Calculate the torsions
     torsions = read_torsions(
-        pdb, xtc, sel=torsion_selection,
-        first_frame=0, last_frame=None, step=1,
-        naming=naming
+        pdb, xtc, sel=torsion_selection, naming=naming,
+        first_frame=first_frame, last_frame=last_frame, step=step
     )
     # Extract the residue info
     nums = [pti.split(' - ')[1].split(' ')[-2] for pti in torsions[0]]
@@ -499,8 +498,8 @@ at_names_chi5 = [["CD", "NE", "CZ", "NH1"]]
 
 
 def read_protein_sidechain_torsions(pdb, xtc, selection='all',
-                                   first_frame=0, last_frame=None, step=1,
-                                   naming='segindex', radians=False):
+                                    first_frame=0, last_frame=None, step=1,
+                                    naming='segindex', radians=False):
     """
     Load protein sidechain torsions.
 
@@ -567,9 +566,8 @@ def read_protein_sidechain_torsions(pdb, xtc, selection='all',
     torsion_selection += indices_chi5
     # Calculate the torsions
     torsions = read_torsions(
-        pdb, xtc, sel=torsion_selection,
-        first_frame=0, last_frame=None, step=1,
-        naming=naming
+        pdb, xtc, sel=torsion_selection, naming=naming,
+        first_frame=first_frame, last_frame=last_frame, step=step
     )
     # Extract the residue info
     nums = [pti.split(' - ')[1].split(' ')[-2] for pti in torsions[0]]
