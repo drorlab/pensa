@@ -46,4 +46,3 @@ for PART in receptor tm; do
 
 done
 
-
