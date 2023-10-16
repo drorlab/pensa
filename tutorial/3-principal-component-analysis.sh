@@ -12,7 +12,7 @@ python ../scripts/calculate_combined_principal_components.py \
 	--out_plots 'plots/receptor' \
 	--out_pc 'pca/receptor' \
         --out_results 'results/receptor' \
-	--start_frame 2000 \
+	--start_frame 1000 \
 	--feature_type 'bb-torsions' \
 	--num_eigenvalues 12 \
 	--num_components 3 \
