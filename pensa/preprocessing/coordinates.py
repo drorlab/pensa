@@ -249,7 +249,9 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
             Sorted indices of the trajectory.
 
     """
-    assert type(values) is list and type(top_names) is list and type(trj_names) is list
+    assert type(values) is list
+    assert type(top_names) is list
+    assert type(trj_names) is list
     # Get some stats
     num_traj = len(values)
     num_frames = [len(val) for val in values]
@@ -266,12 +268,12 @@ def merge_and_sort_coordinates(values, top_names, trj_names, out_name, start_fra
 
     # Combine the input data
     data = np.concatenate(values)
-    # Remember which simulation the data came frome
-    cond = np.concatenate([i * np.ones(num_frames[i], dtype=int)
-                          for i in range(num_traj)])
+    # Remember which simulation ("condition") the data came frome
+    cond = [i * np.ones(num_frames[i], dtype=int) for i in range(num_traj)]
+    cond = np.concatenate(cond)
     # Remember the index in the respective simulation (taking into account cutoff)
-    oidx = np.concatenate(
-        [np.arange(num_frames[i], dtype=int) + start_frame[i] for i in range(num_traj)])
+    oidx = [np.arange(num_frames[i], dtype=int) + start_frame[i] for i in range(num_traj)]
+    oidx = np.concatenate(oidx)
     assert type(oidx[0] == int)
 
     # Define the MDAnalysis trajectories from where the frames come
