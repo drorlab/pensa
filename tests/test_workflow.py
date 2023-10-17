@@ -117,7 +117,7 @@ class Test_pensa(unittest.TestCase):
 
         # - FEATURES -
 
-        self.start_frame = 0
+        self.start_frame = 10
 
         # -- Receptor features --
         sim_a_rec = read_structure_features(
@@ -232,7 +232,7 @@ class Test_pensa(unittest.TestCase):
 
         self.cidx, self.cond, self.oidx, self.wss, self.centroids = obtain_combined_clusters(
             self.sim_a_tmr_data['bb-torsions'], self.sim_b_tmr_data['bb-torsions'],
-            label_a='A', label_b='B', start_frame=0,
+            label_a='A', label_b='B', start_frame=self.start_frame,
             algorithm='kmeans', max_iter=100, num_clusters=3, min_dist=12,
             saveas=test_data_path + '/plots/combined_clust_bbtors.pdf'
         )
@@ -273,23 +273,23 @@ class Test_pensa(unittest.TestCase):
         # Simulation A, full receptor
         self.assertEqual(len(self.sim_a_rec_feat['bb-torsions']), 574)
         self.assertEqual(len(self.sim_a_rec_feat['sc-torsions']), 527)
-        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (30, 574))
-        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (30, 527))
+        self.assertEqual(self.sim_a_rec_data['bb-torsions'].shape, (20, 574))
+        self.assertEqual(self.sim_a_rec_data['sc-torsions'].shape, (20, 527))
         # Simulation B, full receptor
         self.assertEqual(len(self.sim_b_rec_feat['bb-torsions']), 574)
         self.assertEqual(len(self.sim_b_rec_feat['sc-torsions']), 527)
-        self.assertEqual(self.sim_b_rec_data['bb-torsions'].shape, (30, 574))
-        self.assertEqual(self.sim_b_rec_data['sc-torsions'].shape, (30, 527))
+        self.assertEqual(self.sim_b_rec_data['bb-torsions'].shape, (20, 574))
+        self.assertEqual(self.sim_b_rec_data['sc-torsions'].shape, (20, 527))
         # Simulation A, transmembrane region
         self.assertEqual(len(self.sim_a_tmr_feat['bb-torsions']), 448)
         self.assertEqual(len(self.sim_a_tmr_feat['sc-torsions']), 423)
-        self.assertEqual(self.sim_a_tmr_data['bb-torsions'].shape, (30, 448))
-        self.assertEqual(self.sim_a_tmr_data['sc-torsions'].shape, (30, 423))
+        self.assertEqual(self.sim_a_tmr_data['bb-torsions'].shape, (20, 448))
+        self.assertEqual(self.sim_a_tmr_data['sc-torsions'].shape, (20, 423))
         # Simulation B, transmembrane region
         self.assertEqual(len(self.sim_b_tmr_feat['bb-torsions']), 448)
         self.assertEqual(len(self.sim_b_tmr_feat['sc-torsions']), 423)
-        self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (30, 448))
-        self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (30, 423))
+        self.assertEqual(self.sim_b_tmr_data['bb-torsions'].shape, (20, 448))
+        self.assertEqual(self.sim_b_tmr_data['sc-torsions'].shape, (20, 423))
 
     # ** ENSEMBLE COMPARISON **
 
@@ -397,8 +397,8 @@ class Test_pensa(unittest.TestCase):
 
     # -- calculate_tica
     def test_12_calculate_tica(self):
-        self.assertEqual(self.tica_bbt_a.koopman_matrix.size, 841)
-        self.assertEqual(self.tica_bbt_b.koopman_matrix.size, 841)
+        self.assertEqual(self.tica_bbt_a.koopman_matrix.size, 361)
+        self.assertEqual(self.tica_bbt_b.koopman_matrix.size, 361)
 
     # -- pca_eigenvalues_plot()
     def test_13_pca_eigenvalues_plot(self):
@@ -428,7 +428,7 @@ class Test_pensa(unittest.TestCase):
         for i in range(len(self.graph)):
             self.assertEqual(len(self.graph[i]), 448)
         # -- Corr
-        self.assertEqual(len(self.corr), 48)
+        self.assertEqual(len(self.corr), 81)
 
     # -- tica_features()
     def test_16_tica_features(self):
@@ -466,8 +466,8 @@ class Test_pensa(unittest.TestCase):
             test_data_path + "/tica/receptor_by_tmr",
             num_ic=3
         )
-        self.assertEqual(len(sproj[0]), 60)
-        self.assertEqual(len(sidx_data[0]), 60)
+        self.assertEqual(len(sproj[0]), 40)
+        self.assertEqual(len(sidx_data[0]), 40)
 
     # -- sort_traj_along_tic()
     def test_19_sort_traj_along_tic(self):
@@ -487,24 +487,26 @@ class Test_pensa(unittest.TestCase):
         self.assertEqual(len(self.val[0]), 2)
         self.assertEqual(len(self.val[1]), 2)
         self.assertEqual(len(self.val[2]), 2)
-        self.assertEqual(len(self.val[0][0]), 30)
-        self.assertEqual(len(self.val[0][1]), 30)
-        self.assertEqual(len(self.val[1][0]), 30)
-        self.assertEqual(len(self.val[1][1]), 30)
-        self.assertEqual(len(self.val[2][0]), 30)
-        self.assertEqual(len(self.val[2][1]), 30)
+        self.assertEqual(len(self.val[0][0]), 20)
+        self.assertEqual(len(self.val[0][1]), 20)
+        self.assertEqual(len(self.val[1][0]), 20)
+        self.assertEqual(len(self.val[1][1]), 20)
+        self.assertEqual(len(self.val[2][0]), 20)
+        self.assertEqual(len(self.val[2][1]), 20)
 
     # ** CLUSTERING **
 
     # -- obtain_combined_clusters()
     def test_21_obtain_combined_clusters(self):
-        self.assertEqual(len(self.cidx), 60)
-        self.assertEqual(len(self.cond), 60)
+        self.assertEqual(len(self.cidx), 40)
+        self.assertEqual(len(self.cond), 40)
         test_oidx = [
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-            17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 0, 1, 2, 3,
-            4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-            21, 22, 23, 24, 25, 26, 27, 28, 29
+#            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+#            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29
         ]
         self.assertEqual(len(self.centroids), 3)
         self.assertEqual(len(self.centroids[0]), 448)
@@ -515,7 +517,7 @@ class Test_pensa(unittest.TestCase):
 
     # -- write_cluster_traj()
     def test_22_write_cluster_traj(self):
-        self.assertEqual(len(self.atom_group), 30)
+        self.assertEqual(len(self.atom_group), 20)
         for i in range(len(self.atom_group)):
             self.assertEqual(self.atom_group[i].n_atoms, 1877)
 
