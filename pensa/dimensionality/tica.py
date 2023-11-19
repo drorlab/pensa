@@ -101,7 +101,7 @@ def project_on_tic(data, ev_idx, tica=None, dim=-1, lag=10):
     return projection
 
 
-def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
+def get_components_tica(data, num, tica=None, lag=10, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its tICA.
 
@@ -114,9 +114,6 @@ def get_components_tica(data, num, tica=None, dim=-1, lag=10, prefix=''):
         tica : tICA obj, optional, default = None
             Information of pre-calculated tICA. Defaults to None.
             Must be calculated for the same features (but not necessarily the same trajectory).
-        dim : int, optional, default = -1
-            The number of dimensions (independent components) to project onto.
-            Only used if tica is not provided.
         lag : int, optional, default = 10
             The lag time, in multiples of the input time step.
             Only used if tica is not provided.

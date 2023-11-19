@@ -94,7 +94,7 @@ def project_on_pc(data, ev_idx, pca=None, dim=-1):
     return projection
 
 
-def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
+def get_components_pca(data, num, pca=None, prefix=''):
     """
     Projects a trajectory onto the first num eigenvectors of its PCA.
 
@@ -107,9 +107,6 @@ def get_components_pca(data, num, pca=None, dim=-1, prefix=''):
         pca : PCA obj, optional, default = None
             Information of pre-calculated PCA.
             Must be calculated for the same features (but not necessarily the same trajectory).
-        dim : int, optional, default = -1
-            The number of dimensions (principal components) to project onto.
-            Only used if tica is not provided.
         prefix : str, optional, default = ''
             First part of the component names. Second part is "PC"+<PC number>
 
