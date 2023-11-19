@@ -44,7 +44,6 @@ def read_torsions(pdb, xtc, sel=[[0, 1, 2, 3], [1, 2, 3, 4]], first_frame=0, las
     torsion_atoms = [u.atoms[selection] for selection in sel]
     dihedrals = Dihedral(torsion_atoms).run()
     dihedral_angles = dihedrals.angles
-    print('DIHEDRAL ANGLES', dihedral_angles.shape)
 
     # Generate the labels
     torsion_labels = []
