@@ -1,4 +1,3 @@
-import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -9,21 +8,23 @@ from .statistics import \
     feature_correlation
 
 
-def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels=False):
+def pca_feature_correlation(features, data, pca=None, num=3, threshold=0.1, plot_file=None, add_labels=False):
     """
-    Prints relevant features and plots feature correlations.
+    Calculates and plots the correlation between principal components and the underlying features.
+    Prints all features with a correlation above the threshold.
 
     Parameters
     ----------
-        pca : PCA obj
-            The PCA of which to plot the features.
         features : list of str
-            Names of the features for which the PCA was performed.
+            Names of the features for which the PCA was/is performed.
         data : float array
-            Trajectory data [frames, frame_data].
-        num : float
+            Trajectory data for the features. Format: [frames, frame_data]
+        pca : PCA obj, default = None
+            The PCA of which to plot the features.
+            If no PCA is provided, it is calculated from the trajectory.
+        num : float, default = 3
             Number of feature correlations to plot.
-        threshold : float
+        threshold : float, default = 0.1
             Features with a correlation above this will be printed.
         plot_file : str, optional, default = None
             Path and name of the file to save the plot.
@@ -32,8 +33,8 @@ def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels
 
 
     """
-    warnings.warn("pca_features() in versions > 0.2.8 needs the data for the features, not only their names!")
     # Project the trajectory data on the principal components
+    # (performs PCA if none is provided)
     projection = get_components_pca(data, num, pca)[1]
     # Plot the highest PC correlations and print relevant features
     test_graph = []
@@ -64,17 +65,14 @@ def pca_features(pca, features, data, num, threshold, plot_file=None, add_labels
     return test_graph, test_corr
 
 
-def tica_features(tica, features, num, threshold, plot_file=None, add_labels=False):
+def tica_feature_correlation(features, data, num=3, tica=None, threshold=0.1, plot_file=None, add_labels=False):
     """
     Prints relevant features and plots feature correlations.
 
     Parameters
     ----------
-        tica : TICA obj
-            The TICA of which to plot the features.
         features : list of str
-            Features for which the TICA was performed
-            (obtained from features object via .describe()).
+            Features for which the TICA was performed.
         num : float
             Number of feature correlations to plot.
         threshold : float

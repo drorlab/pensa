@@ -29,5 +29,5 @@ from .uncertainty_analysis import \
     ssi_sem_analysis
 
 from .projections import \
-    pca_features, \
-    tica_features
+    pca_feature_correlation, \
+    tica_feature_correlation

@@ -15,7 +15,8 @@ from pensa.statesinfo import \
 from pensa.comparison import \
     relative_entropy_analysis, relen_block_analysis, relen_sem_analysis, \
     ssi_ensemble_analysis, ssi_block_analysis, ssi_sem_analysis, \
-    residue_visualization, distances_visualization, pca_features, tica_features
+    residue_visualization, distances_visualization, \
+    pca_feature_correlation, tica_feature_correlation
 
 from pensa.features import \
     read_structure_features, \
@@ -202,8 +203,9 @@ class Test_pensa(unittest.TestCase):
         self.tica_bbt_b = calculate_tica(bbt_b)
 
         # -- PCA features
-        self.graph, self.corr = pca_features(
-            self.pca_combined, self.sim_a_tmr_feat['bb-torsions'], combined_data_tors, 3, 0.4,
+        self.graph, self.corr = pca_feature_correlation(
+            self.sim_a_tmr_feat['bb-torsions'], combined_data_tors,
+            pca=self.pca_combined, num=3, threshold=0.4,
             plot_file=test_data_path + "/plots/pca-features_bbtors_a.pdf"
         )
         plt.close()
@@ -432,8 +434,9 @@ class Test_pensa(unittest.TestCase):
 
     # -- tica_features()
     def test_16_tica_features(self):
-        test_feature = tica_features(
-            self.tica_bbt_a, self.sim_a_tmr_feat['bb-torsions'], 3, 0.4
+        test_feature = tica_feature_correlation(
+            self.sim_a_tmr_feat['bb-torsions'], self.sim_a_tmr_data['bb-torsions'], 
+            tica=self.tica_bbt_a, num=3, threshold=0.4
         )
         self.assertEqual(len(test_feature), 448)
 
