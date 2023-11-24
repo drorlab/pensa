@@ -6,7 +6,7 @@
 rm -r source/* _build
 
 # Auto-generate API docs:
-sphinx-apidoc -M -o ./source ../pensa ../pensa/diffnets/
+sphinx-apidoc -M -o ./source ../pensa
 
 # Format the auto-generated API docs
 sed -i 's/ package//g' source/*.rst

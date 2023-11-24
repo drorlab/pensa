@@ -68,6 +68,8 @@ autodoc_mock_imports = [
     'matplotlib',
     'deeptime',
     'MDAnalysis',
+    'scikit-learn',
+    'sklearn',
     'biotite'
 ]
 
