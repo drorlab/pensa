@@ -14,6 +14,14 @@ pensa.comparison.metrics
    :undoc-members:
    :show-inheritance:
 
+pensa.comparison.projections
+-----------------------------------
+
+.. automodule:: pensa.comparison.projections
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pensa.comparison.relative\_entropy
 -----------------------------------------
 
@@ -34,6 +42,14 @@ pensa.comparison.statistics
 ----------------------------------
 
 .. automodule:: pensa.comparison.statistics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pensa.comparison.uncertainty\_analysis
+---------------------------------------------
+
+.. automodule:: pensa.comparison.uncertainty_analysis
    :members:
    :undoc-members:
    :show-inheritance:
