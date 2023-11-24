@@ -92,6 +92,7 @@ def local_maxima_3D(data, order=1):
         coordinates of the local maxima
     values : ndarray
         values of the local maxima
+
     """
     size = 1 + 2 * order
     footprint = np.ones((size, size, size))
@@ -109,6 +110,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
                           prot_prox=True, use_memmap=False):
     """
     Writes out combined atomgroup density for both input simulations.
+
     Parameters
     ----------
     struc_a : str
@@ -132,6 +134,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Uses numpy memmap to write out a pseudo-trajectory coordinate array.
         This is used for large trajectories to avoid memory errors with large
         python arrays. The default is False.
+
     """
     if not os.path.exists('dens/'):
         os.makedirs('dens/')
@@ -202,7 +205,6 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
 def extract_aligned_coords(struc_a, xtc_a, struc_b, xtc_b):
     """
     Writes out combined atomgroup density for both input simulations.
-
 
     Parameters
     ----------

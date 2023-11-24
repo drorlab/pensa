@@ -184,7 +184,7 @@ def read_nucleicacid_backbone_torsions(pdb, xtc, selection='all',
     EPSILON (ε): C4'(i)-C3'(i)-O3'(i)-P(i + 1)
     ZETA (ζ):    C3'(i)-O3'(i)-P(i + 1)-O5'(i + 1)
     CHI (χ):     O4'(i)-C1'(i)-N9(i)-C4(i) for purines
-                 O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
+    or           O4'(i)-C1'(i)-N1(i)-C2(i) for pyridines
 
     Parameters
     ----------
