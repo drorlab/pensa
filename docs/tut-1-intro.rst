@@ -13,20 +13,19 @@ We are going to compare the structural ensembles of the receptor in these two co
 
 This tutorial assumes that you can download the trajectories (see below). If you can't, you can use any other system you have available and adapt the file names and residue selections accordingly.
 
-Modules
--------
-
-We only need to import the module "os" and all functions from PENSA itself which in turn loads all the modules it needs.
-
-  .. code:: python
-    
-    import os
-    from pensa import *
 
 Download
 --------
 
-PENSA has a predefined function to download GPCRmd trajectories.
+We only need to import the module "os" and PENSA's predefined function to download GPCRmd trajectories here.
+
+  .. code:: python
+    
+    import os
+    from pensa.preprocessing import download_from_gpcrmd
+
+File names usually have to be looked up on the GPCRmd website but we have done this already. 
+Just execute the following to obtain the example for this tutorial:
 
   .. code:: python
 
@@ -41,4 +40,3 @@ PENSA has a predefined function to download GPCRmd trajectories.
     for file in md_files:
         if not os.path.exists(os.path.join(root_dir,file)):
             download_from_gpcrmd(file,root_dir)
-

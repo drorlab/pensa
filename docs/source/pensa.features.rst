@@ -62,22 +62,6 @@ pensa.features.processing
    :undoc-members:
    :show-inheritance:
 
-pensa.features.pyemma\_features
---------------------------------------
-
-.. automodule:: pensa.features.pyemma_features
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pensa.features.txt\_features
------------------------------------
-
-.. automodule:: pensa.features.txt_features
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pensa.features.water\_features
 -------------------------------------
 

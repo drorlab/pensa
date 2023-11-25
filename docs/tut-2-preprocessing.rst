@@ -1,19 +1,25 @@
 Preprocessing
 =============
 
+
+.. code:: python
+
+    import os
+    from pensa.preprocessing import load_selection, \
+        extract_coordinates, extract_coordinates_combined, \
+        extract_aligned_coords, extract_combined_grid
+
+
 Coordinates
 ***********
 
-To work with the protein coordinates, we first need to extract them from
-the simulation, i.e., remove the solvent, lipids etc. This is the
-hardest part but you usually only have to do it once and can then play
-with your data. Preprocessing can handle many common trajectory formats
-(as it is based on MDAnalysis) but the internal featurization (based on
-PyEMMA) is a bit more restrictive, so we will always write xtc
-trajectories. For large trajectories, you might want to use the scripts
-provided in the PENSA repository, e.g., to run them on the computing
-cluster and then download the processed data. Once you know how PENSA
-works, you can write your own scripts.
+To work with the biomolecule's coordinates, we first need to extract them from
+the simulation, i.e., remove the solvent, lipids etc. This is the hardest part 
+but you usually only have to do it once and can then play with your data. 
+Preprocessing can handle many common trajectory formats as it is based on 
+MDAnalysis. You can start by using the scripts provided in the PENSA repository. 
+Once you know how PENSA works, you can write your own scripts.
+
 
 Files and Directories
 ---------------------
@@ -60,9 +66,10 @@ will generate.
 
 .. code:: python
 
-    for subdir in ['traj','plots','vispdb','pca','clusters','results']:
+    for subdir in ['traj', 'features', 'plots', 'vispdb', 'pca', 'clusters', 'results']:
         if not os.path.exists(subdir):
             os.makedirs(subdir)
+
 
 Extracting Coordinates
 ----------------------
@@ -90,14 +97,17 @@ trajectory argument takes a list as arguments, e.g.
 
 .. code:: python
 
-   extract_coordinates('system.psf', 'system.pdb', ['run1.nc','run2.nc','run3.nc'], 
-                       'receptor', 'protein', start_frame=1000)
+    extract_coordinates(
+        'system.psf', 'system.pdb', ['run1.nc','run2.nc','run3.nc'], 
+        'receptor', 'protein', start_frame=1000
+    )
                                 
 
-With the option ``start_frame``, you can exclude the equilibrium phase
+With the option ``start_frame``, you can exclude the equilibration phase
 already at this stage. Be aware that in combined simulations, there is
 no straightforward way to exclude it later as it would require
 bookkeeping about how long each simulation was etc.
+
 
 Selecting Subsets of Coordinates
 --------------------------------
@@ -105,22 +115,24 @@ Selecting Subsets of Coordinates
 For some analysis types, we only want to use the part of the receptor
 that is inside the membrane. In this way, very flexible loops outside
 the membrane cannot distort the analysis result. We can manually
-construct a selection string in MDAnalysis format We use selections based on
-the definitions of transmembrane helices in the
+construct a selection string in `MDAnalysis format <https://userguide.mdanalysis.org/stable/selections.html>`__. 
+Here, we use selections based on the definitions of transmembrane helices in the
 `GPCRdb <https://gpcrdb.org/protein/oprm_human/>`__.
 
 .. code:: python
 
+    # Residue numbers (same in both simulations)
     resnums = "76:98 105:133 138:173 182:208 226:264 270:308 315:354"
     # Generate the selection strings
-    sel_string_a = sel_base_a+" and resnum "+resnums
+    sel_string_a = "protein and resnum "+resnums
     print('Selection A:\n', sel_string_a, '\n')
-    sel_string_b = sel_base_b+" and resnum "+resnums
+    sel_string_b = "protein and resnum "+resnums
     print('Selection B:\n', sel_string_b, '\n')
     # Extract the coordinates of the transmembrane region from the trajectory
     extract_coordinates(ref_file_a, pdb_file_a, [trj_file_a], out_name_a+"_tm", sel_string_a)
     extract_coordinates(ref_file_b, pdb_file_b, [trj_file_b], out_name_b+"_tm", sel_string_b)
-        
+
+
 Loading from Multiple Simulations
 ---------------------------------
     
@@ -133,11 +145,17 @@ to have the exactly same atoms.
 
 .. code:: python
 
-    extract_coordinates_combined([ref_file_a]*3 + [ref_file_b]*3,
-                                 trj_file_a + trj_file_b, 
-                                 [sel_string_a]*3 + [sel_string_b]*3, 
-                                 'traj/combined_tm.xtc', 
-                                 start_frame=400)
+    all_refs = [ref_file_a]*3 + [ref_file_b]*3
+    all_trjs = trj_file_a + trj_file_b
+    all_sels = [sel_string_a]*3 + [sel_string_b]*3
+    
+    extract_coordinates_combined(
+        all_refs, all_trjs, all_sels,
+        'traj/combined_tm.xtc', 
+        start_frame=400
+    )
+
+
 
 Densities
 *********
@@ -152,7 +170,6 @@ water cavities in membrane proteins. Here we demonstrate the preprocessing for
 water density, however the same procedure would be used for ions.   
 
 
-
 Files and Directories
 ---------------------
 
@@ -162,7 +179,6 @@ we must use a trajectory that includes hydrogens, however the density itself
 does not need hydrogens. It can therefore be useful to preprocess a trajectory 
 including the entire solvent for featurization, and generate the individual 
 densities from a smaller selection.
-
 
 .. code:: python
 
@@ -208,11 +224,11 @@ we have to ensure that the protein is aligned across both simulations.
     # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
     extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
                            out_name_b+".gro", out_name_b+".xtc")
-       
+
+
 Extracting the Density 
 ----------------------
-
-    
+ 
 The density is then extracted from the combined ensemble, in which the solvent 
 cavities are aligned.     
     
