@@ -21,12 +21,12 @@ setup(
     ),
     zip_safe=False,
     install_requires=[
-        'numpy==1.20', # because density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
+        'numpy==1.22', # because density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
         'scipy>=1.2',
         'pandas',
         'matplotlib',
         'deeptime',
-        'MDAnalysis==2', # some features we use will likely be removed in MDA 3
+        'MDAnalysis==2.2', # some features we use will likely be removed in MDA 3
         'biotite',
         'gpcrmining',
     ],
