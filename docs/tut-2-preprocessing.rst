@@ -173,7 +173,7 @@ water density, however the same procedure would be used for ions.
 Files and Directories
 ---------------------
 
-Again, we define the necessary files, and furthermore, we define a selection 
+We use the input files as defined above, and furthermore, we define a selection 
 including the water residue name for the density. To featurize the water density, 
 we must use a trajectory that includes hydrogens, however the density itself 
 does not need hydrogens. It can therefore be useful to preprocess a trajectory 
@@ -182,30 +182,11 @@ densities from a smaller selection.
 
 .. code:: python
 
-    # First we preprocess the trajectories to extract coordinates for protein 
-    # and waters.
-    root_dir = './mor-data'
-    # Simulation A
-    ref_file_a =  root_dir+'/11427_dyn_151.psf'
-    pdb_file_a =  root_dir+'/11426_dyn_151.pdb'
-    trj_file_a = [root_dir+'/11423_trj_151.xtc',
-                  root_dir+'/11424_trj_151.xtc',
-                  root_dir+'/11425_trj_151.xtc']
-    # Simulation B
-    ref_file_b =  root_dir+'/11580_dyn_169.psf'
-    pdb_file_b =  root_dir+'/11579_dyn_169.pdb'
-    trj_file_b = [root_dir+'/11576_trj_169.xtc',
-                  root_dir+'/11577_trj_169.xtc',
-                  root_dir+'/11578_trj_169.xtc']
-    # Base for the selection string for each simulation protein and all waters (OH2)
-    sel_base = "protein or byres name OH2"
+    # Base for the selection string for protein and all waters (OH2)
+    sel_base_water = "protein or byres name OH2"
     # Names of the output files
-    out_name_a = "traj/cond-a_water"
-    out_name_b = "traj/cond-b_water"
-    
-    for subdir in ['traj','plots','vispdb','pca','clusters','results']:
-        if not os.path.exists(subdir):
-            os.makedirs(subdir)
+    out_name_water_a = "traj/condition-a_water"
+    out_name_water_b = "traj/condition-b_water"
  
  
 Aligning Coordinates 
@@ -215,32 +196,50 @@ As waters are not "attached" to the protein, water sites are defined spatially.
 Therefore to locate the same sites for comparative analysis across both protein ensembles, 
 we have to ensure that the protein is aligned across both simulations. 
 
+We first extract the coordinates of the receptor from the trajectory.
+
 .. code:: python
     
-    # Extract the coordinates of the receptor from the trajectory
-    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base)
-    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base)    
-    
-    # Extract the aligned coordinates of the ensemble a aligned to ensemble b 
-    extract_aligned_coords(out_name_a+".gro", out_name_a+".xtc", 
-                           out_name_b+".gro", out_name_b+".xtc")
+    extract_coordinates(
+        ref_file_a, pdb_file_a, trj_file_a,
+        out_name_water_a, sel_base_water
+    )
+    extract_coordinates(
+        ref_file_b, pdb_file_b, trj_file_b,
+        out_name_water_b, sel_base_water
+    )   
+        
+Then we align the coordinates of the ensemble a to the average of ensemble b.
+
+.. code:: python
+
+    extract_aligned_coordinates(
+        out_name_water_a+".gro", out_name_water_a+".xtc",
+        out_name_water_b+".gro", out_name_water_b+".xtc",
+        xtc_aligned = out_name_water_a+"_aligned.xtc",
+        pdb_outname = out_name_water_b+"_average.pdb"
+    )
 
 
 Extracting the Density 
 ----------------------
  
 The density is then extracted from the combined ensemble, in which the solvent 
-cavities are aligned.     
-    
+cavities are aligned.   
+
+We have the option to write out a pseudo-trajectory coordinate array to a memmap.
+This helps us avoid memory errors with large python arrays.
+
 .. code:: python
     
-    # Extract the combined density of the waters in both ensembles a and b 
-    extract_combined_grid(out_name_a+".gro", "dens/cond-a_wateraligned.xtc", 
-                          out_name_b+".gro", out_name_b+".xtc",
-                          atomgroup="OH2",
-                          write_grid_as="TIP3P",
-                          out_name= "ab_grid_")
+    extract_combined_grid(
+        out_name_water_a+".gro", out_name_water_a+"_aligned.xtc",
+        out_name_water_b+".gro", out_name_water_b+".xtc",
+        atomgroup="OH2", write_grid_as="TIP3P",
+        out_name="traj/water_grid_ab_",
+        use_memmap=True, memmap='traj/combined.mymemmap'
+    )
                           
 This density can now be used to locate and featurize the same water pockets in 
 both individual simulations, even if a water site only exists in one simulation. 
-                          
+                       
