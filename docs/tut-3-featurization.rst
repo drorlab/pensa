@@ -156,8 +156,8 @@ water
 
 .. code:: python
     
-    struc = "traj/cond-a_water.gro"
-    xtc = "traj/cond-a_water.gro"
+    struc = "traj/condition-a_water.gro"
+    xtc = "traj/condition-a_water.gro"
     water_feat, water_data = read_water_features(
         structure_input = struc, 
         xtc_input = xtc,
@@ -165,19 +165,18 @@ water
         atomgroup = "OH2",
         write = True,
         write_grid_as="TIP3P",
-        out_name = "11426_dyn_151"
+        out_name = "features/11426_dyn_151_water"
     )
 
 To featurize sites common to both ensembles, we obtain the density grid 
-following the preprocessing steps in the density tutorial. This is then input 
-and waters are featurized according to the combined ensemble density. Sites are 
-therefore conserved across both ensembles and can be compared.
+following the steps in the density section of the preprocessing tutorial. 
+This way, sites are the same across both ensembles and can be compared.
 
 .. code:: python
 
-    struc = "traj/cond-a_water.gro"
-    xtc = "dens/cond-a_wateraligned.xtc"
-    grid = "dens/ab_grid_OH2_density.xtc"
+    struc = "traj/condition-a_water.gro"
+    xtc = "traj/condition-a_water_aligned.xtc"
+    grid = "traj/water_grid_ab_OH2_density.dx"
     water_feat, water_data = read_water_features(
         structure_input = struc,
         xtc_input = xtc,
@@ -187,10 +186,8 @@ therefore conserved across both ensembles and can be compared.
     )
 
 
-
 Single-Atom Features
 ********************
-
 
 For single atoms we use a similar function which provides the same functionality 
 but ignores orientations as atoms are considered spherically symmetric.
@@ -213,9 +210,6 @@ written (write=True) using the default density conversion "Angstrom^{-3}" in MDA
         atomgroup = "SOD",
         element = "Na",
         write = True,
-        out_name = "11426_dyn_151"
+        out_name = "features/11426_dyn_151_sodium"
     )
-                                              
-                                              
-                                              
-                                              
+                                            
