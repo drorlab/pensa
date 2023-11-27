@@ -68,10 +68,8 @@ def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms
     u = mda.Universe(structure_input, xtc_input)
 
     if write is True:
-        if not os.path.exists('atom_features/'):
-            os.makedirs('atom_features/')
         p = u.select_atoms("protein")
-        pdb_outname = 'atom_features/' + out_name + "_AtomSites.pdb"
+        pdb_outname = out_name + "_AtomSites.pdb"
         p_avg = np.zeros_like(p.positions)
         # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
         for ts in u.trajectory:
@@ -128,13 +126,13 @@ def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms
         shifted_coords = coords[atom_no] + g.origin
         point_str = str(shifted_coords)[1:-1]
 
-        # Find all water atoms within 2.5 Angstroms of density maxima
+        # Find all atoms within 2.5 Angstroms of density maxima
         for i in tqdm(range(len(u.trajectory))):
             u.trajectory[i]
             radius = ' 2.5'
             atomgroup_IDS = list(u.select_atoms('name ' + atomgroup + ' and point ' + point_str + radius).indices)
             if len(atomgroup_IDS) == 0:
-                atomgroup_IDS[-1]
+                atomgroup_IDS = [-1]
             counting.append(atomgroup_IDS)
 
         # Atom indices that appear in the atom site
@@ -149,8 +147,8 @@ def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms
 
         # Write data out and visualize atom sites in pdb
         if write is True:
-            data_out('atom_features/' + out_name + atom_ID + '.txt', [counting])
-            data_out('atom_features/' + out_name + element + 'AtomsSummary.txt', atom_information)
+            data_out(out_name + atom_ID + '.txt', [counting])
+            data_out(out_name + element + '_AtomsSummary.txt', atom_information)
             write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
 
             u_pdb = mda.Universe(pdb_outname)
