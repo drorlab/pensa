@@ -112,10 +112,8 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
     u = mda.Universe(structure_input, xtc_input)
 
     if write is True:
-        if not os.path.exists('water_features/'):
-            os.makedirs('water_features/')
         p = u.select_atoms("protein")
-        pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
+        pdb_outname = out_name + "_WaterSites.pdb"
         p_avg = np.zeros_like(p.positions)
         # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
         for ts in u.trajectory:
@@ -210,8 +208,8 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
         # Write data out and visualize water sites in pdb
         if write is True:
-            data_out('water_features/' + out_name + water_ID + '.txt', water_out)
-            data_out('water_features/' + out_name + 'WatersSummary.txt', water_information)
+            data_out(out_name + water_ID + '.txt', water_out)
+            data_out(out_name + '_WaterSummary.txt', water_information)
             write_atom_to_pdb(pdb_outname, atom_location, water_ID, atomgroup)
             u_pdb = mda.Universe(pdb_outname)
             u_pdb.add_TopologyAttr('tempfactors')
