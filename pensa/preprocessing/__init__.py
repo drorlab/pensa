@@ -15,7 +15,7 @@ from .download import \
     get_transmem_from_uniprot
 
 from .density import \
-    extract_aligned_coords, \
+    extract_aligned_coordinates, \
     extract_combined_grid, \
     generate_grid, \
     dens_grid_pdb, \
