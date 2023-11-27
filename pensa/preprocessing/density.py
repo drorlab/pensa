@@ -288,10 +288,8 @@ def generate_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=Tru
     g = D.density
     # Write the grid if requested
     if write_grid_as is not None:
-        if not os.path.exists('dens/'):
-            os.makedirs('dens/')
         D.density.convert_density(write_grid_as)
-        D.density.export('dens/' + out_name + atomgroup + "_density.dx", type="double")
+        D.density.export(out_name + atomgroup + "_density.dx", type="double")
 
     return g
 
@@ -338,10 +336,8 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
     u = mda.Universe(structure_input, xtc_input)
 
     if write:
-        if not os.path.exists('water_features/'):
-            os.makedirs('water_features/')
         p = u.select_atoms("protein")
-        pdb_outname = 'water_features/' + out_name + "_WaterSites.pdb"
+        pdb_outname = out_name + "_WaterSites.pdb"
         p_avg = np.zeros_like(p.positions)
         # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
         for ts in u.trajectory:
