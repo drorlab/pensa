@@ -107,7 +107,7 @@ def local_maxima_3D(data, order=1):
 
 
 def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_as, out_name,
-                          prot_prox=True, use_memmap=False):
+                          prot_prox=True, use_memmap=False, memmap='combined_traj.mymemmap'):
     """
     Writes out combined atomgroup density for both input simulations.
 
@@ -134,6 +134,8 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         Uses numpy memmap to write out a pseudo-trajectory coordinate array.
         This is used for large trajectories to avoid memory errors with large
         python arrays. The default is False.
+    memmap : str, default='combined_traj.mymemmap'
+        The numpy memmap file for the combined pseudo-trajectory.
 
     """
     condition_a = mda.Universe(struc_a, xtc_a)
@@ -149,7 +151,7 @@ def extract_combined_grid(struc_a, xtc_a, struc_b, xtc_b, atomgroup, write_grid_
         # The shape for memmap pseudo-trajetcory
         array_shape = [smallest_traj_len, len(condition_a.atoms) + len(condition_b.atoms), 3]
         # Write out pseudo-trajetcory
-        merged_coords = np.memmap('combined_traj.mymemmap', dtype='float32', mode='w+',
+        merged_coords = np.memmap(memmap, dtype='float32', mode='w+',
                                   shape=(array_shape[0], array_shape[1], array_shape[2]))
         # Creating universe with blank timesteps from pseudo-trajectory
         combined_conditions.load_new(merged_coords, format=MemoryReader)
