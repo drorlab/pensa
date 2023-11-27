@@ -147,8 +147,8 @@ def read_atom_features(structure_input, xtc_input, atomgroup, element, top_atoms
 
         # Write data out and visualize atom sites in pdb
         if write is True:
-            data_out(out_name + atom_ID + '.txt', [counting])
-            data_out(out_name + element + '_AtomsSummary.txt', atom_information)
+            data_out(out_name + '_' + atom_ID + '.txt', [counting])
+            data_out(out_name + '_' + element + '_AtomsSummary.txt', atom_information)
             write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup)
 
             u_pdb = mda.Universe(pdb_outname)

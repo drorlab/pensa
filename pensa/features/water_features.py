@@ -208,7 +208,7 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
         # Write data out and visualize water sites in pdb
         if write is True:
-            data_out(out_name + water_ID + '.txt', water_out)
+            data_out(out_name + '_' + water_ID + '.txt', water_out)
             data_out(out_name + '_WaterSummary.txt', water_information)
             write_atom_to_pdb(pdb_outname, atom_location, water_ID, atomgroup)
             u_pdb = mda.Universe(pdb_outname)

@@ -289,7 +289,7 @@ def generate_grid(u, atomgroup, write_grid_as=None, out_name=None, prot_prox=Tru
     # Write the grid if requested
     if write_grid_as is not None:
         D.density.convert_density(write_grid_as)
-        D.density.export(out_name + atomgroup + "_density.dx", type="double")
+        D.density.export(out_name + '_' + atomgroup + "_density.dx", type="double")
 
     return g
 
@@ -405,7 +405,7 @@ def dens_grid_pdb(structure_input, xtc_input, atomgroup, top_atoms=35,
             u_pdb.atoms.write(pdb_outname)
 
     # Return the dictionaries.
-    return print('Pdb file completed.')
+    return print('PDB file completed.')
 
 
 def write_atom_to_pdb(pdb_outname, atom_location, atom_ID, atomgroup):
