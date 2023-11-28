@@ -2,7 +2,7 @@ import os
 from pensa.preprocessing import \
     download_from_gpcrmd, \
     extract_coordinates, \
-    extract_aligned_coords, \
+    extract_aligned_coordinates, \
     extract_combined_grid
 from pensa.features import \
     read_structure_features, \
