@@ -142,7 +142,7 @@ extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a, sel_base_a)
 extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b, sel_base_b)
 
 # Extract the coordinates of the ensemble a aligned to ensemble b
-extract_aligned_coords(
+extract_aligned_coordinates(
     out_name_a + ".gro", out_name_a + ".xtc",
     out_name_b + ".gro", out_name_b + ".xtc"
 )
