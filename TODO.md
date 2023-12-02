@@ -4,18 +4,6 @@
   - [ ] Trivial examples for each function
   - [ ] Unit tests for SSI 
   - [ ] Unit tests for density features
-- [ ] Unified tutorial in documentation. Make one page for each subpackage
-  - [x] preprocessing
-    - [x] coordinates
-    - [x] densities
-  - [x] featurization
-    - [x] structure features
-    - [x] water features
-    - [x] atom features
-  - [x] comparison
-  - [x] dimensionality reduction
-  - [ ] clusters (show how to cluster on PCs)
-  - [x] SSI
 
 ### Plans
 - [ ] More example tcl scripts for VMD 
@@ -24,6 +12,10 @@
   - [ ] with respect to a reference ensemble (will not always work for KLD)
 - [ ] Use MDAnalysis instead of biotite for water featurization
 - [ ] Weighted PCA/tICA? (to account for varying simulation lengths or uncertainty) 
+- [ ] Make file format (png/pdf?) for matplotlib optional.
+
+### Ideas
+- [ ] Logo
 - [ ] Implement T-distributed Stochastic Neighbor Embedding (t-SNE)
   - [ ] Read up on [t-SNE for molecular trajectories](https://www.frontiersin.org/articles/10.3389/fmolb.2020.00132/full)
   - [ ] See if we can import or adapt [existing code](https://github.com/spiwokv/tltsne).
@@ -36,12 +28,6 @@
   - [ ] First tests
   - [ ] write module
   - [ ] write unit tests
-- [ ] Make file format (png/pdf?) for matplotlib optional.
-- [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis).
-- [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
-
-### Ideas
-- [ ] Logo
 - [ ] Contacts as features 
   - [ ] Think about a [GetContacts](https://getcontacts.github.io/) reader
 - [ ] Position deviations as features (similar to components of RMSD)
@@ -61,7 +47,9 @@
 - [ ] Try to integrate [network analysis](https://aip.scitation.org/doi/full/10.1063/5.0020974).
 - [ ] Try to integrate [Deep learning the slow modes for rare events sampling](https://www.pnas.org/content/118/44/e2113533118)
 - [ ] Check out [correlationplus](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00742)
-- [ ] Improve clusering using [Gaussian Mixture Models](https://arxiv.org/abs/2112.11424)
+- [ ] Improve clustering using [Gaussian Mixture Models](https://arxiv.org/abs/2112.11424)
+- [ ] Implement [Linear Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis).
+- [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
 
 ### Done  ✓
 - [x] Colab Tutorial
@@ -90,6 +78,12 @@
 - [x] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for clustering.
 - [x] Use scikit-learn or [Deeptime](https://deeptime-ml.github.io/latest/index.html) instead of PyEMMA for dimensionality reduction.
 - [x] exploratory analysis via correlation coefficients of the features
+- [x] Unified tutorial in documentation.
+  - [x] preprocessing
+  - [x] featurization
+  - [x] comparison
+  - [x] dimensionality reduction and clusters 
+  - [x] SSI
 
 ### Abandoned
 - [ ] Frame classification via CNN on features
