@@ -1,7 +1,7 @@
 Introduction
 ============
 
-in this tutorial, we show some common functions included in PENSA, using trajectories of a G protein-coupled receptor (GPCR). We retrieve the molecular dynamics trajectories for this tutorial from `GPCRmd <https://submission.gpcrmd.org/home/>`_, an online platform for collection and curation of GPCR simulations. It is described in more detail `here <https://www.nature.com/articles/s41592-020-0884-y>`_.
+in this tutorial, we show some common functions included in PENSA, using trajectories of a G protein-coupled receptor (GPCR). We retrieve the molecular dynamics trajectories for this tutorial from `GPCRmd <https://www.gpcrmd.org/>`_, an online platform for collection and curation of GPCR simulations. It is described in more detail `here <https://www.nature.com/articles/s41592-020-0884-y>`_.
 
 .. image:: https://pbs.twimg.com/media/Ej8-VJ5WkAAbgJc?format=jpg&name=large
   :width: 500
