@@ -1,3 +1,4 @@
+Jinja2<3.1
 Sphinx==3.1.2
 sphinx_rtd_theme==0.5.1
 sphinxcontrib-applehelp==1.0.2
