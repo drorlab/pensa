@@ -1,7 +1,9 @@
 What is PENSA?
 ==============
 
-PENSA is a collection of python methods for exploratory analysis and comparison of protein structural ensembles, e.g., from molecular dynamics simulations.
+
+PENSA is a collection of python methods for exploratory analysis and comparison of biomolecular conformational ensembles, e.g., from molecular dynamics simulations.
+
 
 Functionality
 *************
@@ -13,16 +15,25 @@ With PENSA, you can (currently):
 - **cluster structures across ensembles** via k-means or regular-space clustering and write out the resulting clusters as trajectories.
 - trace allosteric information flow through a protein using **state-specific information** analysis methods.
 
-All functionality is available as a python package. For the most common applications, example `python scripts <https://github.com/drorlab/pensa/tree/master/scripts>`_ are provided. 
+Biomolecules can be featurized using backbone torsions, sidechain torsions, or arbitrary distances (e.g., between all backbone C-alpha atoms). 
+We also provide density-based methods to featurize water and ion pockets as well as a featurizer for hydrogen bonds. 
+The library is modular so you can easily write your own feature reader.
 
-To make yourself familiar with PENSA's functionality, see the `tutorial <https://pensa.readthedocs.io/en/latest/tut-1-intro.html>`_.
+PENSA also includes trajectory processing tools based on MDAnalysis and plotting functions using Matplotlib.
+
+All functionality is available as a python package. 
+
 
 Citation
 ********
 
-If you publish about work for which PENSA was useful, please cite it accordingly.
+If you publish about work for which PENSA was useful, please cite our [preprint](https://arxiv.org/abs/2212.02714):
 
-The general citation, representing the "concept" of the software is the following:
+    Systematic Analysis of Biomolecular Conformational Ensembles with PENSA
+    M. Vögele, N. J. Thomson, S. T. Truong, J. McAvity, U. Zachariae, R. O. Dror
+    arXiv:2212.02714 [q-bio.BM] 2022
+
+The reference for the software implementation itself is the following:
 
     Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity. (2021). PENSA. Zenodo. http://doi.org/10.5281/zenodo.4362136
 
