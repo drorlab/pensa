@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='pensa',
     version='0.3.0',
-    description='PENSA - Protein ENSemble Analysis',
+    description='exploratory analysis and comparison of biomolecular conformational ensembles.',
     url='http://github.com/drorlab/pensa',
     author='Martin Voegele, Neil Thomson, Sang Truong, Jasper McAvity',
     author_email='martinvoegele1989@gmail.com',
@@ -21,7 +21,7 @@ setup(
     ),
     zip_safe=False,
     install_requires=[
-        'numpy==1.22', # because density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
+        'numpy==1.22', # density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
         'scipy>=1.2',
         'pandas',
         'matplotlib',
