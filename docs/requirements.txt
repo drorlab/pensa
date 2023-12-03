@@ -6,12 +6,12 @@ sphinxcontrib-htmlhelp==1.0.3
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
-numpy
+numpy==1.22
 scipy>=1.2
 matplotlib
 deeptime
-MDAnalysis
+MDAnalysis==2.2
 scikit-learn
 cython
 biotite
-pensa
+pensa==0.3.0
