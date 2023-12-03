@@ -27,11 +27,11 @@ All functionality is available as a python package.
 Citation
 ********
 
-If you publish about work for which PENSA was useful, please cite our [preprint](https://arxiv.org/abs/2212.02714):
+If you publish about work for which PENSA was useful, please cite our preprint:
 
     Systematic Analysis of Biomolecular Conformational Ensembles with PENSA
     M. Vögele, N. J. Thomson, S. T. Truong, J. McAvity, U. Zachariae, R. O. Dror
-    arXiv:2212.02714 [q-bio.BM] 2022
+    `arXiv:2212.02714 [q-bio.BM] 2022 <https://arxiv.org/abs/2212.02714>`_.
 
 The reference for the software implementation itself is the following:
 
