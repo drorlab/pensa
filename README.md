@@ -22,7 +22,9 @@ With PENSA, you can (currently):
 - __cluster structures across ensembles__ via k-means or regular-space clustering and write out the resulting clusters as trajectories.
 - trace allosteric information flow through a protein using __state-specific information__ analysis methods.
 
-Biomolecules can be featurized using backbone torsions, sidechain torsions, or arbitrary distances (e.g., between all backbone C-alpha atoms) and we provide density-based methods to featurize water and ion pockets. PENSA also includes trajectory processing tools based on [MDAnalysis](https://www.mdanalysis.org/) and plotting functions using [Matplotlib](https://matplotlib.org/).
+Biomolecules can be featurized using backbone torsions, sidechain torsions, or arbitrary distances (e.g., between all backbone C-alpha atoms). We also provide density-based methods to featurize water and ion pockets as well as a featurizer for hydrogen bonds. The library is modular so you can easily write your own feature reader.
+
+PENSA also includes trajectory processing tools based on [MDAnalysis](https://www.mdanalysis.org/) and plotting functions using [Matplotlib](https://matplotlib.org/).
 
 ## Documentation
 PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/), where you find installation instructions, API documentation, and a tutorial.
