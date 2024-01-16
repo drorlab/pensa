@@ -7,9 +7,25 @@ import os
 from pensa.preprocessing.density import generate_grid, local_maxima_3D, write_atom_to_pdb
 
 
-# ----------------------
+
+# -------------------
 #  Helper Functions
-#
+# -------------------
+
+
+def name_atom_features(u, atom_ids, feature_type='H-DON', naming='plain'):
+    atom_names = []
+    for id in atom_ids:
+        at = u.select_atoms('index %i' % id)[0]
+        if naming == 'chainid':
+            at_label = '%s %s %s %s' % (at.chainID, at.residue.resname, at.resid, at.name)
+        elif naming == 'segid':
+            at_label = '%s %s %s %s' % (at.segid, at.residue.resname, at.resid, at.name)
+        else:
+            at_label = '%s %s %s' % (at.residue.resname, at.resid, at.name)
+        atom_names.append('%s: %s' % (feature_type, at_label))
+    return atom_names
+
 
 def name_pairs(u, all_pairs, pair_type='HBOND', naming='plain'):
     pair_names = []
@@ -32,7 +48,8 @@ def name_pairs(u, all_pairs, pair_type='HBOND', naming='plain'):
 
 # ----------------------------------------------------
 #  Functions based on a distance-and-angle criterion
-#
+# ----------------------------------------------------
+
 
 def read_h_bonds(structure_input, xtc_input, selection1, selection2, naming='plain'):
     """
@@ -92,7 +109,7 @@ def read_h_bonds(structure_input, xtc_input, selection1, selection2, naming='pla
 
 # -----------------------------------------------
 #  Functions based on a distance-only criterion
-#
+# -----------------------------------------------
 
 
 def atg_to_names(atg):
