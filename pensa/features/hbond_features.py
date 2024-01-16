@@ -258,7 +258,7 @@ def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
     return feature_names, features_data
 
 
-def read_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None, out_name=None):
+def read_h_bonds_quickly(structure_input, xtc_input, fixed_group, dyn_group):
     """
     Find hydrogen bonding partners for atomgroup1 in atomgroup2.
 
@@ -273,33 +273,20 @@ def read_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None,
     dyn_group: str
         Atomgroup selection to find bonding partners within.
 
-    write : bool, optional
-        If true, the following data will be written out: reference pdb with occupancies,
-        water distributions, water data summary. The default is None.
-    out_name : str, optional
-        Prefix for all written filenames. The default is None.
-
     Returns
     -------
-        feature_names : list of str
-            Names of all bonds
-        features_data : numpy array
-            Data for all bonds
+    feature_names : list of str
+        Names of all bonds
+    features_data : numpy array
+        Data for all bonds
 
     """
-
-    if write is not None:
-        if out_name is None:
-            print('WARNING: You are writing results without providing out_name.')
 
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
 
     u = mda.Universe(structure_input, xtc_input)
-    if write is True:
-        if not os.path.exists('lig_hbonds/'):
-            os.makedirs('lig_hbonds/')
 
     # First locate all potential bonding sites
     interacting_atoms1 = fixed_group
@@ -379,25 +366,6 @@ def read_h_bonds(structure_input, xtc_input, fixed_group, dyn_group, write=None,
         for pair in range(len(all_acceptor_pairs)):
             if list(reversed(all_acceptor_pairs[pair])) in [flat for sub in all_bonds[1][frame_no] for flat in sub]:
                 acceptor_dist[pair][frame_no] = 1
-
-    # Write data out and visualize water sites in pdb
-    if write is True:
-        np.savetxt(
-            'lig_hbonds/' + out_name + 'all_donor_pair_names.txt',
-            np.array(all_donor_pair_names, dtype=object), fmt='%s'
-        )
-        np.savetxt(
-            'lig_hbonds/' + out_name + 'all_acceptor_pair_names.txt',
-            np.array(all_acceptor_pair_names, dtype=object), fmt='%s'
-        )
-        np.savetxt(
-            'lig_hbonds/' + out_name + 'all_donor_pair_data.txt',
-            np.array(donor_dist, dtype=object), fmt='%s'
-        )
-        np.savetxt(
-            'lig_hbonds/' + out_name + 'all_acceptor_pair_data.txt',
-            np.array(acceptor_dist, dtype=object), fmt='%s'
-        )
 
     feature_names['donor_names'] = np.array(all_donor_pair_names)
     feature_names['acceptor_names'] = np.array(all_acceptor_pair_names)
