@@ -1,8 +1,3 @@
-"""
-Created on Fri May  6 12:03:52 2022
-
-@author: neil
-"""
 import MDAnalysis as mda
 from MDAnalysis.analysis.hydrogenbonds.hbond_analysis import (HydrogenBondAnalysis as HBA)
 import numpy as np
@@ -12,8 +7,140 @@ import os
 from pensa.preprocessing.density import generate_grid, local_maxima_3D, write_atom_to_pdb
 
 
+# -----------------------------------------------
+#  Functions based on a distance-only criterion
+#
+
+
+def atg_to_names(atg):
+    idxes = [7, 10, 2]
+    all_atgs = []
+    print(atg)
+    for line in range(len(atg)):
+        stringdex = [str(atg[line]).split(' ')[idx] for idx in idxes]
+        all_atgs.append(stringdex[-1][:-1] + " " + stringdex[1] + " " + stringdex[2])
+    return all_atgs
+
+
 def _unique_bonding_pairs(lst):
     return ([list(i) for i in {* [tuple(sorted(i)) for i in lst]}])
+
+
+def read_h_bonds_quickly(structure_input, xtc_input, fixed_group, dyn_group):
+    """
+    Find hydrogen bonding partners for atomgroup1 in atomgroup2.
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (TPR format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    fixed_group : str
+        Atomgroup selection to find bonding partners for.
+    dyn_group: str
+        Atomgroup selection to find bonding partners within.
+
+    Returns
+    -------
+    feature_names : list of str
+        Names of all bonds
+    features_data : numpy array
+        Data for all bonds
+
+    """
+
+    # Initialize the dictionaries.
+    feature_names = {}
+    features_data = {}
+
+    u = mda.Universe(structure_input, xtc_input)
+
+    # First locate all potential bonding sites
+    interacting_atoms1 = fixed_group
+    # locate all potential bonding sites for atomgroups
+    hbond = HBA(universe=u)
+    atomgroup_donors1 = hbond.guess_hydrogens(interacting_atoms1)
+    atomgroup_acceptors1 = hbond.guess_acceptors(interacting_atoms1)
+
+    interacting_atoms2 = dyn_group + " and around 3.5 " + fixed_group
+    interacting_atoms2_idx = u.select_atoms(interacting_atoms2, updating=True).indices
+    int2group = 'index ' + ' or index '.join([str(ind) for ind in interacting_atoms2_idx])
+    # locate all potential bonding sites for atomgroups
+    hbond = HBA(universe=u)
+    atomgroup_donors2 = hbond.guess_hydrogens(int2group)
+    atomgroup_acceptors2 = hbond.guess_acceptors(int2group)
+    # print(atomgroup_donors2)
+
+    donor1_idcs = u.select_atoms(atomgroup_donors1).indices
+    acceptor1_idcs = u.select_atoms(atomgroup_acceptors1).indices
+    donor2_idcs = u.select_atoms(atomgroup_donors2).indices
+    acceptor2_idcs = u.select_atoms(atomgroup_acceptors2).indices
+
+    # First locate all potential bonding sites for atomgroups
+    # bonds for [[atomgroup1 donors] , [atomgroup1 acceptors]]
+    all_bonds = [[], []]
+    for frame_no in tqdm(range(len(u.trajectory))):
+        # find the frame
+        u.trajectory[frame_no]
+
+        # obtain indices for all donor and acceptor atoms
+        frame_bonds = []
+        for donor1_idx in donor1_idcs:
+            idx_bonds = []        # find donor positions
+            donor1_pos = np.array(u.select_atoms("index " + str(donor1_idx)).positions)
+            for acceptor2_idx in acceptor2_idcs:
+                # find acceptor positions
+                acceptor2_pos = np.array(u.select_atoms("index " + str(acceptor2_idx)).positions)
+                # if distance between atoms less than 3.5 angstrom then count as bond
+                if np.linalg.norm(donor1_pos - acceptor2_pos) < 3.5:
+                    idx_bonds.append([donor1_idx, acceptor2_idx])
+            # print(idx_bonds)
+            frame_bonds.append(idx_bonds)
+            # print(frame_bonds)
+            all_bonds[0].append(frame_bonds)
+
+        frame_bonds = []
+        for donor2_idx in donor2_idcs:
+            idx_bonds = []
+            # find donor positions
+            donor2_pos = np.array(u.select_atoms("index " + str(donor2_idx)).positions)
+            for acceptor1_idx in acceptor1_idcs:
+                # find acceptor positions
+                acceptor1_pos = np.array(u.select_atoms("index " + str(acceptor1_idx)).positions)
+                # if distance between atoms less than 3.5 angstrom then count as bond
+                if np.linalg.norm(donor2_pos - acceptor1_pos) < 3.5:
+                    idx_bonds.append([donor2_idx, acceptor1_idx])
+            # print(idx_bonds)
+            frame_bonds.append(idx_bonds)
+            # print(frame_bonds)
+            all_bonds[1].append(frame_bonds)
+
+    all_donor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
+    all_acceptor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
+
+    all_donor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
+                             atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_donor_pairs]
+    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
+                                atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_acceptor_pairs]
+
+    donor_dist = np.zeros((len(all_donor_pairs), len(u.trajectory)))
+    acceptor_dist = np.zeros((len(all_acceptor_pairs), len(u.trajectory)))
+
+    for frame in tqdm(range(len(u.trajectory))):
+        for pair in range(len(all_donor_pairs)):
+            if list(reversed(all_donor_pairs[pair])) in [flat for sub in all_bonds[0][frame_no] for flat in sub]:
+                donor_dist[pair][frame_no] = 1
+        for pair in range(len(all_acceptor_pairs)):
+            if list(reversed(all_acceptor_pairs[pair])) in [flat for sub in all_bonds[1][frame_no] for flat in sub]:
+                acceptor_dist[pair][frame_no] = 1
+
+    feature_names['donor_names'] = np.array(all_donor_pair_names)
+    feature_names['acceptor_names'] = np.array(all_acceptor_pair_names)
+    features_data['donor_data'] = np.array(donor_dist)
+    features_data['acceptor_data'] = np.array(acceptor_dist)
+
+    return feature_names, features_data
 
 
 def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
@@ -256,130 +383,3 @@ def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
             np.sum(np.array(bondouts[1][1], dtype=object), axis=1) / len(u.trajectory)
 
     return feature_names, features_data
-
-
-def read_h_bonds_quickly(structure_input, xtc_input, fixed_group, dyn_group):
-    """
-    Find hydrogen bonding partners for atomgroup1 in atomgroup2.
-
-    Parameters
-    ----------
-    structure_input : str
-        File name for the reference file (TPR format).
-    xtc_input : str
-        File name for the trajectory (xtc format).
-    fixed_group : str
-        Atomgroup selection to find bonding partners for.
-    dyn_group: str
-        Atomgroup selection to find bonding partners within.
-
-    Returns
-    -------
-    feature_names : list of str
-        Names of all bonds
-    features_data : numpy array
-        Data for all bonds
-
-    """
-
-    # Initialize the dictionaries.
-    feature_names = {}
-    features_data = {}
-
-    u = mda.Universe(structure_input, xtc_input)
-
-    # First locate all potential bonding sites
-    interacting_atoms1 = fixed_group
-    # locate all potential bonding sites for atomgroups
-    hbond = HBA(universe=u)
-    atomgroup_donors1 = hbond.guess_hydrogens(interacting_atoms1)
-    atomgroup_acceptors1 = hbond.guess_acceptors(interacting_atoms1)
-
-    interacting_atoms2 = dyn_group + " and around 3.5 " + fixed_group
-    interacting_atoms2_idx = u.select_atoms(interacting_atoms2, updating=True).indices
-    int2group = 'index ' + ' or index '.join([str(ind) for ind in interacting_atoms2_idx])
-    # locate all potential bonding sites for atomgroups
-    hbond = HBA(universe=u)
-    atomgroup_donors2 = hbond.guess_hydrogens(int2group)
-    atomgroup_acceptors2 = hbond.guess_acceptors(int2group)
-    # print(atomgroup_donors2)
-
-    donor1_idcs = u.select_atoms(atomgroup_donors1).indices
-    acceptor1_idcs = u.select_atoms(atomgroup_acceptors1).indices
-    donor2_idcs = u.select_atoms(atomgroup_donors2).indices
-    acceptor2_idcs = u.select_atoms(atomgroup_acceptors2).indices
-
-    # First locate all potential bonding sites for atomgroups
-    # bonds for [[atomgroup1 donors] , [atomgroup1 acceptors]]
-    all_bonds = [[], []]
-    for frame_no in tqdm(range(len(u.trajectory))):
-        # find the frame
-        u.trajectory[frame_no]
-
-        # obtain indices for all donor and acceptor atoms
-        frame_bonds = []
-        for donor1_idx in donor1_idcs:
-            idx_bonds = []        # find donor positions
-            donor1_pos = np.array(u.select_atoms("index " + str(donor1_idx)).positions)
-            for acceptor2_idx in acceptor2_idcs:
-                # find acceptor positions
-                acceptor2_pos = np.array(u.select_atoms("index " + str(acceptor2_idx)).positions)
-                # if distance between atoms less than 3.5 angstrom then count as bond
-                if np.linalg.norm(donor1_pos - acceptor2_pos) < 3.5:
-                    idx_bonds.append([donor1_idx, acceptor2_idx])
-            # print(idx_bonds)
-            frame_bonds.append(idx_bonds)
-            # print(frame_bonds)
-            all_bonds[0].append(frame_bonds)
-
-        frame_bonds = []
-        for donor2_idx in donor2_idcs:
-            idx_bonds = []
-            # find donor positions
-            donor2_pos = np.array(u.select_atoms("index " + str(donor2_idx)).positions)
-            for acceptor1_idx in acceptor1_idcs:
-                # find acceptor positions
-                acceptor1_pos = np.array(u.select_atoms("index " + str(acceptor1_idx)).positions)
-                # if distance between atoms less than 3.5 angstrom then count as bond
-                if np.linalg.norm(donor2_pos - acceptor1_pos) < 3.5:
-                    idx_bonds.append([donor2_idx, acceptor1_idx])
-            # print(idx_bonds)
-            frame_bonds.append(idx_bonds)
-            # print(frame_bonds)
-            all_bonds[1].append(frame_bonds)
-
-    all_donor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[0] for x in sub] for y in subl])
-    all_acceptor_pairs = _unique_bonding_pairs([y for subl in [x for sub in all_bonds[1] for x in sub] for y in subl])
-
-    all_donor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
-                             atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_donor_pairs]
-    all_acceptor_pair_names = [[atg_to_names(u.select_atoms('index ' + str(i[0])))[0],
-                                atg_to_names(u.select_atoms('index ' + str(i[1])))[0]] for i in all_acceptor_pairs]
-
-    donor_dist = np.zeros((len(all_donor_pairs), len(u.trajectory)))
-    acceptor_dist = np.zeros((len(all_acceptor_pairs), len(u.trajectory)))
-
-    for frame in tqdm(range(len(u.trajectory))):
-        for pair in range(len(all_donor_pairs)):
-            if list(reversed(all_donor_pairs[pair])) in [flat for sub in all_bonds[0][frame_no] for flat in sub]:
-                donor_dist[pair][frame_no] = 1
-        for pair in range(len(all_acceptor_pairs)):
-            if list(reversed(all_acceptor_pairs[pair])) in [flat for sub in all_bonds[1][frame_no] for flat in sub]:
-                acceptor_dist[pair][frame_no] = 1
-
-    feature_names['donor_names'] = np.array(all_donor_pair_names)
-    feature_names['acceptor_names'] = np.array(all_acceptor_pair_names)
-    features_data['donor_data'] = np.array(donor_dist)
-    features_data['acceptor_data'] = np.array(acceptor_dist)
-
-    return feature_names, features_data
-
-
-def atg_to_names(atg):
-    idxes = [8, 10, 2]
-    all_atgs = []
-    print(atg)
-    for line in range(len(atg)):
-        stringdex = [str(atg[line]).split(' ')[idx] for idx in idxes]
-        all_atgs.append(stringdex[0][:-1] + " " + stringdex[1] + " " + stringdex[2])
-    return all_atgs
