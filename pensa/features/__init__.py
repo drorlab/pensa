@@ -35,6 +35,7 @@ from .csv_features import \
 from .hbond_features import \
     read_h_bonds, \
     read_h_bonds_quickly, \
+    read_h_bond_satisfaction, \
     read_cavity_bonds
 
 from .processing import \

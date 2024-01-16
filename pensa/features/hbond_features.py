@@ -106,6 +106,80 @@ def read_h_bonds(structure_input, xtc_input, selection1, selection2, naming='pla
     return feature_names, features_data
 
 
+def read_h_bond_satisfaction(structure_input, xtc_input, fixed_group, dyn_group='all', naming='plain'):
+    """
+    Find whether hydrogen-bond donors and acceptors in atom group 1 (fixed) are satisfied by partners in atom group 2 (dynamic).
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (TPR format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    fixed_group : str
+        Atomgroup selection to find bonding partners for.
+    dyn_group: str
+        Atomgroup selection to find bonding partners within.
+    naming : str, default='plain'
+        Naming scheme for each atom in the feature names.
+        plain: neither chain nor segment ID included
+        chainid: include chain ID (only works if chains are defined)
+        segid: include segment ID (only works if segments are defined)
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all H-bond donors and acceptors
+        features_data : numpy array
+            Binary satisfaction data for all donors and acceptors 
+
+    """
+
+    # Find hydrogen bonds between the groups
+    u = mda.Universe(structure_input, xtc_input)
+    hbond = HBA(universe=u, between=[fixed_group, dyn_group])
+    hbonds_mda = hbond.run()
+    hb = hbonds_mda.results.hbonds
+
+    # Find all atoms in the fixed group
+    fixed_group_ids = hbond.between_ags[0][0].indices
+    # Determine all donors in the fixed group
+    all_donors = np.array(np.unique(hb[:,1]), dtype=int)
+    donor_in_fixed = [i in fixed_group_ids for i in all_donors]
+    fixed_donors = all_donors[donor_in_fixed].tolist()
+    # Determine all acceptors in the fixed group
+    all_acceptors = np.array(np.unique(hb[:,3]), dtype=int)
+    acceptor_in_fixed = [i in fixed_group_ids for i in all_acceptors]
+    fixed_acceptors = all_acceptors[acceptor_in_fixed].tolist()
+    
+    # Give the features the corresponding names
+    donor_names = name_atom_features(u, fixed_donors, feature_type='H-DON', naming=naming)
+    acceptor_names = name_atom_features(u, fixed_acceptors, feature_type='H-ACC', naming=naming)
+    
+    # Initialize the arrays for the occupation distributions (binary)
+    donor_data = np.zeros((len(fixed_donors), len(u.trajectory)), dtype=int)
+    acceptor_data = np.zeros((len(fixed_acceptors), len(u.trajectory)), dtype=int)
+    
+    # Go through all bonds and set the corresponding values to one
+    for bond in hb:
+        frame = int(bond[0])
+        donor_id = bond[1]
+        hydrogen_id = bond[2]
+        acceptor_id = bond[3] 
+        if donor_id in fixed_donors:
+            donor_num = np.argwhere([donor_id == id for id in fixed_donors])[0][0]
+            donor_data[donor_num, frame] = 1
+        if acceptor_id in fixed_acceptors:
+            acceptor_num = np.argwhere([acceptor_id == id for id in fixed_acceptors])[0][0]
+            acceptor_data[acceptor_num, frame] = 1
+
+    # Construct the output dictionaries.
+    feature_names = donor_names + acceptor_names
+    features_data = np.concatenate([donor_data, acceptor_data])
+
+    return feature_names, features_data
+
+
 
 # -----------------------------------------------
 #  Functions based on a distance-only criterion
