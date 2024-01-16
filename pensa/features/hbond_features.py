@@ -7,6 +7,89 @@ import os
 from pensa.preprocessing.density import generate_grid, local_maxima_3D, write_atom_to_pdb
 
 
+# ----------------------
+#  Helper Functions
+#
+
+def name_pairs(u, all_pairs, pair_type='HBOND', naming='plain'):
+    pair_names = []
+    for pair in all_pairs:
+        don = u.select_atoms('index ' + str(pair[0]))[0]
+        acc = u.select_atoms('index ' + str(pair[1]))[0]
+        if naming == 'chainid':
+            at_label_don = '%s %s %s %s' % (don.chainID, don.residue.resname, don.resid, don.name)
+            at_label_acc = '%s %s %s %s' % (acc.chainID, acc.residue.resname, acc.resid, acc.name)
+        elif naming == 'segid':
+            at_label_don = '%s %s %s %s' % (don.segid, don.residue.resname, don.resid, don.name)
+            at_label_acc = '%s %s %s %s' % (acc.segid, acc.residue.resname, acc.resid, acc.name)
+        else:
+            at_label_don = '%s %s %s' % (don.residue.resname, don.resid, don.name)
+            at_label_acc = '%s %s %s' % (acc.residue.resname, acc.resid, acc.name)
+        pair_names.append('%s: %s - %s' % (pair_type, at_label_don, at_label_acc))
+    return pair_names
+
+
+
+# ----------------------------------------------------
+#  Functions based on a distance-and-angle criterion
+#
+
+def read_h_bonds(structure_input, xtc_input, selection1, selection2, naming='plain'):
+    """
+    Read hydrogen bonds between two atm groups.
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (TPR format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    selection1 : str
+        Atom group selection to find bonding partners for.
+    selection2: str
+        Atom group selection to find bonding partners within.
+    naming : str, default='plain'
+        Naming scheme for each atom in the feature names.
+        plain: neither chain nor segment ID included
+        chainid: include chain ID (only works if chains are defined)
+        segid: include segment ID (only works if segments are defined)
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all bonds
+        features_data : numpy array
+            Data for all bonds
+
+    """
+
+    # Find hydrogen bonds between the groups
+    u = mda.Universe(structure_input, xtc_input)
+    hbond = HBA(universe=u, between=[selection1, selection2])
+    hbonds_mda = hbond.run()
+    hb = hbonds_mda.results.hbonds
+
+    # Determine all donor-acceptor pairs
+    all_pairs = np.array(np.unique(hb[:,1:4:2], axis=0), dtype=int).tolist()
+    # Determine the corresponding names
+    feature_names = name_pairs(u, all_pairs, pair_type='HBOND', naming=naming)
+    
+    # Initialize the arrays for the occupation distributions (binary)
+    features_data = np.zeros((len(all_pairs), len(u.trajectory)), dtype=int)
+    # Go through all bonds and set the corresponding values to one
+    for bond in hb:
+        frame = int(bond[0])
+        donor_id = bond[1]
+        hydrogen_id = bond[2]
+        acceptor_id = bond[3] 
+        pair = [donor_id, acceptor_id]
+        pair_id = np.argwhere([p == pair for p in all_pairs])[0][0]
+        features_data[pair_id, frame] = 1
+
+    return feature_names, features_data
+
+
+
 # -----------------------------------------------
 #  Functions based on a distance-only criterion
 #
