@@ -36,7 +36,8 @@ from .hbond_features import \
     read_h_bonds, \
     read_h_bonds_quickly, \
     read_h_bond_satisfaction, \
-    read_cavity_bonds
+    read_water_site_h_bonds, \
+    read_water_site_h_bonds_quickly
 
 from .processing import \
     get_feature_subset, \
