@@ -180,6 +180,106 @@ def read_h_bond_satisfaction(structure_input, xtc_input, fixed_group, dyn_group=
     return feature_names, features_data
 
 
+def read_water_site_h_bonds(structure_input, xtc_input, water_o_atom_name, biomol_sel='protein', 
+                            site_IDs=None, grid_input=None, write_grid_as=None, out_name=None):
+    """
+    Find hydrogen bonds between waters occupying cavities and protein.
+
+    Parameters
+    ----------
+    structure_input : str
+        File name for the reference file (TPR format).
+    xtc_input : str
+        File name for the trajectory (xtc format).
+    water_o_atom_name : str
+        Atom name to calculate the density for (usually water oxygen).
+    biomol_sel : str
+        Selection string for the biomolecule that forms the cavity/site. The default is 'protein'
+    site_IDs : list, optional
+        List of indexes for the sites desired to investigate. If none is provided, all sites will be analyzed
+    grid_input : str, optional
+        File name for the density grid input. The default is None, and a grid is automatically generated.
+    write : bool, optional
+        If true, the following data will be written out: reference pdb with occupancies,
+        water distributions, water data summary. The default is None.
+    write_grid_as : str, optional
+        If you choose to write out the grid, you must specify the water model
+        to convert the density into. The default is None. Options are suggested if default.
+    out_name : str, optional
+        Prefix for all written filenames. The default is None.
+
+    Returns
+    -------
+        feature_names : list of str
+            Names of all features
+        features_data : numpy array
+            Data for all features
+
+    """
+
+    # Create the universe
+    u = mda.Universe(structure_input, xtc_input)
+
+    # Create or load the density grid
+    if grid_input is None:
+        g = generate_grid(u, water_o_atom_name, write_grid_as, out_name)
+    else:
+        g = Grid(grid_input)        
+
+    # Write the water binding sites
+    if out_name is not None:
+        p = u.select_atoms(biomol_sel)
+        pdb_outname = out_name + "_WaterSites.pdb"
+        p_avg = np.zeros_like(p.positions)
+        # do a quick average of the protein (in reality you probably want to remove PBC and RMSD-superpose)
+        for ts in u.trajectory:
+            p_avg += p.positions
+        p_avg /= len(u.trajectory)
+        # temporarily replace positions with the average
+        p.positions = p_avg
+        # write average protein coordinates
+        p.write(pdb_outname)
+        # just make sure that we have clean original coordinates again (start at the beginning)
+        u.trajectory.rewind()
+
+    # Get the positions and values of the water sites
+    xyz, val = local_maxima_3D(g.grid)
+    # Negate the array to get probabilities in descending order
+    val_sort = np.argsort(-1 * val.copy())
+    coords = [xyz[max_val] for max_val in val_sort]
+
+    # Initialize the dictionaries.
+    feature_names = {}
+    features_data = {}
+    # Determine the water sites to analyze
+    if site_IDs is None:
+        site_IDs = np.arange(len(coords)) + 1
+
+    # Go through all selected water sites
+    for site_no in site_IDs:
+        # Site numbers are one-based
+        ID_to_idx = site_no - 1
+        # Print the site number
+        print('\nSite no: ', site_no, '\n')
+        # Shifting the coordinates of the maxima by the grid origin to match
+        # the simulation box coordinates
+        shifted_coords = coords[ID_to_idx] + g.origin
+        point_str = str(shifted_coords)[1:-1]
+        # Write the site atom to the PDB
+        if out_name is not None:
+            write_atom_to_pdb(pdb_outname, shifted_coords, 'W' + str(site_no), water_o_atom_name)
+        # Define the atom group for the water binding site
+        # (all water atoms within 3.5 Angstroms of density maxima)
+        site_water = 'byres (name ' + water_o_atom_name + ' and point ' + point_str + ' 3.5)'
+        # Read H-bond donors and acceptors of the binding site that are satisfied by any water in the pocket
+        hb_names, hb_data = read_h_bond_satisfaction(structure_input, xtc_input, biomol_sel, site_water)
+        # append the feature names and timeseries data
+        feature_names['W' + str(site_no)] = hb_names
+        features_data['W' + str(site_no)] = hb_data
+
+    return feature_names, features_data
+
+
 
 # -----------------------------------------------
 #  Functions based on a distance-only criterion
@@ -317,8 +417,8 @@ def read_h_bonds_quickly(structure_input, xtc_input, fixed_group, dyn_group):
     return feature_names, features_data
 
 
-def read_cavity_bonds(structure_input, xtc_input, atomgroups, site_IDs,
-                     grid_input=None, write=None, write_grid_as=None, out_name=None):
+def read_water_site_h_bonds_quickly(structure_input, xtc_input, atomgroups, site_IDs,
+                                    grid_input=None, write=None, write_grid_as=None, out_name=None):
     """
     Find hydrogen bonds between waters occupying cavities and protein.
 
