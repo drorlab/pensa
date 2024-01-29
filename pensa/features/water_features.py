@@ -67,7 +67,7 @@ def _convert_to_dipole(water_atom_positions):
 
 
 def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
-                       grid_input=None, write=None, write_grid_as=None, out_name=None):
+                       grid_input=None, write_grid_as=None, out_name=None):
     """
     Featurize water pockets for the top X most probable waters (top_waters).
 
@@ -83,14 +83,13 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
         Number of waters to featurize. The default is 10.
     grid_input : str, optional
         File name for the density grid input. The default is None, and a grid is automatically generated.
-    write : bool, optional
-        If true, the following data will be written out: reference pdb with occupancies,
-        water distributions, water data summary. The default is None.
     write_grid_as : str, optional
         If you choose to write out the grid, you must specify the water model
         to convert the density into. The default is None. Options are suggested if default.
     out_name : str, optional
         Prefix for all written filenames. The default is None.
+        If not None, the following data will be written out: reference pdb with occupancies,
+        water distributions, water data summary. The default is None. 
 
     Returns
     -------
@@ -101,17 +100,13 @@ def read_water_features(structure_input, xtc_input, atomgroup, top_waters=10,
 
     """
 
-    if write is not None:
-        if out_name is None:
-            print('WARNING: You are writing results without providing out_name.')
-
     # Initialize the dictionaries.
     feature_names = {}
     features_data = {}
 
     u = mda.Universe(structure_input, xtc_input)
 
-    if write is True:
+    if out_name is not None:
         p = u.select_atoms("protein")
         pdb_outname = out_name + "_WaterSites.pdb"
         p_avg = np.zeros_like(p.positions)
