@@ -159,7 +159,7 @@ def align_coordinates(top, pdb, trj_list, out_name, sel_string='all', start_fram
             First frame to read from the trajectory.
     """
     # Read the topology+PDB files and align selected parts.
-    u = mda.Universe(top, pdb)
+    u = mda.Universe(pdb)
     for trj in trj_list:
         mobile = mda.Universe(top, trj)
         # mobile.trajectory = mobile.trajectory[start_frame:]
