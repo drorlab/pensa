@@ -15,15 +15,6 @@ In your custom python script or Jupyter Notebook, import the PENSA methods via
     
 Have a look at one of the example notebooks below that demonstrate the functionality of the library. 
 
-## Example Notebooks
-
-We explain the library in an [example notebook](https://github.com/drorlab/pensa/blob/master/tutorial/PENSA_Tutorial_GPCRmd.ipynb), comparing freely available  mu-Opioid receptor simulations from [GPCRmd](https://submission.gpcrmd.org/home/).
-
-We host an animated version on Google Colab.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1difJjlcwpN-0hSmGCGrPq9Cxq5wJ7ZDa)
-
-
 ## Usage-ready scripts
 
 This tutorial shows the usage of the scripts for the basic applications provided with this repository. 
