@@ -32,12 +32,6 @@ PENSA's documentation pages are [here](https://pensa.readthedocs.io/en/latest/),
 #### Example Scripts
 For the most common applications, example [Python scripts](https://github.com/drorlab/pensa/tree/master/scripts) are provided. We show how to run the example scripts in a short separate [tutorial](https://github.com/drorlab/pensa/tree/master/tutorial).
 
-#### Demo on Google Colab
-We demonstrate how to use the PENSA library in an interactive and animated example on Google Colab, where we use freely available simulations of a mu-Opioid Receptor from GPCRmd.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1msHB6uGeu2tBw_MnAFFTxcxeW4RnR0is)
-
-
 ## Citation
 
 General citation, representing the "concept" of the software:
