@@ -9,6 +9,6 @@
 source /home/users/mvoegele/miniconda3/etc/profile.d/conda.sh
 conda activate /oak/stanford/groups/rondror/users/mvoegele/envs/pensa_dev
 
-# Run the tests (ignoring diffnets for now)
+# Run the tests 
 pytest 
 
