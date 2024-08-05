@@ -9,6 +9,7 @@ sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
 numpy==1.22
 scipy>=1.2
+pandas==1.4
 matplotlib
 deeptime
 MDAnalysis==2.2
