@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'numpy==1.22', # density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
         'scipy>=1.2',
-        'pandas',
+        'pandas==1.4',
         'matplotlib',
         'deeptime',
         'MDAnalysis==2.2', # some features we use will likely be removed in MDA 3
