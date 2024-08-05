@@ -8,12 +8,11 @@ sphinxcontrib-jsmath
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
 numpy==1.22
-scipy>=1.2
+scipy==1.9
 pandas==1.4
-matplotlib
+matplotlib==3.5
 deeptime
 MDAnalysis==2.2
-scikit-learn
 cython
 biotite
 pensa==0.3.0

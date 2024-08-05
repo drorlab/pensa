@@ -35,6 +35,6 @@ If you publish about work for which PENSA was useful, please cite our preprint:
 
 The reference for the software implementation itself is the following:
 
-    Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity: *PENSA*. Zenodo, 2023. http://doi.org/10.5281/zenodo.4362136
+    Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity: *PENSA*. Zenodo, 2024. http://doi.org/10.5281/zenodo.4362136
 
 To get the citation and DOI for a particular version, see `Zenodo <https://zenodo.org/record/4362136>`_.

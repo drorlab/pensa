@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pensa',
-    version='0.3.0',
+    version='0.4.0',
     description='exploratory analysis and comparison of biomolecular conformational ensembles.',
     url='http://github.com/drorlab/pensa',
     author='Martin Voegele, Neil Thomson, Sang Truong, Jasper McAvity',
