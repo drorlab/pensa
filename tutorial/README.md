@@ -7,7 +7,7 @@ Here we explain in example notebooks how to use the library and the scripts in t
 
 ## Accessing the PENSA Library
 
-Make sure that the library is installed (as explained [here](https://github.com/drorlab/pensa#installation)).
+Make sure that the library is installed (as explained [here](https://pensa.readthedocs.io/en/latest/installation.html#conda-environment)).
 
 In your custom python script or Jupyter Notebook, import the PENSA methods via
 
@@ -19,13 +19,11 @@ Have a look at one of the example notebooks below that demonstrate the functiona
 
 This tutorial shows the usage of the scripts for the basic applications provided with this repository. 
 For each of the following four steps, a bash script runs the python script for an example system: the mu-opioid receptor, once in its apo form and once bound to the ligand BU72. We download the trajectories from GPCRmd.
-For users of the Sherlock cluster at Stanford, an alternative system is available (no download necessary): rhodopsin, once bound to arrestin-1 and once bound to Gi. Below, we go through the steps as invoked by these bash scripts to demonstrate how to use the python code.
+Below, we go through the steps as invoked by these bash scripts to demonstrate how to use the python code.
 
 The following assumes that you invoke the tutorial scripts from the folder ```tutorial``` in the PENSA repository. If this is not the case, you should adapt the file paths accordingly.
 
-Two notes for Sherlock users: 
-- It might be useful to copy the tutorial folder to ```$OAK``` and run the scripts from there. Storage in the home directories is quite limited.
-- You can skip the scripts ```0-``` and ```1-``` and start at ```1alt-``` instead. 
+    cd tutorial
 
 Preprocessing is necessary for all of the subsequent steps, which then are independent from one another.
 
@@ -34,11 +32,32 @@ Preprocessing is necessary for all of the subsequent steps, which then are indep
 For the MOR example, we use example data from [GPCRmd](https://submission.gpcrmd.org/home/).
 Skip this step if you do the rhodopsin example on Sherlock or if you have already downloaded this data.
 
-    python ~/pensa/scripts/get_tutorial_datasets.py -d "./mor-data"
+    bash 0-download.sh
+
+### Running the example scripts
+Now you can just run the ready-to-use scripts of this tutorial folder. If you are interested in the details, you can look at the descriptions below in the ```Manual tutorial``` section.
+
+ To do the preprocessing, just type:
+
+    bash 1-preprocessing-gpcrmd.sh
+
+ To do the comparison, just type:
+
+    bash 2-comparison-of-feature-distributions.sh
+
+ To do the PCA, just type:
+
+    bash 3-principal-component-analysis.sh
+
+ To do the clustering, just type:
+
+    bash 4-clustering.sh
+
+## Manual tutorial
+Here, we explain every single step we do in the bash scripts and provide the commands to run them seperately in the terminal.
 
 ### Preprocessing
-
-To work with the protein coordinates, we first need to extract them from the simulation, i.e., remove the solvent, lipids etc. and write them in the .xtc format that the internal featurization understands. This is the hardest part but you usually only have to do it once and can then play with your data. Preprocessing can handle many common trajectory formats (as it is based on MDAnalysis) but the internal featurization (based on PyEMMA) is a bit more restrictive. 
+To work with the protein coordinates, we first need to extract them from the simulation, i.e., remove the solvent, lipids etc. and write them in the .xtc format that the internal featurization understands. This is the hardest part but you usually only have to do it once and can then play with your data. Preprocessing can handle many common trajectory formats (as it is based on MDAnalysis) but the internal featurization (based on PyEMMA) is a bit more restrictive.
 
 We start by defining the trajectory files of the simulations that we want to compare:
 
@@ -205,7 +224,7 @@ To detect major states of a structural ensemble, PENSA can calculate clusters of
         --write_num_clusters 2
 
 The clustering script, as invoked above, performs the following tasks:
- - It plots the number of frames from each simulation in each cluster. The number of clusters in which to divide the ensemble is determined via ```--write_num_clusters```). 
+ - It plots the number of frames from each simulation in each cluster. The number of clusters in which to divide the ensemble is determined via ```--write_num_clusters```. 
  - It sorts the frames from each simulation into their corresponding cluster. The bases of the corresponding filenames are given via ```out_frames_a```, and ```out_frames_b```, respectively.
  - It calculates the With-In-Sum-Of-Squares (WSS) for different numbers of clusters (the maximum number provided via ```--max_num_clusters```) and plots the result. This plot can be used to determine the optimal number of clusters.
  
