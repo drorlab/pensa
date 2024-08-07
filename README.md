@@ -54,7 +54,7 @@ arXiv:2212.02714 [q-bio.BM] 2022
 Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity
 
 #### Beta-Testers
-Alexander Powers, Lukas Stelzl, Nicole Ong, Eleanore Ocana, Emma Andrick, Callum Ives, and Bu Tran
+Alexander Powers, Lukas Stelzl, Nicole Ong, Eleanore Ocana, Emma Andrick, Callum Ives, Bu Tran, and Luca Morlok
 
 #### Funding & Support 
 This project was started by Martin Vögele at Stanford University, supported by an EMBO long-term fellowship (ALTF 235-2019), as part of the INCITE computing project 'Enabling the Design of Drugs that Achieve Good Effects Without Bad Ones' (BIP152). Neil Thomson was supported by a BBSRC EASTBIO PhD studentship and Jasper McAvity by the Stanford Computer Science department via the CURIS program. Stanford University, the Stanford Research Computing Facility, and the University of Dundee provided additional computational resources and support that contributed to these research results.
