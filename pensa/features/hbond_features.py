@@ -483,7 +483,7 @@ def read_water_site_h_bonds_quickly(structure_input, xtc_input, atomgroups, site
         else:
             g = Grid(grid_input)
     elif grid_input is None:
-        g = generate_grid(u, atomgroups)
+        g = generate_grid(u, atomgroups[0])
     else:
         g = Grid(grid_input)
 
