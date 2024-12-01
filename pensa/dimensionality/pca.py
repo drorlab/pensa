@@ -66,8 +66,9 @@ def pca_features(tica, features, num, threshold, plot_file=None, add_labels=Fals
 
 def project_on_pc(data, ev_idx, pca=None, dim=-1):
     """
-    Projects a trajectory onto an eigenvector of its PCA.
-
+    Projects a trajectory onto an eigenvector of its PCA, i.e., calculates the value along this component at each step of the trajectory (retains the order of the trajectory).
+    Note that the eigenvector is indexed starting from zero.
+    
     Parameters
     ----------
         data : float array
@@ -136,7 +137,8 @@ def get_components_pca(data, num, pca=None, prefix=''):
 
 def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame=0):
     """
-    Sort a trajectory along principal components.
+    Sort a trajectory along principal components. 
+    For each of the num_pc specified components, return a trajectory in which the frames are ordered by their value along the respective components.
 
     Parameters
     ----------
@@ -181,6 +183,7 @@ def sort_traj_along_pc(data, top, trj, out_name, pca=None, num_pc=3, start_frame
 def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_name, num_pc=3, start_frame=0):
     """
     Sort two trajectories along their most important common principal components.
+    For each of the num_pc specified components, return a trajectory in which the frames from both original trajectories are ordered by their value along the respective components.
 
     Parameters
     ----------
@@ -225,7 +228,8 @@ def sort_trajs_along_common_pc(data_a, data_b, top_a, top_b, trj_a, trj_b, out_n
 def sort_mult_trajs_along_common_pc(data, top, trj, out_name, num_pc=3, start_frame=0):
     """
     Sort multiple trajectories along their most important common principal components.
-
+    For each of the num_pc specified components, return a trajectory in which the frames from all original trajectories are ordered by their value along the respective components.
+    
     Parameters
     ----------
         data : list of float arrays
