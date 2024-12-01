@@ -87,6 +87,19 @@ distance per residue in the "B factor" field of a PDB file.
         y_label='max. JS dist. of BB torsions'
     )
 
+
+.. image:: images/JSD_pdb.png
+   :height: 300px
+   :align: center
+   :alt: JSD pbd b-factor visualisaton file.
+
+
+.. image:: images/sc-jsd.png
+   :height: 300px
+   :align: center
+   :alt: Jensen-Shannon Distance PDF output.
+
+
 Let's now save the resulting data in CSV files.
 
 .. code:: python
@@ -159,6 +172,18 @@ We can plot the results in the same way as we did for the backbone analysis.
     )   
 
 
+.. image:: images/SSI_pdb.png
+   :height: 300px
+   :align: center
+   :alt: SSI pbd b-factor visualisaton file.
+
+.. image:: images/sc-ssi.png
+   :height: 300px
+   :align: center
+   :alt: State-Specific Information PDF output.
+
+
+
 Comparing Distances
 -------------------
 
@@ -194,3 +219,11 @@ divergence, Kolmogorov-Smirnov statistic etc. instead).
         names_bbdist, jsd_bbdist, "plots/receptor_jsd-bbdist.pdf",
         vmin = 0.0, vmax = 1.0, cbar_label='JSD'
     )
+
+
+
+.. image:: images/bb-dists.png
+   :height: 300px
+   :align: center
+   :alt: JSD distances pbf plot.
+

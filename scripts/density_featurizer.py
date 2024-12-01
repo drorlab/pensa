@@ -22,45 +22,43 @@ Options include:
 
  """
 
-struc = "mor-data/11426_dyn_151.pdb"
-xtc = "mor-data/11423_trj_151.xtc"
-water_feat, water_data = read_water_features(
-    structure_input=struc,
-    xtc_input=xtc,
-    top_waters=1,
-    atomgroup="OH2",
-    write=True,
-    write_grid_as="TIP3P",
-    out_name="11426_dyn_151"
-)
+# struc = "mor-data/11426_dyn_151.pdb"
+# xtc = "mor-data/11423_trj_151.xtc"
+# water_feat, water_data = read_water_features(
+#     structure_input=struc,
+#     xtc_input=xtc,
+#     top_waters=1,
+#     atomgroup="OH2",
+#     write_grid_as="TIP3P",
+#     out_name="11426_dyn_151"
+# )
 
 
-# We can use the get_atom_features, which provides the same
-# functionality but ignores orientations as atoms are considered spherically symmetric.
+# # We can use the get_atom_features, which provides the same
+# # functionality but ignores orientations as atoms are considered spherically symmetric.
 
-struc = "mor-data/11426_dyn_151.pdb"
+# struc = "mor-data/11426_dyn_151.pdb"
 
-xtc = "mor-data/11423_trj_151.xtc"
+# xtc = "mor-data/11423_trj_151.xtc"
 
-# Here we locate the sodium site which has the highest probability
-# The density grid is written (write=True) using the default density conversion "Angstrom^{-3}" in MDAnalysis
+# # Here we locate the sodium site which has the highest probability
+# # The density grid is written (write=True) using the default density conversion "Angstrom^{-3}" in MDAnalysis
 
-atom_feat, atom_data = read_atom_features(
-    structure_input=struc,
-    xtc_input=xtc,
-    top_atoms=1,
-    atomgroup="SOD",
-    element="Na",
-    write=True,
-    out_name="11426_dyn_151"
-)
+# atom_feat, atom_data = read_atom_features(
+#     structure_input=struc,
+#     xtc_input=xtc,
+#     top_atoms=1,
+#     atomgroup="SOD",
+#     element="Na",
+#     out_name="11426_dyn_151"
+# )
 
 
 # If we have already obtained the grid, we can speed up featurization by reading it in.
 
 struc = "mor-data/11426_dyn_151.pdb"
 xtc = "mor-data/11423_trj_151.xtc"
-grid = "dens/11426_dyn_151OH2_density.dx"
+grid = "11426_dyn_151_OH2_density.dx"
 water_feat, water_data = read_water_features(
     structure_input=struc,
     xtc_input=xtc,
