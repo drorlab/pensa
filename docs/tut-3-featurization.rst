@@ -9,6 +9,12 @@ Note that all reader functions load the names of the features and
 their values separately.
 
 
+.. image:: images/Torsions.jpg
+   :height: 300px
+   :align: center
+   :alt: Torsion angles.
+
+
 Basic Example
 *************
 
@@ -133,6 +139,12 @@ molecules occupy that are of interest. Water pocket featurization extracts
 a distribution that represents whether or not a specific protein cavity is occupied 
 by a water molecule, and what that water molecule's orientation (polarisation) is. 
 
+
+.. image:: images/WaterFeatures.jpg
+   :width: 300px
+   :align: center
+   :alt: Water features derived from density. 
+
 .. code:: python
 
     from pensa.features import read_water_features
@@ -140,7 +152,7 @@ by a water molecule, and what that water molecule's orientation (polarisation) i
 For the pdb visualisation, the trajectory needs to be fit to the first frame of the simulation
 so that the density and protein align with each other.
 
-Here we featurize the top 3 most probable water sites (top_waters = 3).
+Here we featurize the top 2 most probable water sites (top_waters = 2).
 Orientation of the waters (water_data - spherical coordinates [radians]) is a 
 timeseries distribution. When water is not present at the site, the orientation 
 is recorded as 10000.0 to represent an empty state. If write=True, we can 
@@ -161,7 +173,7 @@ water
     water_feat, water_data = read_water_features(
         structure_input = struc, 
         xtc_input = xtc,
-        top_waters = 1,
+        top_waters = 2,
         atomgroup = "OH2",
         write = True,
         write_grid_as="TIP3P",
@@ -176,11 +188,11 @@ This way, sites are the same across both ensembles and can be compared.
 
     struc = "traj/condition-a_water.gro"
     xtc = "traj/condition-a_water_aligned.xtc"
-    grid = "traj/water_grid_ab_OH2_density.dx"
+    grid = "ab_grid_OH2_density.dx"
     water_feat, water_data = read_water_features(
         structure_input = struc,
         xtc_input = xtc,
-        top_waters = 5,
+        top_waters = 2,
         atomgroup = "OH2",
         grid_input = grid
     )
@@ -206,7 +218,7 @@ written (write=True) using the default density conversion "Angstrom^{-3}" in MDA
     atom_feat, atom_data = read_atom_features(
         structure_input = struc,
         xtc_input = xtc,
-        top_atoms = 1,
+        top_atoms = 2,
         atomgroup = "SOD",
         element = "Na",
         write = True,

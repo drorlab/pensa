@@ -169,6 +169,10 @@ relatively rigid with sites that are spatially static, for example internal
 water cavities in membrane proteins. Here we demonstrate the preprocessing for 
 water density, however the same procedure would be used for ions.   
 
+.. image:: images/Density.png
+   :height: 300px
+   :align: center
+   :alt: Density of protein
 
 Files and Directories
 ---------------------
@@ -236,7 +240,7 @@ This helps us avoid memory errors with large python arrays.
         out_name_water_a+".gro", out_name_water_a+"_aligned.xtc",
         out_name_water_b+".gro", out_name_water_b+".xtc",
         atomgroup="OH2", write_grid_as="TIP3P",
-        out_name="traj/water_grid_ab_",
+        out_name="ab_grid_",
         use_memmap=True, memmap='traj/combined.mymemmap'
     )
                           

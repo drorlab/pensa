@@ -199,6 +199,14 @@ We now perform the actual clustering on the combined data.
     )
     cidx, cond, oidx, wss, centroids = cc
 
+
+
+
+.. image:: images/bb-clusts.png
+   :height: 300px
+   :align: center
+   :alt: BB torsion cluster pbf plot.
+
 ... and save the results to a CSV file.
 
 .. code:: python
