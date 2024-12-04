@@ -22,7 +22,7 @@ For example, we can read protein backbone torsions.
 
 .. code:: python
 
-    from pensa.features import read_protein_backbone_torsions
+    from pensa.features import *
 
     bbtors_feat, bbtors_data = read_protein_backbone_torsions(
         "traj/condition-a_receptor.gro", "traj/condition-a_receptor.xtc",
@@ -72,7 +72,7 @@ It was modeled after the feature loader in PyEMMA.
 
 .. code:: python
 
-    from pensa.features import read_structure_features
+    from pensa.features import *
 
 
 .. code:: python
@@ -147,7 +147,7 @@ by a water molecule, and what that water molecule's orientation (polarisation) i
 
 .. code:: python
 
-    from pensa.features import read_water_features
+    from pensa.features import *
 
 For the pdb visualisation, the trajectory needs to be fit to the first frame of the simulation
 so that the density and protein align with each other.
@@ -155,9 +155,9 @@ so that the density and protein align with each other.
 Here we featurize the top 2 most probable water sites (top_waters = 2).
 Orientation of the waters (water_data - spherical coordinates [radians]) is a 
 timeseries distribution. When water is not present at the site, the orientation 
-is recorded as 10000.0 to represent an empty state. If write=True, we can 
-visualise the pocket occupancies on the reference structure in a pdb file with 
-pocket occupancy saved as b_factors. 
+is recorded as 10000.0 to represent an empty state. By specifying an name 
+to write data out with in the argument - out_name, we can visualise the pocket 
+occupancies on the reference structure in a pdb file with pocket occupancy saved as b_factors. 
 
 You must specify the water model for writing out the grid.
 options include:
@@ -169,13 +169,12 @@ water
 .. code:: python
     
     struc = "traj/condition-a_water.gro"
-    xtc = "traj/condition-a_water.gro"
+    xtc = "traj/condition-a_water_aligned.xtc"
     water_feat, water_data = read_water_features(
         structure_input = struc, 
         xtc_input = xtc,
         top_waters = 2,
         atomgroup = "OH2",
-        write = True,
         write_grid_as="TIP3P",
         out_name = "features/11426_dyn_151_water"
     )
@@ -206,7 +205,7 @@ but ignores orientations as atoms are considered spherically symmetric.
 
 .. code:: python
 
-    from pensa.features import read_atom_features
+    from pensa.features import *
 
 Here we locate the sodium site which has the highest probability. The density is 
 written (write=True) using the default density conversion "Angstrom^{-3}" in MDAnalysis.
@@ -218,10 +217,9 @@ written (write=True) using the default density conversion "Angstrom^{-3}" in MDA
     atom_feat, atom_data = read_atom_features(
         structure_input = struc,
         xtc_input = xtc,
-        top_atoms = 2,
+        top_atoms = 1,
         atomgroup = "SOD",
         element = "Na",
-        write = True,
         out_name = "features/11426_dyn_151_sodium"
     )
                                             

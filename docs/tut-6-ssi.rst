@@ -20,17 +20,9 @@ Features and States
 
     import os
     import numpy as np
-    from pensa.features import \
-        read_structure_features, \
-        read_water_features, \
-        get_multivar_res, \
-        sort_features
-    from pensa.statesinfo import \
-        get_discrete_states
-    from pensa.comparison import \
-        ssi_ensemble_analysis, \
-        ssi_feature_analysis, \
-        cossi_featens_analysis
+    from pensa.features import *
+    from pensa.statesinfo import *
+    from pensa.comparison import *
 
 First, load the structural features as described in the previous tutorial:
 
@@ -75,7 +67,7 @@ the preprocessing tutorial.
 
 .. code:: python
 
-    grid = "traj/water_grid_ab_OH2_density.dx"
+    grid = "ab_grid_OH2_density.dx"
     water_feat_a, water_data_a = read_water_features(
         "traj/condition-a_water.gro", "traj/condition-a_water_aligned.xtc",
         top_waters = 5, atomgroup = "OH2", grid_input = grid

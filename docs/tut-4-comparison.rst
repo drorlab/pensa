@@ -8,12 +8,9 @@ First we import the necessary modules.
 
 .. code:: python
 
-    from pensa.comparison import \
-        relative_entropy_analysis, ssi_ensemble_analysis, \
-        residue_visualization, distances_visualization
-    from pensa.features import read_structure_features, \
-        sort_features, get_multivar_res
-    from pensa.statesinfo import get_discrete_states
+    from pensa.comparison import *
+    from pensa.features import *
+    from pensa.statesinfo import *
     import numpy as np
 
 

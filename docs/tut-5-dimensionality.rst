@@ -19,14 +19,10 @@ First we import the necessary modules and functions.
 
 .. code:: python
     
-    from pensa.features import read_structure_features
-    from pensa.dimensionality import \
-        calculate_pca, get_components_pca, pca_eigenvalues_plot, \
-        compare_projections, sort_trajs_along_common_pc, sort_traj_along_pc
-    from pensa.comparison import pca_feature_correlation
-    from pensa.clusters import \
-        obtain_clusters, wss_over_number_of_clusters, write_cluster_traj, \
-        obtain_combined_clusters, wss_over_number_of_combined_clusters
+    from pensa.features import *
+    from pensa.dimensionality import *
+    from pensa.comparison import *
+    from pensa.clusters import *
     import numpy as np
 
 
