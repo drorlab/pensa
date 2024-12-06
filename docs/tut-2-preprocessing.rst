@@ -141,9 +141,17 @@ can use the ``_combined`` version of the extraction function:
 ``extract_coordinates_combined()``. It takes lists as arguments for the
 topology files, too. To use the same selection, “multiply” a list of one
 string, as demonstrated below. For this to work, the two selections need
-to have the exactly same atoms.
+to have the exactly same atoms, so we mak a new selection below removing the additional hydrogen in simulation B.
 
 .. code:: python
+    # # Residue numbers (same in both simulations)
+    resnums = "76:98 105:133 138:173 182:208 226:264 270:308 315:354"
+    # # Generate the selection strings
+    sel_string_a = "not name HD2 and protein and resnum "+resnums
+    print('Selection A:\n', sel_string_a, '\n')
+    sel_string_b = "not name HD2 and protein and resnum "+resnums
+    print('Selection B:\n', sel_string_b, '\n')
+
 
     all_refs = [ref_file_a]*3 + [ref_file_b]*3
     all_trjs = trj_file_a + trj_file_b
@@ -185,6 +193,8 @@ including the entire solvent for featurization, and generate the individual
 densities from a smaller selection.
 
 .. code:: python
+
+    from pensa.preprocessing import *
 
     # Base for the selection string for protein and all waters (OH2)
     sel_base_water = "protein or byres name OH2"
