@@ -34,11 +34,23 @@ Relative Entropy
 ----------------
 
 Here we compare the two ensembles using measures for the relative
-entropy.
+entropy. To anser the question "How different are the two distributions 
+of each feature?" PENSA provides discrete implementations of the 
+Jensen-Shannon distance and the Kullback-Leibler divergences 
+(both from distribution A to distribution B and from distribution B to 
+distribution A, which are not identical). Their sensitivity can be 
+adjusted via the number/spacing of the bins. This type of analysis 
+works well with large datasets, for which even a fine spacing leaves 
+enough samples in each relevant bin.
 
 You can as well calculate the Kolmogorov-Smirnov metric and the
 corresponding p value using the function
 ``kolmogorov_smirnov_analysis()``.
+In contrast to the binned JSD and KLD, the KS statistic is by design 
+discrete and parameter-free. It is more suitable for small datasets, 
+since its usual purpose is hypothesis testing and the comparison of 
+empirical distributions. It tries to answer the question “Are the samples 
+from different distributions?”
 
 Another possibility is to compare only the means and standard deviations
 of the distributions using ``mean_difference_analysis()``.
