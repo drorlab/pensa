@@ -52,12 +52,6 @@
 - [ ] Implement [Non-Negative Matrix Factorization](https://onlinelibrary.wiley.com/doi/10.1002/env.3170050203).
 
 ### Done  ✓
-- [x] Colab Tutorial
-  - [x] Put Notebook on Colab and get it to run.
-  - [x] Add visualizations.
-  - [x] Fix installation via pip.
-  - [x] Fix animations (they only show white canvas).
-  - [x] Add TICA to Colab tutorial.
 - [x] Include TICA in unit tests
 - [x] Write "getting started" for documentation
 - [x] Refactoring and fixes for release 0.2
@@ -86,6 +80,7 @@
   - [x] SSI
 
 ### Abandoned
+- [x] Colab Tutorial
 - [ ] Frame classification via CNN on features
   - [x] Prototype to classify simulation frames --> Diffnets probably more powerful.
   - [ ] Interpret weights as relevance of features
