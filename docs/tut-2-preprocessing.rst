@@ -144,6 +144,7 @@ string, as demonstrated below. For this to work, the two selections need
 to have the exactly same atoms, so we mak a new selection below removing the additional hydrogen in simulation B.
 
 .. code:: python
+
     # # Residue numbers (same in both simulations)
     resnums = "76:98 105:133 138:173 182:208 226:264 270:308 315:354"
     # # Generate the selection strings

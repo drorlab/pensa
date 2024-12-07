@@ -6,26 +6,10 @@ pensa.dimensionality
    :undoc-members:
    :show-inheritance:
 
-pensa.dimensionality.lda
--------------------------------
-
-.. automodule:: pensa.dimensionality.lda
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pensa.dimensionality.pca
 -------------------------------
 
 .. automodule:: pensa.dimensionality.pca
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pensa.dimensionality.qda
--------------------------------
-
-.. automodule:: pensa.dimensionality.qda
    :members:
    :undoc-members:
    :show-inheritance:
