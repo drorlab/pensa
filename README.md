@@ -10,7 +10,7 @@ Status](https://readthedocs.org/projects/pensa/badge/?version=latest)](http://pe
 A collection of Python methods for exploratory analysis and comparison of biomolecular conformational ensembles, e.g., from molecular dynamics simulations.
 All functionality is available as a Python package.  
 
-To get started, see the [__documentation__](https://pensa.readthedocs.io/en/latest/) which includes a tutorial for the PENSA library, or read our [__preprint__](https://arxiv.org/abs/2212.02714).
+To get started, see the [__documentation__](https://pensa.readthedocs.io/en/latest/) which includes a tutorial for the PENSA library, or read our [__article__](https://doi.org/10.1063/5.0235544) or the corresponding [__preprint__](https://arxiv.org/abs/2212.02714).
 
 If you would like to contribute, check out our [__contribution guidelines__](https://github.com/drorlab/pensa/blob/master/CONTRIBUTING.md) and our [__to-do list__](https://github.com/drorlab/pensa/blob/master/TODO.md).
 
@@ -40,12 +40,13 @@ Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity. (2021). PENSA. Zenodo
 ```
 To get the citation and DOI for a particular version, see [Zenodo](https://zenodo.org/record/4362136).
 
-Please also consider citing our our [preprint](https://arxiv.org/abs/2212.02714):
+Please also consider citing our our [article](https://doi.org/10.1063/5.0235544):
 ```
 Systematic Analysis of Biomolecular Conformational Ensembles with PENSA
 M. Vögele, N. J. Thomson, S. T. Truong, J. McAvity, U. Zachariae, R. O. Dror
-arXiv:2212.02714 [q-bio.BM] 2022
+J. Chem. Phys. 162, 014101 (2025)
 ```
+If you lack a JCP subscription, you can read the corresponding [preprint](https://arxiv.org/abs/2212.02714).
 
 
 ## Acknowledgments
