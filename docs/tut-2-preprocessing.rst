@@ -7,7 +7,7 @@ Preprocessing
     import os
     from pensa.preprocessing import load_selection, \
         extract_coordinates, extract_coordinates_combined, \
-        extract_aligned_coords, extract_combined_grid
+        extract_aligned_coordinates, extract_combined_grid
 
 
 Coordinates
