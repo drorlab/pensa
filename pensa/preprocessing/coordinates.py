@@ -18,8 +18,8 @@ def extract_coordinates(top, pdb, trj_list, out_name, sel_string, start_frame=0,
             Can read all MDAnalysis-compatible topology formats.
         pdb : str
             File name for the reference PDB file.
-        trj_list : list of str
-            File names for the input trajectory.
+        trj_list : str or list of str
+            File name(s) for the input trajectory.
             Can read all MDAnalysis-compatible trajectory formats.
         out_name : str
             Core of the file names for the output files.
@@ -29,6 +29,9 @@ def extract_coordinates(top, pdb, trj_list, out_name, sel_string, start_frame=0,
             First frame to read from the trajectory.
 
     """
+    # Convert the trajectory input to a list if it is a single string
+    if type(trj_list) is str:
+        trj_list = [trj_list]
     # Read the topology+PDB files and extract selected parts.
     u = mda.Universe(top, pdb)
     u.residues.resids -= residues_offset

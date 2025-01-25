@@ -100,14 +100,17 @@ class Test_pensa(unittest.TestCase):
         )
 
         # Extract the coordinates of the TM region from the trajectory
+        # - Test using a single trajectory directly
         self.file_tm_single_a = extract_coordinates(
-            self.ref_file_a, self.pdb_file_a, [self.trj_file_a],
+            self.ref_file_a, self.pdb_file_a, self.trj_file_a,
             self.trj_name_a + "_tm", sel_string_a
         )
+        # - Test using a single trajectory as a list
         self.file_tm_single_b = extract_coordinates(
             self.ref_file_b, self.pdb_file_b, [self.trj_file_b],
             self.trj_name_b + "_tm", sel_string_b
         )
+        # - Test using multiple trajectories
         self.file_tm_combined = extract_coordinates_combined(
             [self.ref_file_a] * 3 + [self.ref_file_b] * 3,
             self.trj_file_a + self.trj_file_b,
