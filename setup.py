@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pensa',
-    version='0.5.0',
+    version='0.6.0',
     description='exploratory analysis and comparison of biomolecular conformational ensembles.',
     url='http://github.com/drorlab/pensa',
     author='Martin Voegele, Neil Thomson, Sang Truong, Jasper McAvity',
@@ -21,12 +21,12 @@ setup(
     ),
     zip_safe=False,
     install_requires=[
-        'numpy==1.22', # density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
-        'scipy==1.9',
-        'pandas==1.4',
-        'matplotlib==3.5',
+        'numpy>=1.23', # density functions in MDAnalysis 2 use np.histogramdd() with keyword normed which is deprecated in numpy 1.21 and removed in numpy 1.24
+        'scipy>=1.15',
+        'pandas>=2.2',
+        'matplotlib>=3.9',
         'deeptime',
-        'MDAnalysis==2.2', # some features we use will likely be removed in MDA 3
+        'MDAnalysis==2.8', # some features we use will likely be removed in MDA 3
         'biotite',
         'gpcrmining',
     ],

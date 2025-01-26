@@ -10,19 +10,19 @@ Preprocessing
         extract_aligned_coordinates, extract_combined_grid
 
 
-Coordinates
-***********
+To work with the biomolecule's coordinates, it is often easier to first extract 
+them from the simulation, i.e., remove the solvent, lipids etc. If you would like 
+to calculate water or ion features, you need to calculate the corresponding density.
+This kind of preprocessing steps can be cumbersome but you usually only do it 
+once and can then play with your data.
 
-To work with the biomolecule's coordinates, we first need to extract them from
-the simulation, i.e., remove the solvent, lipids etc. This is the hardest part 
-but you usually only have to do it once and can then play with your data. 
-Preprocessing can handle many common trajectory formats as it is based on 
-MDAnalysis. You can start by using the scripts provided in the PENSA repository. 
-Once you know how PENSA works, you can write your own scripts.
+Based on MDAnalysis, PENSA's preprocessing functions can handle many common formats
+of molecular simulation trajectories. You can start by using the scripts provided 
+in the PENSA repository. Once you know how PENSA works, you can write your own scripts.
 
 
 Files and Directories
----------------------
+**********************
 
 In the following, we define the necessary files. For each simulation, we
 need a reference file (.psf for AMBER), a PDB file, and the trajetory.
@@ -71,8 +71,8 @@ will generate.
             os.makedirs(subdir)
 
 
-Extracting Coordinates
-----------------------
+Coordinates
+***********
 
 We have to ensure that from both simulations, we use the exact same
 parts of the receptor for the analysis. Often, this will be easy and you
@@ -91,14 +91,24 @@ In the first case, we will extract all protein residues, assuming
     extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_receptor", sel_base_a)
     extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_receptor", sel_base_b)
 
-In many cases, you probably have several runs of the same simulation
-that you want to combine to one structural ensemble. This is why the
-trajectory argument takes a list as arguments, e.g.
+In some cases, you may have only one trajectory while in others, 
+you may have several runs of the same simulation that you want 
+to combine to one structural ensemble. 
+This is why the trajectory argument can be either a single string
 
 .. code:: python
 
     extract_coordinates(
-        'system.psf', 'system.pdb', ['run1.nc','run2.nc','run3.nc'], 
+        'system.psf', 'system.pdb', 'run1.nc', 
+        'receptor', 'protein', start_frame=1000
+    )
+
+... or a list of strings.
+
+.. code:: python
+
+    extract_coordinates(
+        'system.psf', 'system.pdb', ['run1.nc','run2.nc','run3.nc'],
         'receptor', 'protein', start_frame=1000
     )
                                 
@@ -129,8 +139,8 @@ Here, we use selections based on the definitions of transmembrane helices in the
     sel_string_b = "protein and resnum "+resnums
     print('Selection B:\n', sel_string_b, '\n')
     # Extract the coordinates of the transmembrane region from the trajectory
-    extract_coordinates(ref_file_a, pdb_file_a, [trj_file_a], out_name_a+"_tm", sel_string_a)
-    extract_coordinates(ref_file_b, pdb_file_b, [trj_file_b], out_name_b+"_tm", sel_string_b)
+    extract_coordinates(ref_file_a, pdb_file_a, trj_file_a, out_name_a+"_tm", sel_string_a)
+    extract_coordinates(ref_file_b, pdb_file_b, trj_file_b, out_name_b+"_tm", sel_string_b)
 
 
 Loading from Multiple Simulations

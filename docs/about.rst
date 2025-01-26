@@ -27,14 +27,14 @@ All functionality is available as a python package.
 Citation
 ********
 
-If you publish about work for which PENSA was useful, please cite our preprint:
+If you publish about work for which PENSA was useful, please cite our publication:
 
-    M. Vögele, N. J. Thomson, S. T. Truong, J. McAvity, U. Zachariae, R. O. Dror:
-    *Systematic Analysis of Biomolecular Conformational Ensembles with PENSA*.
-    `arXiv:2212.02714 [q-bio.BM] 2022 <https://arxiv.org/abs/2212.02714>`_.
+    M. Vögele, N. J. Thomson, S. T. Truong, J. McAvity, U. Zachariae, R. O. Dror: 
+    *Systematic analysis of biomolecular conformational ensembles with PENSA*. 
+    `J. Chem. Phys. 162, 014101 (2025) <https://doi.org/10.1063/5.0235544>`_.
 
 The reference for the software implementation itself is the following:
 
-    Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity: *PENSA*. Zenodo, 2024. http://doi.org/10.5281/zenodo.4362136
+    Martin Vögele, Neil Thomson, Sang Truong, Jasper McAvity: *PENSA*. Zenodo, 2025. http://doi.org/10.5281/zenodo.4362136
 
 To get the citation and DOI for a particular version, see `Zenodo <https://zenodo.org/record/4362136>`_.

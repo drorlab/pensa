@@ -1,13 +1,14 @@
-name: pensa
+name: pensa_py312
 channels:
   - conda-forge
   - defaults
 dependencies: 
-  - python==3.9
-  - scipy==1.9
-  - numpy==1.22
-  - pandas==1.4
-  - matplotlib==3.5
-  - MDAnalysis==2.2
+  - python==3.12
+  - scipy
+  - numpy
+  - pandas
+  - matplotlib
+  - MDAnalysis==2.8
   - deeptime
   - biotite
+  - pip==24
