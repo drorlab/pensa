@@ -37,7 +37,7 @@ dependencies = [
     "biotite",
     "gpcrmining",
 ]
-requires-python = "3.10"
+requires-python = "==3.10"
 
 [project.urls]
 Documentation = "https://pensa.readthedocs.io/en/latest/"
