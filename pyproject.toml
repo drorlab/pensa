@@ -33,11 +33,11 @@ dependencies = [
     "pandas",
     "matplotlib",
     "deeptime",
-    "MDAnalysis=2.8",
+    "MDAnalysis==2.8",
     "biotite",
     "gpcrmining",
 ]
-requires-python = "=3.10"
+requires-python = "==3.10.*"
 
 [project.urls]
 Documentation = "https://pensa.readthedocs.io/en/latest/"
