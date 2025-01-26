@@ -43,6 +43,10 @@ requires-python = "==3.10.*"
 Documentation = "https://pensa.readthedocs.io/en/latest/"
 Source = "http://github.com/drorlab/pensa"
 
+[metadata]
+# Include the license file in the wheel.
+license_files = ["LICENSE"]
+
 [tool.setuptools.packages.find]
 include = [
     "pensa",
@@ -53,6 +57,7 @@ include = [
     "pensa.clusters",
     "pensa.statesinfo"
 ]
+
 
 
 
