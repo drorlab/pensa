@@ -1,4 +1,4 @@
-name: pensa_py312
+name: pensa
 channels:
   - conda-forge
   - defaults
