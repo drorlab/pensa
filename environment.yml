@@ -11,4 +11,4 @@ dependencies:
   - MDAnalysis==2.8
   - deeptime
   - biotite
-  - pip==24
+  - pip
