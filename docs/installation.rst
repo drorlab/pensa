@@ -16,6 +16,7 @@ If you want to use PENSA with Jupyter notebooks:
   .. code:: bash
 
     conda install jupyter
+    python -m ipykernel install --user --name=pensa
 
 Option 1: Install the PENSA library from PyPI
 """""""""""""""""""""""""""""""""""""""""""""
